@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: e24572253963491499b36b122689894b
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - m_UnderwaterShader: {fileID: 4800000, guid: af89b6037bc26e543acc085afa7f1add,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
