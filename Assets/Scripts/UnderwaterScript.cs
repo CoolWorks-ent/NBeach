@@ -5,7 +5,7 @@ using System.Collections;
 public class UnderwaterScript : MonoBehaviour {
 
 	public GameObject waterPlane;
-	bool isUnderwater;
+	public bool isUnderwater;
 	Color normalColor;
     //set in unity editor
 	public Color underwaterColor;

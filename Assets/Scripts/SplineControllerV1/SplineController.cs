@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public enum eOrientationMode { NODE = 0, TANGENT }
+public enum SplineState {Stopped, Loop, Reset, Paused, Resume, Active }
 
 [AddComponentMenu("Splines/Spline Controller")]
 [RequireComponent(typeof(SplineInterpolator))]
@@ -16,6 +17,7 @@ public class SplineController : MonoBehaviour
 	public bool AutoStart = true;
 	public bool AutoClose = true;
 	public bool HideOnExecute = true;
+    public string mSplineState;
 
 
 	SplineInterpolator mSplineInterp;
@@ -48,15 +50,31 @@ public class SplineController : MonoBehaviour
 	void Start()
 	{
 		mSplineInterp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
-
+        mSplineState = mSplineInterp.mSplineState;
 		mTransforms = GetTransforms();
 
 		if (HideOnExecute)
 			DisableTransforms();
 
-		if (AutoStart)
-			FollowSpline();
-	}
+        if (AutoStart)
+            FollowSpline();
+        else
+            mSplineInterp.mSplineState = "Paused";
+    }
+
+    public string sSplineState
+    {
+        get { return mSplineInterp.mSplineState; }
+        set { mSplineInterp.mSplineState = value; }
+    }
+
+    void Update()
+    {
+       if(sSplineState == "Start")
+        {
+            FollowSpline();
+        }
+    }
 
 	void SetupSplineInterpolator(SplineInterpolator interp, Transform[] trans)
 	{
@@ -134,6 +152,7 @@ public class SplineController : MonoBehaviour
 		{
 			SetupSplineInterpolator(mSplineInterp, mTransforms);
 			mSplineInterp.StartInterpolation(null, true, WrapMode);
+            mSplineInterp.mSplineState = "Active";
 		}
 	}
 }

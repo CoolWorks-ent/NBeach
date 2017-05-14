@@ -23,7 +23,9 @@ public class SplineInterpolator : MonoBehaviour
 
 	List<SplineNode> mNodes = new List<SplineNode>();
 	string mState = "";
-	bool mRotations;
+    //state of interpolation
+    string sState = "";
+    bool mRotations;
 
 	OnEndCallback mOnEndCallback;
 
@@ -33,6 +35,13 @@ public class SplineInterpolator : MonoBehaviour
 	{
 		Reset();
 	}
+
+    //set/get state of the spline interpolation
+    public string mSplineState
+    {
+        get{ return sState; }
+        set { sState = value; }
+    }
 
 	public void StartInterpolation(OnEndCallback endCallback, bool bRotations, eWrapMode mode)
 	{
@@ -139,6 +148,11 @@ public class SplineInterpolator : MonoBehaviour
 			return;
 
 		mCurrentTime += Time.deltaTime;
+        if(sState == "Paused")
+        {
+            //movement paused
+            Debug.Log("Spline paused");
+        }
 
 		// We advance to next point in the path
 		if (mCurrentTime >= mNodes[mCurrentIdx + 1].Time)
@@ -171,7 +185,7 @@ public class SplineInterpolator : MonoBehaviour
 			}
 		}
 
-		if (mState != "Stopped")
+		if ((mState != "Stopped" && sState != "Paused") || (sState == "Resume"))
 		{
 			// Calculates the t param between 0 and 1
 			float param = (mCurrentTime - mNodes[mCurrentIdx].Time) / (mNodes[mCurrentIdx + 1].Time - mNodes[mCurrentIdx].Time);
