@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour {
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
                 Debug.Log(rigidbody.velocity);
-                
+
 
                 //move player in direction facing
                 rigidbody.AddForce(transform.forward * swimSpeed);
@@ -167,5 +167,6 @@ public class PlayerController : MonoBehaviour {
             else
                 Debug.Log("rotation limit reached");
         }
+        else Debug.Log("player not moving");
     }
 }

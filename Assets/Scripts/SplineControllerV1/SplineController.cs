@@ -36,6 +36,7 @@ public class SplineController : MonoBehaviour
 		Vector3 prevPos = trans[0].position;
 		for (int c = 1; c <= 100; c++)
 		{
+            //get position of 1st and last spline node
             //Duration = Speed * Time.deltaTime;
 			float currTime = c * Duration / 100;
 			Vector3 currPos = interp.GetHermiteAtTime(currTime);
@@ -79,7 +80,9 @@ public class SplineController : MonoBehaviour
 	void SetupSplineInterpolator(SplineInterpolator interp, Transform[] trans)
 	{
 		interp.Reset();
-       // Duration = Speed * Time.deltaTime;
+        //get distance between first and last nodes of spline
+        float splineDistance = Vector3.Distance(interp.lastNode, interp.firstNode);
+        Duration = splineDistance/Speed;
 		float step = (AutoClose) ? Duration / trans.Length :
 			Duration / (trans.Length - 1);
 

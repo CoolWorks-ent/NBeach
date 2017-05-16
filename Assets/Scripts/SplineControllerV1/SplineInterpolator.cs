@@ -26,6 +26,7 @@ public class SplineInterpolator : MonoBehaviour
     //state of interpolation
     string sState = "";
     bool mRotations;
+    public Vector3 lastNode, firstNode;
 
 	OnEndCallback mOnEndCallback;
 
@@ -53,6 +54,9 @@ public class SplineInterpolator : MonoBehaviour
 		mOnEndCallback = endCallback;
 
 		SetInput();
+        //get first and last node of spline
+        firstNode = mNodes[0].Point;
+        lastNode = mNodes[mNodes.Count - 1].Point;
 	}
 
 	public void Reset()
@@ -170,6 +174,7 @@ public class SplineInterpolator : MonoBehaviour
 					// We stop right in the end point
 					transform.position = mNodes[mNodes.Count - 2].Point;
 
+                    //set rotation of object to same as SPlineNode
 					if (mRotations)
 						transform.rotation = mNodes[mNodes.Count - 2].Rot;
 
