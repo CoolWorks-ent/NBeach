@@ -89,7 +89,7 @@ public class UnderwaterScript : MonoBehaviour {
         RenderSettings.ambientLight = defaultLighting;
         RenderSettings.skybox = defaultSkybox;
         mainCamera.backgroundColor = normalColor;
-        
+
         //set skybox to show
         mainCamera.clearFlags = CameraClearFlags.Skybox;
         //set gravity and speed when player is underwater

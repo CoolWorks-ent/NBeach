@@ -75,7 +75,7 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
     }
 
     Ray ray = GetRay();
-    float dist = eventCamera.farClipPlane - eventCamera.nearClipPlane;
+    float dist = (eventCamera.farClipPlane - eventCamera.nearClipPlane)*0.2f;
     float radius = PointerRadius;
     RaycastHit[] hits;
 

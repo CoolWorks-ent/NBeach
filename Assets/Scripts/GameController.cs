@@ -7,11 +7,15 @@ public class GameController : MonoBehaviour {
     SplineController splineControl;
     [SerializeField]
     PlayerController playerControl;
+
+    SpriteRenderer blackOverlay;
+    float time = 0f;
     // Use this for initialization
     void Start () {
         //set default state to "paused"
         splineControl.sSplineState = "Paused";
-	}
+        blackOverlay = GameObject.Find("BlackOverlay").GetComponent<SpriteRenderer>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -40,7 +44,17 @@ public class GameController : MonoBehaviour {
 
     IEnumerator Level1Start()
     {
-        //set timer to show Title them begin spline
+        //set timer to show Title theme and begin spline
+        float screenFadeOutTime = 3f;
+        //open eyes
+        blackOverlay.color = Color.Lerp(blackOverlay.color, new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f), time);
+            //fade sign every second
+        if (time < 1)
+        {
+            time += Time.deltaTime / screenFadeOutTime;
+        }
+
+        //rotate player to face ocean
         yield return null;
     }
 }

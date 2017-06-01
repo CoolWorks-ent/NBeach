@@ -10,29 +10,32 @@ public class Rock : MonoBehaviour {
 
     public Material inactiveMaterial;
     public Material gazedAtMaterial;
-    [SerializeField]
-    private VRInteractiveItem m_InteractiveItem;
+    private GVRInteractiveItem m_InteractiveItem;
 
     void Start()
     {
         startingPosition = transform.localPosition;
-        SetGazedAt(false);
+        m_InteractiveItem = GetComponent<GVRInteractiveItem>();
+        m_InteractiveItem.OnOver += LookedAt;
+        m_InteractiveItem.OnOut += LookedAway;
     }
 
     private void OnEnable() { 
 
     }
 
-    public void SetGazedAt(bool gazedAt)
+    public void LookedAt()
     {
-        if (inactiveMaterial != null && gazedAtMaterial != null)
-        {
-            Debug.Log("rock looked at");
-            //if statement to determine which which material should be displayed when gazed/not gazed
-            GetComponent<MeshRenderer>().material = gazedAt ? gazedAtMaterial : inactiveMaterial;
-            return;
-        }
-        GetComponent<MeshRenderer>().material.color = gazedAt ? Color.green : Color.red;
+        Debug.Log("rock looked at");
+        //if statement to determine which which material should be displayed when gazed/not gazed
+        GetComponent<MeshRenderer>().material = gazedAtMaterial;
+        //GetComponent<MeshRenderer>().material.color = Color.green;
+    }
+
+    public void LookedAway()
+    {
+        GetComponent<MeshRenderer>().material =  inactiveMaterial;
+        //GetComponent<MeshRenderer>().material.color = Color.red;
     }
 
     public void Reset()

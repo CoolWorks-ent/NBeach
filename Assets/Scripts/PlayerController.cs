@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         /*DEBUG*/
-        //if "R" pressed, continue spline
+        //if "R" pressed, continue player mvmt
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (playerState == PlayerState.NOTMOVING)
@@ -157,7 +157,6 @@ public class PlayerController : MonoBehaviour {
 
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
-                Debug.Log(rigidbody.velocity);
 
 
                 //move player in direction facing
@@ -167,6 +166,7 @@ public class PlayerController : MonoBehaviour {
             else
                 Debug.Log("rotation limit reached");
         }
-        else Debug.Log("player not moving");
+        else { }
+            //Debug.Log("player not moving");
     }
 }

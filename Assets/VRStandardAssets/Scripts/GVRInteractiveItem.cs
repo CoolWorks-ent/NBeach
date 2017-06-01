@@ -9,7 +9,7 @@ namespace VRStandardAssets.Utils
     // that should react to input based on the user's gaze.
     // It contains events that can be subscribed to by classes that
     // need to know about input specifics to this gameobject.
-    public class VRInteractiveItem : MonoBehaviour
+    public class GVRInteractiveItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerUpHandler, IPointerDownHandler
     {
         public event Action OnOver;             // Called when the gaze moves over this object
         public event Action OnOut;              // Called when the gaze leaves this object
@@ -30,7 +30,7 @@ namespace VRStandardAssets.Utils
 
         // The below functions are called by the VREyeRaycaster when the appropriate input is detected.
         // They in turn call the appropriate events should they have subscribers.
-        public void Over()
+        public void OnPointerEnter(PointerEventData eventData)
         {
             m_IsOver = true;
 
@@ -39,7 +39,7 @@ namespace VRStandardAssets.Utils
         }
 
 
-        public void Out()
+        public void OnPointerExit(PointerEventData eventData)
         {
             m_IsOver = false;
 
@@ -48,7 +48,7 @@ namespace VRStandardAssets.Utils
         }
 
 
-        public void Click()
+        public void OnPointerClick(PointerEventData eventData)
         {
             if (OnClick != null)
                 OnClick();
@@ -62,14 +62,14 @@ namespace VRStandardAssets.Utils
         }
 
 
-        public void Up()
+        public void OnPointerUp(PointerEventData eventData)
         {
             if (OnUp != null)
                 OnUp();
         }
 
 
-        public void Down()
+        public void OnPointerDown(PointerEventData eventData)
         {
             if (OnDown != null)
                 OnDown();
