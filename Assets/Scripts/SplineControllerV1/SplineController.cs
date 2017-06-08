@@ -10,14 +10,15 @@ public enum SplineState {Stopped, Loop, Reset, Paused, Resume, Active }
 public class SplineController : MonoBehaviour
 {
 	public GameObject SplineRoot;
-	public float Duration = 10;
+    public static SplineController instance = null;
+    public float Duration = 10;
     public float Speed = 5;
 	public eOrientationMode OrientationMode = eOrientationMode.NODE;
 	public eWrapMode WrapMode = eWrapMode.ONCE;
 	public bool AutoStart = true;
 	public bool AutoClose = true;
 	public bool HideOnExecute = true;
-    public string mSplineState;
+    public SplineState mSplineState;
 
 
 	SplineInterpolator mSplineInterp;
@@ -47,33 +48,97 @@ public class SplineController : MonoBehaviour
 		}
 	}
 
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else if (instance != null)
+            Destroy(gameObject);
 
-	void Start()
-	{
-		mSplineInterp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
-        mSplineState = mSplineInterp.mSplineState;
-		mTransforms = GetTransforms();
+        mSplineInterp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
+        switch(mSplineInterp.mSplineState)
+        {
+            case "Active":
+                mSplineState = SplineState.Active;
+                break;
+            case "Loop":
+                mSplineState = SplineState.Loop;
+                break;
+            case "Paused":
+                mSplineState = SplineState.Paused;
+                break;
+            case "Stopped":
+                mSplineState = SplineState.Stopped;
+                break;
+            case "Resume":
+                mSplineState = SplineState.Resume;
+                break;
+            case "Reset":
+                mSplineState = SplineState.Reset;
+                break;
+            default: break;
+        }
+       
+        mTransforms = GetTransforms();
 
-		if (HideOnExecute)
-			DisableTransforms();
+        if (HideOnExecute)
+            DisableTransforms();
 
         if (AutoStart)
             FollowSpline();
         else
-            mSplineInterp.mSplineState = "Paused";
+            sSplineState = SplineState.Paused;
     }
 
-    public string sSplineState
+    
+	void Start()
+	{
+		
+    }
+
+    public SplineState sSplineState
     {
-        get { return mSplineInterp.mSplineState; }
-        set { mSplineInterp.mSplineState = value; }
+        get { return mSplineState; }
+        set {
+            if (value == SplineState.Active)
+            {
+                mSplineState = SplineState.Active;
+               // mSplineInterp.mSplineState = "Resume";
+            }
+            else if (value == SplineState.Loop)
+            {
+                mSplineState = SplineState.Loop;
+                mSplineInterp.mSplineState = "Loop";
+            }
+            else if (value == SplineState.Paused)
+            {
+                mSplineState = SplineState.Paused;
+                mSplineInterp.mSplineState = "Paused";
+            }
+            else if (value == SplineState.Reset)
+            {
+                mSplineState = SplineState.Reset;
+                mSplineInterp.mSplineState = "Reset";
+            }
+            else if (value == SplineState.Resume)
+            {
+                mSplineState = SplineState.Resume;
+                mSplineInterp.mSplineState = "Resume";
+            }
+            else if (value == SplineState.Stopped)
+            {
+                mSplineState = SplineState.Stopped;
+                mSplineInterp.mSplineState = "Stopped";
+            }
+        }
     }
 
     void Update()
     {
-       if(sSplineState == "Start")
+       if(sSplineState == SplineState.Resume)
         {
             FollowSpline();
+            sSplineState = SplineState.Active;
         }
     }
 
@@ -155,7 +220,7 @@ public class SplineController : MonoBehaviour
 		{
 			SetupSplineInterpolator(mSplineInterp, mTransforms);
 			mSplineInterp.StartInterpolation(null, true, WrapMode);
-            mSplineInterp.mSplineState = "Active";
+            mSplineInterp.mSplineState = "Resume";
 		}
 	}
 }

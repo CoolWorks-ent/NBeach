@@ -1,4 +1,4 @@
-// Copyright 2015 Google Inc. All rights reserved.
+// Copyright 2017 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// Draws a circular reticle in front of any object that the user points at.
 /// The circle dilates if the object is clickable.
@@ -54,12 +55,10 @@ public class GvrReticlePointerImpl : GvrBasePointer {
 
   public float ReticleOuterDiameter { get; private set; }
 
-  public override float MaxPointerDistance {
-    get {
-      return RETICLE_DISTANCE_MAX;
-    }
-  }
+  private Vector3 targetPoint = Vector3.zero;
+  public override Vector3 LineEndPoint { get { return targetPoint; } }
 
+  public override float MaxPointerDistance { get { return RETICLE_DISTANCE_MAX; } }
 
   public GvrReticlePointerImpl() {
     ReticleGrowthSpeed = 8.0f;
@@ -86,9 +85,9 @@ public class GvrReticlePointerImpl : GvrBasePointer {
   /// The targetObject is the object the user is pointing at.
   /// The intersectionPosition is where the ray intersected with the targetObject.
   /// The intersectionRay is the ray that was cast to determine the intersection.
-  public override void OnPointerEnter(GameObject targetObject, Vector3 intersectionPosition,
-     Ray intersectionRay, bool isInteractive) {
-    SetPointerTarget(intersectionPosition, isInteractive);
+  public override void OnPointerEnter(RaycastResult rayastResult, Ray ray,
+    bool isInteractive) {
+    SetPointerTarget(rayastResult.worldPosition, isInteractive);
   }
 
   /// Called every frame the user is still pointing at a valid GameObject. This
@@ -97,16 +96,16 @@ public class GvrReticlePointerImpl : GvrBasePointer {
   /// The targetObject is the object the user is pointing at.
   /// The intersectionPosition is where the ray intersected with the targetObject.
   /// The intersectionRay is the ray that was cast to determine the intersection.
-  public override void OnPointerHover(GameObject targetObject, Vector3 intersectionPosition,
-      Ray intersectionRay, bool isInteractive) {
-    SetPointerTarget(intersectionPosition, isInteractive);
+  public override void OnPointerHover(RaycastResult rayastResult, Ray ray,
+    bool isInteractive) {
+    SetPointerTarget(rayastResult.worldPosition, isInteractive);
   }
 
   /// Called when the user's look no longer intersects an object previously
   /// intersected with a ray projected from the camera.
   /// This is also called just before **OnInputModuleDisabled** and may have have any of
   /// the values set as **null**.
-  public override void OnPointerExit(GameObject targetObject) {
+  public override void OnPointerExit(GameObject previousObject) {
     ReticleDistanceInMeters = RETICLE_DISTANCE_MAX;
     ReticleInnerAngle = RETICLE_MIN_INNER_ANGLE;
     ReticleOuterAngle = RETICLE_MIN_OUTER_ANGLE;
@@ -161,6 +160,7 @@ public class GvrReticlePointerImpl : GvrBasePointer {
       Debug.LogWarning("Cannot operate on a null pointer transform");
       return false;
     }
+    targetPoint = target;
     Vector3 targetLocalPosition = base.PointerTransform.InverseTransformPoint(target);
 
     ReticleDistanceInMeters =

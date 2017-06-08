@@ -76,10 +76,11 @@ public class DemoInputManager : MonoBehaviour {
   [Tooltip("Emulated GVR Platform")]
   public EmulatedPlatformType gvrEmulatedPlatformType = EmulatedPlatformType.Daydream;
   public static string EMULATED_PLATFORM_PROP_NAME = "gvrEmulatedPlatformType";
+#else
+  private GvrSettings.ViewerPlatformType viewerPlatform;
 #endif  // UNITY_EDITOR
 
   void Start() {
-    Input.backButtonLeavesApp = true;
     if (messageCanvas == null) {
       messageCanvas = transform.Find(MESSAGE_CANVAS_NAME).gameObject;
       if (messageCanvas != null) {
@@ -96,6 +97,7 @@ public class DemoInputManager : MonoBehaviour {
     }
     isDaydream = (gvrEmulatedPlatformType == EmulatedPlatformType.Daydream);
 #else
+    viewerPlatform = GvrSettings.ViewerPlatform;
     // First loaded device in Player Settings.
     string vrDeviceName = UnityEngine.VR.VRSettings.loadedDeviceName;
     if (vrDeviceName != CARDBOARD_DEVICE_NAME &&
@@ -105,9 +107,12 @@ public class DemoInputManager : MonoBehaviour {
       return;
     }
 
-    // On a non-Daydream ready phone, fall back to Cardboard if it's present in the
-    // list of enabled VR SDKs.
-    if (!IsDeviceDaydreamReady() && playerSettingsHasCardboard()) {
+    // On a non-Daydream ready phone, fall back to Cardboard if it's present in the list of
+    // enabled VR SDKs.
+    // On a Daydream-ready phone, go into Cardboard mode if it's the currently-paired viewer.
+    if ((!IsDeviceDaydreamReady() && playerSettingsHasCardboard()) ||
+        (IsDeviceDaydreamReady() && playerSettingsHasCardboard() &&
+         GvrSettings.ViewerPlatform == GvrSettings.ViewerPlatformType.Cardboard)) {
       vrDeviceName = CARDBOARD_DEVICE_NAME;
     }
     isDaydream = (vrDeviceName == DAYDREAM_DEVICE_NAME);
@@ -127,15 +132,19 @@ public class DemoInputManager : MonoBehaviour {
     }
     isDaydream = (gvrEmulatedPlatformType == EmulatedPlatformType.Daydream);
     SetVRInputMechanism();
+#else
+    // Viewer type switched at runtime.
+    if (!IsDeviceDaydreamReady() || viewerPlatform == GvrSettings.ViewerPlatform) {
+      return;
+    }
+    isDaydream = (GvrSettings.ViewerPlatform == GvrSettings.ViewerPlatformType.Daydream);
+    viewerPlatform = GvrSettings.ViewerPlatform;
+    SetVRInputMechanism();
 #endif  // UNITY_EDITOR
   }
 
-  void LateUpdate() {
-    GvrViewer.Instance.UpdateState();
-    // Exit when (X) is tapped.
-    if (Input.GetKeyDown(KeyCode.Escape)) {
-      Application.Quit();
-    }
+  public bool IsCurrentlyDaydream() {
+    return isDaydream;
   }
 
   public static bool playerSettingsHasDaydream() {

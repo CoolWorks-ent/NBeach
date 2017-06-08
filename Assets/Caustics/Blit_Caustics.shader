@@ -1,4 +1,6 @@
-﻿Shader "Custom/Blit_Caustics" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Blit_Caustics" {
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_MainTiling ("Distort Tiling", Float) = 1
@@ -30,7 +32,7 @@
 	 
 	v2f vert(appdata_img v){
 	    v2f o;
-	    o.pos = mul(UNITY_MATRIX_MVP, v.vertex);      // compute transformed vertex position
+	    o.pos = UnityObjectToClipPos(v.vertex);      // compute transformed vertex position
 		o.uv = v.texcoord;   // compute the texcoords of the noise
 	    return o;
 	}

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Modified version of Unity's Global Fog Effect for SSMS
 
 Shader "Hidden/SSMS Global Fog" {
@@ -57,7 +59,7 @@ CGINCLUDE
 	{
 		v2f o;
 		v.vertex.z = 0.1;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.uv = v.texcoord.xy;
 		o.uv_depth = v.texcoord.xy;
 		

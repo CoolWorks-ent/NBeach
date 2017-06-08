@@ -22,8 +22,10 @@ public class PlayerController : MonoBehaviour {
     float waterDrag = 1f;
 
     Camera mainCamera;
+    GameObject player;
     UnderwaterScript underwaterScript;
     public PlayerState playerState { get; set; }
+    Rigidbody rigidbody;
     bool insideWall = false;
     bool startMove = false;
     bool isUnderwater;
@@ -51,28 +53,33 @@ public class PlayerController : MonoBehaviour {
         //swimSpeed = splineControl.Speed;
 
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        player = GameObject.FindGameObjectWithTag("Player");
+        rigidbody = this.GetComponent<Rigidbody>();
         //get variable to check if player underwater or not
-        underwaterScript = GetComponent<UnderwaterScript>();
+        underwaterScript = mainCamera.GetComponent<UnderwaterScript>();
     }
 
 	// Update is called once per frame
 	void Update () {
 
-        //enable underwater movement if player underwater
-        if (underwaterScript.isUnderwater)
+            //enable underwater movement if player underwater
+            if (underwaterScript.isUnderwater)
         {
                 UnderwaterMovement();
         }
 
+        //set rotation of player character to same as camera
+        player.transform.rotation = mainCamera.transform.rotation;
+
         //Raycast from player to check for PlayerContainer Collision
-        Vector3 fwd = transform.TransformDirection(Vector3.forward) * 2;
+        Vector3 fwd = mainCamera.transform.TransformDirection(Vector3.forward) * 2;
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         //layer mask to only collide with PlayerOnly layer
         int layerMask = 1 << 8;
 
-        Debug.DrawRay(transform.position, fwd, Color.red);
-        if (Physics.Raycast(transform.position, fwd, out hit,fwd.magnitude,layerMask)) 
+        Debug.DrawRay(mainCamera.transform.position, fwd, Color.red);
+        if (Physics.Raycast(mainCamera.transform.position, fwd, out hit,fwd.magnitude,layerMask)) 
         {
             //make it so player can't move forward more when colliding with container
             if (hit.collider.tag == "PlayerWall")
@@ -109,6 +116,15 @@ public class PlayerController : MonoBehaviour {
                 playerState = PlayerState.NOTMOVING;
         }
 
+        /**NotMoving PlayerState
+         * Cancel all forces when not moving
+         **/
+        if(playerState == PlayerState.NOTMOVING)
+        {
+            rigidbody.angularVelocity = Vector3.zero;
+            rigidbody.velocity = Vector3.zero;
+        }
+
     }
 
     private void FixedUpdate()
@@ -136,7 +152,6 @@ public class PlayerController : MonoBehaviour {
         //if player rotation is less than max rotation angle, then player can move in that direction
         //if player rotation is greater than angle, prevent movement in that forward direction
         float rotDiff = Mathf.Abs(transform.localRotation.y) - Mathf.Abs(p_startRot.y);
-        Rigidbody rigidbody = this.GetComponent<Rigidbody>();
 
         //rigidbody.useGravity = false;
         rigidbody.drag = waterDrag;
@@ -152,15 +167,16 @@ public class PlayerController : MonoBehaviour {
             if (Mathf.Abs(rotDiff) < maxRotAngle)
             {
                 //get head rotation Method 1
-                Quaternion headRotation = InputTracking.GetLocalRotation(VRNode.Head);
+                Quaternion headRotation = mainCamera.transform.localRotation;//InputTracking.GetLocalRotation(VRNode.Head);
 
 
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
 
 
-                //move player in direction facing
-                rigidbody.AddForce(transform.forward * swimSpeed);
+                //move player in direction camera facing
+                rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
+                Debug.Log(rigidbody.velocity);
                 //transform.localPosition += transform.forward * swimSpeed * Time.deltaTime;
             }
             else
