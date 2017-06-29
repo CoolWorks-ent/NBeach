@@ -40,8 +40,8 @@ public class SplineInterpolator : MonoBehaviour
     //set/get state of the spline interpolation
     public string mSplineState
     {
-        get{ return sState; }
-        set { sState = value; }
+        get{ return mState; }
+        set { mState = value; }
     }
 
 	public void StartInterpolation(OnEndCallback endCallback, bool bRotations, eWrapMode mode)
@@ -155,7 +155,7 @@ public class SplineInterpolator : MonoBehaviour
         if(sState == "Paused")
         {
             //movement paused
-            Debug.Log("Spline paused");
+            //Debug.Log("Spline paused");
         }
 
 		// We advance to next point in the path
@@ -190,7 +190,7 @@ public class SplineInterpolator : MonoBehaviour
 			}
 		}
 
-		if ((mState != "Stopped" && sState != "Paused") || (sState == "Resume"))
+		if ((mState != "Stopped" && mState != "Paused") || (mState == "Resume"))
 		{
 			// Calculates the t param between 0 and 1
 			float param = (mCurrentTime - mNodes[mCurrentIdx].Time) / (mNodes[mCurrentIdx + 1].Time - mNodes[mCurrentIdx].Time);
@@ -206,6 +206,11 @@ public class SplineInterpolator : MonoBehaviour
 			}
 		}
 	}
+
+    public int GetCurrentIdx()
+    {
+        return mCurrentIdx;
+    }
 
 	Quaternion GetSquad(int idxFirstPoint, float t)
 	{

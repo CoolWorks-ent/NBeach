@@ -15,4 +15,6 @@ public class SplineNodeProperties : MonoBehaviour
 	
 	public float BreakTime = 0f;
 	public string Name;
+    public float speed;
+    public Quaternion rotation;
 }

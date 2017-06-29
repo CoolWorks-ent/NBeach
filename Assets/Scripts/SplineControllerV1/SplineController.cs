@@ -180,13 +180,12 @@ public class SplineController : MonoBehaviour
 	/// <summary>
 	/// Returns children transforms, sorted by name.
 	/// </summary>
-	Transform[] GetTransforms()
+	public Transform[] GetTransforms()
 	{
 		if (SplineRoot != null)
 		{
 			List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
 			List<Transform> transforms = components.ConvertAll(c => (Transform)c);
-
 			transforms.Remove(SplineRoot.transform);
 			transforms.Sort(delegate(Transform a, Transform b)
 			{
@@ -199,10 +198,31 @@ public class SplineController : MonoBehaviour
 		return null;
 	}
 
-	/// <summary>
-	/// Disables the spline objects, we don't need them outside design-time.
-	/// </summary>
-	void DisableTransforms()
+    //return the nodes of the spline
+    public SplineNodeProperties[] GetNodes()
+    {
+        if (SplineRoot != null)
+        {
+           List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
+            List<Transform> transforms = components.ConvertAll(c => (Transform)c);
+            List<SplineNodeProperties> nodes = new List<SplineNodeProperties>();
+            foreach (Transform child in SplineRoot.transform)
+            {
+                nodes.Add(child.GetComponent<SplineNodeProperties>());
+            }
+            //List<SplineNodeProperties> nodes = components.ConvertAll(c => (SplineNodeProperties)c);
+            nodes.Remove(SplineRoot.GetComponent<SplineNodeProperties>());
+            
+            return nodes.ToArray();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Disables the spline objects, we don't need them outside design-time.
+    /// </summary>
+    void DisableTransforms()
 	{
 		if (SplineRoot != null)
 		{
@@ -210,6 +230,10 @@ public class SplineController : MonoBehaviour
 		}
 	}
 
+   public int getSplineIdx()
+    {
+        return mSplineInterp.GetCurrentIdx();
+    }
 
 	/// <summary>
 	/// Starts the interpolation

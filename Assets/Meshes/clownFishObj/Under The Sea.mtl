@@ -1,0 +1,176 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 01.11.2015 12:35:36
+
+newmtl Urchent_Body
+	Ns 0.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Urchent_Body_Texture.jpg
+	map_Kd Urchent_Body_Texture.jpg
+
+newmtl Blue_Feelers
+	Ns 28.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0039 0.0471 0.5412
+	Kd 0.0039 0.0471 0.5412
+	Ks 0.2213 0.1499 0.8957
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Blue_Feelers_Texture.jpg
+	map_Kd Blue_Feelers_Texture.jpg
+	map_Ke Feelers_Self_Ilum_Falloff_Falloff.jpg
+
+newmtl Red_Feelers
+	Ns 28.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.1843 0.0000 0.1529
+	Kd 0.1843 0.0000 0.1529
+	Ks 0.1963 0.0892 0.6602
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Red_Feelers1_Texture.jpg
+	map_Kd Red_Feelers1_Texture.jpg
+	map_Ke Feelers_Self_Ilum_Falloff_Falloff.jpg
+
+newmtl Purple_Feelers
+	Ns 28.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.1961 0.0039 0.4510
+	Kd 0.1961 0.0039 0.4510
+	Ks 0.6388 0.3569 0.7708
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Purple_Feelers_Texture.jpg
+	map_Kd Purple_Feelers_Texture.jpg
+	map_Ke Feelers_Self_Ilum_Falloff_Falloff.jpg
+
+newmtl Middel_Bubbles
+	Ns 28.0000
+	Ni 1.5000
+	d 0.7700
+	Tr 0.2300
+	Tf 0.7700 0.7700 0.7700 
+	illum 2
+	Ka 0.0039 0.1176 0.6235
+	Kd 0.0039 0.1176 0.6235
+	Ks 0.0785 0.7030 0.9064
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Bubles_Texture.jpg
+	map_Kd Bubles_Texture.jpg
+	map_Ke Feelers_Self_Ilum_Falloff_Falloff.jpg
+
+newmtl Sea_Bottom
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka surface_sand_Texture.jpg
+	map_Kd surface_sand_Texture.jpg
+	map_bump surface_sand_Bump.jpg
+	bump surface_sand_Bump.jpg
+
+newmtl Water
+	Ns 73.0000
+	Ni 1.5000
+	d 0.4500
+	Tr 0.5500
+	Tf 0.4500 0.4500 0.4500 
+	illum 2
+	Ka 0.1882 0.2627 0.5882
+	Kd 0.1882 0.2627 0.5882
+	Ks 0.7830 0.7830 0.7830
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Water_Texture.jpg
+	map_Kd Water_Texture.jpg
+
+newmtl Clownfish2
+	Ns 44.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.4050 0.4050 0.4050
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Clownfish2_Texture.jpg
+	map_Kd Clownfish2_Texture.jpg
+
+newmtl Clownfish
+	Ns 44.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.4050 0.4050 0.4050
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Clownfish_Texture.jpg
+	map_Kd Clownfish_Texture.jpg
+
+newmtl wire_174186203
+	Ns 32
+	d 1
+	Tr 0
+	Tf 1 1 1
+	illum 2
+	Ka 0.6824 0.7294 0.7961
+	Kd 0.6824 0.7294 0.7961
+	Ks 0.3500 0.3500 0.3500
+
+newmtl Coral_Rock1
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Coral_Rock1_Texture.jpg
+	map_Kd Coral_Rock1_Texture.jpg
+	map_bump Coral_Rock1_Bump.jpg
+	bump Coral_Rock1_Bump.jpg
+
+newmtl Coral_Rock2
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka Coral_Rock2_Texture.jpg
+	map_Kd Coral_Rock2_Texture.jpg
+	map_bump Coral_Rock2_Bump.jpg
+	bump Coral_Rock2_Bump.jpg

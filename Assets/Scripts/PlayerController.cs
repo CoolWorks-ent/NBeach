@@ -84,9 +84,9 @@ public class PlayerController : MonoBehaviour {
             //make it so player can't move forward more when colliding with container
             if (hit.collider.tag == "PlayerWall")
             {
-                Debug.Log("Wall is in front of the player!");
                 if (insideWall == false)
                 {
+                    Debug.Log("Wall is in front of the player!");
                     playerState = PlayerState.NOTMOVING;
                     insideWall = true;
                 }
@@ -173,10 +173,8 @@ public class PlayerController : MonoBehaviour {
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
 
-
                 //move player in direction camera facing
                 rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
-                Debug.Log(rigidbody.velocity);
                 //transform.localPosition += transform.forward * swimSpeed * Time.deltaTime;
             }
             else
