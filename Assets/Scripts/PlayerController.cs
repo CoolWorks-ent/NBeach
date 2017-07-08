@@ -25,9 +25,12 @@ public class PlayerController : MonoBehaviour {
     GameObject player;
     UnderwaterScript underwaterScript;
     public PlayerState playerState { get; set; }
+    public bool CanMove = true; //is player allowed to move or not?
+
     Rigidbody rigidbody;
     bool insideWall = false;
     bool startMove = false;
+    
     bool isUnderwater;
     Quaternion p_startRot;
     Vector3 p_startPos;
@@ -100,10 +103,14 @@ public class PlayerController : MonoBehaviour {
         }
 
         //begin player movement again if no longer colliding with PlayerContainer
-        if (startMove == true)
+        if (startMove == true && CanMove==true)
         {
             playerState = PlayerState.MOVING;
             startMove = false;
+        }
+        else if(CanMove == false)
+        {
+            
         }
 
         /*DEBUG*/

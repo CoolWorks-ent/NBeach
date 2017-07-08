@@ -109,5 +109,7 @@ public class GvrReticlePointer : MonoBehaviour {
     }
     reticlePointerImpl.ReticleGrowthSpeed = reticleGrowthSpeed;
     reticlePointerImpl.PointerTransform = transform;
+    Vector3 fwd = transform.forward * reticlePointerImpl.ReticleDistanceInMeters;
+    Debug.DrawRay(transform.position, fwd, Color.red);
   }
 }

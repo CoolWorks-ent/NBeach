@@ -108,8 +108,9 @@ public abstract class GvrBasePointerRaycaster : BaseRaycaster {
         finalRayDirection.Normalize();
 
         Vector3 finalRayStart = cameraLocation + (finalRayDirection * Camera.main.nearClipPlane);
-
+         
         lastRay = new Ray(finalRayStart, finalRayDirection);
+        Debug.DrawRay(finalRayStart, finalRayDirection, Color.red);
         break;
       case RaycastMode.Direct:
         lastRay = new Ray(pointerTransform.position, pointerTransform.forward);

@@ -30,7 +30,7 @@ public class GvrReticlePointerImpl : GvrBasePointer {
   // Minimum distance of the reticle (in meters).
   public const float RETICLE_DISTANCE_MIN = 0.45f;
   // Maximum distance of the reticle (in meters).
-  public const float RETICLE_DISTANCE_MAX = 10.0f;
+  public const float RETICLE_DISTANCE_MAX = 10f;
 
   /// Growth speed multiplier for the reticle.
   public float ReticleGrowthSpeed { private get; set; }
@@ -64,7 +64,7 @@ public class GvrReticlePointerImpl : GvrBasePointer {
     ReticleGrowthSpeed = 8.0f;
     ReticleInnerAngle = 0.0f;
     ReticleOuterAngle = 0.5f;
-    ReticleDistanceInMeters = 10.0f;
+    ReticleDistanceInMeters = 5.0f;
     ReticleInnerDiameter = 0.0f;
     ReticleOuterDiameter = 0.0f;
   }

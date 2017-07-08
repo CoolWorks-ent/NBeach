@@ -22,6 +22,7 @@ public class SplineInterpolator : MonoBehaviour
 	}
 
 	List<SplineNode> mNodes = new List<SplineNode>();
+    List<SplineNode> copyNodes = new List<SplineNode>();
 	string mState = "";
     //state of interpolation
     string sState = "";
@@ -30,12 +31,19 @@ public class SplineInterpolator : MonoBehaviour
 
 	OnEndCallback mOnEndCallback;
 
+    float speed = 5f;
+    float lastStepSize = 0;
+    float targetStepSize;
+    float speedFactor;
+    float t = 0f;
 
-
-	void Awake()
+    void Awake()
 	{
 		Reset();
-	}
+        targetStepSize = speed / 60f;
+        speedFactor = speed / 10;
+        t = Time.deltaTime;
+    }
 
     //set/get state of the spline interpolation
     public string mSplineState
@@ -76,6 +84,12 @@ public class SplineInterpolator : MonoBehaviour
 
 		mNodes.Add(new SplineNode(pos, quat, timeInSeconds, easeInOut));
 	}
+
+    //adds point to linear array with evenly spaced node distances
+    public void AddLinearPoint(Vector3 pos, Quaternion quat, float speed, float timeInSeconds, Vector2 easeInOut)
+    {
+        copyNodes.Add(new SplineNode(pos, quat, timeInSeconds, easeInOut));
+    }
 
 
 	void SetInput()
@@ -146,6 +160,7 @@ public class SplineInterpolator : MonoBehaviour
 	float mCurrentTime;
 	int mCurrentIdx = 1;
 
+
 	void Update()
 	{
 		if (mState == "Reset" || mState == "Stopped" || mNodes.Count < 4)
@@ -190,15 +205,25 @@ public class SplineInterpolator : MonoBehaviour
 			}
 		}
 
-		if ((mState != "Stopped" && mState != "Paused") || (mState == "Resume"))
+		if ((mState != "Stopped" && mState != "Paused") || (mState == "Resume") || (mState == "Active"))
 		{
+            Vector3 previousPosition = transform.position;
 			// Calculates the t param between 0 and 1
-			float param = (mCurrentTime - mNodes[mCurrentIdx].Time) / (mNodes[mCurrentIdx + 1].Time - mNodes[mCurrentIdx].Time);
+			float param = Mathf.Abs((mCurrentTime - mNodes[mCurrentIdx].Time) / (mNodes[mCurrentIdx + 1].Time - mNodes[mCurrentIdx].Time));
 
 			// Smooth the param
 			param = MathUtils.Ease(param, mNodes[mCurrentIdx].EaseIO.x, mNodes[mCurrentIdx].EaseIO.y);
 
-			transform.position = GetHermiteInternal(mCurrentIdx, param);
+            transform.position = GetHermiteInternal(mCurrentIdx, param);
+
+            lastStepSize = Vector3.Magnitude(transform.position - previousPosition);
+            if (lastStepSize < targetStepSize)
+            {
+                speedFactor *= 1.1f;
+            }
+            else
+                speedFactor *= .9f;
+            t += speedFactor * Time.deltaTime;
 
 			if (mRotations)
 			{

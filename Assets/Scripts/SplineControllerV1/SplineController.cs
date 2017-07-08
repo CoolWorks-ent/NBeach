@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public enum eOrientationMode { NODE = 0, TANGENT }
-public enum SplineState {Stopped, Loop, Reset, Paused, Resume, Active }
+public enum SplineState {Start, Stopped, Loop, Reset, Paused, Resume, Active }
 
 [AddComponentMenu("Splines/Spline Controller")]
 [RequireComponent(typeof(SplineInterpolator))]
@@ -76,6 +76,9 @@ public class SplineController : MonoBehaviour
             case "Reset":
                 mSplineState = SplineState.Reset;
                 break;
+            case "Start":
+                mSplineState = SplineState.Start;
+                break;
             default: break;
         }
        
@@ -130,12 +133,17 @@ public class SplineController : MonoBehaviour
                 mSplineState = SplineState.Stopped;
                 mSplineInterp.mSplineState = "Stopped";
             }
+            else if (value == SplineState.Start)
+            {
+                mSplineState = SplineState.Start;
+                mSplineInterp.mSplineState = "Start";
+            }
         }
     }
 
     void Update()
     {
-       if(sSplineState == SplineState.Resume)
+       if(sSplineState == SplineState.Start)
         {
             FollowSpline();
             sSplineState = SplineState.Active;
@@ -148,10 +156,10 @@ public class SplineController : MonoBehaviour
         //get distance between first and last nodes of spline
         float splineDistance = Vector3.Distance(interp.lastNode, interp.firstNode);
         Duration = splineDistance/Speed;
-		float step = (AutoClose) ? Duration / trans.Length :
-			Duration / (trans.Length - 1);
+        float step = (AutoClose) ? Duration / trans.Length :
+            Duration / (trans.Length - 1);
 
-		int c;
+        int c;
 		for (c = 0; c < trans.Length; c++)
 		{
 			if (OrientationMode == eOrientationMode.NODE)
@@ -170,6 +178,15 @@ public class SplineController : MonoBehaviour
 
 				interp.AddPoint(trans[c].position, rot, step * c, new Vector2(0, 1));
 			}
+            //if distance is greater than 'n', add this node point to the linear array
+            if (c > 1)
+            {
+                if ((trans[c].position.magnitude - trans[c - 1].position.magnitude) > 5)
+                {
+                    float temp = trans[c].position.magnitude - trans[c - 1].position.magnitude;
+                    interp.AddLinearPoint(trans[c].position, trans[c].rotation, Speed, step * c, new Vector2(0, 1));
+                }
+            }
 		}
 
 		if (AutoClose)
@@ -244,7 +261,7 @@ public class SplineController : MonoBehaviour
 		{
 			SetupSplineInterpolator(mSplineInterp, mTransforms);
 			mSplineInterp.StartInterpolation(null, true, WrapMode);
-            mSplineInterp.mSplineState = "Resume";
+            mSplineInterp.mSplineState = "Active";
 		}
 	}
 }

@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour {
     SplineController splineControl;
     [SerializeField]
     PlayerController playerControl;
+    [SerializeField]
+    SoundManager soundManager;
 
     GameObject player;
     SpriteRenderer blackOverlay;
@@ -65,6 +67,7 @@ public class GameController : MonoBehaviour {
         Color baseColor = blackOverlay.color;
 
         //open eyes
+        soundManager.PlayMusic(0);
 
         //fade sign out every second
         while (time < screenFadeOutTime)
@@ -76,6 +79,7 @@ public class GameController : MonoBehaviour {
         }
 
         float t = 0;
+        
         //rotate player to face ocean
         Vector3 playerRot = player.transform.rotation.eulerAngles; //rotation in euler angles
         Quaternion baseRot = player.transform.rotation;
@@ -92,7 +96,7 @@ public class GameController : MonoBehaviour {
 
         yield return new WaitForSeconds(1);
         //begin spline
-        splineControl.sSplineState = SplineState.Resume;
+        splineControl.sSplineState = SplineState.Start;
         playerControl.playerState = PlayerState.MOVING;
         Debug.Log("spline started");
 
@@ -117,9 +121,13 @@ public class GameController : MonoBehaviour {
             yield return null;
         }
         Debug.Log("spline paused");
-        playerControl.playerState = PlayerState.NOTMOVING;
+        playerControl.CanMove = false;
         splineControl.sSplineState = SplineState.Stopped;
 
+        //pause for x seconds and let player move around
+        yield return new WaitForSeconds(3);
+        playerControl.CanMove = true;
+        splineControl.sSplineState = SplineState.Resume;
 
         yield return null;
     }
