@@ -75,10 +75,11 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
     }
 
     Ray ray = GetRay();
-    float dist = eventCamera.farClipPlane - eventCamera.nearClipPlane;
+        // Old Version - float dist = eventCamera.farClipPlane - eventCamera.nearClipPlane;
+    float dist = eventCamera.nearClipPlane + 7;
     float radius = PointerRadius;
     RaycastHit[] hits;
-
+        
     if (radius > 0.0f) {
       hits = Physics.SphereCastAll(ray, radius, dist, finalEventMask);
     } else {

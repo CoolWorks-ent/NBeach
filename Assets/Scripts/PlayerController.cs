@@ -33,8 +33,9 @@ public class PlayerController : MonoBehaviour {
     
     bool isUnderwater;
     Quaternion p_startRot;
+    Quaternion p_rotLimitMin, p_rotLimitMax;
     Vector3 p_startPos;
-    float maxRotAngle = 45;
+    float maxRotAngle = 90;
     float minRotAngle = -45;
 
     
@@ -44,6 +45,9 @@ public class PlayerController : MonoBehaviour {
     void Start () {
         p_startPos = transform.position;
         p_startRot = transform.rotation; //use local rotation?
+        //Rotation 
+        p_rotLimitMin = Quaternion.Euler(180,180,180);
+        p_rotLimitMax = Quaternion.Euler(359, 359, 359);
 	}
 
     private void Awake()
@@ -87,7 +91,8 @@ public class PlayerController : MonoBehaviour {
             //make it so player can't move forward more when colliding with container
             if (hit.collider.tag == "PlayerWall")
             {
-                if (insideWall == false)
+                //if (insideWall == false)
+                if(playerState == PlayerState.MOVING)
                 {
                     Debug.Log("Wall is in front of the player!");
                     playerState = PlayerState.NOTMOVING;
@@ -118,8 +123,11 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (playerState == PlayerState.NOTMOVING)
-                playerState = PlayerState.MOVING;
-            else if(playerState == PlayerState.MOVING)
+            {
+                CanMove = true;
+                startMove = true;
+            }
+            else if (playerState == PlayerState.MOVING)
                 playerState = PlayerState.NOTMOVING;
         }
 
@@ -154,6 +162,10 @@ public class PlayerController : MonoBehaviour {
         }*/
     }
 
+
+    /*
+     *Controls underwater movement of the player 
+     */
     void UnderwaterMovement()
     {
         //if player rotation is less than max rotation angle, then player can move in that direction
@@ -171,12 +183,16 @@ public class PlayerController : MonoBehaviour {
         //currently player can only move if state is Moving
         if (playerState != PlayerState.NOTMOVING)
         {
-            if (Mathf.Abs(rotDiff) < maxRotAngle)
-            {
-                //get head rotation Method 1
+            // get head rotation Method 1
                 Quaternion headRotation = mainCamera.transform.localRotation;//InputTracking.GetLocalRotation(VRNode.Head);
-
-
+                                                                             //get player's current rotation based on their starting rotation
+            float curAngle = Quaternion.Angle(p_startRot, headRotation);
+            float curVal = p_startRot.eulerAngles.y - headRotation.eulerAngles.y;
+            //Debug.Log("Rot = " + curVal);
+            //if player's rotation is not behind them, allow movement in the direction they are facing
+            //if (curAngle < maxRotAngle)
+            if(!(headRotation.eulerAngles.y > maxRotAngle && headRotation.eulerAngles.y < 270))
+            {
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
 
@@ -184,8 +200,27 @@ public class PlayerController : MonoBehaviour {
                 rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
                 //transform.localPosition += transform.forward * swimSpeed * Time.deltaTime;
             }
+           /* if (Mathf.Abs(rotDiff) < maxRotAngle)
+            {
+                //get head rotation Method 1
+                Quaternion headRotation = mainCamera.transform.localRotation;//InputTracking.GetLocalRotation(VRNode.Head);
+                //get player's current rotation based on their starting rotation
+                float curAngle = Quaternion.Angle(p_startRot, headRotation);
+                Debug.Log("Rot = " + curAngle);
+                //if player's rotation is not behind them, allow movement in the direction they are facing
+                if (curAngle < ma360xRotAngle)
+                {
+                    //whatever player's velocity is, exert friction force onto the velocity while in water
+                    rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
+
+                    //move player in direction camera facing
+                    rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
+                    //transform.localPosition += transform.forward * swimSpeed * Time.deltaTime;
+                }
+
+            }
             else
-                Debug.Log("rotation limit reached");
+                Debug.Log("rotation limit reached");*/
         }
         else { }
             //Debug.Log("player not moving");

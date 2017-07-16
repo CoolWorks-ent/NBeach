@@ -1,54 +1,63 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum eOrientationMode { NODE = 0, TANGENT }
-public enum SplineState {Start, Stopped, Loop, Reset, Paused, Resume, Active }
+//public enum eOrientationMode { NODE = 0, TANGENT }
+//public enum SplineState { Start, Stopped, Loop, Reset, Paused, Resume, Active }
 
-[AddComponentMenu("Splines/Spline Controller")]
+[AddComponentMenu("Splines/Spline Controller2")]
 [RequireComponent(typeof(SplineInterpolator))]
-public class SplineController : MonoBehaviour
+public class SplineController2 : MonoBehaviour
 {
-	public GameObject SplineRoot;
-    public static SplineController instance = null;
+    public GameObject SplineRoot;
+    public static SplineController2 instance = null;
     public float Duration = 10;
     public float Speed = 5;
-	public eOrientationMode OrientationMode = eOrientationMode.NODE;
-	public eWrapMode WrapMode = eWrapMode.ONCE;
-	public bool AutoStart = true;
-	public bool AutoClose = true;
-	public bool HideOnExecute = true;
+    public eOrientationMode OrientationMode = eOrientationMode.NODE;
+    public eWrapMode WrapMode = eWrapMode.ONCE;
+    public bool AutoStart = true;
+    public bool AutoClose = true;
+    public bool HideOnExecute = true;
     public SplineState mSplineState;
 
 
-	SplineInterpolator mSplineInterp;
-	Transform[] mTransforms;
+    SplineInterpolator mSplineInterp;
+    Transform[] mTransforms;
+    Vector3[] points;
 
-	void OnDrawGizmos()
-	{
-		Transform[] trans = GetTransforms();
-		if (trans.Length < 2)
-			return;
-		SplineInterpolator interp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
-		SetupSplineInterpolator(interp, trans);
-		interp.StartInterpolation(null, false, WrapMode);
+    public SplineNodeProperties[] controlPoints;
+    public bool continuous;
+    public int spanCount;
+    private SplineNodeProperties tmp;
+    private SplineNodeProperties tmp2;
+    private SplineNodeProperties tmp3;
 
 
-		Vector3 prevPos = trans[0].position;
+    void OnDrawGizmos()
+    {
+        Transform[] trans = GetTransforms();
+        if (trans.Length < 2)
+            return;
+        SplineInterpolator interp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
+        SetupSplineInterpolator(interp, trans);
+        interp.StartInterpolation(null, false, WrapMode);
+
+
+        Vector3 prevPos = trans[0].position;
         //cache spline
         float k = 100; //segments
-		for (int c = 1; c <= trans.Length; c++)
-        { 
+        for (int c = 1; c <= trans.Length; c++)
+        {
             //get position of 1st and last spline node
             //Duration = Speed * Time.deltaTime;
-			float currTime = c * Duration / 100;
-			Vector3 currPos = interp.GetHermiteAtTime(currTime);
-			float mag = (currPos-prevPos).magnitude * 2;
-			Gizmos.color = new Color(mag, 0, 0, 1);
-			Gizmos.DrawLine(prevPos, currPos);
-			prevPos = currPos;
-		}
-	}
+            float currTime = c * Duration / 100;
+            Vector3 currPos = interp.GetHermiteAtTime(currTime);
+            float mag = (currPos - prevPos).magnitude * 2;
+            Gizmos.color = new Color(mag, 0, 0, 1);
+            Gizmos.DrawLine(prevPos, currPos);
+            prevPos = currPos;
+        }
+    }
 
     private void Awake()
     {
@@ -58,7 +67,7 @@ public class SplineController : MonoBehaviour
             Destroy(gameObject);
 
         mSplineInterp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
-        switch(mSplineInterp.mSplineState)
+        switch (mSplineInterp.mSplineState)
         {
             case "Active":
                 mSplineState = SplineState.Active;
@@ -83,8 +92,14 @@ public class SplineController : MonoBehaviour
                 break;
             default: break;
         }
-       
+
         mTransforms = GetTransforms();
+
+        //set spline details
+        if (tmp == null) tmp = controlPoints[0];
+        if (tmp2 == null) tmp2 = controlPoints[0];
+        if (tmp3 == null) tmp3 = controlPoints[0];
+        spanCount = continuous ? controlPoints.Length : controlPoints.Length - 3;
 
         if (HideOnExecute)
             DisableTransforms();
@@ -95,20 +110,21 @@ public class SplineController : MonoBehaviour
             sSplineState = SplineState.Paused;
     }
 
-    
-	void Start()
-	{
-		
+
+    void Start()
+    {
+
     }
 
     public SplineState sSplineState
     {
         get { return mSplineState; }
-        set {
+        set
+        {
             if (value == SplineState.Active)
             {
                 mSplineState = SplineState.Active;
-               // mSplineInterp.mSplineState = "Resume";
+                // mSplineInterp.mSplineState = "Resume";
             }
             else if (value == SplineState.Loop)
             {
@@ -145,30 +161,50 @@ public class SplineController : MonoBehaviour
 
     void Update()
     {
-       if(sSplineState == SplineState.Start)
+        if (sSplineState == SplineState.Start)
         {
             FollowSpline();
             sSplineState = SplineState.Active;
         }
+
+
     }
 
-	void SetupSplineInterpolator(SplineInterpolator interp, Transform[] trans)
-	{
-		interp.Reset();
+    void SetupSplineInterpolator(SplineInterpolator interp, Transform[] trans)
+    {
+        interp.Reset();
         //get distance between first and last nodes of spline
         float splineDistance = Vector3.Distance(interp.lastNode, interp.firstNode);
-        Duration = splineDistance/Speed;
+        Duration = splineDistance / Speed;
         float step = (AutoClose) ? Duration / trans.Length :
             Duration / (trans.Length - 1);
         int c;
-        //my version
-        /*for (c = 0; c < trans.Length; c++)
+
+        Vector3 prevPos = trans[0].position;
+        //cache spline
+        float k = 100; //segments
+        for (int i = 1; i <= k; i++)
+        {
+            //get position of 1st and last spline node
+            //Duration = Speed * Time.deltaTime;
+            //float currTime = i * Duration / 100;
+            points[i] = new Vector3();
+            Vector3 currPos = interp.GetHermiteAtTime((float)i/k);
+            points[i] = currPos;
+            float mag = (currPos - prevPos).magnitude * 2;
+            Gizmos.color = new Color(mag, 0, 0, 1);
+            Gizmos.DrawLine(prevPos, currPos);
+            prevPos = currPos;
+        }
+
+        //create array to contain currPos and add the the spline node?
+
+        //cache spline nodes
+        for (c = 0; c < trans.Length; c++)
         {
             if (OrientationMode == eOrientationMode.NODE)
             {
-                step += (Time.deltaTime * Speed) / trans[c].position.magnitude;
-
-                interp.AddPoint(trans[c].position, trans[c].rotation, step, new Vector2(0, 1));
+                interp.AddPoint(trans[c].position, trans[c].rotation, step * c, new Vector2(0, 1));
             }
             else if (OrientationMode == eOrientationMode.TANGENT)
             {
@@ -180,7 +216,7 @@ public class SplineController : MonoBehaviour
                 else
                     rot = trans[c].rotation;
 
-                interp.AddPoint(trans[c].position, rot, step, new Vector2(0, 1));
+                interp.AddPoint(trans[c].position, rot, step * c, new Vector2(0, 1));
             }
             //if distance is greater than 'n', add this node point to the linear array
             if (c > 1)
@@ -191,69 +227,40 @@ public class SplineController : MonoBehaviour
                     interp.AddLinearPoint(trans[c].position, trans[c].rotation, Speed, step * c, new Vector2(0, 1));
                 }
             }
-        }*/
-                
-                for (c = 0; c < trans.Length; c++)
-                {
-                    if (OrientationMode == eOrientationMode.NODE)
-                    {
-                        interp.AddPoint(trans[c].position, trans[c].rotation, step * c, new Vector2(0, 1));
-                    }
-                    else if (OrientationMode == eOrientationMode.TANGENT)
-                    {
-                        Quaternion rot;
-                        if (c != trans.Length - 1)
-                            rot = Quaternion.LookRotation(trans[c + 1].position - trans[c].position, trans[c].up);
-                        else if (AutoClose)
-                            rot = Quaternion.LookRotation(trans[0].position - trans[c].position, trans[c].up);
-                        else
-                            rot = trans[c].rotation;
+        }
 
-                        interp.AddPoint(trans[c].position, rot, step * c, new Vector2(0, 1));
-                    }
-                //if distance is greater than 'n', add this node point to the linear array
-                if (c > 1)
+        if (AutoClose)
+            interp.SetAutoCloseMode(step * c);
+    }
+
+
+    /// <summary>
+    /// Returns children transforms, sorted by name.
+    /// </summary>
+    public Transform[] GetTransforms()
+    {
+        if (SplineRoot != null)
+        {
+            List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
+            List<Transform> transforms = components.ConvertAll(c => (Transform)c);
+            transforms.Remove(SplineRoot.transform);
+            transforms.Sort(delegate (Transform a, Transform b)
             {
-                if ((trans[c].position.magnitude - trans[c - 1].position.magnitude) > 5)
-                {
-                    float temp = trans[c].position.magnitude - trans[c - 1].position.magnitude;
-                    interp.AddLinearPoint(trans[c].position, trans[c].rotation, Speed, step * c, new Vector2(0, 1));
-                }
-            }
-		}
+                return a.name.CompareTo(b.name);
+            });
 
-                if (AutoClose)
-			interp.SetAutoCloseMode(step * c);
-	}
+            return transforms.ToArray();
+        }
 
-
-	/// <summary>
-	/// Returns children transforms, sorted by name.
-	/// </summary>
-	public Transform[] GetTransforms()
-	{
-		if (SplineRoot != null)
-		{
-			List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
-			List<Transform> transforms = components.ConvertAll(c => (Transform)c);
-			transforms.Remove(SplineRoot.transform);
-			transforms.Sort(delegate(Transform a, Transform b)
-			{
-				return a.name.CompareTo(b.name);
-			});
-
-			return transforms.ToArray();
-		}
-
-		return null;
-	}
+        return null;
+    }
 
     //return the nodes of the spline
     public SplineNodeProperties[] GetNodes()
     {
         if (SplineRoot != null)
         {
-           List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
+            List<Component> components = new List<Component>(SplineRoot.GetComponentsInChildren(typeof(Transform)));
             List<Transform> transforms = components.ConvertAll(c => (Transform)c);
             List<SplineNodeProperties> nodes = new List<SplineNodeProperties>();
             foreach (Transform child in SplineRoot.transform)
@@ -262,7 +269,7 @@ public class SplineController : MonoBehaviour
             }
             //List<SplineNodeProperties> nodes = components.ConvertAll(c => (SplineNodeProperties)c);
             nodes.Remove(SplineRoot.GetComponent<SplineNodeProperties>());
-            
+
             return nodes.ToArray();
         }
 
@@ -273,28 +280,28 @@ public class SplineController : MonoBehaviour
     /// Disables the spline objects, we don't need them outside design-time.
     /// </summary>
     void DisableTransforms()
-	{
-		if (SplineRoot != null)
-		{
-			SplineRoot.SetActiveRecursively(false);
-		}
-	}
+    {
+        if (SplineRoot != null)
+        {
+            SplineRoot.SetActiveRecursively(false);
+        }
+    }
 
-   public int getSplineIdx()
+    public int getSplineIdx()
     {
         return mSplineInterp.GetCurrentIdx();
     }
 
-	/// <summary>
-	/// Starts the interpolation
-	/// </summary>
-	void FollowSpline()
-	{
-		if (mTransforms.Length > 0)
-		{
-			SetupSplineInterpolator(mSplineInterp, mTransforms);
-			mSplineInterp.StartInterpolation(null, true, WrapMode);
+    /// <summary>
+    /// Starts the interpolation
+    /// </summary>
+    void FollowSpline()
+    {
+        if (mTransforms.Length > 0)
+        {
+            SetupSplineInterpolator(mSplineInterp, mTransforms);
+            mSplineInterp.StartInterpolation(null, true, WrapMode);
             mSplineInterp.mSplineState = "Active";
-		}
-	}
+        }
+    }
 }

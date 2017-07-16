@@ -30,6 +30,8 @@ public class FishInteract : MonoBehaviour {
             Vector3 targetPos = player.transform.position + playerOffset;
             //smooth follow?
            transform.position += (targetPos - transform.position) * followSharpness;
+           //set to face same direction as player
+           transform.rotation = player.transform.rotation;
         }
 	}
 
@@ -61,9 +63,22 @@ public class FishInteract : MonoBehaviour {
                 //for now, just place in random position
                 playerOffset = new Vector3(UnityEngine.Random.Range(-2.0f, 2.0f),
                     UnityEngine.Random.Range(-3.0f, 2.0f), UnityEngine.Random.Range(-1.0f, 1.0f));
+                
+                Debug.Log(this.gameObject.name + "follow player");
+
+                //for 1st second of collision, play animation, reduce the followSpeed, and make the transition smooth before going to Update
+                float t = 0;
+                float animTime = 1f;
+                while (t < animTime)
+                {
+                    Vector3 targetPos = player.transform.position + playerOffset;
+                    //smooth follow?
+                    float followVal = 0.1f;
+                    transform.position += (targetPos - transform.position) * followVal;
+                    t += Time.deltaTime;
+                }
                 //lerp fish position to position close to player
                 move_wPlayer = true;
-                Debug.Log(this.gameObject.name + "follow player");
             }
         }
     }
