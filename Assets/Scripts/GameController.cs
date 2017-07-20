@@ -5,15 +5,20 @@ using System.Collections.Generic;
 public class GameController : MonoBehaviour {
 
     [SerializeField]
-    SplineController splineControl;
-    [SerializeField]
     PlayerController playerControl;
     [SerializeField]
     SoundManager soundManager;
+    [SerializeField]
+    CameraPathAnimator pathControl;
 
     GameObject player;
     SpriteRenderer blackOverlay;
     GameObject[] waterParticles;
+
+
+
+    List<string> s1Events;
+
     // Use this for initialization
     void Start () {
         //set default state to "paused"
@@ -21,7 +26,8 @@ public class GameController : MonoBehaviour {
         blackOverlay = GameObject.Find("BlackOverlay").GetComponent<SpriteRenderer>();
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1);
         StartCoroutine(Level1Start());
-        player = GameObject.Find("Player Container").gameObject;
+        player = GameObject.Find("PlayerCube").gameObject;
+        pathControl.playOnStart = false;
     }
 
     void Awake()
@@ -31,6 +37,19 @@ public class GameController : MonoBehaviour {
         //order particles are currently added to array: greastest to least = 1st item is the last item in the array
         waterParticles[0].SetActive(false);
         waterParticles[1].SetActive(false);
+
+        //subscribe to Scene1Event event call
+        EventManager.StartListening("Scene1Event", Scene1Events);
+        s1Events = new List<string>{"waterBubbles",""};
+        pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
+    }
+
+    
+
+    private void DebugFunc(string evt)
+    {
+        if (evt == "Paused")
+            Debug.Log("[Camera Path]: Paused");
     }
 	
 	// Update is called once per frame
@@ -39,7 +58,7 @@ public class GameController : MonoBehaviour {
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (splineControl.sSplineState == SplineState.Paused) //unpause
+            /*if (splineControl.sSplineState == SplineState.Paused) //unpause
             {
                 splineControl.sSplineState = SplineState.Resume;
                 playerControl.playerState = PlayerState.MOVING;
@@ -48,14 +67,48 @@ public class GameController : MonoBehaviour {
             {
                 splineControl.sSplineState = SplineState.Paused;
                 playerControl.playerState = PlayerState.NOTMOVING;
-            }
+            }*/
         }
         //if "O" pressed, continue spline
         if (Input.GetKeyDown(KeyCode.O))
         {
-            splineControl.sSplineState = SplineState.Resume;
+            //splineControl.sSplineState = SplineState.Resume;
             playerControl.playerState = PlayerState.MOVING;
         }
+    }
+
+    //function that contains what each event in song 1 should do
+    void Scene1Events(string evt)
+    { 
+            switch (evt)
+            {
+                case "waterParticle":
+                    Debug.Log("water particle activated");
+                    waterParticles[1].SetActive(true);
+                    break;
+                case "Scene2":
+                    StartCoroutine(Scene1_5());
+                    break;
+                default:
+                    break;
+            }
+                
+    }
+
+    IEnumerator Scene1_5()
+    {
+        //pause the spline
+        playerControl.CanMove = false;
+        pathControl.Pause();
+
+        //pause for x seconds and let player move around
+        yield return new WaitForSeconds(3);
+
+        //resume the spline
+        playerControl.CanMove = true;
+        pathControl.Play();
+
+        yield return null;
     }
 
     IEnumerator Level1Start()
@@ -96,6 +149,12 @@ public class GameController : MonoBehaviour {
 
         yield return new WaitForSeconds(1);
         //begin spline
+        pathControl.Play();
+        playerControl.CanMove = true;
+
+        /*
+         * Old code to begin spline
+        //begin spline
         splineControl.sSplineState = SplineState.Start;
         playerControl.playerState = PlayerState.MOVING;
         Debug.Log("spline started");
@@ -130,5 +189,6 @@ public class GameController : MonoBehaviour {
         splineControl.sSplineState = SplineState.Resume;
 
         yield return null;
+        */
     }
 }

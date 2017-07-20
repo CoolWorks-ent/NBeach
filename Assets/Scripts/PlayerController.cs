@@ -10,8 +10,6 @@ public enum PlayerState { MOVING, SWIMMING, JUMPING, NOTMOVING }
 public class PlayerController : MonoBehaviour {
 
     [SerializeField]
-    SplineController splineControl;
-    [SerializeField]
     float swimSpeed = 2f;
     [SerializeField]
     float myGravity = 9f;
