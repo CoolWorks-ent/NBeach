@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour {
 
     Camera mainCamera;
     GameObject player;
+    GameController gameController;
     UnderwaterScript underwaterScript;
     public PlayerState playerState { get; set; }
     public bool CanMove = true; //is player allowed to move or not?
@@ -36,8 +37,10 @@ public class PlayerController : MonoBehaviour {
     float maxRotAngle = 90;
     float minRotAngle = -45;
 
+    //playerInteractableItems
+    SpeedBoost speedBoost;
+    SpeedEffectAnimator speedAnimator;
     
-
 
     // Use this for initialization
     void Start () {
@@ -50,6 +53,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake()
     {
+
+        EventManager.StartListening("Player_SpeedBoost", OnSpeedBoost);
         //by default player is not moving
         playerState = PlayerState.NOTMOVING;
 
@@ -62,6 +67,9 @@ public class PlayerController : MonoBehaviour {
         rigidbody = this.GetComponent<Rigidbody>();
         //get variable to check if player underwater or not
         underwaterScript = mainCamera.GetComponent<UnderwaterScript>();
+
+        //Effects that affect player
+        //speedAnimator = mainCamera.GetComponent<SpeedEffectAnimator>();
     }
 
 	// Update is called once per frame
@@ -84,13 +92,13 @@ public class PlayerController : MonoBehaviour {
         int layerMask = 1 << 8;
 
         Debug.DrawRay(mainCamera.transform.position, fwd, Color.red);
-        if (Physics.Raycast(mainCamera.transform.position, fwd, out hit,fwd.magnitude,layerMask)) 
+        if (Physics.Raycast(mainCamera.transform.position, fwd, out hit, fwd.magnitude, layerMask))
         {
             //make it so player can't move forward more when colliding with container
             if (hit.collider.tag == "PlayerWall")
             {
-                //if (insideWall == false)
-                if(playerState == PlayerState.MOVING)
+                
+                if (playerState == PlayerState.MOVING)
                 {
                     Debug.Log("Wall is in front of the player!");
                     playerState = PlayerState.NOTMOVING;
@@ -98,12 +106,15 @@ public class PlayerController : MonoBehaviour {
                 }
             }
         }
+        
         //if player no longer colliding with wall, set player to move
         else if (insideWall == true && playerState == PlayerState.NOTMOVING)
         {
             insideWall = false;
             startMove = true;
         }
+        else //if raycast hits nothing, then player is inside container but too deep
+            insideWall = true;
 
         //begin player movement again if no longer colliding with PlayerContainer
         if (startMove == true && CanMove==true)
@@ -113,8 +124,9 @@ public class PlayerController : MonoBehaviour {
         }
         else if(CanMove == false)
         {
-            
+            playerState = PlayerState.NOTMOVING;
         }
+
 
         /*DEBUG*/
         //if "R" pressed, continue player mvmt
@@ -140,6 +152,33 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    void OnSpeedBoost(string str)
+    {
+        StartCoroutine(SpeedBoostRoutine());
+    }
+
+    private IEnumerator SpeedBoostRoutine()
+    {
+        //increase speed of player 
+        float speedTime = 4f;//speedBoost.speedTime;
+        float initBoostTime = 2f;//speedBoost.initBoostTime;
+        float boostAmt = 2f;//speedBoost.boostAmt;
+        float timeElapsed = 0f;
+
+        //plays the speed effect for x seconds
+        while (timeElapsed < speedTime)
+        {
+            //increase speed instantly.  but need to set up a gradual increase instead.
+            //gameController.pathControl.pathSpeed += boostAmt;
+
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        //stop speed boost
+        EventManager.TriggerEvent("Player_SpeedBoostOff", "Player_SpeedBoost");   
+    }
+
+
     private void FixedUpdate()
     {
 
@@ -158,7 +197,15 @@ public class PlayerController : MonoBehaviour {
         {
             playerState = PlayerState.NOTMOVING;
         }*/
+        //trigger speed boost if collide with the object
+        if (collision.collider.tag == "SpeedBoost")
+        {
+            EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
+            //get speedBoost object to use for variables
+            speedBoost = collision.gameObject.GetComponent<SpeedBoost>();
+        }
     }
+
 
 
     /*

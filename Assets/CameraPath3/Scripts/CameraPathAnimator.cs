@@ -15,6 +15,8 @@ using System.Text;
 using System.Xml;
 #endif
 
+public enum PathState { Start, Stopped, Loop, Reset, Paused, Play, Active }
+
 public class CameraPathAnimator : MonoBehaviour
 {
     public float minimumCameraSpeed = 0.01f;
@@ -42,6 +44,7 @@ public class CameraPathAnimator : MonoBehaviour
         none
     }
 
+
     public Transform orientationTarget;
     [SerializeField]
     private CameraPath _cameraPath;
@@ -56,6 +59,7 @@ public class CameraPathAnimator : MonoBehaviour
     private bool _playing;
     public animationModes animationMode = animationModes.once;
     [SerializeField]
+
     private orientationModes _orientationMode = orientationModes.custom;
     public bool smoothOrientationModeChanges = false;
     public float orientationModeLerpTime = 0.3f;
@@ -97,6 +101,8 @@ public class CameraPathAnimator : MonoBehaviour
 
     public Vector3 animatedObjectStartPosition;
     public Quaternion animatedObjectStartRotation;
+
+    PathState mPathState;
 
     //Events
     public delegate void AnimationStartedEventHandler();
@@ -197,6 +203,42 @@ public class CameraPathAnimator : MonoBehaviour
     public virtual float currentTime
     {
         get { return _pathTime * _percentage; }
+    }
+
+    /// <summary>
+    /// all possible states of the path and their corresponding functions.  
+    /// Should be called by outside scripts 
+    /// </summary>
+    public PathState pPathState
+    {
+        get { return mPathState; }
+        set
+        {
+            if (value == PathState.Active)
+            {
+                mPathState = PathState.Active;
+                // mSplineInterp.mSplineState = "Resume";
+            }
+            else if (value == PathState.Loop)
+            {
+                mPathState = PathState.Loop;
+            }
+            else if (value == PathState.Paused)
+            {
+                mPathState = PathState.Paused;
+                Pause();
+            }
+            else if (value == PathState.Stopped)
+            {
+                mPathState = PathState.Stopped;
+                Stop();
+            }
+            else if (value == PathState.Play)
+            {
+                mPathState = PathState.Play;
+                Play();
+            }
+        }
     }
 
     /// <summary>

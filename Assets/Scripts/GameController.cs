@@ -9,7 +9,7 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     SoundManager soundManager;
     [SerializeField]
-    CameraPathAnimator pathControl;
+    public CameraPathAnimator pathControl;
 
     GameObject player;
     SpriteRenderer blackOverlay;
@@ -58,16 +58,16 @@ public class GameController : MonoBehaviour {
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
         {
-            /*if (splineControl.sSplineState == SplineState.Paused) //unpause
+            if (pathControl.pPathState == PathState.Paused) //unpause
             {
-                splineControl.sSplineState = SplineState.Resume;
-                playerControl.playerState = PlayerState.MOVING;
+                pathControl.pPathState = PathState.Play;
+                playerControl.CanMove = true;
             }
             else  //pause
             {
-                splineControl.sSplineState = SplineState.Paused;
-                playerControl.playerState = PlayerState.NOTMOVING;
-            }*/
+                pathControl.pPathState = PathState.Paused;
+                playerControl.CanMove = false;
+            }
         }
         //if "O" pressed, continue spline
         if (Input.GetKeyDown(KeyCode.O))
@@ -99,14 +99,14 @@ public class GameController : MonoBehaviour {
     {
         //pause the spline
         playerControl.CanMove = false;
-        pathControl.Pause();
+        pathControl.pPathState = PathState.Paused;
 
         //pause for x seconds and let player move around
         yield return new WaitForSeconds(3);
 
         //resume the spline
         playerControl.CanMove = true;
-        pathControl.Play();
+        pathControl.pPathState = PathState.Play;
 
         yield return null;
     }
@@ -148,9 +148,11 @@ public class GameController : MonoBehaviour {
         //have fish swim up to player and begin to lead player
 
         yield return new WaitForSeconds(1);
+
         //begin spline
         pathControl.Play();
         playerControl.CanMove = true;
+        playerControl.playerState = PlayerState.MOVING;
 
         /*
          * Old code to begin spline
