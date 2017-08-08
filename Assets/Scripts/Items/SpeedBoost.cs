@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour {
 
-    public float speedTime = 4f, initBoostTime = 2f, boostAmt = 1f;
+    public float speedTime = 4f, initBoostTime = 2f, boostAmt = .5f;
     float timeElapsed;
+    float origSpeed;
     bool playSpeedAnim;
     SpeedEffectAnimator speedAnimator;
     GameController gameController;
@@ -15,7 +16,9 @@ public class SpeedBoost : MonoBehaviour {
     void Start () {
         speedTime = 4f;
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
-        speedAnimator = this.GetComponent<SpeedEffectAnimator>();
+        EventManager.StartListening("Player_SpeedBoostOff", OnDeboost);
+        speedAnimator = Camera.main.GetComponent<SpeedEffectAnimator>();
+        origSpeed = gameController.pathControl.pathSpeed;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -38,6 +41,11 @@ public class SpeedBoost : MonoBehaviour {
         playSpeedAnim = true;
         
         //*optional: set the time of the speed boost here
+    }
+
+    private void OnDeboost(string str)
+    {
+        StartCoroutine(GradualDeboost());
     }
 
     // Update is called once per frame
@@ -72,5 +80,25 @@ public class SpeedBoost : MonoBehaviour {
         }
 
         yield return null;
+    }
+
+    IEnumerator GradualDeboost()
+    {
+        // decrease speed over time
+         float baseSpeed = gameController.pathControl.pathSpeed;
+        float decreaseTime = 1f;
+        //reset time
+        float time = 0;
+        while (time < decreaseTime)
+        {
+            Debug.Log("revert boost");
+            //decrease speed back to normal speed
+            gameController.pathControl.pathSpeed = Mathf.Lerp(baseSpeed, origSpeed, time / decreaseTime);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        //set back to original speed
+        gameController.pathControl.pathSpeed = origSpeed;
+       yield return null;
     }
 }

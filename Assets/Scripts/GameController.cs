@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,11 +11,14 @@ public class GameController : MonoBehaviour {
     SoundManager soundManager;
     [SerializeField]
     public CameraPathAnimator pathControl;
+    [SerializeField]
+    GameObject debugMenuPrefab;
 
     GameObject player;
     SpriteRenderer blackOverlay;
     GameObject[] waterParticles;
-
+    bool showDebug=false;
+    private GameObject debugMenuObj;
 
 
     List<string> s1Events;
@@ -51,9 +55,10 @@ public class GameController : MonoBehaviour {
         if (evt == "Paused")
             Debug.Log("[Camera Path]: Paused");
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
 
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
@@ -75,6 +80,40 @@ public class GameController : MonoBehaviour {
             //splineControl.sSplineState = SplineState.Resume;
             playerControl.playerState = PlayerState.MOVING;
         }
+
+        ///<Debug Stuff>
+        /// Anything related to onscreen Debug Mode
+        ///</Debug>
+
+        if (Input.GetKeyDown(KeyCode.BackQuote)) //tilda
+        {
+            //show Debug Menu
+            if (ShowDebug)
+                ShowDebug = false;
+            else
+                ShowDebug = true;
+        }
+
+        
+
+    }
+
+    private bool ShowDebug
+    {
+        
+        set
+        {
+            showDebug = value;
+            if (showDebug == true && debugMenuObj == null)
+            {
+                debugMenuObj = Instantiate(debugMenuPrefab);
+                
+            }
+            else
+                Destroy(debugMenuObj);
+        }
+        get {
+            return showDebug; }
     }
 
     //function that contains what each event in song 1 should do
