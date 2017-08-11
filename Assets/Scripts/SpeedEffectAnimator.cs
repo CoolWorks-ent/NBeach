@@ -50,6 +50,15 @@ public class SpeedEffectAnimator : MonoBehaviour {
 
     }
 
+    private void Reset(string str)
+    {
+        if(m_Playing)
+        {
+            StopCoroutine(PlayTextures());
+            speedFxOverlay.gameObject.SetActive(false);
+        }
+            
+    }
 
     public void StartAnim(string str)
     {

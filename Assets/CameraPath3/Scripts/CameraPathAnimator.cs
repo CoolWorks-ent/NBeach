@@ -10,6 +10,7 @@
 
 using System;
 using UnityEngine;
+using System.Collections;
 #if UNITY_EDITOR
 using System.Text;
 using System.Xml;
@@ -272,17 +273,39 @@ public class CameraPathAnimator : MonoBehaviour
     public virtual void Stop()
     {
         _playing = false;
+        EventManager.TriggerEvent("Player_Stop", "playerStop");
         _percentage = 0;
         if (AnimationStoppedEvent != null) AnimationStoppedEvent();
     }
 
     /// <summary>
-    /// Pause the animation where it is
+    /// Pause the animation where it is, after a gradual stop to be less jarring
     /// </summary>
     public virtual void Pause()
     {
+        //_playing = false;
+        //if (AnimationPausedEvent != null) AnimationPausedEvent();
+        StartCoroutine(GradualPause());
+        
+    }
+
+    private IEnumerator GradualPause()
+    {
+        float speed = pathSpeed;
+        float time = 0;
+        float timeToPause = 0.5f;
+        while(time < timeToPause)
+        {
+            pathSpeed = Mathf.Lerp(speed, 0, time/timeToPause);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
         _playing = false;
+        EventManager.TriggerEvent("Player_Stop", "playerStop");
         if (AnimationPausedEvent != null) AnimationPausedEvent();
+
+        yield return null;
     }
 
     /// <summary>

@@ -27,11 +27,16 @@ public class GameController : MonoBehaviour {
     void Start () {
         //set default state to "paused"
         //splineControl.sSplineState = SplineState.Paused;
-        blackOverlay = GameObject.Find("BlackOverlay").GetComponent<SpriteRenderer>();
-        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1);
-        StartCoroutine(Level1Start());
+
+        if (GameObject.Find("BlackOverlay"))
+        {
+            blackOverlay = GameObject.Find("BlackOverlay").GetComponent<SpriteRenderer>();
+            blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1);
+        }
         player = GameObject.Find("PlayerCube").gameObject;
         pathControl.playOnStart = false;
+        StartCoroutine(Level1Start());
+        
     }
 
     void Awake()
@@ -44,6 +49,7 @@ public class GameController : MonoBehaviour {
 
         //subscribe to Scene1Event event call
         EventManager.StartListening("Scene1Event", Scene1Events);
+        EventManager.StartListening("Player_Stop",ResetPlayer);
         s1Events = new List<string>{"waterBubbles",""};
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
     }
@@ -93,14 +99,10 @@ public class GameController : MonoBehaviour {
             else
                 ShowDebug = true;
         }
-
-        
-
     }
 
     private bool ShowDebug
     {
-        
         set
         {
             showDebug = value;
@@ -116,6 +118,17 @@ public class GameController : MonoBehaviour {
             return showDebug; }
     }
 
+    //return player and associated effects back to default state
+    private void ResetPlayer(string evt)
+    {
+        //cancel forces
+        playerControl.playerState = PlayerState.NOTMOVING;
+        playerControl.CanMove = false;
+        playerControl.Reset();
+        //cancel FX
+        //cancel powerUps
+    }
+
     //function that contains what each event in song 1 should do
     void Scene1Events(string evt)
     { 
@@ -128,10 +141,14 @@ public class GameController : MonoBehaviour {
                 case "Scene2":
                     StartCoroutine(Scene1_5());
                     break;
+                case "SceneEnd":
+                    break;
+                case "test":
+                    pathControl.pPathState = PathState.Paused;
+                    break;
                 default:
                     break;
-            }
-                
+            }       
     }
 
     IEnumerator Scene1_5()
@@ -156,18 +173,22 @@ public class GameController : MonoBehaviour {
         float time = 0;
         float screenFadeOutTime = 1f;
         float headRotTime = 5f;
-        Color baseColor = blackOverlay.color;
+        
 
         //open eyes
         soundManager.PlayMusic(0);
 
-        //fade sign out every second
-        while (time < screenFadeOutTime)
+        if (blackOverlay != null)
         {
-            Debug.Log("fading");
-            blackOverlay.color = Color.Lerp(baseColor, new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f), time / screenFadeOutTime);
-            time += Time.deltaTime;
-            yield return null;
+            Color baseColor = blackOverlay.color;
+            //fade sign out every second
+            while (time < screenFadeOutTime)
+            {
+                Debug.Log("fading");
+                blackOverlay.color = Color.Lerp(baseColor, new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f), time / screenFadeOutTime);
+                time += Time.deltaTime;
+                yield return null;
+            }
         }
 
         float t = 0;

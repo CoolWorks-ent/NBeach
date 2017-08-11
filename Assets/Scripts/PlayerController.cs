@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour {
     Vector3 p_startPos;
     float maxRotAngle = 90;
     float minRotAngle = -45;
+    Vector3 movementVector;
+    Vector3 undesiredMvmtVector;
 
     //playerInteractableItems
     SpeedBoost speedBoost;
@@ -72,6 +74,13 @@ public class PlayerController : MonoBehaviour {
         //speedAnimator = mainCamera.GetComponent<SpeedEffectAnimator>();
     }
 
+    //reset player to default state
+    public void Reset()
+    {
+        EventManager.TriggerEvent("CancelPowerUps", "cancelPowerUps");
+    }
+
+
 	// Update is called once per frame
 	void Update () {
 
@@ -101,8 +110,11 @@ public class PlayerController : MonoBehaviour {
                 if (playerState == PlayerState.MOVING)
                 {
                     Debug.Log("Wall is in front of the player!");
-                    playerState = PlayerState.NOTMOVING;
+                    CanMove = false;
                     insideWall = true;
+                    //project vector of motion onto the plane's normal (via raycast) 
+                    undesiredMvmtVector = hit.normal * Vector3.Dot(mainCamera.transform.forward, hit.normal);
+                    movementVector = mainCamera.transform.forward - undesiredMvmtVector;
                 }
             }
         }
@@ -111,10 +123,11 @@ public class PlayerController : MonoBehaviour {
         else if (insideWall == true && playerState == PlayerState.NOTMOVING)
         {
             insideWall = false;
+            CanMove = true;
             startMove = true;
         }
         else //if raycast hits nothing, then player is inside container but too deep
-            insideWall = true;
+            //insideWall = true;
 
         //begin player movement again if no longer colliding with PlayerContainer
         if (startMove == true && CanMove==true)
@@ -154,7 +167,7 @@ public class PlayerController : MonoBehaviour {
 
     void OnSpeedBoost(string str)
     {
-        StartCoroutine(SpeedBoostRoutine());
+        //StartCoroutine(SpeedBoostRoutine());
     }
 
     private IEnumerator SpeedBoostRoutine()
@@ -169,7 +182,7 @@ public class PlayerController : MonoBehaviour {
         while (timeElapsed < speedTime)
         {
             //increase speed instantly.  but need to set up a gradual increase instead.
-            //gameController.pathControl.pathSpeed += boostAmt;
+            gameController.pathControl.pathSpeed += boostAmt;
 
             timeElapsed += Time.deltaTime;
             yield return null;
@@ -192,11 +205,6 @@ public class PlayerController : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        //make it so player can't move forward more when colliding with container
-        /*if(collision.collider.tag == "PlayerContainer")
-        {
-            playerState = PlayerState.NOTMOVING;
-        }*/
         //trigger speed boost if collide with the object
         if (collision.collider.tag == "SpeedBoost")
         {
@@ -208,9 +216,9 @@ public class PlayerController : MonoBehaviour {
 
 
 
-    /*
-     *Controls underwater movement of the player 
-     */
+    /// <summary>
+    /// Controls Underwater movement for Player
+    /// </summary>
     void UnderwaterMovement()
     {
         //if player rotation is less than max rotation angle, then player can move in that direction
@@ -233,17 +241,26 @@ public class PlayerController : MonoBehaviour {
                                                                              //get player's current rotation based on their starting rotation
             float curAngle = Quaternion.Angle(p_startRot, headRotation);
             float curVal = p_startRot.eulerAngles.y - headRotation.eulerAngles.y;
-            //Debug.Log("Rot = " + curVal);
-            //if player's rotation is not behind them, allow movement in the direction they are facing
-            //if (curAngle < maxRotAngle)
+
+            //if player's rotation is not behind them, allow movement in the direction they are facing.  DO NOT ALLOW BACKWARDS MOVEMENT
             if(!(headRotation.eulerAngles.y > maxRotAngle && headRotation.eulerAngles.y < 270))
             {
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);
 
-                //move player in direction camera facing
-                rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
-                //transform.localPosition += transform.forward * swimSpeed * Time.deltaTime;
+                if (insideWall)
+                {
+                    //move player in direction of player's movement vector when colliding with wall.
+                    movementVector = mainCamera.transform.forward - undesiredMvmtVector;
+                    //setting z to 0 to prevent player moving backward away from wall or forward into the wall
+                    movementVector = new Vector3(movementVector.x, movementVector.y, 0);
+                    rigidbody.AddForce(movementVector * swimSpeed);
+                }
+                else
+                {
+                    //move player in direction camera facing, when player wall not being collided with
+                    rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
+                }
             }
            /* if (Mathf.Abs(rotDiff) < maxRotAngle)
             {

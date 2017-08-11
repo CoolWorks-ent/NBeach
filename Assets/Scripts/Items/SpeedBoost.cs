@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour {
 
-    public float speedTime = 4f, initBoostTime = 2f, boostAmt = .5f;
+    public float speedTime = 4f, initBoostTime = 2f, boostAmt = 1f;
     float timeElapsed;
     float origSpeed;
     bool playSpeedAnim;
+    bool playDeboost;
     SpeedEffectAnimator speedAnimator;
     GameController gameController;
     CameraPath pathController;
@@ -17,6 +18,7 @@ public class SpeedBoost : MonoBehaviour {
         speedTime = 4f;
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
         EventManager.StartListening("Player_SpeedBoostOff", OnDeboost);
+        EventManager.StartListening("CancelPowerUps", OnCancel);
         speedAnimator = Camera.main.GetComponent<SpeedEffectAnimator>();
         origSpeed = gameController.pathControl.pathSpeed;
     }
@@ -27,25 +29,44 @@ public class SpeedBoost : MonoBehaviour {
         {
             EventManager.TriggerEvent("Player_SpeedBoost","Player_SpeedBoost");
             OnSpeedBoost("evt");
-            //increase player speed over time
-            StartCoroutine(GradualBoost());
             //destroy this object after boost is finished
         }
     }
 
     private void OnSpeedBoost(string str)
     {
+        //start FX animation
         speedAnimator.StartAnim("anim");
         timeElapsed = Time.deltaTime;
-        //EventManager.TriggerEvent("Player_SpeedBoost","evt");
         playSpeedAnim = true;
-        
+
+        //increase player speed over time
+        StartCoroutine(GradualBoost());
         //*optional: set the time of the speed boost here
     }
 
     private void OnDeboost(string str)
     {
+        playDeboost = true;
         StartCoroutine(GradualDeboost());
+    }
+
+    private void OnCancel(string str)
+    {
+        //reset camera path speed and stop speed animation
+        speedAnimator.StopAnim("anim");
+
+        //stop speedBoost routine & reset player's path speed
+        if (playDeboost == true)
+            StopCoroutine(GradualDeboost());
+        if (playSpeedAnim == true)
+        {
+            StopCoroutine(GradualBoost());
+            gameController.pathControl.pathSpeed = origSpeed;
+            Debug.Log(gameController.pathControl.pathSpeed);
+            //destroy this game object, that was playing the animation
+            Destroy(gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -69,10 +90,10 @@ public class SpeedBoost : MonoBehaviour {
     {
         float time = 0;
         float baseSpeed = gameController.pathControl.pathSpeed;
+        Debug.Log("boosting");
         //fade sign out every second
         while (time < initBoostTime)
         {
-            Debug.Log("boosting");
             //increase speed over time and hold that speed
             gameController.pathControl.pathSpeed = Mathf.Lerp(baseSpeed, gameController.pathControl.pathSpeed + boostAmt, time/initBoostTime);
             time += Time.deltaTime;
@@ -89,9 +110,9 @@ public class SpeedBoost : MonoBehaviour {
         float decreaseTime = 1f;
         //reset time
         float time = 0;
+        Debug.Log("revert boost");
         while (time < decreaseTime)
-        {
-            Debug.Log("revert boost");
+        {   
             //decrease speed back to normal speed
             gameController.pathControl.pathSpeed = Mathf.Lerp(baseSpeed, origSpeed, time / decreaseTime);
             time += Time.deltaTime;
@@ -99,6 +120,8 @@ public class SpeedBoost : MonoBehaviour {
         }
         //set back to original speed
         gameController.pathControl.pathSpeed = origSpeed;
-       yield return null;
+        //destroy object
+        Destroy(this);
+        yield return null;
     }
 }
