@@ -2,13 +2,13 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace VRStandardAssets.Utils
-{
     //Modified for functionality with GVR SDK
     // This class should be added to any gameobject in the scene
     // that should react to input based on the user's gaze.
     // It contains events that can be subscribed to by classes that
     // need to know about input specifics to this gameobject.
+
+
     public class GVRInteractiveItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerUpHandler, IPointerDownHandler
     {
         public event Action OnOver;             // Called when the gaze moves over this object
@@ -75,4 +75,3 @@ namespace VRStandardAssets.Utils
                 OnDown();
         }
     }
-}

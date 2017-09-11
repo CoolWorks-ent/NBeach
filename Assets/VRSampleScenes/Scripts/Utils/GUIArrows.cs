@@ -1,35 +1,41 @@
 using UnityEngine;
-
+using System.Collections.Generic;
+// This class fades in and out arrows which indicate to
+// the player which direction they should be facing.
 namespace VRStandardAssets.Utils
-{ 
-    // This class fades in and out arrows which indicate to
-    // the player which direction they should be facing.
+{
     public class GUIArrows : MonoBehaviour
     {
-        [SerializeField] private float m_FadeDuration = 0.5f;       // How long it takes for the arrows to appear and disappear.
-        [SerializeField] private float m_ShowAngle = 60f;           // How far from the desired facing direction the player must be facing for the arrows to appear.
-        [SerializeField] private Transform m_DesiredDirection;      // Indicates which direction the player should be facing (uses world space forward if null).
-        [SerializeField] private Transform m_Camera;                // Reference to the camera to determine which way the player is facing.
-        [SerializeField] private Renderer[] m_ArrowRenderers;       // Reference to the renderers of the arrows used to fade them in and out.
+        [SerializeField]
+        private float m_FadeDuration = 0.5f;       // How long it takes for the arrows to appear and disappear.
+        [SerializeField]
+        private float m_ShowAngle = 60f;           // How far from the desired facing direction the player must be facing for the arrows to appear.
+        [SerializeField]
+        private Transform m_DesiredDirection;      // Indicates which direction the player should be facing (uses world space forward if null).
+        [SerializeField]
+        private Transform m_Camera;                // Reference to the camera to determine which way the player is facing.
+        [SerializeField]
+        private Renderer[] m_ArrowRenderers;       // Reference to the renderers of the arrows used to fade them in and out.
 
 
         private float m_CurrentAlpha;                               // The alpha the arrows currently have.
         private float m_TargetAlpha;                                // The alpha the arrows are fading towards.
         private float m_FadeSpeed;                                  // How much the alpha should change per second (calculated from the fade duration).
 
-
         private const string k_MaterialPropertyName = "_Alpha";     // The name of the alpha property on the shader being used to fade the arrows.
 
 
-	    private void Start ()
-	    {
+        private void Start()
+        {
             // Speed is distance (zero alpha to one alpha) divided by time (duration).
             m_FadeSpeed = 1f / m_FadeDuration;
-	    }
+
+        }
 
 
         private void Update()
         {
+
             // The vector in which the player should be facing is the forward direction of the transform specified or world space.
             Vector3 desiredForward = m_DesiredDirection == null ? Vector3.forward : m_DesiredDirection.forward;
 
@@ -61,9 +67,10 @@ namespace VRStandardAssets.Utils
 
 
         // Turn the arrows on.
-        public void Show ()
+        public void Show()
         {
             gameObject.SetActive(true);
         }
+
     }
 }

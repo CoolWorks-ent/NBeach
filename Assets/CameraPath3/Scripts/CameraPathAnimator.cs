@@ -83,6 +83,7 @@ public class CameraPathAnimator : MonoBehaviour
     //the time the path animation should last for
     [SerializeField]
     private float _pathSpeed = 10;
+    private float _basePathSpeed = 0;
     private float _percentage;
     private float _lastPercentage;
     public float nearestOffset = 0;
@@ -247,7 +248,10 @@ public class CameraPathAnimator : MonoBehaviour
     /// </summary>
     public virtual void Play()
     {
-        _playing = true;
+        StartCoroutine(GradualStart());
+        /*_playing = true;
+        if(_basePathSpeed!=0)
+            _pathSpeed = _basePathSpeed;
         if (!isReversed)
         {
             if(_percentage == 0)
@@ -265,6 +269,7 @@ public class CameraPathAnimator : MonoBehaviour
             }
         }
         _lastPercentage = _percentage;
+        */
     }
 
     /// <summary>
@@ -291,12 +296,15 @@ public class CameraPathAnimator : MonoBehaviour
 
     private IEnumerator GradualPause()
     {
-        float speed = pathSpeed;
+        float speed = _pathSpeed;
+        //set original speed of path to use later
+        if(_basePathSpeed==0)
+            _basePathSpeed = _pathSpeed;
         float time = 0;
         float timeToPause = 0.5f;
         while(time < timeToPause)
         {
-            pathSpeed = Mathf.Lerp(speed, 0, time/timeToPause);
+            _pathSpeed = Mathf.Lerp(speed, 0, time/timeToPause);
             time += Time.deltaTime;
             yield return null;
         }
@@ -305,6 +313,51 @@ public class CameraPathAnimator : MonoBehaviour
         EventManager.TriggerEvent("Player_Stop", "playerStop");
         if (AnimationPausedEvent != null) AnimationPausedEvent();
 
+        yield return null;
+    }
+
+    //gradually start camera movement to prevent "jerk", "abrupt" movement
+    private IEnumerator GradualStart()
+    {
+        if (_basePathSpeed != 0)
+            _pathSpeed = _basePathSpeed;
+        float topSpeed = _pathSpeed; //max speed
+        //temporarily set pathSpeed to 0
+        _pathSpeed = 0;
+        float time = 0;
+        float timeToStart = 1.0f;
+        _playing = true;
+
+        if (!isReversed)
+        {
+            if (_percentage == 0)
+            {
+                if (AnimationStartedEvent != null) AnimationStartedEvent();
+                cameraPath.eventList.OnAnimationStart(0);
+            }
+        }
+        else
+        {
+            if (_percentage == 1)
+            {
+                if (AnimationStartedEvent != null) AnimationStartedEvent();
+                cameraPath.eventList.OnAnimationStart(1);
+            }
+        }
+        _lastPercentage = _percentage;
+
+
+        //gradually increase path speed to max speed
+        while (time < timeToStart)
+        {
+            _pathSpeed = Mathf.Lerp(0, topSpeed, time / timeToStart);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        _pathSpeed = topSpeed; //set path speed in case it is not equal to topSpeed at end of LERP
+                
+        EventManager.TriggerEvent("Player_Start", "playerStart");
+        
         yield return null;
     }
 

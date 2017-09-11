@@ -21,8 +21,24 @@ GameObject:
   - component: {fileID: 4230403560313132}
   - component: {fileID: 33752583433606530}
   - component: {fileID: 23252465566628166}
+  - component: {fileID: 136808116066845478}
   m_Layer: 0
   m_Name: Coral_Rock2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1797062181452236
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4297595667923172}
+  m_Layer: 0
+  m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,11 +50,25 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1502041801017902}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.0596857, y: -0.04220906, z: 0.9932441, w: 0.09012301}
+  m_LocalPosition: {x: -5.49263, y: 12.435837, z: 132.6044}
+  m_LocalScale: {x: 70, y: 70.000015, z: 70.000015}
+  m_Children:
+  - {fileID: 4297595667923172}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 5.4290004, y: 6.399, z: 169.93501}
+--- !u!4 &4297595667923172
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1797062181452236}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 4230403560313132}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23252465566628166
@@ -80,3 +110,16 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1502041801017902}
   m_Mesh: {fileID: 4300036, guid: 08e12e91a9ac38c4abd1c57e06bc2acc, type: 3}
+--- !u!136 &136808116066845478
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1502041801017902}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.20307921
+  m_Height: 0.7
+  m_Direction: 2
+  m_Center: {x: -0.6292066, y: 0.03197382, z: 0.12779494}

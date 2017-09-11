@@ -250,16 +250,52 @@ public class PlayerController : MonoBehaviour {
 
                 if (insideWall)
                 {
+                    /*old player mvmt code*/
                     //move player in direction of player's movement vector when colliding with wall.
-                    movementVector = mainCamera.transform.forward - undesiredMvmtVector;
+                    //movementVector = mainCamera.transform.forward - undesiredMvmtVector;
                     //setting z to 0 to prevent player moving backward away from wall or forward into the wall
-                    movementVector = new Vector3(movementVector.x, movementVector.y, 0);
-                    rigidbody.AddForce(movementVector * swimSpeed);
+                    //movementVector = new Vector3(movementVector.normalized.x, movementVector.normalized.y, 0);
+                    //rigidbody.velocity = movementVector * 10f;
+                    //rigidbody.AddForce(movementVector * (swimSpeed));
+
+                    /*new moveement code*/
+                    float maxVelocityChange = 1;
+                    movementVector = mainCamera.transform.forward - undesiredMvmtVector;
+                    // Calculate how fast we should be moving
+                    Vector3 targetVelocity = movementVector;
+                    targetVelocity = transform.TransformDirection(targetVelocity);
+                    targetVelocity *= swimSpeed;
+
+                    // Apply a force that attempts to reach our target velocity
+                    Vector3 velocity = rigidbody.velocity;
+                    Vector3 velocityChange = (targetVelocity - velocity);
+                    velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
+                    velocityChange.y = Mathf.Clamp(velocityChange.y, -maxVelocityChange, maxVelocityChange);
+                    velocityChange.z = 0;
+                    rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 }
                 else
                 {
+                    /*old player mvmt code*/
                     //move player in direction camera facing, when player wall not being collided with
-                    rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
+                    //rigidbody.AddForce(mainCamera.transform.forward * swimSpeed);
+
+                    /*new moveement code*/
+                    float maxVelocityChange = 1;
+                    movementVector = mainCamera.transform.forward;
+                    // Calculate how fast we should be moving
+                    Vector3 targetVelocity = movementVector;
+                    targetVelocity = transform.TransformDirection(targetVelocity);
+                    targetVelocity *= swimSpeed;
+
+                    // Apply a force that attempts to reach our target velocity
+                    Vector3 velocity = rigidbody.velocity;
+                    Vector3 velocityChange = (targetVelocity - velocity);
+                    velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
+                    velocityChange.y = Mathf.Clamp(velocityChange.y, -maxVelocityChange, maxVelocityChange);
+                    velocityChange.z = 0;
+                    rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+
                 }
             }
            /* if (Mathf.Abs(rotDiff) < maxRotAngle)

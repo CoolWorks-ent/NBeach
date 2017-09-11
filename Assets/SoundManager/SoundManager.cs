@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SoundManager : MonoBehaviour {
 	
@@ -15,9 +16,10 @@ public class SoundManager : MonoBehaviour {
 	
 	private int playCount = 0;
 	private int[] soundSeq;
+    private List<AudioSource> allAudioSourcesTemp = new List<AudioSource>();
 	
 	private string musicPath = "Sounds/BGMusic/";
-	private string foleyPath = "Sounds/Foley/";
+	private string foleyPath = "Sounds/FX/";
 	private string playerVoxPath = "Sounds/VoxPlayer/";
 	private string masterVoxPath = "Sounds/VoxMaster/";
 	private string monsterPath = "Sounds/Monsters/";
@@ -30,7 +32,7 @@ public class SoundManager : MonoBehaviour {
 	private string[] music = new string[] {"NB!2", "FirstLevelFight", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
 	
 	//Foley sounds
-	private string[] foleySounds = new string[] {"Fire_launch", "Fire_hit", "Lightning_launch", "Lightning_hit", "Water_launch", "Water_hit", "Portal_open", "IntroSceneFire", "Intro_door", "Fire_charging", "Water_charging", "Lightning_charging", "Charging"};
+	private string[] foleySounds = new string[] {"wavesIncoming", "wavesCrashing"};
 	
 	//Player Vox
 	private string[] playerLines = new string[] {"ICanUseThisTeleportation", "Master", "MyMasterTaughtMe", "MaybeFireMagic", "ThereAreMoreSpells", "FireMonstersMyWaterSpell"};
@@ -70,25 +72,25 @@ public class SoundManager : MonoBehaviour {
 		BGMusic.GetComponent<AudioSource> ().Play ();
 	}
 	
-	public void PlayFoleySound(int num)
+	public void PlayFoleySound(int num, float volume=0.9f)
 	{
+
 		print ("foley sound : " + num);
-		AudioClip newClip = (AudioClip)Resources.Load(string.Concat(foleyPath,foleySounds[num]), typeof(AudioClip));
-		
+        AudioClip newClip = (AudioClip)Resources.Load(string.Concat(foleyPath, foleySounds[num]), typeof(AudioClip));
 		//trying new logic, spawning a gameobject for the sound
-		GameObject newFoley = (GameObject)Instantiate (newSound);
+		GameObject newFoley = GameObject.Instantiate(newSound);
 		newFoley.transform.parent = transform;
-		
-		newFoley.GetComponent<AudioSource> ().clip = newClip;
-		
-		//loop the intro scene fire
-		if(num == 7)
-		{
-			newFoley.GetComponent<AudioSource>().Play();
-			newFoley.GetComponent<AudioSource>().loop = true;
-		}
-		else //destroy all the other sounds after playing
-			StartCoroutine(PlayAndDestroy (newFoley, newClip.length));
+
+        AudioSource newFoleyAudio = newFoley.GetComponent<AudioSource>();
+
+        newFoleyAudio.clip = newClip;
+        newFoleyAudio.volume = volume;
+
+        //add new audio source to list
+        allAudioSourcesTemp.Add(newFoleyAudio);
+
+        //destroy all the other sounds after playing
+        StartCoroutine(PlayAndDestroy (newFoley, newClip.length));
 	}
 
 	public void PlayChargingSound(string type)
@@ -126,12 +128,14 @@ public class SoundManager : MonoBehaviour {
 		//trying new logic, spawning a gameobject for the sound
 		GameObject newFoley = (GameObject)Instantiate (newSound);
 		newFoley.transform.parent = transform;
-		
-		newFoley.GetComponent<AudioSource> ().clip = newClip;
 
-		newFoley.GetComponent<AudioSource> ().volume = 0.9f;
+        AudioSource newFoleyAudio = newFoley.GetComponent<AudioSource>();
 
-		StartCoroutine(PlayAndDestroy (newFoley, newClip.length));
+        newFoleyAudio.clip = newClip;
+
+        newFoleyAudio.volume = 0.9f;
+
+        StartCoroutine(PlayAndDestroy (newFoley, newClip.length));
 	}
 	
 	public void PlayMonsterSound(string type)
@@ -155,21 +159,47 @@ public class SoundManager : MonoBehaviour {
 		//trying new logic, spawning a gameobject for the sound
 		GameObject newFoley = (GameObject)Instantiate (newSound);
 		newFoley.transform.parent = transform;
-		
-		newFoley.GetComponent<AudioSource> ().clip = newClip;
+        AudioSource newFoleyAudio = newFoley.GetComponent<AudioSource>();
 
-		newFoley.GetComponent<AudioSource> ().volume = 0.9f;
-		
+        newFoleyAudio.clip = newClip;
+
+        newFoleyAudio.volume = 0.9f;
+
+        //add new audio source to list
+        allAudioSourcesTemp.Add(newFoleyAudio);
+
 		//loop the intro tense scene sound
 		StartCoroutine(PlayAndDestroy (newFoley, newClip.length));
 	}
 	
 	private IEnumerator PlayAndDestroy(GameObject newFoley, float pLength)
 	{
-		newFoley.GetComponent<AudioSource> ().Play ();
-		yield return new WaitForSeconds(pLength);
+        AudioSource tempAudio;
+        tempAudio = newFoley.GetComponent<AudioSource>();
+        tempAudio.Play();
+
+        yield return new WaitForSeconds(pLength);
+        //even when audio is stopped, this audio will be destroyed after the waitTime
+        for(int i=0;i< allAudioSourcesTemp.Count;i++)
+        {
+            if(allAudioSourcesTemp[i] == tempAudio)
+            {
+                allAudioSourcesTemp.Remove(tempAudio);
+            }
+        }
 		Destroy (newFoley);
 	}
+
+    /// <summary>
+    /// stops all temporary audio.  temp audio is considered anything that is not playing in the background, mainly music
+    /// </summary>
+    public void StopAllTempAudio()
+    {
+        foreach (AudioSource audioS in allAudioSourcesTemp)
+        {
+            audioS.Stop();
+        }
+    }
 	
 	public void CrossFadeMusicIntroScene()
 	{

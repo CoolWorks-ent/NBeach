@@ -79,12 +79,16 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
     float dist = eventCamera.nearClipPlane + 7;
     float radius = PointerRadius;
     RaycastHit[] hits;
-        
+    int layerMask = 1 << 9; //pinteract layer
+    int layerMask2 = 1 << 2; //default layer
+    int finalLayerMask = layerMask;
+
     if (radius > 0.0f) {
       hits = Physics.SphereCastAll(ray, radius, dist, finalEventMask);
     } else {
-      hits = Physics.RaycastAll(ray, dist, finalEventMask);
-    }
+            //hits = Physics.RaycastAll(ray, dist, finalEventMask);
+            hits = Physics.RaycastAll(ray, dist, finalLayerMask);
+        }
 
     if (hits.Length == 0) {
       return;
