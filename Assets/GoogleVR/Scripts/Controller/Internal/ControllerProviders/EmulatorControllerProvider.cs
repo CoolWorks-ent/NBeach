@@ -9,12 +9,12 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissioßns and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The controller is not available for versions of Unity without the
-// // GVR native integration.
-#if UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_EDITOR)
+// This class is only used in the Editor, so make sure to only compile it on that platform.
+// Additionally, it depends on EmulatorManager which is only compiled in the editor.
+#if UNITY_EDITOR
 
 using UnityEngine;
 
@@ -22,6 +22,12 @@ using UnityEngine;
 namespace Gvr.Internal {
   /// Controller provider that connects to the controller emulator to obtain controller events.
   class EmulatorControllerProvider : IControllerProvider {
+#if UNITY_HAS_GOOGLEVR && UNITY_ANDROID
+    /// Helper class to get Instant Preview controller events if connected.
+    private InstantPreviewControllerProvider instantPreviewControllerProvider =
+      new InstantPreviewControllerProvider();
+#endif // UNITY_HAS_GOOGLEVR && UNITY_ANDROID
+
     private ControllerState state = new ControllerState();
 
     /// Yaw correction due to recentering.
@@ -33,11 +39,15 @@ namespace Gvr.Internal {
     /// The last (uncorrected) orientation received from the emulator.
     private Quaternion lastRawOrientation = Quaternion.identity;
 
+    public bool SupportsBatteryStatus {
+      get { return true; }
+    }
+
     /// Creates a new EmulatorControllerProvider with the specified settings.
-    internal EmulatorControllerProvider(GvrController.EmulatorConnectionMode connectionMode) {
-      if (connectionMode == GvrController.EmulatorConnectionMode.USB) {
+    internal EmulatorControllerProvider(GvrControllerInput.EmulatorConnectionMode connectionMode) {
+      if (connectionMode == GvrControllerInput.EmulatorConnectionMode.USB) {
         EmulatorConfig.Instance.PHONE_EVENT_MODE = EmulatorConfig.Mode.USB;
-      } else if (connectionMode == GvrController.EmulatorConnectionMode.WIFI) {
+      } else if (connectionMode == GvrControllerInput.EmulatorConnectionMode.WIFI) {
         EmulatorConfig.Instance.PHONE_EVENT_MODE = EmulatorConfig.Mode.WIFI;
       } else {
         EmulatorConfig.Instance.PHONE_EVENT_MODE = EmulatorConfig.Mode.OFF;
@@ -51,9 +61,21 @@ namespace Gvr.Internal {
     }
 
     public void ReadState(ControllerState outState) {
+#if UNITY_HAS_GOOGLEVR && UNITY_ANDROID
+      if (InstantPreview.Instance != null && InstantPreview.Instance.IsCurrentlyConnected
+          && !EmulatorManager.Instance.Connected) {
+        // Uses Instant Preview to get controller state if connected.
+        instantPreviewControllerProvider.ReadState(outState);
+        return;
+      }
+#endif // UNITY_HAS_GOOGLEVR && UNITY_ANDROID
+      // If Instant Preview is not connected, tries to use the Controller Emulator.
       lock (state) {
-        state.connectionState = EmulatorManager.Instance.Connected ? GvrConnectionState.Connected :
-            GvrConnectionState.Connecting;
+        state.connectionState = GvrConnectionState.Connected;
+        if (!EmulatorManager.Instance.Connected) {
+          state.connectionState = EmulatorManager.Instance.Connecting ?
+              GvrConnectionState.Connecting : GvrConnectionState.Disconnected;
+        }
         state.apiStatus = EmulatorManager.Instance.Connected ? GvrControllerApiStatus.Ok :
             GvrControllerApiStatus.Unavailable;
 
@@ -103,32 +125,35 @@ namespace Gvr.Internal {
     }
 
     private void HandleButtonEvent(EmulatorButtonEvent buttonEvent) {
-      if (buttonEvent.code == EmulatorButtonEvent.ButtonCode.kHome) {
-        if (buttonEvent.down) {
+      switch (buttonEvent.code) {
+      case EmulatorButtonEvent.ButtonCode.kApp:
           lock (state) {
-            // Started the recentering gesture.
-            state.recentering = true;
-          }
-        } else {
-          // Finished the recentering gesture. Recenter controller.
-          Recenter();
-        }
-        return;
-      }
-
-      if (buttonEvent.code != EmulatorButtonEvent.ButtonCode.kApp &&
-          buttonEvent.code != EmulatorButtonEvent.ButtonCode.kClick) return;
-
-      lock (state) {
-        if (buttonEvent.code == EmulatorButtonEvent.ButtonCode.kApp) {
           state.appButtonState = buttonEvent.down;
           state.appButtonDown = buttonEvent.down;
           state.appButtonUp = !buttonEvent.down;
-        } else {
+        }
+        break;
+      case EmulatorButtonEvent.ButtonCode.kHome:
+        lock (state) {
+          state.homeButtonState = buttonEvent.down;
+          state.homeButtonDown = buttonEvent.down;
+          if (buttonEvent.down) {
+            // Started the recentering gesture.
+            state.recentering = true;
+          }
+        }
+        if (!buttonEvent.down) {
+          // Finished the recentering gesture. Recenter controller.
+          Recenter();
+        }
+        break;
+      case EmulatorButtonEvent.ButtonCode.kClick:
+      lock (state) {
           state.clickButtonState = buttonEvent.down;
           state.clickButtonDown = buttonEvent.down;
           state.clickButtonUp = !buttonEvent.down;
         }
+        break;
       }
     }
 
@@ -173,4 +198,4 @@ namespace Gvr.Internal {
 }
 /// @endcond
 
-#endif  // UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_EDITOR)
+#endif  // UNITY_EDITOR

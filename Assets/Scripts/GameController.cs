@@ -33,6 +33,7 @@ public class GameController : MonoBehaviour {
     void Start () {
         //set unity player to run even when video is not in focus
         Application.runInBackground = true;
+        Input.backButtonLeavesApp = true;
 
         //set default state to "paused"
         //splineControl.sSplineState = SplineState.Paused;
@@ -88,6 +89,11 @@ public class GameController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        // Exit when (X) is tapped.
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
 
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
