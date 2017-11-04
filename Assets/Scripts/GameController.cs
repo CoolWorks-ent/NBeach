@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+
+public enum GameState { IsPlaying, IsPaused, IsOver, InMenu}
 
 public class GameController : MonoBehaviour {
 
@@ -19,6 +22,7 @@ public class GameController : MonoBehaviour {
     GameObject debugMenuPrefab;
 
     GameObject player;
+    public GameState gameState { get; set; }
     Image blackOverlay;
     GameObject wave;
     GameObject[] waterParticles;
@@ -26,11 +30,35 @@ public class GameController : MonoBehaviour {
     bool showDebug=false;
     private GameObject debugMenuObj;
 
+    private static GameController gameController;
+
+    public static GameController instance
+    {
+        get
+        {
+            if (!gameController)
+            {
+                gameController = FindObjectOfType(typeof(GameController)) as GameController;
+
+                if (!gameController)
+                {
+                    Debug.LogError("There needs to be one active GameController script on a GameObject in your scene.");
+                }
+            }
+            return gameController;
+        }
+
+    }
+
 
     List<string> s1Events;
 
     // Use this for initialization
     void Start () {
+
+        //set gamestate
+        gameState = GameState.IsPlaying;
+
         //set unity player to run even when video is not in focus
         Application.runInBackground = true;
         Input.backButtonLeavesApp = true;
@@ -38,40 +66,48 @@ public class GameController : MonoBehaviour {
         //set default state to "paused"
         //splineControl.sSplineState = SplineState.Paused;
 
-        blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
-        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
-        blackOverlay.gameObject.SetActive(false);
+        /********************************
+         * Song 2 
+         * ********************************/
+        if (SceneManager.GetActiveScene().name == "Song1_V2")
+        {
+            blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
+            blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
+            blackOverlay.gameObject.SetActive(false);
 
-        player = GameObject.Find("PlayerCube").gameObject;
-        wave = GameObject.Find("Wave").gameObject;
-        //hide wave asset
-        Color waveColor = wave.GetComponent<Renderer>().material.color;
-        waveColor = new Color(waveColor.r, waveColor.g, waveColor.b, 0f);
-        wave.GetComponent<Renderer>().material.color = waveColor;
+            player = GameObject.Find("PlayerCube").gameObject;
+            wave = GameObject.Find("Wave").gameObject;
+            //hide wave asset
+            Color waveColor = wave.GetComponent<Renderer>().material.color;
+            waveColor = new Color(waveColor.r, waveColor.g, waveColor.b, 0f);
+            wave.GetComponent<Renderer>().material.color = waveColor;
 
-        specialFish = GameObject.Find("ClownFish_Special").GetComponent<MagicFish>();
-        specialFish.gameObject.SetActive(false);
+            specialFish = GameObject.Find("ClownFish_Special").GetComponent<MagicFish>();
+            specialFish.gameObject.SetActive(false);
 
-        pathControl.playOnStart = false;
-        StartCoroutine(Level1Start());
-
+            pathControl.playOnStart = false;
+            StartCoroutine(Level1Start());
+        }
 
         
     }
 
     void Awake()
     {
-        waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
-        //there are 3 particles now, need to make this dynamic later
-        //order particles are currently added to array: greastest to least = 1st item is the last item in the array
-        waterParticles[0].SetActive(false);
-        waterParticles[1].SetActive(true);
-        waterParticles[2].SetActive(true);
+        if (SceneManager.GetActiveScene().name == "Song1_V2")
+        {
+            waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
+            //there are 3 particles now, need to make this dynamic later
+            //order particles are currently added to array: greastest to least = 1st item is the last item in the array
+            waterParticles[0].SetActive(false);
+            waterParticles[1].SetActive(true);
+            waterParticles[2].SetActive(true);
 
-        //subscribe to Scene1Event event call
-        EventManager.StartListening("Scene1Event", Scene1Events);
-        EventManager.StartListening("Player_Stop",ResetPlayer);
-        s1Events = new List<string>{"waterBubbles",""};
+            //subscribe to Scene1Event event call
+            EventManager.StartListening("Scene1Event", Scene1Events);
+            EventManager.StartListening("Player_Stop", ResetPlayer);
+            s1Events = new List<string> { "waterBubbles", "" };
+        }
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
         pathControl.AnimationFinishedEvent += delegate { DebugFunc("Finished"); };
     }

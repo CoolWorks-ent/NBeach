@@ -17,6 +17,15 @@ public class UIManager : MonoBehaviour {
 		
 	}
 
+    /*
+     * function that will re-scale UI based upon mobile vs. PC
+     * 
+     */
+     public void RescaleUI()
+    {
+
+    }
+
     //when notified to show Arrow, show and blink
     public void showArrow(int side, GameObject obj)
     {
