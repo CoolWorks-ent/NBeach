@@ -90,6 +90,7 @@ public class CameraPathAnimator : MonoBehaviour
     private float _delayTime;
     public float startPercent = 0;
     public bool animateFOV = true;
+    public float topSpeed = 0;
     public Vector3 targetModeUp = Vector3.up;
 
     //the sensitivity of the mouse in mouselook
@@ -301,7 +302,7 @@ public class CameraPathAnimator : MonoBehaviour
         if(_basePathSpeed==0)
             _basePathSpeed = _pathSpeed;
         float time = 0;
-        float timeToPause = 0.5f;
+        float timeToPause = 1f;
         while(time < timeToPause)
         {
             _pathSpeed = Mathf.Lerp(speed, 0, time/timeToPause);
@@ -319,9 +320,13 @@ public class CameraPathAnimator : MonoBehaviour
     //gradually start camera movement to prevent "jerk", "abrupt" movement
     private IEnumerator GradualStart()
     {
-        if (_basePathSpeed != 0)
+        if (_basePathSpeed != 0 && topSpeed == 0)
+        {
             _pathSpeed = _basePathSpeed;
-        float topSpeed = _pathSpeed; //max speed
+            topSpeed = _pathSpeed; //max speed
+        }    
+        else if(_basePathSpeed == 0)
+            _basePathSpeed = _pathSpeed;
         //temporarily set pathSpeed to 0
         _pathSpeed = 0;
         float time = 0;
@@ -355,6 +360,8 @@ public class CameraPathAnimator : MonoBehaviour
             yield return null;
         }
         _pathSpeed = topSpeed; //set path speed in case it is not equal to topSpeed at end of LERP
+        //reset topSpeed
+        topSpeed = 0;
                 
         EventManager.TriggerEvent("Player_Start", "playerStart");
         

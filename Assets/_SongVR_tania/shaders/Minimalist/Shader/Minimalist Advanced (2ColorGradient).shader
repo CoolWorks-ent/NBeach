@@ -164,7 +164,9 @@ shader "Minimalist/2 Color Gradient/Advanced" {
 			fixed4 frag(vertexOutput i) : COLOR
 			{
 				 fixed4 mainColor = fixed4(i.color, 1);
-				 fixed4 _MainTexture_var = fixed4(tex2D(_MainTexture,i.uv.rg).rgb, 1)   * (_MainTexturePower + 1);
+//				 fixed4 _MainTexture_var = fixed4(tex2D(_MainTexture,i.uv.rg).rgb, 1)   * (_MainTexturePower + 1);
+			fixed4 _MainTexture_var = fixed4(tex2D(_MainTexture, i.uv).rgb, 1)   * (_MainTexturePower + 1);
+
 
 				 half4 lmColor = UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUV);
                  half4 lmPower = lerp(fixed4(1,1,1,1), half4(DecodeLightmap(lmColor), 0), _LMPower);

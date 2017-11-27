@@ -44,18 +44,31 @@ public class UnderwaterScript : MonoBehaviour {
 
     }
 
-	void Update () 
-	{
-		//if player under water plane, display water effects
+    void Update()
+    {
+        //if player under water plane, display water effects
         //if not already underwater, check if player under the water plane.  if in water, check if player above water plane.
-		if ((transform.position.y < waterPlane.transform.position.y) != isUnderwater) 
+        /*if ((transform.position.y > waterPlane.transform.position.y) != isUnderwater) 
 		{
 			isUnderwater = transform.position.y < waterPlane.transform.position.y;
 			if (isUnderwater) SetUnderwater ();
 			if (!isUnderwater) SetNormal ();
-		}
+		}*/
 
-		/*if(transform.position.y < groundLevel)
+         if (transform.position.y < waterPlane.transform.position.y)
+         {
+             isUnderwater = true;
+             SetUnderwater();
+            Debug.Log("underwater");
+         }
+        else
+        {
+            isUnderwater = false;
+            SetNormal();
+            Debug.Log("above water");
+        }
+                
+        /*if(transform.position.y < groundLevel)
 		{
 			canSwim = true;
 			underGround = true;
@@ -66,7 +79,7 @@ public class UnderwaterScript : MonoBehaviour {
 			underGround = false;
 		}*/
 
-		if(isUnderwater && canSwim == true && underGround == false && Input.GetKey(KeyCode.E))
+        if (isUnderwater && canSwim == true && underGround == false && Input.GetKey(KeyCode.E))
 		{
             //GetComponent<ConstantForce>().relativeForce = new Vector3(0,-200, 0);
 		}

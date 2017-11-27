@@ -25,7 +25,12 @@ public class GameController : MonoBehaviour {
     public GameState gameState { get; set; }
     Image blackOverlay;
     GameObject wave;
+    GameObject waveTunnel;
     GameObject[] waterParticles;
+	GameObject darkRoom;
+	float scene1Time = 5f;
+	ParticleSystem HolyLight;
+
     MagicFish specialFish;
     bool showDebug=false;
     private GameObject debugMenuObj;
@@ -67,7 +72,7 @@ public class GameController : MonoBehaviour {
         //splineControl.sSplineState = SplineState.Paused;
 
         /********************************
-         * Song 2 
+         * Song 1
          * ********************************/
         if (SceneManager.GetActiveScene().name == "Song1_V2")
         {
@@ -77,6 +82,8 @@ public class GameController : MonoBehaviour {
 
             player = GameObject.Find("PlayerCube").gameObject;
             wave = GameObject.Find("Wave").gameObject;
+            waveTunnel = GameObject.Find("WaveTunnel").gameObject;
+            waveTunnel.SetActive(false);
             //hide wave asset
             Color waveColor = wave.GetComponent<Renderer>().material.color;
             waveColor = new Color(waveColor.r, waveColor.g, waveColor.b, 0f);
@@ -103,6 +110,8 @@ public class GameController : MonoBehaviour {
             waterParticles[1].SetActive(true);
             waterParticles[2].SetActive(true);
 
+			darkRoom = GameObject.Find ("DarkRoom");
+
             //subscribe to Scene1Event event call
             EventManager.StartListening("Scene1Event", Scene1Events);
             EventManager.StartListening("Player_Stop", ResetPlayer);
@@ -118,6 +127,8 @@ public class GameController : MonoBehaviour {
     {
         if (evt == "Paused")
             Debug.Log("[Camera Path]: Paused");
+        else if (evt == "Resume")
+            Debug.Log("[Camera Path]: Resume");
         else if (evt == "Finished")
             Debug.Log("[Camera Path]: Finished");
     }
@@ -199,20 +210,102 @@ public class GameController : MonoBehaviour {
     { 
             switch (evt)
             {
-                case "waterParticle":
+				case "Song1_Opening":
+					//StartCoroutine (Scene1());
+                    break;
+				case "waterParticle":
                     Debug.Log("water particle activated");
                     waterParticles[1].SetActive(true);
                     break;
-                case "Scene2":
+                case "Song1_pt2":
                     StartCoroutine(Scene1_5());
                     break;
                 case "SceneEnd":
                     break;
                 default:
                     break;
-            }       
+            }
+        Debug.Log("[EVENT] " + evt);
     }
 
+    void Song2Events(string evt)
+    {
+        switch(evt)
+        {
+            case "Song2_Opening":
+                break;
+            default:
+                break;
+        }
+    }
+
+	IEnumerator Scene1()
+	{
+		float pt1Time = 35f;
+		float pt2Time = 10f;
+		float fadeTime = .5f;
+        float scene1Time = 60f;
+		float time = 0;
+
+        //restrict player movement
+        //playerControl.CanMove = false;
+        //pathControl.pPathState = PathState.Paused;
+
+        //dark room should rotate until scene is finished
+        IEnumerator darkRoomThread = (DarkRoom(scene1Time));
+        StartCoroutine (darkRoomThread);
+        yield return new WaitForSeconds(pt1Time);
+
+        //show a small light and slowly glows brighter
+        HolyLight = GameObject.Find("HolyLight").GetComponent<ParticleSystem>();
+        HolyLight.Play();
+		yield return new WaitForSeconds (pt2Time);
+        StopCoroutine(darkRoomThread);
+		//Open dark room (fade away) & reveal ocean
+		MeshRenderer roomMat = darkRoom.GetComponent<MeshRenderer>();
+        Color initColor = roomMat.material.GetColor("_TintColor");
+        Color fadeColor = new Color(initColor.r, initColor.g, initColor.b, 0);
+        while (time < fadeTime) {
+			roomMat.material.SetColor("_TintColor", Color.Lerp(initColor, fadeColor, time / fadeTime));
+			time += Time.deltaTime;
+			yield return null;
+		}
+        darkRoom.SetActive(false);
+
+        //begin player movement
+        //pathControl.pPathState = PathState.Play;
+        //playerControl.playerState = PlayerState.MOVING;
+        //playerControl.CanMove = true;
+
+        //begin spline
+        pathControl.Play();
+        playerControl.CanMove = true;
+        playerControl.playerState = PlayerState.MOVING;
+    }
+
+	IEnumerator DarkRoom(float rotTime)
+	{
+		float time = 0;
+		float rotSpeed = 100;
+
+        //get list of particles and activate them
+        GameObject[] particles = GameObject.FindGameObjectsWithTag("particle_light");
+        /*foreach( GameObject particle in particles)
+        {
+            particle.GetComponent<ParticleSystem>().Play();
+        }*/
+
+		//rotate until 1st part of scene is finished
+		while(time < rotTime) 
+		{
+			darkRoom.transform.Rotate(Vector3.up * (rotSpeed * Time.deltaTime));
+			time += Time.deltaTime;
+			yield return null;
+		}
+		yield return null;
+	}
+
+    //player hits bursts from water and hits wave @3:00min
     IEnumerator Scene1_5()
     {
         //pause the spline
@@ -241,13 +334,16 @@ public class GameController : MonoBehaviour {
 
         //show left arrow to warn player to look to the left at the wave
         uiManager.showArrow(0, wave);
+        //set the impact position to be slightly further from the camera
+        Vector3 crashPos = player.transform.position;
 
         while (time < waveCrashTime)
         {
-            wave.transform.position = Vector3.Lerp(w_basePosition, player.transform.position, time / waveCrashTime);
+            wave.transform.position = Vector3.Lerp(w_basePosition, crashPos, time / waveCrashTime);
             if((time/waveCrashTime) > .8f)
             {
                 //cut to black
+                wave.SetActive(false); //deactivate wave so can't be seen
                 blackOverlay.gameObject.SetActive(true);
                 blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
             }
@@ -255,32 +351,26 @@ public class GameController : MonoBehaviour {
             time += Time.deltaTime;
             yield return null;
         }
-        //play waveHit sound
-        soundManager.PlayFoleySound(1,1f);
 
         Debug.Log("Player hit by wave");
-
+        //play waveHit sound
+        soundManager.PlayFoleySound(1,1f);
         yield return new WaitForSeconds(.5f);
         //stop all extra audio playing, except BGMusic
-        soundManager.StopAllTempAudio();
-                
-        wave.SetActive(false);
+        soundManager.StopAllTempAudio();           
+        //make wave tunnel active for next event
+        waveTunnel.SetActive(true);
         //turn off arrows manually
         uiManager.hideArrow(0);
 
+        yield return new WaitForSeconds(3);
         //reset player rotation and position in the PlayerContainer
-        player.transform.rotation = Quaternion.Euler(90,0,0);
+        //player.transform.rotation = Quaternion.Euler(player.transform.rotation.x,-90,player.transform.rotation.z);
         player.transform.localPosition = new Vector3(0, 0, 0);
-        Camera.main.transform.rotation = Quaternion.Euler(0, 0, 0);
-        yield return new WaitForSeconds(3);
         
-        //open eyes, and fade out black overlay
-        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f);
-        blackOverlay.gameObject.SetActive(false);
-        yield return new WaitForSeconds(3);
-
         //show special fish
-        specialFish.gameObject.SetActive(true);
+        /*Special Fish Evt - NOT USING ANYMORE
+         * .gameObject.SetActive(true);
 
         time = 0f;
         float headRotTime = 3f;
@@ -305,10 +395,20 @@ public class GameController : MonoBehaviour {
         yield return new WaitUntil(() => (specialFish.activated == true));
         //wait until fish has faced player and dissapeared, then continue
         yield return new WaitForSeconds(specialFish.animTime+1);
+        */
         
-        //resume the spline
+        //resume the spline, player should be beginning to move once they open their eyes
         playerControl.CanMove = true;
+        //pathControl.pathSpeed = 7;
+        pathControl.topSpeed = 7;
         pathControl.pPathState = PathState.Play;
+
+        //pause to allow camera to look towards wave and then open eyes
+        yield return new WaitForSeconds(1.2f);
+
+        //open eyes, and fade out black overlay
+        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f);
+        blackOverlay.gameObject.SetActive(false);
 
         yield return null;
     }
@@ -320,11 +420,11 @@ public class GameController : MonoBehaviour {
         float screenFadeOutTime = 1f;
         float headRotTime = 5f;
 
-        
-
 
         //open eyes
         soundManager.PlayMusic(0);
+        yield return new WaitForSeconds(3);
+       
 
         /* Disable overlay for test purposes
         if (blackOverlay != null)
@@ -347,12 +447,12 @@ public class GameController : MonoBehaviour {
         Quaternion baseRot = player.transform.rotation;
         Quaternion nextRot = Quaternion.Euler(0, playerRot.y, playerRot.z);
         Debug.Log("rotate head");
-        /*while (t < headRotTime)
+        while (t < headRotTime)
         {
             player.transform.rotation = Quaternion.Lerp(baseRot, nextRot, (t / headRotTime));
             t += Time.deltaTime;
             yield return null;
-        }*/
+        }
 
         //have fish swim up to player and begin to lead player
 
@@ -362,6 +462,8 @@ public class GameController : MonoBehaviour {
         pathControl.Play();
         playerControl.CanMove = true;
         playerControl.playerState = PlayerState.MOVING;
+
+        StartCoroutine(Scene1());
 
         /*
          * Old code to begin spline

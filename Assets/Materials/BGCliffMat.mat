@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: BGCliffMat
-  m_Shader: {fileID: 4800000, guid: b82146df20c04ce4ab6fd0e4deb53a03, type: 3}
+  m_Shader: {fileID: 4800000, guid: 1409f2c4ac38ea64cb5e3ce5bc2d4c96, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -18,6 +18,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _AppearTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -82,5 +86,7 @@ Material:
     - _Emission: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _HighlightColor: {r: 0.63, g: 0.52, b: 0.38, a: 0.66}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowColor: {r: 0.96, g: 1, b: 1, a: 0.85}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 0}

@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 114000012376193132}
   m_Layer: 9
   m_Name: carpFish (1)
-  m_TagString: Untagged
+  m_TagString: creature
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -655,7 +655,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010889217676}
   m_LocalRotation: {x: -0, y: 0.1123361, z: -0, w: 0.9936703}
-  m_LocalPosition: {x: -156.75562, y: -16.938822, z: 40.295578}
+  m_LocalPosition: {x: 5.433716, y: 10.644888, z: -116.403564}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children:
   - {fileID: 4000012227913344}

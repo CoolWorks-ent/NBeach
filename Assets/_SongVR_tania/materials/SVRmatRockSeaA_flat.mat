@@ -42,7 +42,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 4da9afe40c9eca540bb47e0bded79285, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -68,10 +68,10 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _GradientHeight: 10
-    - _GradientHeight_B: 0.75
-    - _GradientHeight_F: 0.75
-    - _GradientHeight_L: 0.75
-    - _GradientHeight_R: 0.75
+    - _GradientHeight_B: 1
+    - _GradientHeight_F: 1
+    - _GradientHeight_L: 1
+    - _GradientHeight_R: 1
     - _GradientYStartPos: 0
     - _GradientYStartPos_B: 0
     - _GradientYStartPos_F: 0
@@ -80,7 +80,7 @@ Material:
     - _LM: 1
     - _LMPower: 0
     - _LocalSpace: 0
-    - _MainTexturePower: 0
+    - _MainTexturePower: 0.1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -97,15 +97,15 @@ Material:
     m_Colors:
     - _AmbientColor: {r: 0.46366778, g: 0.74786425, b: 0.9852941, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Color1_B: {r: 1, g: 0.8588236, b: 0.6313726, a: 1}
-    - _Color1_F: {r: 1, g: 0.8583027, b: 0.63235295, a: 1}
-    - _Color1_L: {r: 1, g: 0.8588236, b: 0.6313726, a: 1}
-    - _Color1_R: {r: 1, g: 0.8588236, b: 0.6313726, a: 1}
-    - _Color2_B: {r: 0.54509807, g: 0.3803922, b: 0.058823533, a: 1}
-    - _Color2_F: {r: 0.5441177, g: 0.38115183, b: 0.060012974, a: 1}
-    - _Color2_L: {r: 0.54509807, g: 0.3803922, b: 0.058823533, a: 1}
-    - _Color2_R: {r: 0.54509807, g: 0.3803922, b: 0.058823533, a: 1}
-    - _Color_D: {r: 0.54509807, g: 0.3803922, b: 0.058823533, a: 1}
-    - _Color_T: {r: 1, g: 0.8588236, b: 0.6313726, a: 1}
+    - _Color1_B: {r: 0.7647059, g: 0.9372549, b: 1, a: 1}
+    - _Color1_F: {r: 0.7647059, g: 0.9372549, b: 1, a: 1}
+    - _Color1_L: {r: 0.7647059, g: 0.9372549, b: 1, a: 1}
+    - _Color1_R: {r: 0.7647059, g: 0.9372549, b: 1, a: 1}
+    - _Color2_B: {r: 0.14509805, g: 0.3372549, b: 0.44705883, a: 1}
+    - _Color2_F: {r: 0.14511247, g: 0.3355328, b: 0.44852942, a: 1}
+    - _Color2_L: {r: 0.14509805, g: 0.3372549, b: 0.44705883, a: 1}
+    - _Color2_R: {r: 0.14509805, g: 0.3372549, b: 0.44705883, a: 1}
+    - _Color_D: {r: 0.14509805, g: 0.3372549, b: 0.44705883, a: 1}
+    - _Color_T: {r: 0.7647059, g: 0.9372549, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LMColor: {r: 1, g: 1, b: 1, a: 1}
