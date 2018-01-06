@@ -19,13 +19,9 @@ public class Darkness : MonoBehaviour {
     bool chasing = false, idle = false;
     public EnemyState enemyState { get; set; }
 
-    private Vector3[] path;
-    private int targetIndex;
-
     // Use this for initialization
     void Start () {
         enemyState = EnemyState.CHASING;
-        PathRequestManager.RequestPath(transform.position, PathRequestManager.instance.player.position, OnPathFound);
 	}
 	
 	// Update is called once per frame
@@ -39,7 +35,7 @@ public class Darkness : MonoBehaviour {
         float maxTime = 2f;
 
         //velocity based mvmt
-       /* Rigidbody rigidbody = GetComponent<Rigidbody>();
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
         Vector3 velocity = Vector3.forward * mvmtSpeed; //move forward at constant speed
 
         if (enemyState == EnemyState.CHASING)
@@ -47,38 +43,8 @@ public class Darkness : MonoBehaviour {
             //TO DO - Create New code to chase player based upon player position
 
             //new Vector3(rigidbody.velocity.x * mvmtSpeed, rigidbody.velocity.y * mvmtSpeed, rigidbody.velocity.z * mvmtSpeed);
-           // rigidbody.MovePosition(rigidbody.position + Vector3.forward * mvmtSpeed * Time.deltaTime);
+            rigidbody.MovePosition(rigidbody.position + Vector3.forward * mvmtSpeed * Time.deltaTime);
             //rigidbody.AddForce(velocity, ForceMode.Force);
-        }*/
-    }
-
-    public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
-    {
-        if (pathSuccessful)
-        {
-            path = newPath;
-            //StopCoroutine(FollowPath());
-            //StartCoroutine(FollowPath());
-        }
-    }
-
-    IEnumerator FollowPath()
-    {
-        Vector3 currentWaypoint = path[0];
-
-        while(true)
-        {
-            if(transform.position == currentWaypoint)
-            {
-                targetIndex++;
-                if(targetIndex >= path.Length)
-                {
-                    yield break;
-                }
-                currentWaypoint = path[targetIndex];
-            }
-            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, mvmtSpeed);
-            yield return null;
         }
     }
 
