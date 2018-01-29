@@ -11,7 +11,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     PlayerController playerControl;
     [SerializeField]
-    SoundManager soundManager;
+    public SoundManager soundManager;
+    [SerializeField]
+    public LevelManager lvlManager;
     [SerializeField]
     Camera UICamera;
     [SerializeField]
@@ -22,14 +24,16 @@ public class GameController : MonoBehaviour {
     GameObject debugMenuPrefab;
 
     GameObject player;
-    public GameState gameState { get; set; }
-    Image blackOverlay;
     GameObject wave;
     GameObject waveTunnel;
     GameObject[] waterParticles;
-	GameObject darkRoom;
-	float scene1Time = 5f;
-	ParticleSystem HolyLight;
+    GameObject darkRoom;
+    float scene1Time = 5f;
+    ParticleSystem HolyLight;
+
+    public GameState gameState { get; set; }
+    public Image blackOverlay, dmgOverlay;
+
 
     MagicFish specialFish;
     bool showDebug=false;
@@ -95,8 +99,21 @@ public class GameController : MonoBehaviour {
             pathControl.playOnStart = false;
             StartCoroutine(Level1Start());
         }
+        if (SceneManager.GetActiveScene().name == "Song1_V2")
+        {
+            dmgOverlay = GameObject.Find("DmgOverlay").GetComponent<Image>();
+            dmgOverlay.color = new Color(dmgOverlay.color.r, dmgOverlay.color.g, dmgOverlay.color.b, 0);
+            dmgOverlay.gameObject.SetActive(false);
+        }
 
-        
+        /********************************
+         * Song 2
+         * ********************************/
+        if (SceneManager.GetActiveScene().name == "Song2")
+        {
+            song2_lvl lvl2 = (song2_lvl)lvlManager.levelList[0];
+            lvl2.Initialize();
+        }
     }
 
     void Awake()
@@ -117,8 +134,10 @@ public class GameController : MonoBehaviour {
             EventManager.StartListening("Player_Stop", ResetPlayer);
             s1Events = new List<string> { "waterBubbles", "" };
         }
+
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
         pathControl.AnimationFinishedEvent += delegate { DebugFunc("Finished"); };
+        EventManager.StartListening("StopAllTempAudio", delegate { DebugFunc("StopAudio"); });
     }
 
     
@@ -131,6 +150,8 @@ public class GameController : MonoBehaviour {
             Debug.Log("[Camera Path]: Resume");
         else if (evt == "Finished")
             Debug.Log("[Camera Path]: Finished");
+        else if (evt == "StopAudio")
+            Debug.Log("[Sound Manager]: Audio Stopped");
     }
 
     // Update is called once per frame
@@ -248,7 +269,7 @@ public class GameController : MonoBehaviour {
 		float time = 0;
 
         //restrict player movement
-        //playerControl.CanMove = false;
+        playerControl.CanMove = false;
         //pathControl.pPathState = PathState.Paused;
 
         //dark room should rotate until scene is finished
@@ -400,7 +421,7 @@ public class GameController : MonoBehaviour {
         //resume the spline, player should be beginning to move once they open their eyes
         playerControl.CanMove = true;
         //pathControl.pathSpeed = 7;
-        pathControl.topSpeed = 7;
+        pathControl.topSpeed = 5;
         pathControl.pPathState = PathState.Play;
 
         //pause to allow camera to look towards wave and then open eyes
@@ -504,4 +525,5 @@ public class GameController : MonoBehaviour {
         yield return null;
         */
     }
+
 }

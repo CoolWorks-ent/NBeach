@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class song1_lvl : MonoBehaviour {
+public class song1_lvl : Level {
 
 	// Use this for initialization
 	void Start () {

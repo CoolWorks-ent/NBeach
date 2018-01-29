@@ -11,13 +11,12 @@ public enum EnemyState { CHASING, IDLE }
 public class Darkness : MonoBehaviour {
 
     [SerializeField]
-    int spawnRate;
-    [SerializeField]
-    float mvmtSpeed = 4f;
+    float mvmtSpeed = 6f;
 
     //enemy states
     bool chasing = false, idle = false;
     public EnemyState enemyState { get; set; }
+    public EnemySpawner enemySpawner;
 
     // Use this for initialization
     void Start () {
@@ -51,7 +50,28 @@ public class Darkness : MonoBehaviour {
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.gameObject.tag == "Projectile")
+        {
             Debug.Log("Darkness Destroyed");
+            this.enemySpawner.enemyList.Remove(this);
+            Destroy(this.gameObject);
+        }
+            //EventManager.TriggerEvent("DarknessDeath", gameObject.);
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.tag == "Projectile")
+        {
+            Debug.Log("Darkness Destroyed");
+            this.enemySpawner.enemyList.Remove(this);
+            Destroy(this.gameObject);
+            //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
+        }
+
+        if(collider.gameObject.tag == "Player")
+        {
+            Debug.Log("Darkness collided with Player");
+        }
     }
 
     IEnumerator ApproachPlayer()

@@ -2,48 +2,67 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Class to manage enemies in the scene & the spawning of enemies
+ */
 
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
     Darkness darknessEnemy;
     [SerializeField]
-    Transform[] spawnLocs;
+    int spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
-    int spawnRate = 4; //The greater the slower, 1 every x seconds
+    Transform[] spawnLocs;
+
+    public List<Darkness> enemyList;
+    public bool spawningEnemies = false;
     int MaxEnemyCount = 10;
-    int enemyCount = 0;
     float spawnWait = 0;
+    int enemiesDestroyed = 0;
 
     public void Start()
     {
-        enemyCount = 0;
+        enemyList = new List<Darkness>();
+        //EventManager.StartListening("DarknessDeath", DarknessDeath);
     }
 
     //function called if an enemy dies to decrease from the total enemy count
-    public void DarknessDeath()
+    void DarknessDeath(string enemyName)
     {
-        enemyCount -= 1;
+        //remove enemy from the list
+        Darkness enemyObj = GameObject.Find(enemyName).GetComponent<Darkness>();
+        enemyList.Remove(enemyObj);
+        Destroy(enemyObj.gameObject);
     }
 
     public void Update()
     {
-        
-        if (enemyCount < MaxEnemyCount)
+        //only spawn enemies if this bool tells it to
+        if (spawningEnemies == true)
         {
-            if (spawnWait >= spawnRate)
+            if (enemyList.Count < MaxEnemyCount)
             {
-                //choose random spawn location in array and spawn there
-                Darkness enemy = Instantiate(darknessEnemy, spawnLocs[Random.Range(0, spawnLocs.Length)].position, darknessEnemy.transform.rotation);
-                //reset timer
-                spawnWait = 0;
-                enemyCount += 1;
-                Debug.Log("darkness spawned");
+                if (spawnWait >= spawnRate)
+                {
+                    //choose random spawn location in array and spawn there
+                    Darkness enemy = Instantiate(darknessEnemy, spawnLocs[Random.Range(0, spawnLocs.Length)].position, darknessEnemy.transform.rotation);
+                    enemy.enemySpawner = this;
+                    //reset timer
+                    spawnWait = 0;
+                    //add enemy to management list
+                    enemyList.Add(enemy);
+                    Debug.Log("darkness spawned");
+                }
+                else
+                {
+                    //increase timer
+                    spawnWait += Time.deltaTime;
+                }
+
             }
-            
         }
 
-        //increase timer
-        spawnWait = spawnWait + Time.deltaTime;
+        
     }
 }

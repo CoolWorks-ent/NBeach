@@ -29,7 +29,7 @@ public class SoundManager : MonoBehaviour {
 	//private int[] results = new int[] {15, 1645, 135, 567};
 	
 	//Music
-	private string[] music = new string[] {"NB!2", "FirstLevelFight", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
+	private string[] music = new string[] {"NB!2", "Cooly2", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
 	
 	//Foley sounds
 	private string[] foleySounds = new string[] {"wavesIncoming", "wavesCrashing"};
@@ -195,6 +195,7 @@ public class SoundManager : MonoBehaviour {
     /// </summary>
     public void StopAllTempAudio()
     {
+        EventManager.TriggerEvent("StopAllTempAudio", "false");
         foreach (AudioSource audioS in allAudioSourcesTemp)
         {
             audioS.Stop();
@@ -290,6 +291,40 @@ public class SoundManager : MonoBehaviour {
 		
 		yield return new WaitForSeconds(0f);
 	}
+
+    public void FadeInMusic(int num)
+    {
+        AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath, music[num]), typeof(AudioClip));
+        BGMusic.GetComponent<AudioSource>().clip = newClip;
+        StartCoroutine(FadeIn(BGMusic));
+    }
+
+    public IEnumerator FadeIn(GameObject newMusic)
+    {
+        BGMusic.GetComponent<AudioSource>().volume = 0;
+        //set music level to 0
+        float curMusicLevel = BGMusic.GetComponent<AudioSource>().volume;
+
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+
+        curAudio.Play(); //play new music at zero volume
+
+        //fade in slowly
+        float crossFadeSpeed = .2f;
+
+        while (curMusicLevel <= 0.8f)
+        {
+
+            curMusicLevel = Mathf.Lerp(curMusicLevel, 1.0f, crossFadeSpeed * Time.deltaTime); //increase new track volume
+            curAudio.volume = curMusicLevel;
+
+            yield return null;
+        }
+        curAudio.volume = 1.0f;
+        print("Volumes set");
+
+        yield return new WaitForSeconds(0f);
+    }
 
 	public void PlayPlayerVox(int num)
 	{
