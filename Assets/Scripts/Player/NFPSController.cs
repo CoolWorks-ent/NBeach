@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRStandardAssets.Utils;
 
+[System.Serializable]
+public class PlayerBoundary
+{
+    public float xMin, xMax;
+}
+
 public class NFPSController : MonoBehaviour {
 
     // This script controls the gun for the shooter
@@ -50,7 +56,9 @@ public class NFPSController : MonoBehaviour {
 
         public GameController gController;
         int playerHealth;
-        int playerAmmo;
+        public int playerAmmo;
+        public int maxAmmo;
+        public PlayerBoundary pBoundary;
 
     /*
      * Local Variables
@@ -79,6 +87,7 @@ public class NFPSController : MonoBehaviour {
         float curTime = 0;
         float normZ = 0;
         bool resetRot = true;
+        bool canDodgeRight = true, canDodgeLeft = true;
 
     private void Awake()
         {
@@ -89,6 +98,7 @@ public class NFPSController : MonoBehaviour {
             playerHealth = 100;
             //start player with 10 ammo
             playerAmmo = 10;
+            maxAmmo = 10;
             bReloading = true;
         }
 
@@ -105,17 +115,28 @@ public class NFPSController : MonoBehaviour {
             //m_VRInput.OnDown -= HandleDown;
         }
 
+    private void FixedUpdate()
+    {
+        //function to excute the player's dodge
+        PlayerDodge();
 
-        private void Update()
+    }
+
+    private void Update()
         {
 
         //update ammo text on HUD
         ammoText.text = playerAmmo.ToString();
 
-        //function to excute the player's dodge
-        PlayerDodge();
+        
 
-        //show ammo in player's hand
+        /*******
+         * Default - Clamp Player's Movement (only during gameplay)
+         *******/
+        rigidbody.transform.position = new Vector3(Mathf.Clamp(rigidbody.transform.position.x, 170, 200), rigidbody.transform.position.y, rigidbody.transform.position.z);
+
+        //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
+        //Manage Player's Ammo and check for Firing
         if (playerAmmo > 0)
             {
                 
@@ -191,6 +212,13 @@ public class NFPSController : MonoBehaviour {
                 Vector3 targetPos = rayOrigin + (fwd * weaponRange);
                 StartCoroutine(Fire(targetPos));
         }
+        else
+        {
+            if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
+            {
+                Debug.Log("No Ammo!!");
+            }
+        }
 
 
             /*
@@ -250,29 +278,38 @@ public class NFPSController : MonoBehaviour {
         if ((lastDodgeTime + dodgeCooldownTime < curTime) && resetRot == true)
         {
             //Vector3 curPos = transform.position;
-            if ((normZ > minLeftRoll && normZ < maxLeftRoll))
+            //dodge left
+            if ((normZ > minLeftRoll && normZ < maxLeftRoll && canDodgeLeft))
             {
+                //Check if player is colliding with the left dodge limit
+
                 Vector3 curPos = playerContainer.transform.position;
                 Vector3 newPos = new Vector3(curPos.x + dodgeAmt, curPos.y, curPos.z);
-                StopCoroutine("executeDodge");
+
+                //StopCoroutine("executeDodge");
                 StartCoroutine(executeDodge(rigidbody, newPos));
+
                 //rigidbody.velocity = Vector3.right * dodgeSpeed;
                 lastDodgeTime = Time.time;
                 print("dodge left!");
                 resetRot = false;
             }
-            else if ((normZ < minRightRoll && normZ > maxRightRoll))
+            //dodge right
+            else if ((normZ < minRightRoll && normZ > maxRightRoll && canDodgeRight))
             {
                 Vector3 curPos = playerContainer.transform.position;
                 Vector3 newPos = new Vector3(curPos.x - dodgeAmt, curPos.y, curPos.z);
-                StopCoroutine("executeDodge");
+
+                //StopCoroutine("executeDodge");
                 StartCoroutine(executeDodge(rigidbody, newPos));
+
                 //rigidbody.velocity = Vector3.left * dodgeSpeed;
                 lastDodgeTime = Time.time;
                 print("dodge right");
                 resetRot = false;
             }
         }
+        //reset dodge conditions when player returns neutral head rotation
         if ((normZ < minLeftRoll) && (normZ > minRightRoll))
         {
             resetRot = true;
@@ -286,11 +323,12 @@ public class NFPSController : MonoBehaviour {
     IEnumerator executeDodge(Rigidbody body, Vector3 newPos)
     {
         float dodgeTime = 0.5f;
-        float dodgeSpeed = 7f;
+        float dodgeSpeed = 10f; //the lower the speed, the longer the dodge distance
         float t = 0;
         while (t < dodgeTime)
         {
             //body.MovePosition(newPos * dodgeSpeed * Time.deltaTime);
+            //playerContainer.transform.position = Vector3.MoveTowards(playerContainer.transform.position, newPos, dodgeSpeed * Time.deltaTime);
             playerContainer.transform.position = Vector3.MoveTowards(playerContainer.transform.position, newPos, dodgeSpeed * Time.deltaTime);
             t += Time.deltaTime;
             yield return null;

@@ -51,23 +51,19 @@ public class Darkness : MonoBehaviour {
     {
         if (collision.collider.gameObject.tag == "Projectile")
         {
-            Debug.Log("Darkness Destroyed");
-            this.enemySpawner.enemyList.Remove(this);
-            Destroy(this.gameObject);
+            if (collision.collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
+            {
+                Debug.Log("Darkness Destroyed");
+                this.enemySpawner.enemyList.Remove(this);
+                Destroy(this.gameObject);
+                //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
+            }
         }
             //EventManager.TriggerEvent("DarknessDeath", gameObject.);
     }
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.tag == "Projectile")
-        {
-            Debug.Log("Darkness Destroyed");
-            this.enemySpawner.enemyList.Remove(this);
-            Destroy(this.gameObject);
-            //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
-        }
-
         if(collider.gameObject.tag == "Player")
         {
             Debug.Log("Darkness collided with Player");

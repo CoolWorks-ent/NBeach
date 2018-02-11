@@ -82,7 +82,7 @@ public class song2_lvl : Level {
             yield return null;
         }
         //start playing bg song
-        gController.soundManager.FadeInMusic(1);
+        //gController.soundManager.FadeInMusic(1);
 
     }
 }

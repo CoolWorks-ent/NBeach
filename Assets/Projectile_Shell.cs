@@ -21,27 +21,32 @@ public class Projectile_Shell : MonoBehaviour {
 
         Debug.Log("New projectile created");
         EventManager.StartListening("FireProjectile", OnFire);
- 
+        StartCoroutine(updatePos());
     }
 
     public void Initialize(Transform gunPoint)
     {
         shootPoint = gunPoint;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    private void FixedUpdate()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         Rigidbody myRigidBody = GetComponent<Rigidbody>();
 
         //move with player gun while in hand
-        if (projectileFired == false)
+        /*if (projectileFired == false)
         {
             transform.position = shootPoint.position;
             Vector3 temp = Camera.main.transform.position - shootPoint.position;
             transform.LookAt(Camera.main.transform.position);
             transform.rotation = Quaternion.LookRotation(temp,Camera.main.transform.up) * Quaternion.Euler(90, 90, 0);
-        }
+        }*/
 
         //myRigidBody.velocity = Vector3.forward * 1;
         /*if (elapsedTime <= airTime)
@@ -54,6 +59,18 @@ public class Projectile_Shell : MonoBehaviour {
             Destroy(this.gameObject);*/
     }
 
+    IEnumerator updatePos()
+    {
+        while (projectileFired == false)
+        {
+            transform.position = shootPoint.position;
+            Vector3 temp = Camera.main.transform.position - shootPoint.position;
+            transform.LookAt(Camera.main.transform.position);
+            transform.rotation = Quaternion.LookRotation(temp, Camera.main.transform.up) * Quaternion.Euler(90, 90, 0);
+            yield return null;
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
 
@@ -62,7 +79,12 @@ public class Projectile_Shell : MonoBehaviour {
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.tag == "Darkness")
-            Destroy(this.gameObject);
+        {
+            if (projectileFired == true)
+            {
+                Destroy(this.gameObject);
+            }
+        }            
     }
 
     void OnFire(string evt)
