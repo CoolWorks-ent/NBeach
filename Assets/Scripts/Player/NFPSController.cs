@@ -97,7 +97,7 @@ public class NFPSController : MonoBehaviour {
         laserLine = GetComponent<LineRenderer>();
             playerHealth = 100;
             //start player with 10 ammo
-            playerAmmo = 10;
+            playerAmmo = 0;
             maxAmmo = 10;
             bReloading = true;
         }
@@ -149,7 +149,8 @@ public class NFPSController : MonoBehaviour {
                     projectile.Initialize(m_GunEnd);    
                     bReloading = false;
                     bProjectileInHand = true;
-                }
+                    nextFire = Time.time + fireRate;
+            }
                 else if(bProjectileInHand == false)
                 {
                     StopCoroutine("CreateNewProjectile");
@@ -159,10 +160,9 @@ public class NFPSController : MonoBehaviour {
             }
 
             //create delay btw firing time, 0.5 sec between each shot
-            if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
+            if (Input.GetButtonDown("Fire1") && Time.time > nextFire )
             {
-                nextFire = Time.time + fireRate;
-
+                
                 // If the game isn't playing don't do anything.
                 if (GameController.instance.gameState != GameState.IsPlaying)
                     return;
@@ -171,54 +171,54 @@ public class NFPSController : MonoBehaviour {
                 if (playerAmmo <= 0)
                     return;
 
-            //raycast target hitting using GVR raycast
 
-            //ShootingTarget shootingTarget = GvrReticlePointer.PointerRay.CurrentInteractible ? m_EyeRaycaster.CurrentInteractible.GetComponent<ShootingTarget>() : null;
-            GameObject shootingTarget = null;
-            GvrBasePointer reticle;
-                //CurrentRaycastResult.WorldPosi   //Determine what object the reticle raycast is intersecting with...if there is one
-                Transform target = shootingTarget ? shootingTarget.transform : null;
-
-            /* New FPS code from UNITY*
-             */
-            Vector3 rayOrigin = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
-            Vector3 fwd = Camera.main.transform.TransformDirection(Vector3.forward);
-            Debug.DrawRay(rayOrigin, fwd * weaponRange, Color.green);
-            Ray ray = Camera.main.ScreenPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
-
-            RaycastHit hit;
-            GameObject projectile_spawn = GameObject.Find("CamCenter");
-            if (Physics.Raycast(ray, out hit, 100000.0f))
-            {
-                Debug.DrawLine(projectile_spawn.transform.position, hit.point, Color.red);
-                //projectile.GetComponent<Rigidbody>().AddForce((hit.point - projectile_spawn.transform.position).normalized * 10, ForceMode.Impulse);
-                //projectile.GetComponent<Rigidbody>().AddForce(projectile_spawn.transform.position * 50, ForceMode.Impulse);
-            }
-            else
-            {
-                //projectile.GetComponent<Rigidbody>().AddForce(projectile.transform.position * 50, ForceMode.Impulse);
-            }
-                /*laserLine.SetPosition(0, m_GunEnd.position);
-
-                if (Physics.Raycast(rayOrigin, fwd, out hit, weaponRange))
+                if (bProjectileInHand == true)
                 {
-                    laserLine.SetPosition(1, hit.point);
+
+                    nextFire = Time.time + fireRate;
+
+                    //raycast target hitting using GVR raycast
+
+                    //ShootingTarget shootingTarget = GvrReticlePointer.PointerRay.CurrentInteractible ? m_EyeRaycaster.CurrentInteractible.GetComponent<ShootingTarget>() : null;
+                    GameObject shootingTarget = null;
+                    GvrBasePointer reticle;
+                    //CurrentRaycastResult.WorldPosi   //Determine what object the reticle raycast is intersecting with...if there is one
+                    Transform target = shootingTarget ? shootingTarget.transform : null;
+
+                    /* New FPS code from UNITY*
+                     */
+                    Vector3 rayOrigin = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
+                    Vector3 fwd = Camera.main.transform.TransformDirection(Vector3.forward);
+                    Debug.DrawRay(rayOrigin, fwd * weaponRange, Color.green);
+                    Ray ray = Camera.main.ScreenPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+
+                    RaycastHit hit;
+                    GameObject projectile_spawn = GameObject.Find("CamCenter");
+                    if (Physics.Raycast(ray, out hit, 100000.0f))
+                    {
+                        Debug.DrawLine(projectile_spawn.transform.position, hit.point, Color.red);
+                        //projectile.GetComponent<Rigidbody>().AddForce((hit.point - projectile_spawn.transform.position).normalized * 10, ForceMode.Impulse);
+                        //projectile.GetComponent<Rigidbody>().AddForce(projectile_spawn.transform.position * 50, ForceMode.Impulse);
+                    }
+                    else
+                    {
+                        //projectile.GetComponent<Rigidbody>().AddForce(projectile.transform.position * 50, ForceMode.Impulse);
+                    }
+                    /*laserLine.SetPosition(0, m_GunEnd.position);
+
+                    if (Physics.Raycast(rayOrigin, fwd, out hit, weaponRange))
+                    {
+                        laserLine.SetPosition(1, hit.point);
+                    }
+                    else
+                    {
+                        laserLine.SetPosition(1, rayOrigin + (fwd * weaponRange));
+                    }
+                    */
+                    Vector3 targetPos = rayOrigin + (fwd * weaponRange);
+                    StartCoroutine(Fire(targetPos));
                 }
-                else
-                {
-                    laserLine.SetPosition(1, rayOrigin + (fwd * weaponRange));
-                }
-                */
-                Vector3 targetPos = rayOrigin + (fwd * weaponRange);
-                StartCoroutine(Fire(targetPos));
-        }
-        else
-        {
-            if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
-            {
-                Debug.Log("No Ammo!!");
             }
-        }
 
 
             /*

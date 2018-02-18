@@ -29,14 +29,20 @@ public class ShellPickup : MonoBehaviour {
         if (player.playerAmmo == 0)
         {
             Debug.Log("shell pickedup");
-            player.playerAmmo += ammoCount;
-            
+            EventManager.TriggerEvent("PickUpShell","pickUpShell");
+            //add player ammo after coRoutine is finished
             StartCoroutine(moveItemToPlayer());
         }
         //play bubble particle
         //GameObject bubbleCopy = Instantiate(bubbles, transform.position, Quaternion.identity, transform) as GameObject;
         //bubbleCopy.GetComponentInChildren<ParticleSystem>().Play();
     }
+
+    void AddAmmo()
+    {
+        player.playerAmmo += ammoCount;
+    }
+
 
     IEnumerator BounceEffect()
     {
@@ -121,9 +127,11 @@ public class ShellPickup : MonoBehaviour {
             time += Time.deltaTime;
             yield return null;
         }
-
+        //give player new ammo
+        AddAmmo();
         yield return new WaitForSeconds(.5f);
         Destroy(this.gameObject);
+
         yield return 0;
     }
 

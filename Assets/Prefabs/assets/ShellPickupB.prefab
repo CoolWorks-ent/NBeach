@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23986433412691560}
   - component: {fileID: 114475835282828238}
   - component: {fileID: 65870719747331386}
-  - component: {fileID: 114223813806301846}
+  - component: {fileID: 114768620367981086}
   m_Layer: 0
   m_Name: ShellPickupB
   m_TagString: Untagged
@@ -95,17 +95,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.52062714, y: 0.1898848, z: 0.5036005}
   m_Center: {x: -0.028673187, y: -7.3389216e-16, z: -0.20657228}
---- !u!114 &114223813806301846
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1771000276839866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fea6f8eea666334aaf9869ad8f7bcda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114475835282828238
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -118,3 +107,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bubbles: {fileID: 0}
+--- !u!114 &114768620367981086
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1771000276839866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
