@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class song2_lvl : Level {
 
@@ -13,17 +14,26 @@ public class song2_lvl : Level {
     int shellSpawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
     Transform[] shellLocs;
+    [SerializeField]
+    GameObject darkBoss;
+    [SerializeField]
+    ParticleSystem RainFX;
 
+    CameraPathAnimator pathControl;
+    public Image blackOverlay;
     int enemiesDestroyed = 0;
     float curSongTime = 0;
-    int stageNum = 1;
+    float songStartTime = 0;
+    int stageNum = 0;
     float stage1StartTime = 120; //in seconds
     float stage2StartTime = 180; //3min in seconds
     float stage3StartTime = 240; //4min in seconds
 
     int numOfShells = 0;
     int maxShellCount = 2;
-
+    int rainEmissionRateDefault = 8;
+    int rainEmissionRateMax = 40;
+    Material nightSkybox;
 
     // Use this for initialization
     void Start () {
@@ -34,10 +44,19 @@ public class song2_lvl : Level {
     {
         EventManager.StartListening("DarknessDeath", DarknessDestroyed);
         EventManager.StartListening("PickUpShell", Evt_ShellPickedUp);
-        //start Intro First
+        
 
-        //Start Stage1 of battle
-        Stage1();
+        pathControl = GameController.instance.pathControl;
+        blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
+        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
+        blackOverlay.gameObject.SetActive(false);
+        nightSkybox = (Material)Resources.Load("Skyboxes/Night 01A", typeof(Material));
+        //start Intro First
+        darkBoss.SetActive(false);
+        RainFX.Stop();
+
+        //Start Stage0 of battle
+        Stage0();
    }
 
 
@@ -45,15 +64,23 @@ public class song2_lvl : Level {
 	// Update is called once per frame
 	void Update () {
 
-        ShellSpawner();
+        //get current time based upon when stage0 started
+        curSongTime = Time.time - songStartTime;
 
+        
+        if (stageNum == 1 && curSongTime >= stage1StartTime)
+        {
+            //start Stage1 of battle
+            Stage1();
+            ShellSpawner();
+        }
         //Logic for Stages of Battle
-        if (enemiesDestroyed > 10 && stageNum == 1 && curSongTime >= stage2StartTime)
+        if (enemiesDestroyed > 10 && stageNum == 2 && curSongTime >= stage2StartTime)
         {
             //start Stage2 of battle
             Stage2();
         }
-        else if(enemiesDestroyed > 30 && stageNum == 2 && curSongTime >= stage3StartTime)
+        else if(enemiesDestroyed > 30 && stageNum == 3 && curSongTime >= stage3StartTime)
         {
             //start Stage2 of battle
             Stage3();
@@ -109,8 +136,19 @@ public class song2_lvl : Level {
     /***************
      *****Level Stage Functions ****************
      ************/
+
+    void Stage0()
+    {
+        stageNum = 0;
+        songStartTime = Time.time;
+        darkBoss.SetActive(true);
+
+        StartCoroutine(Stage0Routine());
+        
+    }
     void Stage1()
     {
+        stageNum = 1;
         enemySpawners.spawningEnemies = true;
         StartCoroutine(Stage1Routine());
     }
@@ -125,7 +163,50 @@ public class song2_lvl : Level {
         stageNum = 3;
     }
 
+    //function to make player run to next rock when old rock is destroyed Via Spline
+    IEnumerator RunToNewRock()
+    {
+        //begin spline
+        pathControl.Play();
+        //playerControl.CanMove = true;
+        //playerControl.playerState = PlayerState.MOVING;
+        yield return 0;
+    }
+    public void PauseSpline()
+    {
+
+    }
+
     //functions to turn enemy spawners on or off
+    IEnumerator Stage0Routine()
+    {
+        //start rain
+        RainFX.Play();
+        float rainIncreaseTime = 5f;
+        float t = 0;
+
+        yield return new WaitForSeconds(5);
+        //display overlay briefly to be eye-blink and block the change of the skybox
+        blackOverlay.gameObject.SetActive(true);
+        blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
+        yield return new WaitForSeconds(0.1f);
+        //change skybox to night
+        print("night sky");
+        RenderSettings.skybox = nightSkybox;
+        yield return new WaitForSeconds(0.1f);
+        blackOverlay.gameObject.SetActive(false);
+
+        //increase the rains RateOverTime gradually
+        while (t < rainIncreaseTime )
+        {
+            UnityEngine.ParticleSystem.EmissionModule em = RainFX.emission;
+           em.rateOverTime  = Mathf.Lerp(rainEmissionRateDefault, rainEmissionRateMax, t / rainIncreaseTime);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return 0;
+    }
 
     IEnumerator Stage1Routine()
     {

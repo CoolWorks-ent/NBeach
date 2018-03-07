@@ -255,6 +255,9 @@ public class GameController : MonoBehaviour {
         {
             case "Song2_Opening":
                 break;
+            case "Pause":
+                lvlManager.currentLvl.GetComponent<song2_lvl>().PauseSpline();
+                break;
             default:
                 break;
         }
