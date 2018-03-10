@@ -343,7 +343,8 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114833597250864170, guid: 7c4809a66ce8eed4989868b3fa664ff6, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 7c4809a66ce8eed4989868b3fa664ff6, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &50000697
@@ -31710,7 +31711,7 @@ MonoBehaviour:
   hermiteTension: 1
   hermiteBias: 0
   editorPreview: {fileID: 0}
-  selectedPoint: 1
+  selectedPoint: 0
   pointMode: 3
   addPointAtPercent: 1
   _aspect: 1.7778
@@ -31734,7 +31735,7 @@ MonoBehaviour:
   orientationIndicatorColours: {r: 0.5, g: 0.1, b: 0.5, a: 1}
   autoSetStoedPointRes: 1
   enableUndo: 1
-  showPreview: 0
+  showPreview: 1
   enablePreviews: 1
 --- !u!4 &602444341
 Transform:
@@ -52327,11 +52328,11 @@ MonoBehaviour:
   worldPosition: {x: 165.41464, y: 46.56, z: 86.89603}
   lockPoint: 0
   type: 1
-  eventName: path_rock3
-  target: {fileID: 0}
-  methodName: 
-  methodArgument: 
-  argumentType: 0
+  eventName: Scene2Event
+  target: {fileID: 284208490}
+  methodName: Scene2Event
+  methodArgument: PAUSE_SPLINE
+  argumentType: 3
 --- !u!114 &602445173
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -52358,10 +52359,10 @@ MonoBehaviour:
   lockPoint: 0
   type: 1
   eventName: path_rock2
-  target: {fileID: 0}
-  methodName: 
-  methodArgument: 
-  argumentType: 0
+  target: {fileID: 284208490}
+  methodName: Scene2Event
+  methodArgument: PAUSE_SPLINE
+  argumentType: 3
 --- !u!114 &602445174
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -62447,8 +62448,8 @@ MonoBehaviour:
   hermiteTension: 0
   hermiteBias: 0
   editorPreview: {fileID: 0}
-  selectedPoint: 1
-  pointMode: 0
+  selectedPoint: 0
+  pointMode: 3
   addPointAtPercent: 0.024
   _aspect: 1.7778
   _previewResolution: 800
@@ -79276,7 +79277,7 @@ GameObject:
   - component: {fileID: 1891092508}
   m_Layer: 0
   m_Name: Song2_LevelObj
-  m_TagString: Untagged
+  m_TagString: song2_obj
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79446,6 +79447,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelList:
   - {fileID: 1891092508}
+  currentLvl: {fileID: 0}
 --- !u!4 &1911514508
 Transform:
   m_ObjectHideFlags: 0

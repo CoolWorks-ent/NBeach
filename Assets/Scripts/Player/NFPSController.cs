@@ -11,7 +11,7 @@ public class PlayerBoundary
     public GameObject boundary_right;
 }
 
-public enum FPSPlayerState { MOVING, SWIMMING, NOTMOVING }
+//public enum FPSPlayerState { MOVING, SWIMMING, NOTMOVING }
 
 public class NFPSController : PlayerController {
 
@@ -84,7 +84,7 @@ public class NFPSController : PlayerController {
         float minLeftRoll = 20;
         float maxLeftRoll = 45;
         float dodgeSpeed = 6f;
-        Rigidbody rigidbody;
+        Rigidbody nRigidbody;
         float dodgeCooldownTime = 1f; //1 second for cooldown
         float lastDodgeTime = 0;
         float curTime = 0;
@@ -96,7 +96,7 @@ public class NFPSController : PlayerController {
         {
             gController = GameObject.Find("GameController").GetComponent<GameController>();
             EventManager.StartListening("FireProjectile", ProjectileFired);
-        rigidbody = playerContainer.GetComponent<Rigidbody>();
+        nRigidbody = playerContainer.GetComponent<Rigidbody>();
         laserLine = GetComponent<LineRenderer>();
             playerHealth = 100;
             //start player with 10 ammo
@@ -131,12 +131,13 @@ public class NFPSController : PlayerController {
         //update ammo text on HUD
         ammoText.text = playerAmmo.ToString();
 
-        
+
 
         /*******
          * Default - Clamp Player's Movement (only during gameplay)
          *******/
-        rigidbody.transform.position = new Vector3(Mathf.Clamp(rigidbody.transform.position.x, 170, 200), rigidbody.transform.position.y, rigidbody.transform.position.z);
+        
+        nRigidbody.transform.position = new Vector3(Mathf.Clamp(nRigidbody.transform.position.x, 170, 200), nRigidbody.transform.position.y, nRigidbody.transform.position.z);
 
         //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
         //Manage Player's Ammo and check for Firing
@@ -295,7 +296,7 @@ public class NFPSController : PlayerController {
                     Vector3 newPos = new Vector3(curPos.x + dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
-                    StartCoroutine(executeDodge(rigidbody, newPos));
+                    StartCoroutine(executeDodge(nRigidbody, newPos));
 
                     //rigidbody.velocity = Vector3.right * dodgeSpeed;
                     lastDodgeTime = Time.time;
@@ -313,7 +314,7 @@ public class NFPSController : PlayerController {
                     Vector3 newPos = new Vector3(curPos.x - dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
-                    StartCoroutine(executeDodge(rigidbody, newPos));
+                    StartCoroutine(executeDodge(nRigidbody, newPos));
 
                     //rigidbody.velocity = Vector3.left * dodgeSpeed;
                     lastDodgeTime = Time.time;

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /*********************
  * Base Level Script for any level in the game
@@ -15,8 +16,8 @@ public class LevelManager : MonoBehaviour {
     // Use this for initialization
     void Awake ()
     {
-
-	}
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
     public LevelManager()
     {
@@ -30,11 +31,20 @@ public class LevelManager : MonoBehaviour {
 		
 	}
 
-    private void OnLevelWasLoaded(int level)
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if(level == 2)
+        Debug.Log("OnSceneLoaded: " + scene.name);
+        Debug.Log("Mode: " + mode);
+        switch(scene.name)
         {
-            currentLvl = GameObject.FindGameObjectWithTag("song2_obj").GetComponent<song2_lvl>();
-        }   
+            case "Song1_V2":
+                currentLvl = GameObject.FindGameObjectWithTag("song1_obj").GetComponent<song1_lvl>();
+                break;
+            case "Song2":
+                currentLvl = GameObject.FindGameObjectWithTag("song2_obj").GetComponent<song2_lvl>();
+                break;
+            default:
+                break;
+        }
     }
 }

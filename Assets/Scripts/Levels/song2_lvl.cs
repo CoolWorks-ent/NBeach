@@ -44,9 +44,9 @@ public class song2_lvl : Level {
     {
         EventManager.StartListening("DarknessDeath", DarknessDestroyed);
         EventManager.StartListening("PickUpShell", Evt_ShellPickedUp);
-        
 
-        pathControl = GameController.instance.pathControl;
+        gController = GameController.instance;
+        pathControl = gController.pathControl;
         blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
         blackOverlay.gameObject.SetActive(false);
@@ -167,14 +167,16 @@ public class song2_lvl : Level {
     IEnumerator RunToNewRock()
     {
         //begin spline
+        pathControl.topSpeed = 8;
         pathControl.Play();
         //playerControl.CanMove = true;
-        //playerControl.playerState = PlayerState.MOVING;
+        gController.playerControl.playerState = PlayerState.MOVING;
         yield return 0;
     }
     public void PauseSpline()
     {
-
+        pathControl.Pause();
+        gController.playerControl.playerState = PlayerState.NOTMOVING;
     }
 
     //functions to turn enemy spawners on or off
@@ -204,6 +206,8 @@ public class song2_lvl : Level {
             t += Time.deltaTime;
             yield return null;
         }
+
+        StartCoroutine(RunToNewRock());
 
         yield return 0;
     }
