@@ -174,14 +174,14 @@ public class GameController : MonoBehaviour {
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (pathControl.pPathState == PathState.Paused) //unpause
+            if (pathControl.pPathState == CamPathState.Paused) //unpause
             {
-                pathControl.pPathState = PathState.Play;
+                pathControl.pPathState = CamPathState.Play;
                 playerControl.CanMove = true;
             }
             else  //pause
             {
-                pathControl.pPathState = PathState.Paused;
+                pathControl.pPathState = CamPathState.Paused;
                 playerControl.CanMove = false;
             }
         }
@@ -281,7 +281,7 @@ public class GameController : MonoBehaviour {
 
         //restrict player movement
         playerControl.CanMove = false;
-        //pathControl.pPathState = PathState.Paused;
+        //pathControl.pPathState = CamPathState.Paused;
 
         //dark room should rotate until scene is finished
         IEnumerator darkRoomThread = (DarkRoom(scene1Time));
@@ -305,7 +305,7 @@ public class GameController : MonoBehaviour {
         darkRoom.SetActive(false);
 
         //begin player movement
-        //pathControl.pPathState = PathState.Play;
+        //pathControl.pPathState = CamPathState.Play;
         //playerControl.playerState = PlayerState.MOVING;
         //playerControl.CanMove = true;
 
@@ -342,7 +342,7 @@ public class GameController : MonoBehaviour {
     {
         //pause the spline
         playerControl.CanMove = false;
-        pathControl.pPathState = PathState.Paused;
+        pathControl.pPathState = CamPathState.Paused;
 
         //pause for x seconds and let player move around
         yield return new WaitForSeconds(3);
@@ -433,7 +433,7 @@ public class GameController : MonoBehaviour {
         playerControl.CanMove = true;
         //pathControl.pathSpeed = 7;
         pathControl.topSpeed = 5;
-        pathControl.pPathState = PathState.Play;
+        pathControl.pPathState = CamPathState.Play;
 
         //pause to allow camera to look towards wave and then open eyes
         yield return new WaitForSeconds(1.2f);

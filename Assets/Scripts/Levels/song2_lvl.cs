@@ -199,7 +199,7 @@ public class song2_lvl : Level {
     public void PauseSpline()
     {
         //pathControl.Pause();
-        pathControl.pPathState = PathState.Paused;
+        pathControl.pPathState = CamPathState.Paused;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
 
         //increment state number because player has reach next rock

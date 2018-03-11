@@ -26,7 +26,7 @@ using Thread = System.Threading.Thread;
 [HelpURL("http://arongranberg.com/astar/docs/class_astar_path.php")]
 public class AstarPath : VersionedMonoBehaviour {
 	/** The version number for the A* %Pathfinding Project */
-	public static readonly System.Version Version = new System.Version(4, 1, 10);
+	public static readonly System.Version Version = new System.Version(4, 1, 12);
 
 	/** Information about where the package was downloaded */
 	public enum AstarDistribution { WebsiteDownload, AssetStore };
@@ -591,17 +591,25 @@ public class AstarPath : VersionedMonoBehaviour {
 		return tagNames;
 	}
 
+	/** Used outside of play mode to initialize the AstarPath object even if it has not been selected in the inspector yet.
+	 * This will set the #active property and deserialize all graphs.
+	 *
+	 * This is useful if you want to do changes to the graphs in the editor outside of play mode, but cannot be sure that the graphs have been deserialized yet.
+	 * In play mode this method does nothing.
+	 */
+	public static void FindAstarPath () {
+		if (Application.isPlaying) return;
+		if (active == null) active = GameObject.FindObjectOfType<AstarPath>();
+		if (active != null && (active.data.graphs == null || active.data.graphs.Length == 0)) active.data.DeserializeGraphs();
+	}
+
 	/** Tries to find an AstarPath object and return tag names.
 	 * If an AstarPath object cannot be found, it returns an array of length 1 with an error message.
 	 * \see AstarPath.GetTagNames
 	 */
 	public static string[] FindTagNames () {
-		if (active == null) active = GameObject.FindObjectOfType<AstarPath>();
-		if (active != null) {
-			return active.GetTagNames();
-		} else {
-			return new string[1] { "There is no AstarPath component in the scene" };
-		}
+		FindAstarPath();
+		return active != null ? active.GetTagNames() : new string[1] { "There is no AstarPath component in the scene" };
 	}
 
 	/** Returns the next free path ID */
@@ -1648,7 +1656,7 @@ public class AstarPath : VersionedMonoBehaviour {
 
 		if (active.pathProcessor.queue.IsTerminating) return;
 
-		if (path.PipelineState == Pathfinding.PathState.Created) {
+		if (path.PipelineState == PathState.Created) {
 			throw new System.Exception("The specified path has not been started yet.");
 		}
 
@@ -1658,9 +1666,9 @@ public class AstarPath : VersionedMonoBehaviour {
 			Debug.LogError("You are calling the BlockUntilCalculated function recursively (maybe from a path callback). Please don't do this.");
 		}
 
-		if (path.PipelineState < Pathfinding.PathState.ReturnQueue) {
+		if (path.PipelineState < PathState.ReturnQueue) {
 			if (active.IsUsingMultithreading) {
-				while (path.PipelineState < Pathfinding.PathState.ReturnQueue) {
+				while (path.PipelineState < PathState.ReturnQueue) {
 					if (active.pathProcessor.queue.IsTerminating) {
 						waitForPathDepth--;
 						throw new System.Exception("Pathfinding Threads seem to have crashed.");
@@ -1671,8 +1679,8 @@ public class AstarPath : VersionedMonoBehaviour {
 					active.PerformBlockingActions(true);
 				}
 			} else {
-				while (path.PipelineState < Pathfinding.PathState.ReturnQueue) {
-					if (active.pathProcessor.queue.IsEmpty && path.PipelineState != Pathfinding.PathState.Processing) {
+				while (path.PipelineState < PathState.ReturnQueue) {
+					if (active.pathProcessor.queue.IsEmpty && path.PipelineState != PathState.Processing) {
 						waitForPathDepth--;
 						throw new System.Exception("Critical error. Path Queue is empty but the path state is '" + path.PipelineState + "'");
 					}
@@ -1741,8 +1749,8 @@ public class AstarPath : VersionedMonoBehaviour {
 			return;
 		}
 
-		if (path.PipelineState != Pathfinding.PathState.Created) {
-			throw new System.Exception("The path has an invalid state. Expected " + Pathfinding.PathState.Created + " found " + path.PipelineState + "\n" +
+		if (path.PipelineState != PathState.Created) {
+			throw new System.Exception("The path has an invalid state. Expected " + PathState.Created + " found " + path.PipelineState + "\n" +
 				"Make sure you are not requesting the same path twice");
 		}
 
@@ -1761,7 +1769,7 @@ public class AstarPath : VersionedMonoBehaviour {
 		path.Claim(astar);
 
 		// Will increment p.state to PathState.PathQueue
-		((IPathInternals)path).AdvanceState(Pathfinding.PathState.PathQueue);
+		((IPathInternals)path).AdvanceState(PathState.PathQueue);
 		if (pushToFront) {
 			astar.pathProcessor.queue.PushFront(path);
 		} else {

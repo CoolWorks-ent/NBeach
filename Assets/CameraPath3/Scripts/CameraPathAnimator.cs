@@ -16,7 +16,7 @@ using System.Text;
 using System.Xml;
 #endif
 
-public enum PathState { Start, Stopped, Loop, Reset, Paused, Play, Active }
+public enum CamPathState { Start, Stopped, Loop, Reset, Paused, Play, Active }
 
 public class CameraPathAnimator : MonoBehaviour
 {
@@ -105,7 +105,7 @@ public class CameraPathAnimator : MonoBehaviour
     public Vector3 animatedObjectStartPosition;
     public Quaternion animatedObjectStartRotation;
 
-    PathState mPathState;
+    CamPathState mPathState;
 
     //Events
     public delegate void AnimationStartedEventHandler();
@@ -212,33 +212,33 @@ public class CameraPathAnimator : MonoBehaviour
     /// all possible states of the path and their corresponding functions.  
     /// Should be called by outside scripts 
     /// </summary>
-    public PathState pPathState
+    public CamPathState pPathState
     {
         get { return mPathState; }
         set
         {
-            if (value == PathState.Active)
+            if (value == CamPathState.Active)
             {
-                mPathState = PathState.Active;
+                mPathState = CamPathState.Active;
                 // mSplineInterp.mSplineState = "Resume";
             }
-            else if (value == PathState.Loop)
+            else if (value == CamPathState.Loop)
             {
-                mPathState = PathState.Loop;
+                mPathState = CamPathState.Loop;
             }
-            else if (value == PathState.Paused)
+            else if (value == CamPathState.Paused)
             {
-                mPathState = PathState.Paused;
+                mPathState = CamPathState.Paused;
                 Pause();
             }
-            else if (value == PathState.Stopped)
+            else if (value == CamPathState.Stopped)
             {
-                mPathState = PathState.Stopped;
+                mPathState = CamPathState.Stopped;
                 Stop();
             }
-            else if (value == PathState.Play)
+            else if (value == CamPathState.Play)
             {
-                mPathState = PathState.Play;
+                mPathState = CamPathState.Play;
                 Play();
             }
         }
