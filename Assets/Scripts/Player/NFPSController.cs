@@ -55,7 +55,7 @@ public class NFPSController : PlayerController {
         [SerializeField]
         private Text ammoText;
         [SerializeField]
-        private GameObject playerContainer;
+        public GameObject playerContainer;
 
         public GameController gController;
         int playerHealth;
@@ -92,6 +92,8 @@ public class NFPSController : PlayerController {
         bool resetRot = true;
         bool canDodgeRight = true, canDodgeLeft = true;
 
+        
+
     private void Awake()
         {
             gController = GameObject.Find("GameController").GetComponent<GameController>();
@@ -103,6 +105,7 @@ public class NFPSController : PlayerController {
             playerAmmo = 0;
             maxAmmo = 10;
             bReloading = true;
+            
         }
 
 
@@ -135,9 +138,10 @@ public class NFPSController : PlayerController {
 
         /*******
          * Default - Clamp Player's Movement (only during gameplay)
+         * Clamp the movement to the x-axis btw. 170 & 200
          *******/
         
-        nRigidbody.transform.position = new Vector3(Mathf.Clamp(nRigidbody.transform.position.x, 170, 200), nRigidbody.transform.position.y, nRigidbody.transform.position.z);
+        nRigidbody.transform.position = new Vector3(Mathf.Clamp(nRigidbody.transform.position.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.position.y, nRigidbody.transform.position.z);
 
         //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
         //Manage Player's Ammo and check for Firing
@@ -398,9 +402,32 @@ public class NFPSController : PlayerController {
             yield return null;
         }
     }
-/* 
- * Projectile and Weapon Based Functions
- */
+
+    private IEnumerator SpeedBoostRoutine()
+    {
+        //increase speed of player 
+        float speedTime = 4f;//speedBoost.speedTime;
+        float initBoostTime = 2f;//speedBoost.initBoostTime;
+        float boostAmt = 2f;//speedBoost.boostAmt;
+        float timeElapsed = 0f;
+
+        //plays the speed effect for x seconds
+        while (timeElapsed < speedTime)
+        {
+            //increase speed instantly.  but need to set up a gradual increase instead.
+            gController.pathControl.pathSpeed += boostAmt;
+
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        //stop speed boost
+        EventManager.TriggerEvent("Player_SpeedBoostOff", "Player_SpeedBoost");
+    }
+
+
+    /* 
+     * Projectile and Weapon Based Functions
+     */
     IEnumerator CreateNewProjectile()
     {
         float time = .4f;

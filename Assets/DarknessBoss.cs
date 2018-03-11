@@ -6,7 +6,7 @@ public class DarknessBoss : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        EventManager.StartListening("Stage1",Stage1);
+        EventManager.StartListening("Stage1Start",Stage1);
 	}
 	
 	// Update is called once per frame

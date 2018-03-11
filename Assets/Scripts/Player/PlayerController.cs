@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour {
     Vector3 movementVector;
     Vector3 undesiredMvmtVector;
 
-    //playerInteractableItems
+    //playerInteractableItems + UI specific variables
     SpeedBoost speedBoost;
     SpeedEffectAnimator speedAnimator;
     
