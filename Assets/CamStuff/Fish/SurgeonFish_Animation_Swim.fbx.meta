@@ -1,0 +1,197 @@
+fileFormatVersion: 2
+guid: a8b1e84ca5098894085b660262005f80
+timeCreated: 1519609796
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: pCube1_pCube2_pCube2_pCube6
+    100002: pPlane16
+    100004: pPlane17
+    100006: pPlane18
+    100008: pPlane19
+    100010: pPlane2
+    100012: pPlane3
+    100014: pPlane5
+    100016: pPlane6
+    100018: Surgeon_Base
+    100020: Surgeon_Fin_L
+    100022: Surgeon_Fin_R
+    100024: Surgeon_Head
+    100026: Surgeon_Spine_01
+    100028: Surgeon_Spine_02
+    100030: Surgeon_Tail_Base
+    100032: Surgeon_Tail_Tip
+    100034: //RootNode
+    400000: pCube1_pCube2_pCube2_pCube6
+    400002: pPlane16
+    400004: pPlane17
+    400006: pPlane18
+    400008: pPlane19
+    400010: pPlane2
+    400012: pPlane3
+    400014: pPlane5
+    400016: pPlane6
+    400018: Surgeon_Base
+    400020: Surgeon_Fin_L
+    400022: Surgeon_Fin_R
+    400024: Surgeon_Head
+    400026: Surgeon_Spine_01
+    400028: Surgeon_Spine_02
+    400030: Surgeon_Tail_Base
+    400032: Surgeon_Tail_Tip
+    400034: //RootNode
+    4300000: pCube1_pCube2_pCube2_pCube6
+    4300002: pPlane2
+    4300004: pPlane3
+    4300006: pPlane5
+    4300008: pPlane6
+    4300010: pPlane16
+    4300012: pPlane17
+    4300014: pPlane18
+    4300016: pPlane19
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: pCube1_pCube2_pCube2_pCube6
+    13700002: pPlane16
+    13700004: pPlane17
+    13700006: pPlane18
+    13700008: pPlane19
+    13700010: pPlane2
+    13700012: pPlane3
+    13700014: pPlane5
+    13700016: pPlane6
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 48
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane2
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane3
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane5
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane6
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane16
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane17
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane18
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube6/pPlane19
+        weight: 1
+      - path: Surgeon_Base
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Fin_L
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Fin_R
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Head
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Spine_01
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Spine_01/Surgeon_Spine_02
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Spine_01/Surgeon_Spine_02/Surgeon_Tail_Base
+        weight: 1
+      - path: Surgeon_Base/Surgeon_Spine_01/Surgeon_Spine_02/Surgeon_Tail_Base/Surgeon_Tail_Tip
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
