@@ -9,7 +9,7 @@ public enum GameState { IsPlaying, IsPaused, IsOver, InMenu}
 public class GameController : MonoBehaviour {
 
     [SerializeField]
-    PlayerController playerControl;
+    public PlayerController playerControl;
     [SerializeField]
     public SoundManager soundManager;
     [SerializeField]
@@ -118,6 +118,11 @@ public class GameController : MonoBehaviour {
 
     void Awake()
     {
+        /*
+         * LOAD RESOURCES on AWAKE
+         * load different resources based upon the Scene loaded
+         */
+        EventManager.StartListening("Player_Stop", ResetPlayer);
         if (SceneManager.GetActiveScene().name == "Song1_V2")
         {
             waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
@@ -131,8 +136,11 @@ public class GameController : MonoBehaviour {
 
             //subscribe to Scene1Event event call
             EventManager.StartListening("Scene1Event", Scene1Events);
-            EventManager.StartListening("Player_Stop", ResetPlayer);
             s1Events = new List<string> { "waterBubbles", "" };
+        }
+        else if(SceneManager.GetActiveScene().name == "Song2")
+        {
+            EventManager.StartListening("Scene2Event", Scene2Events);
         }
 
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
@@ -166,14 +174,14 @@ public class GameController : MonoBehaviour {
         //if "P" pressed, pause spline
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (pathControl.pPathState == PathState.Paused) //unpause
+            if (pathControl.pPathState == CamPathState.Paused) //unpause
             {
-                pathControl.pPathState = PathState.Play;
+                pathControl.pPathState = CamPathState.Play;
                 playerControl.CanMove = true;
             }
             else  //pause
             {
-                pathControl.pPathState = PathState.Paused;
+                pathControl.pPathState = CamPathState.Paused;
                 playerControl.CanMove = false;
             }
         }
@@ -249,11 +257,14 @@ public class GameController : MonoBehaviour {
         Debug.Log("[EVENT] " + evt);
     }
 
-    void Song2Events(string evt)
+    void Scene2Events(string evt)
     {
         switch(evt)
         {
             case "Song2_Opening":
+                break;
+            case "PAUSE_SPLINE":
+                lvlManager.currentLvl.GetComponent<song2_lvl>().PauseSpline();
                 break;
             default:
                 break;
@@ -270,7 +281,7 @@ public class GameController : MonoBehaviour {
 
         //restrict player movement
         playerControl.CanMove = false;
-        //pathControl.pPathState = PathState.Paused;
+        //pathControl.pPathState = CamPathState.Paused;
 
         //dark room should rotate until scene is finished
         IEnumerator darkRoomThread = (DarkRoom(scene1Time));
@@ -294,7 +305,7 @@ public class GameController : MonoBehaviour {
         darkRoom.SetActive(false);
 
         //begin player movement
-        //pathControl.pPathState = PathState.Play;
+        //pathControl.pPathState = CamPathState.Play;
         //playerControl.playerState = PlayerState.MOVING;
         //playerControl.CanMove = true;
 
@@ -331,7 +342,7 @@ public class GameController : MonoBehaviour {
     {
         //pause the spline
         playerControl.CanMove = false;
-        pathControl.pPathState = PathState.Paused;
+        pathControl.pPathState = CamPathState.Paused;
 
         //pause for x seconds and let player move around
         yield return new WaitForSeconds(3);
@@ -422,7 +433,7 @@ public class GameController : MonoBehaviour {
         playerControl.CanMove = true;
         //pathControl.pathSpeed = 7;
         pathControl.topSpeed = 5;
-        pathControl.pPathState = PathState.Play;
+        pathControl.pPathState = CamPathState.Play;
 
         //pause to allow camera to look towards wave and then open eyes
         yield return new WaitForSeconds(1.2f);
