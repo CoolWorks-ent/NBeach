@@ -1,0 +1,197 @@
+fileFormatVersion: 2
+guid: 4b18f905b290bfa4b8e174c1412c7f98
+timeCreated: 1519609795
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: pCube1_pCube2_pCube2_pCube7
+    100004: pPlane10
+    100006: pPlane11
+    100008: pPlane12
+    100010: pPlane13
+    100012: pPlane14
+    100014: pPlane15
+    100016: pPlane7
+    100018: pPlane8
+    100020: Snapper_Base
+    100022: Snapper_Fin_L
+    100024: Snapper_Fin_R
+    100026: Snapper_Head
+    100028: Snapper_Spine_01
+    100030: Snapper_Spine_02
+    100032: Snapper_Tail_Base
+    100034: Snapper_Tail_Tip
+    400000: //RootNode
+    400002: pCube1_pCube2_pCube2_pCube7
+    400004: pPlane10
+    400006: pPlane11
+    400008: pPlane12
+    400010: pPlane13
+    400012: pPlane14
+    400014: pPlane15
+    400016: pPlane7
+    400018: pPlane8
+    400020: Snapper_Base
+    400022: Snapper_Fin_L
+    400024: Snapper_Fin_R
+    400026: Snapper_Head
+    400028: Snapper_Spine_01
+    400030: Snapper_Spine_02
+    400032: Snapper_Tail_Base
+    400034: Snapper_Tail_Tip
+    4300000: pCube1_pCube2_pCube2_pCube7
+    4300002: pPlane10
+    4300004: pPlane11
+    4300006: pPlane8
+    4300008: pPlane7
+    4300010: pPlane12
+    4300012: pPlane13
+    4300014: pPlane14
+    4300016: pPlane15
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: pCube1_pCube2_pCube2_pCube7
+    13700002: pPlane10
+    13700004: pPlane11
+    13700006: pPlane12
+    13700008: pPlane13
+    13700010: pPlane14
+    13700012: pPlane15
+    13700014: pPlane7
+    13700016: pPlane8
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 48
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane7
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane8
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane10
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane11
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane12
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane13
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane14
+        weight: 1
+      - path: pCube1_pCube2_pCube2_pCube7/pPlane15
+        weight: 1
+      - path: Snapper_Base
+        weight: 1
+      - path: Snapper_Base/Snapper_Fin_L
+        weight: 1
+      - path: Snapper_Base/Snapper_Fin_R
+        weight: 1
+      - path: Snapper_Base/Snapper_Head
+        weight: 1
+      - path: Snapper_Base/Snapper_Spine_01
+        weight: 1
+      - path: Snapper_Base/Snapper_Spine_01/Snapper_Spine_02
+        weight: 1
+      - path: Snapper_Base/Snapper_Spine_01/Snapper_Spine_02/Snapper_Tail_Base
+        weight: 1
+      - path: Snapper_Base/Snapper_Spine_01/Snapper_Spine_02/Snapper_Tail_Base/Snapper_Tail_Tip
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

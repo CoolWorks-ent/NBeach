@@ -17,10 +17,13 @@ public class Darkness : MonoBehaviour {
     bool chasing = false, idle = false;
     public EnemyState enemyState { get; set; }
     public EnemySpawner enemySpawner;
+    private Transform target;
 
     // Use this for initialization
     void Start () {
         enemyState = EnemyState.CHASING;
+        target = GameObject.FindObjectOfType<AI_Manager>().player;
+        GetComponent<Pathfinding.AIDestinationSetter>().target = target;
 	}
 	
 	// Update is called once per frame
@@ -34,7 +37,7 @@ public class Darkness : MonoBehaviour {
         float maxTime = 2f;
 
         //velocity based mvmt
-        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        /*Rigidbody rigidbody = GetComponent<Rigidbody>();
         Vector3 velocity = Vector3.forward * mvmtSpeed; //move forward at constant speed
 
         if (enemyState == EnemyState.CHASING)
@@ -44,7 +47,7 @@ public class Darkness : MonoBehaviour {
             //new Vector3(rigidbody.velocity.x * mvmtSpeed, rigidbody.velocity.y * mvmtSpeed, rigidbody.velocity.z * mvmtSpeed);
             rigidbody.MovePosition(rigidbody.position + Vector3.forward * mvmtSpeed * Time.deltaTime);
             //rigidbody.AddForce(velocity, ForceMode.Force);
-        }
+        }*/
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -70,7 +73,7 @@ public class Darkness : MonoBehaviour {
         }
     }
 
-    IEnumerator ApproachPlayer()
+    /*IEnumerator ApproachPlayer()
     {
         float startTime ;
         float curTime;
@@ -90,5 +93,5 @@ public class Darkness : MonoBehaviour {
             yield return null;
         }
         yield return 0;
-    }
+    }*/
 }
