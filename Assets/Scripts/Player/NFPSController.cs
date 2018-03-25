@@ -98,8 +98,8 @@ public class NFPSController : PlayerController {
         {
             gController = GameObject.Find("GameController").GetComponent<GameController>();
             EventManager.StartListening("FireProjectile", ProjectileFired);
-        nRigidbody = playerContainer.GetComponent<Rigidbody>();
-        laserLine = GetComponent<LineRenderer>();
+            nRigidbody = playerContainer.GetComponent<Rigidbody>();
+            laserLine = GetComponent<LineRenderer>();
             playerHealth = 100;
             //start player with 10 ammo
             playerAmmo = 0;
@@ -141,7 +141,7 @@ public class NFPSController : PlayerController {
          * Clamp the movement to the x-axis btw. 170 & 200
          *******/
         
-        nRigidbody.transform.position = new Vector3(Mathf.Clamp(nRigidbody.transform.position.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.position.y, nRigidbody.transform.position.z);
+        nRigidbody.transform.localPosition = new Vector3(Mathf.Clamp(nRigidbody.transform.localPosition.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.localPosition.y, nRigidbody.transform.localPosition.z);
 
         //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
         //Manage Player's Ammo and check for Firing
@@ -289,14 +289,14 @@ public class NFPSController : PlayerController {
             bool canMove = false;
 
             //dodge left
-            if ((normZ > minLeftRoll && normZ < maxLeftRoll))
+            if ((normZ < minRightRoll && normZ > maxRightRoll))
             {
                 canMove = CheckMvmtBoundary("left");
                 if (canMove)
                 {
                     //Check if player is colliding with the left dodge limit
 
-                    Vector3 curPos = playerContainer.transform.position;
+                    Vector3 curPos = playerContainer.transform.localPosition;
                     Vector3 newPos = new Vector3(curPos.x + dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
@@ -309,12 +309,12 @@ public class NFPSController : PlayerController {
                 }
             }
             //dodge right
-            else if ((normZ < minRightRoll && normZ > maxRightRoll))
+            else if ((normZ > minLeftRoll && normZ < maxLeftRoll))
             {
                 canMove = CheckMvmtBoundary("right");
                 if (canMove)
                 {
-                    Vector3 curPos = playerContainer.transform.position;
+                    Vector3 curPos = playerContainer.transform.localPosition;
                     Vector3 newPos = new Vector3(curPos.x - dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
@@ -345,7 +345,7 @@ public class NFPSController : PlayerController {
         switch (direction)
         {
             case "left":
-                if (transform.position.x <= pBoundary.boundary_left.transform.position.x)
+                if (nRigidbody.transform.localPosition.x <= pBoundary.boundary_left.transform.localPosition.x)
                 {
                     //prevent further dodging to the left
                     canDodgeLeft = false;
@@ -354,7 +354,7 @@ public class NFPSController : PlayerController {
                 }
                 break;
             case "right":
-                if (transform.position.x >= pBoundary.boundary_right.transform.position.x)
+                if (nRigidbody.transform.localPosition.x >= pBoundary.boundary_right.transform.localPosition.x)
                 {
                     //prevent further dodging to the right
                     canDodgeLeft = true;
@@ -397,7 +397,7 @@ public class NFPSController : PlayerController {
         {
             //body.MovePosition(newPos * dodgeSpeed * Time.deltaTime);
             //playerContainer.transform.position = Vector3.MoveTowards(playerContainer.transform.position, newPos, dodgeSpeed * Time.deltaTime);
-            playerContainer.transform.position = Vector3.MoveTowards(playerContainer.transform.position, newPos, dodgeSpeed * Time.deltaTime);
+            playerContainer.transform.localPosition = Vector3.MoveTowards(playerContainer.transform.localPosition, newPos, dodgeSpeed * Time.deltaTime);
             t += Time.deltaTime;
             yield return null;
         }
@@ -525,6 +525,10 @@ public class NFPSController : PlayerController {
             //call damage function
             OnPlayerDamaged(collider.transform);
         }
+        if(collider.gameObject.tag == "DarkBossAttack")
+        {
+            OnPlayerDamaged(collider.transform);
+        }
 
         //dodge barriers via trigger volumes
         /*if(collider.gameObject == pBoundary.boundary_left)
@@ -552,6 +556,8 @@ public class NFPSController : PlayerController {
 
             //player loses health based upon the type of darkness or attack. I'm hard scripting the values for now
             if (enemy.tag == "Darkness")
+                playerHealth -= 10;
+            if (enemy.tag == "DarkBossAttack")
                 playerHealth -= 10;
 
             curTime = Time.time;

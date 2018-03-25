@@ -15,18 +15,19 @@ public class song2_lvl : Level {
     [SerializeField]
     Transform[] shellLocs;
     [SerializeField]
-    GameObject darkBoss;
+    DarknessBoss darkBoss;
     [SerializeField]
     ParticleSystem RainFX;
     [SerializeField]
     GameObject enemyStageObj;
+    GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
     CameraPathAnimator pathControl;
     public Image blackOverlay;
     int enemiesDestroyed = 0;
     float curSongTime = 0;
     float songStartTime = 0;
-    int stageNum = 0;
+    public int stageNum = 0;
     float stage1StartTime = 120; //in seconds
     float stage2StartTime = 180; //3min in seconds
     float stage3StartTime = 240; //4min in seconds
@@ -64,7 +65,8 @@ public class song2_lvl : Level {
         blackOverlay.gameObject.SetActive(false);
         nightSkybox = (Material)Resources.Load("Skyboxes/Night 01A", typeof(Material));
         //start Intro First
-        darkBoss.SetActive(false);
+        darkBoss.gameObject.SetActive(false);
+        darkBossObj = darkBoss.transform.parent.gameObject;
         RainFX.Stop();
 
         //Start Stage0 of battle
@@ -78,25 +80,30 @@ public class song2_lvl : Level {
 
         //get current time based upon when stage0 started
         curSongTime = Time.time - songStartTime;
-
         
+	}
+
+    void StartNextStage()
+    {
         if (stageNum == 1) //&& curSongTime >= stage1StartTime)
         {
             //start Stage1 of battle
             Stage1();
         }
         //Logic for Stages of Battle
-        if (enemiesDestroyed > 10 && stageNum == 2) //&& curSongTime >= stage2StartTime)
+        //minimum 10 enemies Destroyed
+        if (stageNum == 2) //&& curSongTime >= stage2StartTime)
         {
             //start Stage2 of battle
             Stage2();
         }
-        else if(enemiesDestroyed > 30 && stageNum == 3 && curSongTime >= stage3StartTime)
+        //minimu 30 enemies destroyed
+        else if (stageNum == 3 )//&& curSongTime >= stage3StartTime)
         {
             //start Stage2 of battle
             Stage3();
         }
-	}
+    }
 
     private void DebugFunc(string evt)
     {
@@ -164,7 +171,7 @@ public class song2_lvl : Level {
     {
         stageNum = 0;
         songStartTime = Time.time;
-        darkBoss.SetActive(true);
+        darkBoss.gameObject.SetActive(true);
 
         StartCoroutine(Stage0Routine());
         
@@ -196,6 +203,9 @@ public class song2_lvl : Level {
         yield return 0;
     }
 
+    /*
+     * Function that Pauses Spline for when the player reaches a new rock ONLY.
+     */
     public void PauseSpline()
     {
         //pathControl.Pause();
@@ -205,7 +215,7 @@ public class song2_lvl : Level {
         //increment state number because player has reach next rock
         stageNum += 1; 
         Debug.Log("Rock " + stageNum + " Reached.");
-
+        StartNextStage();
         //remove speed boost and other FX
         //gController.playerControl.Reset();
     }
@@ -245,20 +255,29 @@ public class song2_lvl : Level {
         //move dark boss to the top of the water plane
         float moveTime = 4;
         t = 0;
-        Vector3 startPos = darkBoss.transform.position;
+        Vector3 startPos = darkBossObj.transform.position;
         Vector3 endPos = new Vector3(startPos.x, GameObject.Find("OceanSurfaceQuad").transform.position.y, startPos.z);
 
         while (t <= moveTime)
         {
             //slowly move darkboss to above the water and begin its attack
-            darkBoss.transform.position = Vector3.Lerp(startPos, endPos, t / moveTime);
+            darkBossObj.transform.position = Vector3.Lerp(startPos, endPos, t / moveTime);
             t += Time.deltaTime;
             yield return null;
         }
+        //start the dark boss' attack sequence
+        darkBoss.stage = DarknessBoss.BossStage.stage1;
+        darkBoss.status = DarknessBoss.BossStatus.start;
 
         float waitTime = stage1StartTime - curSongTime;
+        Debug.Log("time till next stage = " + waitTime);
+        //This is the length of time the rest of the stage should play out
         yield return new WaitForSeconds(3);
-        StartCoroutine(RunToNewRock(1));
+        //darkBoss.DoRockSmash_Interrupt();
+
+        //wait for an event for when the rock is destroyed by the dark boss.
+        //After dark boss as destroyed the rock, Trigger the RunToNewRock CoRoutine...
+       // StartCoroutine(RunToNewRock(1));
 
         yield return 0;
     }
