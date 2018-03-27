@@ -29,3 +29,23 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Assets/CameraPath3/ExamplesII_U5.unitypackage.meta
+Assets/GoogleVR/Demos/Environment/cubeRoom.obj.meta
+Assets/GoogleVR/GVRVideoPlayer.unitypackage.meta
+Assets/InstantPreview/InstantPreview.apk.meta
+Assets/Julia/JuliaSwimming.obj.meta
+Assets/Meshes/Rock_Bridge.obj.meta
+Assets/Meshes/Under The Sea.obj.meta
+Assets/Meshes/clownFishObj/Under The Sea.obj.meta
+Assets/Meshes/clownFishObj/images.meta
+Assets/Particles/Textures.meta
+Assets/Player.meta
+Assets/Prefabs/Song1.meta
+Assets/Prefabs/Song3.meta
+Assets/Prefabs/Song4.meta
+Assets/Scenes/ScreenSpaceScatteringFog-master/SSMS.unitypackage.meta
+Assets/Scripts/CameraControls.meta
+Assets/Textures/Rocks/Rock_6/Rock_6.OBJ.meta
+Assets/Textures/Rocks/Rock_6/Rock_6_Tex/Thumbs.db.meta
+Assets/Textures/clownFishObj/Under The Sea.obj.meta
+Assets/Textures/clownFishObj/images.meta
