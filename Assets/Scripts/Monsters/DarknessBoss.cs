@@ -299,17 +299,29 @@ public class DarknessBoss : MonoBehaviour {
     int makeTestAttack(float range)
     {
         int index = -1;
-        float value = range;
-        if (value >= 66)
+        //value determines the chance of a certain attack
+        float value = Random.Range(0f, 100f);
+        if (doRockSmash == true)
+            value = 101;
+        do
         {
-            attackState = BossAttackType.Ball;
-            index = 0;
-        }
-        else
-        {
-            attackState = BossAttackType.Smash;
-            index = 1;
-        }
+            if (value >= 66)
+            {
+                attackState = BossAttackType.Smash;
+                index = 2;
+            }
+            else if(value >= 101)
+            {
+                attackState = BossAttackType.RockSmash;
+                index = 3;
+            }
+            else
+            {
+                attackState = BossAttackType.Ball;
+                index = 0;
+            }
+            value = Random.Range(0f, 100f);
+        } while (lastAttack == index);
         lastAttack = index;
 
         return index;
@@ -343,7 +355,7 @@ public class DarknessBoss : MonoBehaviour {
                     break;
                 case BossAttackType.Ball:
                     path = attackPrefabs[0];
-                    offset = new Vector3(0, 0, -8);
+                    offset = new Vector3(0, 0, -3);
                     //animationControl.SetBool("IsRest", true);
                     //animationControl.SetBool("AttackWait", false);
                     break;
