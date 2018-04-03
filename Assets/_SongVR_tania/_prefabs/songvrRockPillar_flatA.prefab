@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33282504656960866}
   - component: {fileID: 23132139926055736}
   - component: {fileID: 136611619237291334}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: songvrRockPillar_flatA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,8 +36,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1120230077365522}
   m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -182.95561, y: 20.227043, z: 180.30916}
-  m_LocalScale: {x: 5, y: 10, z: 5}
+  m_LocalPosition: {x: -185.56561, y: 20.227043, z: 224.20917}
+  m_LocalScale: {x: 4, y: 8, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0

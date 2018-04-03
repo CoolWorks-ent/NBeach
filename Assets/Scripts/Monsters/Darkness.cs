@@ -25,6 +25,7 @@ public class Darkness : MonoBehaviour {
         target = GameObject.FindObjectOfType<AI_Manager>().player;
         GetComponent<Pathfinding.AIDestinationSetter>().target = target;
         GetComponent<Pathfinding.AIPath>().repathRate = Random.Range(2.5f, 5.0f);
+        GetComponent<Pathfinding.AIPath>().maxSpeed = Random.Range(1.0f, 3.25f);
 	}
 	
 	// Update is called once per frame
