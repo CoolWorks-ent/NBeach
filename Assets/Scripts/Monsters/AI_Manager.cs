@@ -19,7 +19,7 @@ public class AI_Manager : MonoBehaviour {
 		maxEnemyCount = 10;
 		if(instance != null && instance != this)
 		{
-			Debug.LogError("Instance of AI Manager already exist in this scene");
+			//Debug.LogError("Instance of AI Manager already exist in this scene");
 		}
 		else instance = this;
 
