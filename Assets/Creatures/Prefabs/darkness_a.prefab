@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 114097100065400938}
   - component: {fileID: 114683955086906738}
   - component: {fileID: 114185389251221894}
+  - component: {fileID: 114073798283436518}
   m_Layer: 12
   m_Name: darkness_a
   m_TagString: Untagged
@@ -157,6 +158,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.14, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114073798283436518
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  penalty: 1000
+  randomStep: 2
 --- !u!114 &114097100065400938
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -182,10 +197,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 2
-  repathRate: 1
+  repathRate: 3
   canSearch: 1
   canMove: 1
-  maxSpeed: 1
+  maxSpeed: 1.5
   gravity: {x: NaN, y: NaN, z: NaN}
   groundMask:
     serializedVersion: 2
@@ -193,13 +208,14 @@ MonoBehaviour:
   centerOffset: 2.5
   rotationIn2D: 0
   targetCompatibility: {fileID: 0}
+  maxAcceleration: -2.5
   rotationSpeed: 360
   slowdownDistance: 0.6
-  pickNextWaypointDist: 2
+  pickNextWaypointDist: 1
   endReachedDistance: 0.2
   alwaysDrawGizmos: 1
   slowWhenNotFacingTarget: 1
-  whenCloseToDestination: 0
+  whenCloseToDestination: 1
 --- !u!114 &114683955086906738
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -215,7 +231,7 @@ MonoBehaviour:
   drawGizmos: 1
   detailedGizmos: 0
   startEndModifier:
-    addPoints: 0
+    addPoints: 1
     exactStartPoint: 3
     exactEndPoint: 3
     useRaycasting: 0
@@ -225,6 +241,7 @@ MonoBehaviour:
     useGraphRaycasting: 0
   traversableTags: -1
   tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  graphMask: -1
 --- !u!114 &114846825338175836
 MonoBehaviour:
   m_ObjectHideFlags: 1
