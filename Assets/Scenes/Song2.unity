@@ -1738,6 +1738,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 423014920}
+  ActiveDarkness: []
+  maxEnemyCount: 0
 --- !u!4 &423014920
 Transform:
   m_ObjectHideFlags: 0
@@ -25775,7 +25777,7 @@ MonoBehaviour:
   orientationTarget: {fileID: 0}
   _cameraPath: {fileID: 602444340}
   playOnStart: 0
-  animationObject: {fileID: 0}
+  animationObject: {fileID: 1275722337}
   animationMode: 0
   _orientationMode: 0
   smoothOrientationModeChanges: 0
@@ -77884,7 +77886,7 @@ Prefab:
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1087406834434032, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
       propertyPath: m_IsActive
