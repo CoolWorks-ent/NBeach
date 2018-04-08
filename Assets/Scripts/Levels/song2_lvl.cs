@@ -80,8 +80,11 @@ public class song2_lvl : Level {
 
         //get current time based upon when stage0 started
         curSongTime = Time.time - songStartTime;
-        
-	}
+
+        //call function to handle spawning of throwable shells
+        ShellSpawner();
+
+    }
 
     void StartNextStage()
     {
@@ -125,16 +128,19 @@ public class song2_lvl : Level {
     /**********
      **********Pick-Up Spawning Functions***********
      **********/
-     void ShellSpawner()
+    void ShellSpawner()
     {
         /*Logic for managing shell projectiles in scene
         */
-        
-        //only spawn enemies if this bool tells it to
-        if (numOfShells < maxShellCount)
-        {
-            StartCoroutine(SpawnShellPickUp());
-            numOfShells += 1;
+        //Only spawn shells if the player is in a battle sequence. Ie. NotMoving and Not in a cutscene
+        if (gController.playerControl.playerState != PlayerState.MOVING)
+        { 
+            //only spawn shells if this bool tells it to
+            if (numOfShells < maxShellCount)
+            {
+                StartCoroutine(SpawnShellPickUp());
+                numOfShells += 1;
+            }
         }
             
     }
@@ -179,7 +185,6 @@ public class song2_lvl : Level {
     void Stage1()
     {
         stageNum = 1;
-        ShellSpawner();
         StartCoroutine(Stage1Routine());
     }
 
@@ -206,7 +211,7 @@ public class song2_lvl : Level {
     /*
      * Function that Pauses Spline for when the player reaches a new rock ONLY.
      */
-    public void PauseSpline()
+    public void PauseSplineEndStage()
     {
         //pathControl.Pause();
         pathControl.pPathState = CamPathState.Paused;
@@ -271,13 +276,14 @@ public class song2_lvl : Level {
 
         float waitTime = stage1StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
+        float tempWaitTime = 15;
         //This is the length of time the rest of the stage should play out
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(tempWaitTime);
         //darkBoss.DoRockSmash_Interrupt();
 
         //wait for an event for when the rock is destroyed by the dark boss.
         //After dark boss as destroyed the rock, Trigger the RunToNewRock CoRoutine...
-       // StartCoroutine(RunToNewRock(1));
+       StartCoroutine(RunToNewRock(1));
 
         yield return 0;
     }
@@ -291,6 +297,15 @@ public class song2_lvl : Level {
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         //start playing bg song
         //gController.soundManager.FadeInMusic(1);
+
+        float tempWaitTime = 15;
+        //This is the length of time the rest of the stage should play out
+        yield return new WaitForSeconds(tempWaitTime);
+        //darkBoss.DoRockSmash_Interrupt();
+
+        //wait for an event for when the rock is destroyed by the dark boss.
+        //After dark boss as destroyed the rock, Trigger the RunToNewRock CoRoutine...
+        StartCoroutine(RunToNewRock(2));
         yield return 0;
     }
 

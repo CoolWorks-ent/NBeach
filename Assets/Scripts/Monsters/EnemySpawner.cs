@@ -15,12 +15,15 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField]
     Transform[] spawnLocs;
 
+    public List<Darkness> enemyList;
     public bool spawningEnemies = false;
+    int MaxEnemyCount = 10;
     float spawnWait = 0;
     int enemiesDestroyed = 0;
 
     public void Start()
     {
+        enemyList = new List<Darkness>();
         //EventManager.StartListening("DarknessDeath", DarknessDeath);
     }
 
@@ -29,6 +32,7 @@ public class EnemySpawner : MonoBehaviour
     {
         //remove enemy from the list
         Darkness enemyObj = GameObject.Find(enemyName).GetComponent<Darkness>();
+        enemyList.Remove(enemyObj);
         Destroy(enemyObj.gameObject);
     }
 
@@ -37,18 +41,17 @@ public class EnemySpawner : MonoBehaviour
         //only spawn enemies if this bool tells it to
         if (spawningEnemies == true)
         {
-            if (AI_Manager.Instance.ActiveDarkness.Count < AI_Manager.Instance.maxEnemyCount)
+            if (enemyList.Count < MaxEnemyCount)
             {
                 if (spawnWait >= spawnRate)
                 {
                     //choose random spawn location in array and spawn there
-                    Vector3 randomloc = Random.insideUnitCircle * 5;
-                    Darkness enemy = Instantiate(darknessEnemy, spawnLocs[Random.Range(0, spawnLocs.Length)].position + new Vector3(randomloc.x, 0, randomloc.y), darknessEnemy.transform.rotation);
+                    Darkness enemy = Instantiate(darknessEnemy, spawnLocs[Random.Range(0, spawnLocs.Length)].position, darknessEnemy.transform.rotation);
                     enemy.enemySpawner = this;
                     //reset timer
                     spawnWait = 0;
                     //add enemy to management list
-                    AI_Manager.Instance.AddtoDarknessList(enemy);
+                    enemyList.Add(enemy);
                     Debug.Log("darkness spawned");
                 }
                 else

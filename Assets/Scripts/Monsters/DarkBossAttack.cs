@@ -41,6 +41,7 @@ public class DarkBossAttack : MonoBehaviour {
         if (collider.gameObject.tag == "Player")
         {
             Debug.Log("Dark Boss Attack collided with Player");
+            //event call for player damaged
             Destroy(this.gameObject);
         }
     }

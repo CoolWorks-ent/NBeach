@@ -139,7 +139,7 @@ public class DarknessBoss : MonoBehaviour {
                     attackTimer = 0;
                     status = BossStatus.fight;
                     animationControl.SetBool("AttackWait", true);
-                    animationControl.SetBool("isRest", false);
+                    animationControl.SetBool("IsRest", false);
                     //StartCoroutine("FlashSpellIcon");
                 }
                 else
@@ -150,7 +150,7 @@ public class DarknessBoss : MonoBehaviour {
                 break;
             //REST1 the Boss is vulnerable to be hit
             case BossStatus.rest:
-                animationControl.SetBool("isRest", true);
+                animationControl.SetBool("IsRest", true);
                 attackState = BossAttackType.none;
                 checkHit(BossStatus.end);
                 break;
@@ -346,6 +346,8 @@ public class DarknessBoss : MonoBehaviour {
     {
         string path = "";
         Vector3 offset = Vector3.zero;
+        //RESET attackTime for boss
+        attackTimer = 0;
         if (attacks.Count < maxAttacks)
         {
             switch (attackState)
@@ -383,8 +385,10 @@ public class DarknessBoss : MonoBehaviour {
             newGb.GetComponent<DarkBossAttack>().Target = target;
             newGb.transform.parent = transf;
             attacks.Add(newGb);
+
             //Create Attack Projectile HERE
             //target.GetComponent<CreateMagicBoss>().BossAttack = newGb;
+            
 
             changeAttackType = true;
             attackAnimFinished = false;
@@ -456,8 +460,8 @@ public class DarknessBoss : MonoBehaviour {
     //Call this function to force the Boss to use the RockSmash and end the stage...
     public void DoRockSmash_Interrupt()
     {
-
-        doAttack(MagicPos.transform);
+        StartCoroutine(DoAttackCoroutine(MagicPos.transform));
+        //doAttackCoroutine(MagicPos.transform);
         changeAttackType = true;
         animationControl.SetBool("DoRockSmashAttack", true);
     }

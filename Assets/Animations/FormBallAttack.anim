@@ -54,7 +54,8 @@ AnimationClip:
   - time: 0
     functionName: DarkBallAttack
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 1338938340241644, guid: 094d159ea6619c9449162ba30d541de8,
+      type: 2}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

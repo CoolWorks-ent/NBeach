@@ -16,7 +16,7 @@ public class PlayerBoundary
 public class NFPSController : PlayerController {
 
     // This script controls the gun for the shooter
-    // scenes, including it's movement and shooting.
+    // scenes, including it'` movement and shooting.
 
         /*
          * Serializable Fields
@@ -54,6 +54,8 @@ public class NFPSController : PlayerController {
         private GUI playerHUD;
         [SerializeField]
         private Text ammoText;
+        [SerializeField]
+        private Text healthText;
         [SerializeField]
         public GameObject playerContainer;
 
@@ -133,6 +135,8 @@ public class NFPSController : PlayerController {
 
         //update ammo text on HUD
         ammoText.text = playerAmmo.ToString();
+        healthText.text = playerHealth.ToString();
+
 
 
 
@@ -460,7 +464,6 @@ public class NFPSController : PlayerController {
         int layerMask = 1 << 8;
 
         Debug.DrawRay(Camera.main.transform.position, fwd, Color.red);
-
         throwArm.GetComponent<Animator>().SetTrigger("ThrowTrigger");
 
         //EventManager.TriggerEvent("FireProjectile", "fireprojectile");
@@ -574,6 +577,7 @@ public class NFPSController : PlayerController {
         
     }
 
+    //Coroutine to player effect when player is damaged
     IEnumerator OnPlayerDamaged_corout()
     {
         Image dmgOverlay = gController.dmgOverlay;

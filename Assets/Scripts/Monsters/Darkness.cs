@@ -6,7 +6,7 @@ using UnityEngine;
  * Base script for mini-darkness.  very basic movement and AI
  */
 
-public enum EnemyState { CHASING, IDLE, ATTACK }
+public enum EnemyState { CHASING, IDLE }
 
 public class Darkness : MonoBehaviour {
 
@@ -21,15 +21,33 @@ public class Darkness : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        enemyState = EnemyState.IDLE;
+        enemyState = EnemyState.CHASING;
         target = GameObject.FindObjectOfType<AI_Manager>().player;
         GetComponent<Pathfinding.AIDestinationSetter>().target = target;
-        GetComponent<Pathfinding.AIPath>().repathRate = Random.Range(2.5f, 5.0f);
-        GetComponent<Pathfinding.AIPath>().maxSpeed = Random.Range(1.0f, 3.25f);
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+        //StartCoroutine(ApproachPlayer());
+
+        //MOVE THIS TO COROUTINE ONCE Time.DeltaTime is fixed
+        float startTime;
+        float curTime;
+        float maxTime = 2f;
+
+        //velocity based mvmt
+        /*Rigidbody rigidbody = GetComponent<Rigidbody>();
+        Vector3 velocity = Vector3.forward * mvmtSpeed; //move forward at constant speed
+
+        if (enemyState == EnemyState.CHASING)
+        {
+            //TO DO - Create New code to chase player based upon player position
+
+            //new Vector3(rigidbody.velocity.x * mvmtSpeed, rigidbody.velocity.y * mvmtSpeed, rigidbody.velocity.z * mvmtSpeed);
+            rigidbody.MovePosition(rigidbody.position + Vector3.forward * mvmtSpeed * Time.deltaTime);
+            //rigidbody.AddForce(velocity, ForceMode.Force);
+        }*/
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -39,7 +57,7 @@ public class Darkness : MonoBehaviour {
             if (collision.collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
-                AI_Manager.Instance.AddtoDarknessList(this);
+                this.enemySpawner.enemyList.Remove(this);
                 Destroy(this.gameObject);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
@@ -55,4 +73,25 @@ public class Darkness : MonoBehaviour {
         }
     }
 
+    /*IEnumerator ApproachPlayer()
+    {
+        float startTime ;
+        float curTime;
+        float maxTime = 2f;
+
+        //velocity based mvmt
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        Vector3 velocity = Vector3.forward * mvmtSpeed; //move forward at constant speed
+
+        while (enemyState == EnemyState.CHASING)
+        {
+            //TO DO - Create New code to chase player based upon player position
+
+            //new Vector3(rigidbody.velocity.x * mvmtSpeed, rigidbody.velocity.y * mvmtSpeed, rigidbody.velocity.z * mvmtSpeed);
+            rigidbody.MovePosition(rigidbody.position + Vector3.forward * mvmtSpeed);
+            //rigidbody.AddForce(velocity, ForceMode.Force);
+            yield return null;
+        }
+        yield return 0;
+    }*/
 }

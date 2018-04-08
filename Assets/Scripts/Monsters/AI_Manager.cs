@@ -5,39 +5,14 @@ using UnityEngine;
 public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
-	public List<Darkness> ActiveDarkness;
-
-	public int maxEnemyCount;
-	private static AI_Manager instance;
-	public static AI_Manager Instance
-	{
-		get {return instance; }
-	}
-
-	void Awake()
-	{
-		maxEnemyCount = 10;
-		if(instance != null && instance != this)
-		{
-			//Debug.LogError("Instance of AI Manager already exist in this scene");
-		}
-		else instance = this;
-
-		ActiveDarkness = new List<Darkness>();
-
-		player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
-	}
+	private List<Darkness> ActiveDarkness;
 
 	void Start () {
-
+		ActiveDarkness = new List<Darkness>();
+		//Pass darkness object into list using an event 
 	}
 	
 	void Update () {
 		
-	}
-
-	public void AddtoDarknessList(Darkness updatedDarkness)
-	{
-		ActiveDarkness.Add(updatedDarkness);
 	}
 }

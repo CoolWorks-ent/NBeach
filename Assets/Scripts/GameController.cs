@@ -263,8 +263,8 @@ public class GameController : MonoBehaviour {
         {
             case "Song2_Opening":
                 break;
-            case "PAUSE_SPLINE":
-                lvlManager.currentLvl.GetComponent<song2_lvl>().PauseSpline();
+            case "PAUSE_SPLINE_EndStage":
+                lvlManager.currentLvl.GetComponent<song2_lvl>().PauseSplineEndStage();
                 break;
             default:
                 break;
