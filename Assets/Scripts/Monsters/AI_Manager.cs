@@ -28,16 +28,15 @@ public class AI_Manager : MonoBehaviour {
 		player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
 
-	void Start () {
-
-	}
-	
-	void Update () {
-		
-	}
-
 	public void AddtoDarknessList(Darkness updatedDarkness)
 	{
 		ActiveDarkness.Add(updatedDarkness);
+		updatedDarkness.target = player;
+	}
+
+	public IEnumerator WaitTimer(float timer)
+	{
+		yield return new WaitForSeconds(timer);
+		Debug.LogWarning("Time is up for idle");
 	}
 }
