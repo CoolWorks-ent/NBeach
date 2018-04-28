@@ -6,30 +6,25 @@ using UnityEngine;
  * Base script for mini-darkness.  very basic movement and AI
  */
 
-public enum EnemyState { CHASING, IDLE, ATTACK }
-
 public class Darkness : MonoBehaviour {
 
-    [SerializeField]
-    float mvmtSpeed = 6f;
+    public Transform target;
+    public Pathfinding.AIDestinationSetter aIDestSetter;
+    public Pathfinding.AIPath aIPath;
+    public DarkStateController dsController;
 
-    //enemy states
-    bool chasing = false, idle = false;
-    public EnemyState enemyState { get; set; }
-    public EnemySpawner enemySpawner;
-    private Transform target;
 
     // Use this for initialization
     void Start () {
-        enemyState = EnemyState.IDLE;
-        target = GameObject.FindObjectOfType<AI_Manager>().player;
-        GetComponent<Pathfinding.AIDestinationSetter>().target = target;
-        GetComponent<Pathfinding.AIPath>().repathRate = Random.Range(2.5f, 5.0f);
-        GetComponent<Pathfinding.AIPath>().maxSpeed = Random.Range(1.0f, 3.25f);
+        aIDestSetter = GetComponent<Pathfinding.AIDestinationSetter>();
+        aIPath = GetComponent<Pathfinding.AIPath>();
+        dsController.ChangeState(EnemyState.IDLE, this);
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        dsController.ExecuteCurrentState(this);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -55,4 +50,5 @@ public class Darkness : MonoBehaviour {
         }
     }
 
+    
 }

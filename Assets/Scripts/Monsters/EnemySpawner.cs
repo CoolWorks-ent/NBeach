@@ -44,7 +44,6 @@ public class EnemySpawner : MonoBehaviour
                     //choose random spawn location in array and spawn there
                     Vector3 randomloc = Random.insideUnitCircle * 5;
                     Darkness enemy = Instantiate(darknessEnemy, spawnLocs[Random.Range(0, spawnLocs.Length)].position + new Vector3(randomloc.x, 0, randomloc.y), darknessEnemy.transform.rotation);
-                    enemy.enemySpawner = this;
                     //reset timer
                     spawnWait = 0;
                     //add enemy to management list
