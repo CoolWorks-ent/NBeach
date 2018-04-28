@@ -87,6 +87,7 @@ public class NFPSController : PlayerController {
         float maxLeftRoll = 45;
         float dodgeSpeed = 6f;
         Rigidbody nRigidbody;
+        Rigidbody playerRigidbody;
         float dodgeCooldownTime = 1f; //1 second for cooldown
         float lastDodgeTime = 0;
         float curTime = 0;
@@ -101,13 +102,14 @@ public class NFPSController : PlayerController {
             gController = GameObject.Find("GameController").GetComponent<GameController>();
             EventManager.StartListening("FireProjectile", ProjectileFired);
             nRigidbody = playerContainer.GetComponent<Rigidbody>();
+            playerRigidbody = GetComponent<Rigidbody>();
             laserLine = GetComponent<LineRenderer>();
             playerHealth = 100;
             //start player with 10 ammo
             playerAmmo = 0;
             maxAmmo = 10;
             bReloading = true;
-            
+
         }
 
 
@@ -275,6 +277,7 @@ public class NFPSController : PlayerController {
         //headRotation = (pitch, yaw, roll)
         //check for head rotation angle that is btw, 
         float zRotation = headRotation.eulerAngles.z;
+        
         if (zRotation >= 180) //normalize btw. -180 < z < 180
         {
             normZ = zRotation - 360;
@@ -283,7 +286,6 @@ public class NFPSController : PlayerController {
         {
             normZ = zRotation;
         }
-
         //add checks to see if player is colliding with triggers on the left/right sides to prevent player from dodging too far off screen
 
         //if dodge time has cooled down, check for the dodge 
@@ -293,7 +295,7 @@ public class NFPSController : PlayerController {
             bool canMove = false;
 
             //dodge left
-            if ((normZ < minRightRoll && normZ > maxRightRoll))
+            if ((normZ > minLeftRoll && normZ < maxLeftRoll))
             {
                 canMove = CheckMvmtBoundary("left");
                 if (canMove)
@@ -301,7 +303,7 @@ public class NFPSController : PlayerController {
                     //Check if player is colliding with the left dodge limit
 
                     Vector3 curPos = playerContainer.transform.localPosition;
-                    Vector3 newPos = new Vector3(curPos.x + dodgeAmt, curPos.y, curPos.z);
+                    Vector3 newPos = new Vector3(curPos.x - dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
                     StartCoroutine(executeDodge(nRigidbody, newPos));
@@ -313,13 +315,13 @@ public class NFPSController : PlayerController {
                 }
             }
             //dodge right
-            else if ((normZ > minLeftRoll && normZ < maxLeftRoll))
+            else if ((normZ < minRightRoll && normZ > maxRightRoll))
             {
                 canMove = CheckMvmtBoundary("right");
                 if (canMove)
                 {
                     Vector3 curPos = playerContainer.transform.localPosition;
-                    Vector3 newPos = new Vector3(curPos.x - dodgeAmt, curPos.y, curPos.z);
+                    Vector3 newPos = new Vector3(curPos.x + dodgeAmt, curPos.y, curPos.z);
 
                     //StopCoroutine("executeDodge");
                     StartCoroutine(executeDodge(nRigidbody, newPos));
@@ -344,26 +346,26 @@ public class NFPSController : PlayerController {
 
     bool CheckMvmtBoundary(string direction)
     {
-        bool canMove = false;
+        bool canMove = true;
         //dodge barriers via trigger volumes
         switch (direction)
         {
             case "left":
-                if (nRigidbody.transform.localPosition.x <= pBoundary.boundary_left.transform.localPosition.x)
+                if (playerRigidbody.transform.position.x >= pBoundary.boundary_left.transform.position.x)
                 {
                     //prevent further dodging to the left
                     canDodgeLeft = false;
                     canDodgeRight = true;
-                    canMove = true;
+                    canMove = false;
                 }
                 break;
             case "right":
-                if (nRigidbody.transform.localPosition.x >= pBoundary.boundary_right.transform.localPosition.x)
+                if (playerRigidbody.transform.position.x <= pBoundary.boundary_right.transform.position.x)
                 {
                     //prevent further dodging to the right
                     canDodgeLeft = true;
                     canDodgeRight = false;
-                    canMove = true;
+                    canMove = false;
                 }
                 break;
             default:
@@ -461,7 +463,7 @@ public class NFPSController : PlayerController {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         //layer mask to only collide with PlayerOnly layer
-        int layerMask = 1 << 8;
+        int layerMask = 1 << 15;
 
         Debug.DrawRay(Camera.main.transform.position, fwd, Color.red);
         throwArm.GetComponent<Animator>().SetTrigger("ThrowTrigger");
@@ -517,6 +519,10 @@ public class NFPSController : PlayerController {
         if(collision.transform.tag == "Darkness")
         {
             //call damage function
+            OnPlayerDamaged(collision.transform);
+        }
+        if (collision.gameObject.tag == "DarkBossAttack")
+        {
             OnPlayerDamaged(collision.transform);
         }
     }
@@ -591,7 +597,7 @@ public class NFPSController : PlayerController {
             //fade in quickly
             while (time < screenFadeInTime)
             {
-                Debug.Log("fading in");
+                //Debug.Log("fading in");
                 dmgOverlay.color = Color.Lerp(baseColor, new Color(dmgOverlay.color.r, dmgOverlay.color.g, dmgOverlay.color.b, .8f), time / screenFadeInTime);
                 time += Time.deltaTime;
                 yield return null;
@@ -600,7 +606,7 @@ public class NFPSController : PlayerController {
             //fade sign out every second
             while (time < screenFadeOutTime)
             {
-                Debug.Log("fading out");
+                //Debug.Log("fading out");
                 dmgOverlay.color = Color.Lerp(baseColor, new Color(dmgOverlay.color.r, dmgOverlay.color.g, dmgOverlay.color.b, 0f), time / screenFadeOutTime);
                 time += Time.deltaTime;
                 yield return null;

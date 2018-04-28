@@ -15,11 +15,18 @@ public class song2_lvl : Level {
     [SerializeField]
     Transform[] shellLocs;
     [SerializeField]
+    SpeedBoost speedBoostPowerUp;
+    [SerializeField]
+    GameObject[] coverRocks;
+    [SerializeField]
     DarknessBoss darkBoss;
     [SerializeField]
     ParticleSystem RainFX;
     [SerializeField]
     GameObject enemyStageObj;
+    [SerializeField]
+    GameObject playerStageObj;
+
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
     CameraPathAnimator pathControl;
@@ -36,7 +43,8 @@ public class song2_lvl : Level {
     int darkSpawnRate_Stage3 = 4;
 
     int numOfShells = 0;
-    int maxShellCount = 2;
+    int maxShellCount = 5;
+    List<ShellPickup> shellArray;
     int rainEmissionRateDefault = 8;
     int rainEmissionRateMax = 40;
     Material nightSkybox;
@@ -71,7 +79,8 @@ public class song2_lvl : Level {
 
         //Start Stage0 of battle
         Stage0();
-   }
+        gController.playerControl.playerState = PlayerState.NOTMOVING;
+    }
 
 
 	
@@ -130,24 +139,24 @@ public class song2_lvl : Level {
      **********/
     void ShellSpawner()
     {
+        float spawnRate = 2;
         /*Logic for managing shell projectiles in scene
         */
         //Only spawn shells if the player is in a battle sequence. Ie. NotMoving and Not in a cutscene
         if (gController.playerControl.playerState != PlayerState.MOVING)
         { 
             //only spawn shells if this bool tells it to
-            if (numOfShells < maxShellCount)
+            if (shellArray.Count < maxShellCount)
             {
-                StartCoroutine(SpawnShellPickUp());
-                numOfShells += 1;
+                StartCoroutine(SpawnShellPickUp(spawnRate));
+                //numOfShells += 1;
             }
         }
             
     }
 
-    IEnumerator SpawnShellPickUp()
+    IEnumerator SpawnShellPickUp(float shellSpawnRate)
     {
-        float shellSpawnRate = 2;
         float time = 0;
         while (time <= shellSpawnRate)
         {
@@ -157,6 +166,7 @@ public class song2_lvl : Level {
         //choose random spawn location in array and spawn there
         ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
         ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
+        shellArray.Add(reloadShell);
         Debug.Log("pickup shell spawned");
         
         yield return 0;
@@ -165,7 +175,12 @@ public class song2_lvl : Level {
     //event function for when a shell is pickedup
     void Evt_ShellPickedUp(string str)
     {
-        numOfShells -= 1;
+        for(int i=0;i < shellArray.Count;i++)
+        {
+            if (shellArray[i].name == str)
+                shellArray.RemoveAt(i);
+        }
+        //numOfShells -= 1;
     }
 
 
@@ -191,20 +206,32 @@ public class song2_lvl : Level {
     void Stage2()
     {
         stageNum = 2;
+        StartCoroutine(Stage2Routine());
     }
 
     void Stage3()
     {
         stageNum = 3;
     }
+    public IEnumerator OnPlayerCoverDestroyed()
+    {
+        StartCoroutine(RunToNewRock(1));
+        yield return 0;
+    }
 
     //function to make player run to next rock when old rock is destroyed Via Spline
-    IEnumerator RunToNewRock(int rockNum)
+    public IEnumerator RunToNewRock(int rockNum)
     {
         //begin spline
         pathControl.Play();
-        //playerControl.CanMove = true;
+        gController.playerControl.CanMove = false;
         gController.playerControl.playerState = PlayerState.MOVING;
+        
+        yield return new WaitForSeconds(1);
+        Transform playerPos = GameObject.FindGameObjectWithTag("Player").transform;
+        //SpeedBoost spdBoost = new SpeedBoost();
+        SpeedBoost spdBoost = Instantiate(speedBoostPowerUp, playerPos.position, playerPos.rotation);
+        //EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
         yield return 0;
     }
 
@@ -215,7 +242,15 @@ public class song2_lvl : Level {
     {
         //pathControl.Pause();
         pathControl.pPathState = CamPathState.Paused;
+        gController.playerControl.CanMove = true;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
+
+        //remove old shells from previous area
+        foreach (ShellPickup s in shellArray)
+        {
+            Destroy(s.gameObject);
+            shellArray.Remove(s);
+        }
 
         //increment state number because player has reach next rock
         stageNum += 1; 
@@ -276,14 +311,16 @@ public class song2_lvl : Level {
 
         float waitTime = stage1StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
-        float tempWaitTime = 15;
+        float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
         yield return new WaitForSeconds(tempWaitTime);
-        //darkBoss.DoRockSmash_Interrupt();
 
+        //start attack to destroy the player's cover rock
         //wait for an event for when the rock is destroyed by the dark boss.
+        darkBoss.DoRockSmash_Interrupt(coverRocks[0]);
+      
         //After dark boss as destroyed the rock, Trigger the RunToNewRock CoRoutine...
-       StartCoroutine(RunToNewRock(1));
+
 
         yield return 0;
     }
@@ -294,24 +331,33 @@ public class song2_lvl : Level {
         //Set Enemy Stage to face the Player Container Position
         enemyStageObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform);
 
+        //snap player transform to face dark boss after reaching the new stage position
+        playerStageObj.transform.LookAt(darkBoss.transform);
+
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         //start playing bg song
         //gController.soundManager.FadeInMusic(1);
 
-        float tempWaitTime = 15;
+        float waitTime = stage2StartTime - curSongTime;
+        Debug.Log("time till next stage = " + waitTime);
+        float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
         yield return new WaitForSeconds(tempWaitTime);
         //darkBoss.DoRockSmash_Interrupt();
 
         //wait for an event for when the rock is destroyed by the dark boss.
+        darkBoss.DoRockSmash_Interrupt(coverRocks[1]);
+
         //After dark boss as destroyed the rock, Trigger the RunToNewRock CoRoutine...
-        StartCoroutine(RunToNewRock(2));
         yield return 0;
     }
 
     IEnumerator Stage2Routine()
     {
         Debug.Log("Stage 2 Start");
+        //snap player transform to face dark boss after reaching the new stage position
+        gController.playerStage.transform.LookAt(darkBoss.transform);
+
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
 
         while (curSongTime < 10f)
@@ -320,9 +366,51 @@ public class song2_lvl : Level {
             curSongTime += Time.deltaTime;
             yield return null;
         }
+
+        float waitTime = stage3StartTime - curSongTime;
+        Debug.Log("time till next stage = " + waitTime);
+        float tempWaitTime = 5;
+        //This is the length of time the rest of the stage should play out
+        yield return new WaitForSeconds(tempWaitTime);
+
+        //wait for an event for when the rock is destroyed by the dark boss.
+        darkBoss.DoRockSmash_Interrupt(coverRocks[2]);
+        yield return new WaitForSeconds(2);
+
+        //Dark Boss moves closer
+        //The Darkness should overwhelm player in 20 seconds, increase spawn rate
+        enemySpawners.spawnRate = darkSpawnRate_Stage3;
+        yield return new WaitForSeconds(20);
+
+        StartCoroutine(Song2_EndCutscene());
         //start playing bg song
         //gController.soundManager.FadeInMusic(1);
 
+    }
+
+    IEnumerator Song2_EndCutscene()
+    {
+        float time = 0;
+        float screenFadeOutTime = 1f;
+        darkBoss.DoRockSmash_Interrupt(gController.playerControl.gameObject);
+
+        //player flies towards the beach
+
+        //scene fades to black as player's eyes close
+        if (blackOverlay != null)
+        {
+            Color baseColor = blackOverlay.color;
+            //fade sign out every second
+            while (time < screenFadeOutTime)
+            {
+                Debug.Log("fading");
+                blackOverlay.color = Color.Lerp(baseColor, new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f), time / screenFadeOutTime);
+                time += Time.deltaTime;
+                yield return null;
+            }
+        }
+        
+       yield return 0;
     }
 
     IEnumerator Stage3Routine()

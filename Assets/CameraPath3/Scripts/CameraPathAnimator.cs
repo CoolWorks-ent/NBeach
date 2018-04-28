@@ -16,7 +16,7 @@ using System.Text;
 using System.Xml;
 #endif
 
-public enum CamPathState { Start, Stopped, Loop, Reset, Paused, Play, Active }
+public enum CamPathState { Start, Stopped, Loop, Reset, Paused, PausedImmediate, Play, Active }
 
 public class CameraPathAnimator : MonoBehaviour
 {
@@ -231,6 +231,11 @@ public class CameraPathAnimator : MonoBehaviour
                 mPathState = CamPathState.Paused;
                 Pause();
             }
+            else if (value == CamPathState.PausedImmediate)
+            {
+                mPathState = CamPathState.PausedImmediate;
+                Pause();
+            }
             else if (value == CamPathState.Stopped)
             {
                 mPathState = CamPathState.Stopped;
@@ -293,6 +298,24 @@ public class CameraPathAnimator : MonoBehaviour
         //if (AnimationPausedEvent != null) AnimationPausedEvent();
         StartCoroutine(GradualPause());
         
+    }
+
+    public virtual void PauseImmediate()
+    {
+        StartCoroutine(ImmediatePause());
+    }
+
+    private IEnumerator ImmediatePause()
+    {
+        if (_basePathSpeed == 0)
+            _basePathSpeed = _pathSpeed;
+
+        _pathSpeed = 0;
+        _playing = false;
+        EventManager.TriggerEvent("Player_Stop", "playerStop");
+        if (AnimationPausedEvent != null) AnimationPausedEvent();
+
+        yield return null;
     }
 
     private IEnumerator GradualPause()

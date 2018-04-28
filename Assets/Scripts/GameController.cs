@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public PlayerController playerControl;
     [SerializeField]
+    public GameObject playerStage;
+    [SerializeField]
     public SoundManager soundManager;
     [SerializeField]
     public LevelManager lvlManager;
@@ -141,6 +143,7 @@ public class GameController : MonoBehaviour {
         else if(SceneManager.GetActiveScene().name == "Song2")
         {
             EventManager.StartListening("Scene2Event", Scene2Events);
+            EventManager.StartListening("Player_Cover_Destroyed", Scene2Events);
         }
 
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
@@ -259,16 +262,24 @@ public class GameController : MonoBehaviour {
 
     void Scene2Events(string evt)
     {
-        switch(evt)
+        song2_lvl level = lvlManager.currentLvl.GetComponent<song2_lvl>();
+        switch (evt)
         {
             case "Song2_Opening":
                 break;
             case "PAUSE_SPLINE_EndStage":
-                lvlManager.currentLvl.GetComponent<song2_lvl>().PauseSplineEndStage();
+                level.PauseSplineEndStage();
+                break;
+            case "PAUSE_IMMEDIATE":
+                pathControl.pPathState = CamPathState.PausedImmediate;
+                break;
+            case "Player_Cover_Destroyed":
+                level.StartCoroutine(level.OnPlayerCoverDestroyed());
                 break;
             default:
                 break;
         }
+        Debug.Log("[EVENT] " + evt);
     }
 
 	IEnumerator Scene1()

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour {
 
+    [SerializeField]
+    string boostType;
+
     public float speedTime = 1f; //length of time player keeps speedBoost
     public float initBoostTime = .5f, boostAmt =1f;
     float timeElapsed;
@@ -19,6 +22,7 @@ public class SpeedBoost : MonoBehaviour {
     void Start () {
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
         EventManager.StartListening("Player_SpeedBoostOff", OnDeboost);
+        EventManager.StartListening("Player_SpeedBoost", OnSpeedBoost);
         EventManager.StartListening("CancelPowerUps", OnCancel);
         speedAnimator = Camera.main.GetComponent<SpeedEffectAnimator>();
         origSpeed = gameController.pathControl.pathSpeed;
@@ -26,12 +30,25 @@ public class SpeedBoost : MonoBehaviour {
 
     private void OnTriggerEnter(Collider collider)
     {
-        if(collider.tag == "Player")
+        if (boostType == "PlayerOnly")
         {
-            EventManager.TriggerEvent("Player_SpeedBoost","Player_SpeedBoost");
-            OnSpeedBoost("evt");
-            speedBoostObj = this.gameObject;
-            //destroy this object after boost is finished
+            if (collider.tag == "Player")
+            {
+                EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
+                //OnSpeedBoost("evt");
+                speedBoostObj = this.gameObject;
+                //destroy this object after boost is finished
+            }
+        }
+    else
+        {
+            if(collider.tag == "PlayerContainer")
+            {
+                EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
+                //OnSpeedBoost("evt");
+                speedBoostObj = this.gameObject;
+                //destroy this object after boost is finished
+            }
         }
     }
 
@@ -113,8 +130,8 @@ public class SpeedBoost : MonoBehaviour {
 
     IEnumerator GradualDeboost()
     {
-        if (speedBoostObj != null)
-        { 
+        //if (speedBoostObj != null)
+        //{ 
                 // decrease speed over time
                 float baseSpeed = gameController.pathControl.pathSpeed;
             float decreaseTime = initBoostTime;
@@ -130,9 +147,10 @@ public class SpeedBoost : MonoBehaviour {
             }
             //set back to original speed
             gameController.pathControl.pathSpeed = origSpeed;
-            //destroy object
+        //destroy object
+        if (speedBoostObj != null)
             Destroy(speedBoostObj);
-        }
+        //}
         yield return null;
     }
 }

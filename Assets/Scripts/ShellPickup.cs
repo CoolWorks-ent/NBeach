@@ -11,7 +11,7 @@ public class ShellPickup : MonoBehaviour {
     // Use this for initialization
     void Start () {
         m_InteractiveItem = GetComponent<GVRInteractiveItem>();
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<NFPSController>();
+        player = GameObject.FindGameObjectWithTag("PlayerCube").GetComponent<NFPSController>();
         m_InteractiveItem.OnDown += PickUpShell;
         ammoCount = 10;
     }
@@ -29,7 +29,7 @@ public class ShellPickup : MonoBehaviour {
         if (player.playerAmmo == 0)
         {
             Debug.Log("shell pickedup");
-            EventManager.TriggerEvent("PickUpShell","pickUpShell");
+            EventManager.TriggerEvent("PickUpShell",gameObject.name);
             //add player ammo after coRoutine is finished
             StartCoroutine(moveItemToPlayer());
         }

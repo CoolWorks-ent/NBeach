@@ -37,6 +37,7 @@ public class DarknessBoss : MonoBehaviour {
     private SoundManager sm;
     string[] attackPrefabs = { "DarkBoss/Boss_Bullet", "DarkBoss/Boss_Bullet", "DarkBoss/Boss_Bullet" };
     List<GameObject> attacks = new List<GameObject>();
+    List<GameObject> attacksInProgress = new List<GameObject>();
     //private GameObject flashParent;
     Animator animationControl;
     bool canAttack = false, changeAttackType = false;
@@ -170,6 +171,8 @@ public class DarknessBoss : MonoBehaviour {
     //when not increasing timer it does other stuff
     void UpdateBoss()
     {
+        target = GameObject.FindGameObjectWithTag("Player");
+
         if (attacks.Count < maxAttacks && changeAttackType)
         {
             animationControl.SetTrigger("NoAttackAlive");
@@ -183,7 +186,7 @@ public class DarknessBoss : MonoBehaviour {
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
             animationControl.SetBool("DoProjectileAttack", true);
-            StartCoroutine(DoAttackCoroutine(MagicPos.transform));
+            StartCoroutine(DoAttackCoroutine(MagicPos.transform, target, false));
         }
         else if(animationControl.GetCurrentAnimatorStateInfo(0).IsName("AttackWait") && !changeAttackType && attackState == BossAttackType.Smash)
         {
@@ -191,7 +194,7 @@ public class DarknessBoss : MonoBehaviour {
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
             animationControl.SetBool("DoSmashAttack", true);
-            StartCoroutine(DoAttackCoroutine(MagicPos.transform));
+            StartCoroutine(DoAttackCoroutine(MagicPos.transform, target, false));
         }
         else if (animationControl.GetCurrentAnimatorStateInfo(0).IsName("AttackWait") && !changeAttackType && attackState == BossAttackType.RockSmash)
         {
@@ -199,7 +202,7 @@ public class DarknessBoss : MonoBehaviour {
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
             animationControl.SetBool("DoRockSmashAttack", true);
-            StartCoroutine(DoAttackCoroutine(MagicPos.transform));
+            StartCoroutine(DoAttackCoroutine(MagicPos.transform, target, false));
         }
     }
     /**************************
@@ -342,13 +345,13 @@ public class DarknessBoss : MonoBehaviour {
         }
     }
 
-    IEnumerator DoAttackCoroutine(Transform transf)
+    IEnumerator DoAttackCoroutine(Transform transf, GameObject target, bool overRide)
     {
         string path = "";
         Vector3 offset = Vector3.zero;
         //RESET attackTime for boss
         attackTimer = 0;
-        if (attacks.Count < maxAttacks)
+        if (attacks.Count < maxAttacks || overRide == true)
         {
             switch (attackState)
             {
@@ -374,33 +377,47 @@ public class DarknessBoss : MonoBehaviour {
                     offset = new Vector3(0, 0, -3);
                     break;
             }
-
-            //Wait for attack animation to finish
-            yield return new WaitUntil(() => attackAnimFinished == true);
-
-            //attack will be created after the animation
-            Debug.Log("[Dark Boss] Attack: " + attackState);
+            //set boss status to wait for next attack time
+            //status = BossStatus.charging;
+            changeAttackType = true;
             GameObject newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
-            //Attach my FinalBossController to the new FinalBossAttack script in newGb
-            newGb.GetComponent<DarkBossAttack>().Target = target;
+            if (attackState == BossAttackType.RockSmash)
+            {
+                newGb.GetComponent<DarkBossAttack>().Target = target;
+                newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
+            }
+            else
+            {
+                newGb.GetComponent<DarkBossAttack>().Target = target;
+                newGb.GetComponent<DarkBossAttack>().attackType = "Ball";
+            }
+            Debug.Log("[Dark Boss] Attack: " + attackState);
             newGb.transform.parent = transf;
             attacks.Add(newGb);
+            attacksInProgress.Add(newGb);
+            //Wait for attack animation to finish
+            /*
+            yield return new WaitUntil(() => attackAnimFinished == true);
+
+            //Attach my FinalBossController to the new FinalBossAttack script in newGb
+            //attack will move after the animation
+            newGb.GetComponent<DarkBossAttack>().moveAttack();
 
             //Create Attack Projectile HERE
             //target.GetComponent<CreateMagicBoss>().BossAttack = newGb;
+
             
 
-            changeAttackType = true;
             attackAnimFinished = false;
             animationControl.SetBool("DoProjectileAttack", false);
             animationControl.SetBool("DoRockSmashAttack", false);
             animationControl.SetBool("DoSmashAttack", false);
             animationControl.SetBool("IsRest", true);
-            animationControl.SetBool("AttackWait", false);
+            animationControl.SetBool("AttackWait", false);*/
             yield return 0;
         }
     }
-    //Checks the Bosses current attack type and instantiates the correct boss attack
+    //NO LONGER USING...Use Coroutine instead.  Checks the Bosses current attack type and instantiates the correct boss attack
     void doAttack(Transform transf)
     {
         string path = "";
@@ -458,12 +475,15 @@ public class DarknessBoss : MonoBehaviour {
     }
 
     //Call this function to force the Boss to use the RockSmash and end the stage...
-    public void DoRockSmash_Interrupt()
+    public void DoRockSmash_Interrupt(GameObject rockTransform)
     {
-        StartCoroutine(DoAttackCoroutine(MagicPos.transform));
-        //doAttackCoroutine(MagicPos.transform);
-        changeAttackType = true;
+        animationControl.SetBool("AttackWait", true);
+        animationControl.SetBool("IsRest", false);
         animationControl.SetBool("DoRockSmashAttack", true);
+        attackState = BossAttackType.RockSmash;
+        StartCoroutine(DoAttackCoroutine(MagicPos.transform, rockTransform, true));
+        //doAttackCoroutine(MagicPos.transform);
+        //changeAttackType = true;
     }
 
 
@@ -472,8 +492,20 @@ public class DarknessBoss : MonoBehaviour {
      */
     public void OnAttackAnimFinished(string evt)
     {
-        attackAnimFinished = true;
+        GameObject attack = attacksInProgress[0];
+        attacksInProgress.RemoveAt(0);
+        //attackAnimFinished = true;
         Debug.Log("attackAnimFinished");
+        //Attach my FinalBossController to the new FinalBossAttack script in newGb
+        //attack will move after the animation
+        attack.GetComponent<DarkBossAttack>().moveAttack();
+
+        //reset animation bools
+        animationControl.SetBool("DoProjectileAttack", false);
+        animationControl.SetBool("DoRockSmashAttack", false);
+        animationControl.SetBool("DoSmashAttack", false);
+        animationControl.SetBool("IsRest", true);
+        animationControl.SetBool("AttackWait", false);
     }
 
     IEnumerator FlashSpellIcon()
@@ -513,6 +545,7 @@ public class DarknessBoss : MonoBehaviour {
         }
     }
 
+    //Create FX for DarkBall Attack
     void DarkBallAttack(int side)
     {
         /*
@@ -523,11 +556,6 @@ public class DarknessBoss : MonoBehaviour {
         GameObject newFX = Instantiate(DarkBallFX.gameObject, transf.position, Quaternion.identity) as GameObject;
         //DarkBallFX.Play();
         newFX.transform.parent = transf;
-
-    }
-
-    void Stage1(string str)
-    {
 
     }
 }
