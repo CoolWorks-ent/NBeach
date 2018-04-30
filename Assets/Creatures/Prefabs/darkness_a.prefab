@@ -26,7 +26,7 @@ GameObject:
   - component: {fileID: 114683955086906738}
   - component: {fileID: 114185389251221894}
   - component: {fileID: 114073798283436518}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: darkness_a
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 33108034144373744}
   - component: {fileID: 23919024872525614}
   - component: {fileID: 64614841458248028}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: dirt
   m_TagString: dirt
   m_Icon: {fileID: 0}
@@ -59,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 187.01804, y: 45.23, z: 71.4}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4901106677447990}
   m_Father: {fileID: 0}
@@ -71,13 +71,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1745507492148574}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.0000009536744, z: -1.1368684e-13}
   m_LocalScale: {x: 1.0000005, y: 1.0000004, z: 1.0000002}
   m_Children: []
   m_Father: {fileID: 4849616495344730}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23919024872525614
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -91,7 +91,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 811b6e42ce2e0ff4b9e99ab3d665ce7a, type: 2}
+  - {fileID: 2100000, guid: 0b3ed1ddb4202f44a824dfe332e66286, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,7 +116,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1745507492148574}
-  m_Mesh: {fileID: 4300000, guid: 4e791fb172719774aa18c51a8d43c74e, type: 3}
+  m_Mesh: {fileID: 4300000, guid: fa98ca6de26ddeb46ac612a15829298a, type: 3}
 --- !u!54 &54671049203182734
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -145,7 +145,7 @@ MeshCollider:
   m_Convex: 1
   m_InflateMesh: 0
   m_SkinWidth: 0.01
-  m_Mesh: {fileID: 4300000, guid: 4e791fb172719774aa18c51a8d43c74e, type: 3}
+  m_Mesh: {fileID: 4300000, guid: fa98ca6de26ddeb46ac612a15829298a, type: 3}
 --- !u!65 &65578689530358540
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -201,7 +201,7 @@ MonoBehaviour:
   canSearch: 1
   canMove: 1
   maxSpeed: 1.5
-  gravity: {x: NaN, y: NaN, z: NaN}
+  gravity: {x: 0, y: 0, z: 0}
   groundMask:
     serializedVersion: 2
     m_Bits: 1

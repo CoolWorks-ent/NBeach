@@ -20,7 +20,7 @@ public class DarknessBoss : MonoBehaviour {
         none, Smash, Ball, RockSmash
     };
 
-    public GameObject MagicPos, target;
+    public GameObject MagicPos, target, ArmPivot, darkHand;
     public BossStatus status = BossStatus.start;
     public BossStage stage = BossStage.stage1;
     public BossAttackType attackState = BossAttackType.none;
@@ -42,9 +42,11 @@ public class DarknessBoss : MonoBehaviour {
     Animator animationControl;
     bool canAttack = false, changeAttackType = false;
     bool attackAnimFinished;
+    bool rockSmashInterruptAttack = false;
     int[] attackOrder = new int[3];
     float attackChance;
     int lastAttack = 0, maxAttacks = 1;
+    GameObject rockSmashTarget =null;
     Color red, blue, brown;
     Hashtable doAttackHit = new Hashtable();
     private SpriteRenderer spellIcon;
@@ -102,7 +104,7 @@ public class DarknessBoss : MonoBehaviour {
         /************************
          **Switch to Manage Boss Stages
          ************************/
-        switch(stage)
+       /* switch(stage)
         {
             case BossStage.stage1:
                 checkTime(BossStage.stage2);
@@ -113,6 +115,7 @@ public class DarknessBoss : MonoBehaviour {
                 checkTime(BossStage.stage3);
                 break;
         }
+        */
 
         /************************
          **Switch to Manage Boss Status
@@ -198,11 +201,16 @@ public class DarknessBoss : MonoBehaviour {
         }
         else if (animationControl.GetCurrentAnimatorStateInfo(0).IsName("AttackWait") && !changeAttackType && attackState == BossAttackType.RockSmash)
         {
-            
+
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
+            //set the target + rotation/position of "HAND" for attack
+            //ArmPivot.transform.LookAt(target.transform.position);
+            Vector3 tempTarget = new Vector3(0,0,0);
+            tempTarget = new Vector3(target.transform.position.x-20, target.transform.position.y, target.transform.position.z);
+            transform.LookAt(tempTarget);
             animationControl.SetBool("DoRockSmashAttack", true);
-            StartCoroutine(DoAttackCoroutine(MagicPos.transform, target, false));
+            StartCoroutine(DoAttackCoroutine(ArmPivot.transform, target, false));
         }
     }
     /**************************
@@ -373,6 +381,7 @@ public class DarknessBoss : MonoBehaviour {
                 case BossAttackType.RockSmash:
                     //animationControl.SetBool("IsRest", true);
                     //animationControl.SetBool("AttackWait", false);
+
                     path = attackPrefabs[2];
                     offset = new Vector3(0, 0, -3);
                     break;
@@ -383,8 +392,12 @@ public class DarknessBoss : MonoBehaviour {
             GameObject newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
             if (attackState == BossAttackType.RockSmash)
             {
+                newGb.SetActive(false);
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
+
+                darkHand.GetComponent<DarkBossAttack>().Target = target;
+                darkHand.GetComponent<DarkBossAttack>().attackType = "RockSmash";
             }
             else
             {
@@ -477,13 +490,22 @@ public class DarknessBoss : MonoBehaviour {
     //Call this function to force the Boss to use the RockSmash and end the stage...
     public void DoRockSmash_Interrupt(GameObject rockTransform)
     {
-        animationControl.SetBool("AttackWait", true);
-        animationControl.SetBool("IsRest", false);
-        animationControl.SetBool("DoRockSmashAttack", true);
-        attackState = BossAttackType.RockSmash;
-        StartCoroutine(DoAttackCoroutine(MagicPos.transform, rockTransform, true));
-        //doAttackCoroutine(MagicPos.transform);
-        //changeAttackType = true;
+        //animationControl.SetBool("AttackWait", true);
+        //animationControl.SetBool("IsRest", false);
+        //animationControl.SetBool("DoSmashAtack", false);
+        //animationControl.SetBool("DoProjectileAttack", false);
+        //animationControl.SetBool("DoRockSmashAttack", true);
+        if (attacksInProgress.Count > 0)
+            rockSmashInterruptAttack = true;
+        else
+        {
+            attackState = BossAttackType.RockSmash;
+            //StartCoroutine(DoAttackCoroutine(MagicPos.transform, rockTransform, true));
+            //doAttackCoroutine(MagicPos.transform);
+            changeAttackType = false;
+            status = BossStatus.charging;
+        }
+        rockSmashTarget = rockTransform;
     }
 
 
@@ -494,18 +516,44 @@ public class DarknessBoss : MonoBehaviour {
     {
         GameObject attack = attacksInProgress[0];
         attacksInProgress.RemoveAt(0);
+        //reset attack timer when attack's animation has finished
+        attackTimer = 0;
+
         //attackAnimFinished = true;
         Debug.Log("attackAnimFinished");
         //Attach my FinalBossController to the new FinalBossAttack script in newGb
-        //attack will move after the animation
-        attack.GetComponent<DarkBossAttack>().moveAttack();
+        //projectile attack will move after the animation 
+        if (attack.GetComponent<DarkBossAttack>().attackType == "Ball")
+        {
+            attack.GetComponent<DarkBossAttack>().moveAttack();
+            attacks.Remove(attack);
+        }
+        else if (attack.GetComponent<DarkBossAttack>().attackType == "RockSmash")
+        {
+            attacks.Remove(attack);
+        }
 
-        //reset animation bools
-        animationControl.SetBool("DoProjectileAttack", false);
-        animationControl.SetBool("DoRockSmashAttack", false);
-        animationControl.SetBool("DoSmashAttack", false);
-        animationControl.SetBool("IsRest", true);
-        animationControl.SetBool("AttackWait", false);
+        if (rockSmashInterruptAttack)
+        {
+            animationControl.SetBool("DoProjectileAttack", false);
+            animationControl.SetBool("DoRockSmashAttack", false);
+            animationControl.SetBool("DoSmashAttack", false);
+            animationControl.SetBool("IsRest", false);
+            animationControl.SetBool("AttackWait", true);
+            rockSmashInterruptAttack = false;
+            changeAttackType = false;
+            attackState = BossAttackType.RockSmash;
+        }
+        else
+        {
+            if(attack)
+            //reset animation bools
+            animationControl.SetBool("DoProjectileAttack", false);
+            animationControl.SetBool("DoRockSmashAttack", false);
+            animationControl.SetBool("DoSmashAttack", false);
+            animationControl.SetBool("IsRest", true);
+            animationControl.SetBool("AttackWait", false);
+        }
     }
 
     IEnumerator FlashSpellIcon()

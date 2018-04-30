@@ -173,7 +173,7 @@ public class NFPSController : PlayerController {
                 }
             }
 
-            //create delay btw firing time, 0.5 sec between each shot
+        //create delay btw firing time, 0.5 sec between each shot
             if (Input.GetButtonDown("Fire1") && Time.time > nextFire )
             {
                 

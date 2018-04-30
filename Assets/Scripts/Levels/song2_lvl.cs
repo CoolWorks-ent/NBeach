@@ -44,6 +44,7 @@ public class song2_lvl : Level {
 
     int numOfShells = 0;
     int maxShellCount = 5;
+    float shellSpawnTime = 0;
     List<ShellPickup> shellArray;
     int rainEmissionRateDefault = 8;
     int rainEmissionRateMax = 40;
@@ -77,6 +78,7 @@ public class song2_lvl : Level {
         darkBossObj = darkBoss.transform.parent.gameObject;
         RainFX.Stop();
 
+        shellArray = new List<ShellPickup>();
         //Start Stage0 of battle
         Stage0();
         gController.playerControl.playerState = PlayerState.NOTMOVING;
@@ -144,30 +146,48 @@ public class song2_lvl : Level {
         */
         //Only spawn shells if the player is in a battle sequence. Ie. NotMoving and Not in a cutscene
         if (gController.playerControl.playerState != PlayerState.MOVING)
-        { 
+        {
+            //StartCoroutine(SpawnShellPickUp(spawnRate));
+
+            if (shellSpawnTime >= spawnRate && shellArray.Count < maxShellCount)
+            {
+                ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
+                ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
+                shellArray.Add(reloadShell);
+                Debug.Log("pickup shell spawned");
+                shellSpawnTime = 0;
+            }
+            else
+            {
+                shellSpawnTime += Time.deltaTime;
+            }
+
             //only spawn shells if this bool tells it to
-            if (shellArray.Count < maxShellCount)
+            /*if (shellArray.Count < maxShellCount)
             {
                 StartCoroutine(SpawnShellPickUp(spawnRate));
                 //numOfShells += 1;
-            }
+            }*/
         }
             
     }
 
     IEnumerator SpawnShellPickUp(float shellSpawnRate)
     {
-        float time = 0;
-        while (time <= shellSpawnRate)
+        if (shellArray.Count < maxShellCount)
         {
-            time += Time.deltaTime;
-            yield return null;
+            float time = 0;
+            while (time <= shellSpawnRate)
+            {
+                time += Time.deltaTime;
+                yield return null;
+            }
+            //choose random spawn location in array and spawn there
+            ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
+            ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
+            shellArray.Add(reloadShell);
+            Debug.Log("pickup shell spawned");
         }
-        //choose random spawn location in array and spawn there
-        ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
-        ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
-        shellArray.Add(reloadShell);
-        Debug.Log("pickup shell spawned");
         
         yield return 0;
     }
@@ -311,6 +331,7 @@ public class song2_lvl : Level {
 
         float waitTime = stage1StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
+
         float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
         yield return new WaitForSeconds(tempWaitTime);
@@ -330,6 +351,7 @@ public class song2_lvl : Level {
         Debug.Log("Stage 1 Start");
         //Set Enemy Stage to face the Player Container Position
         enemyStageObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform);
+        darkBoss.transform.rotation = new Quaternion(0, 0, 0, 0);
 
         //snap player transform to face dark boss after reaching the new stage position
         playerStageObj.transform.LookAt(darkBoss.transform);
@@ -355,17 +377,13 @@ public class song2_lvl : Level {
     IEnumerator Stage2Routine()
     {
         Debug.Log("Stage 2 Start");
+        //Set Enemy Stage to face the Player Container Position
+        enemyStageObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform);
+
         //snap player transform to face dark boss after reaching the new stage position
         gController.playerStage.transform.LookAt(darkBoss.transform);
 
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
-
-        while (curSongTime < 10f)
-        {
-            //track and increment total time passed since beginning of level
-            curSongTime += Time.deltaTime;
-            yield return null;
-        }
 
         float waitTime = stage3StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
@@ -374,10 +392,12 @@ public class song2_lvl : Level {
         yield return new WaitForSeconds(tempWaitTime);
 
         //wait for an event for when the rock is destroyed by the dark boss.
+        //tell boss to destroy the player's last cover rock
         darkBoss.DoRockSmash_Interrupt(coverRocks[2]);
         yield return new WaitForSeconds(2);
 
-        //Dark Boss moves closer
+        //!Dark Boss moves closer!
+
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
         yield return new WaitForSeconds(20);
