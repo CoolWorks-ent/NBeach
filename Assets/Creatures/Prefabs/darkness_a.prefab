@@ -45,8 +45,8 @@ GameObject:
   - component: {fileID: 23919024872525614}
   - component: {fileID: 64614841458248028}
   m_Layer: 0
-  m_Name: dirt
-  m_TagString: dirt
+  m_Name: darkness_model
+  m_TagString: Darkness
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
