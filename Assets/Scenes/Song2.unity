@@ -56156,7 +56156,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 728596525}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.3232727, y: -1.8033905, z: -6.707184}
+  m_LocalPosition: {x: -11.84, y: -1.8033905, z: -1.54}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1789478972}
@@ -78532,7 +78532,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1448868960}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.7032776, y: -1.8033905, z: -4.1871796}
+  m_LocalPosition: {x: -5.7032776, y: -1.8033905, z: -1.07}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1789478972}
@@ -79146,6 +79146,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 8200008, guid: e333d7eef0fcdd74596463b6938fd932, type: 2}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8200004, guid: e333d7eef0fcdd74596463b6938fd932, type: 2}
+      propertyPath: spreadCustomCurve.m_RotationOrder
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -80758,7 +80762,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 300968603}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.713272, y: -1.8033905, z: -5.0271835}
+  m_LocalPosition: {x: -11.713272, y: -1.8033905, z: -5.88}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1789478972}

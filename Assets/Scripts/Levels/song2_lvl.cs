@@ -320,6 +320,9 @@ public class song2_lvl : Level {
         Vector3 startPos = darkBossObj.transform.position;
         Vector3 endPos = new Vector3(startPos.x, GameObject.Find("OceanSurfaceQuad").transform.position.y, startPos.z);
 
+        //[PLAY MUSIC] start playing bg song
+        gController.soundManager.FadeInMusic(1);
+
         while (t <= moveTime)
         {
             //slowly move darkboss to above the water and begin its attack
@@ -358,8 +361,6 @@ public class song2_lvl : Level {
         playerStageObj.transform.LookAt(darkBoss.transform);
 
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
-        //start playing bg song
-        //gController.soundManager.FadeInMusic(1);
 
         float waitTime = stage2StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
@@ -448,5 +449,13 @@ public class song2_lvl : Level {
         //start playing bg song
         //gController.soundManager.FadeInMusic(1);
 
+    }
+
+    void SmoothLookAtRotate(GameObject targetObj, float speed)
+    {
+        var targetRotation = Quaternion.LookRotation(targetObj.transform.position - transform.position);
+
+        // Smoothly rotate towards the target point.
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, speed * Time.deltaTime);
     }
 }
