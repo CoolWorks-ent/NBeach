@@ -515,45 +515,51 @@ public class DarknessBoss : MonoBehaviour {
      */
     public void OnAttackAnimFinished(string evt)
     {
-        GameObject attack = attacksInProgress[0];
-        attacksInProgress.RemoveAt(0);
-        //reset attack timer when attack's animation has finished
-        attackTimer = 0;
+        GameObject attack;
+        if (attacksInProgress.Count > 0)
+        {
+            attack = attacksInProgress[0];
+            attacksInProgress.RemoveAt(0);
 
-        //attackAnimFinished = true;
-        Debug.Log("attackAnimFinished");
-        //Attach my FinalBossController to the new FinalBossAttack script in newGb
-        //projectile attack will move after the animation 
-        if (attack.GetComponent<DarkBossAttack>().attackType == "Ball")
-        {
-            attack.GetComponent<DarkBossAttack>().moveAttack();
-            attacks.Remove(attack);
-        }
-        else if (attack.GetComponent<DarkBossAttack>().attackType == "RockSmash")
-        {
-            attacks.Remove(attack);
-        }
+            //reset attack timer when attack's animation has finished
+            attackTimer = 0;
 
-        if (rockSmashInterruptAttack)
-        {
-            animationControl.SetBool("DoProjectileAttack", false);
-            animationControl.SetBool("DoRockSmashAttack", false);
-            animationControl.SetBool("DoSmashAttack", false);
-            animationControl.SetBool("IsRest", false);
-            animationControl.SetBool("AttackWait", true);
-            rockSmashInterruptAttack = false;
-            changeAttackType = false;
-            attackState = BossAttackType.RockSmash;
-        }
-        else
-        {
-            if(attack)
-            //reset animation bools
-            animationControl.SetBool("DoProjectileAttack", false);
-            animationControl.SetBool("DoRockSmashAttack", false);
-            animationControl.SetBool("DoSmashAttack", false);
-            animationControl.SetBool("IsRest", true);
-            animationControl.SetBool("AttackWait", false);
+            //attackAnimFinished = true;
+            Debug.Log("attackAnimFinished");
+            //Attach my FinalBossController to the new FinalBossAttack script in newGb
+            //projectile attack will move after the animation 
+            if (attack.GetComponent<DarkBossAttack>().attackType == "Ball")
+            {
+                attack.GetComponent<DarkBossAttack>().moveAttack();
+                attacks.Remove(attack);
+            }
+            else if (attack.GetComponent<DarkBossAttack>().attackType == "RockSmash")
+            {
+                attacks.Remove(attack);
+            }
+
+
+            if (rockSmashInterruptAttack)
+            {
+                animationControl.SetBool("DoProjectileAttack", false);
+                animationControl.SetBool("DoRockSmashAttack", false);
+                animationControl.SetBool("DoSmashAttack", false);
+                animationControl.SetBool("IsRest", false);
+                animationControl.SetBool("AttackWait", true);
+                rockSmashInterruptAttack = false;
+                changeAttackType = false;
+                attackState = BossAttackType.RockSmash;
+            }
+            else
+            {
+                if (attack)
+                    //reset animation bools
+                    animationControl.SetBool("DoProjectileAttack", false);
+                animationControl.SetBool("DoRockSmashAttack", false);
+                animationControl.SetBool("DoSmashAttack", false);
+                animationControl.SetBool("IsRest", true);
+                animationControl.SetBool("AttackWait", false);
+            }
         }
     }
 

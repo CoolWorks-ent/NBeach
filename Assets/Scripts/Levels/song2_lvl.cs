@@ -270,9 +270,10 @@ public class song2_lvl : Level {
         //remove old shells from previous area
         foreach (ShellPickup s in shellArray)
         {
+            //shellArray.Remove(s);
             Destroy(s.gameObject);
-            shellArray.Remove(s);
         }
+        shellArray.Clear();
 
         //increment state number because player has reach next rock
         stageNum += 1; 
