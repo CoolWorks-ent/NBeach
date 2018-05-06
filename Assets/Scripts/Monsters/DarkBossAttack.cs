@@ -5,7 +5,7 @@ using UnityEngine;
 public class DarkBossAttack : MonoBehaviour {
 
     public GameObject Target;
-    public string attackType;
+    public string attackType; //Ball, RockSmash, Smash
 
     Vector3 targetPos;
     float moveTime = 5f; //higher this value, the faster the attack moves and the longer it lasts...
@@ -67,7 +67,8 @@ public class DarkBossAttack : MonoBehaviour {
             //Destroy(this.gameObject);
 
         }
-        if (collision.gameObject.tag == "PlayerCube")
+
+        else if (collision.gameObject.tag == "PlayerCube" && attackType == "Ball")
         {
             Debug.Log("Dark Boss Attack collided with Player");
             //event call for player damaged
@@ -75,7 +76,7 @@ public class DarkBossAttack : MonoBehaviour {
         }
 
         //destroy attack if it hits a NORMAL environment object
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Environment"))
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Environment") && attackType == "Ball")
         {
             Destroy(this.gameObject);
         }
@@ -83,11 +84,22 @@ public class DarkBossAttack : MonoBehaviour {
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.tag == "PlayerCube")
+        if (collider.gameObject.tag == "PlayerCube" && attackType == "Ball")
         {
             Debug.Log("Dark Boss Attack collided with Player");
             //event call for player damaged
             Destroy(this.gameObject);
+        }
+
+        if (collider.gameObject.tag == "player cover" && attackType == "RockSmash")
+        {
+            Debug.Log("Dark Boss Attack collided with player rock cover");
+            //event call for player damaged
+            EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
+            //kick off destruction animation for rock cover
+            Destroy(collider.gameObject);
+            //Destroy(this.gameObject);
+
         }
 
     }

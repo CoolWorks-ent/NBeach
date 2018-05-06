@@ -235,6 +235,8 @@ public class song2_lvl : Level {
     }
     public IEnumerator OnPlayerCoverDestroyed()
     {
+        //slight delay after rock is destroyed  before player should run
+        yield return new WaitForSeconds(.5f);
         StartCoroutine(RunToNewRock(1));
         yield return 0;
     }
@@ -331,7 +333,6 @@ public class song2_lvl : Level {
 
         float waitTime = stage1StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
-
         float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
         yield return new WaitForSeconds(tempWaitTime);

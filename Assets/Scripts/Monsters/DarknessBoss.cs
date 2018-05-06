@@ -389,18 +389,19 @@ public class DarknessBoss : MonoBehaviour {
             //set boss status to wait for next attack time
             //status = BossStatus.charging;
             changeAttackType = true;
-            GameObject newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
+            GameObject newGb;// = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
             if (attackState == BossAttackType.RockSmash)
             {
-                newGb.SetActive(false);
+                //newGb.SetActive(false);
+                //newGb.GetComponent<DarkBossAttack>().Target = target;
+                //newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
+                newGb = darkHand;
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
-
-                darkHand.GetComponent<DarkBossAttack>().Target = target;
-                darkHand.GetComponent<DarkBossAttack>().attackType = "RockSmash";
             }
             else
             {
+                newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "Ball";
             }

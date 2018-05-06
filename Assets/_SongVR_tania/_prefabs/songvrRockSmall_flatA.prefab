@@ -22,12 +22,13 @@ GameObject:
   - component: {fileID: 33993263551204158}
   - component: {fileID: 23589819677282882}
   - component: {fileID: 136584235601815904}
+  - component: {fileID: 54671548118427748}
   m_Layer: 13
   m_Name: songvrRockSmall_flatA
-  m_TagString: Untagged
+  m_TagString: player cover
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &4263623679531380
 Transform:
@@ -36,7 +37,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1006897838119362}
   m_LocalRotation: {x: 0.043283235, y: 0.9462038, z: 0.28721425, w: 0.1425931}
-  m_LocalPosition: {x: 182.88, y: 46.93, z: 96.11}
+  m_LocalPosition: {x: 185.4, y: 46.63, z: 96.11}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children: []
   m_Father: {fileID: 0}
@@ -81,6 +82,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1006897838119362}
   m_Mesh: {fileID: 4300000, guid: e1dabdf0fa43ff34283da7baf14c9cbf, type: 3}
+--- !u!54 &54671548118427748
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1006897838119362}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!136 &136584235601815904
 CapsuleCollider:
   m_ObjectHideFlags: 1

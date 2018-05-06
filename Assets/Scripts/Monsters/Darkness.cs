@@ -29,7 +29,7 @@ public class Darkness : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.gameObject.tag == "Projectile")
+        if (collision.gameObject.tag == "Projectile")
         {
             if (collision.collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {

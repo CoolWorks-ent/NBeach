@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 54752242457737414}
   - component: {fileID: 114173645243659162}
   - component: {fileID: 65211916204687114}
+  - component: {fileID: 65985366487693760}
   m_Layer: 0
   m_Name: ShellProjectile
   m_TagString: Projectile
@@ -100,6 +101,18 @@ Rigidbody:
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &65211916204687114
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1441688069760980}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.52062714, y: 0.1898848, z: 0.5036005}
+  m_Center: {x: -0.028673187, y: 0, z: -0.20657228}
+--- !u!65 &65985366487693760
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
