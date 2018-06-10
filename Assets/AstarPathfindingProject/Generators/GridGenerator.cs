@@ -62,7 +62,8 @@ namespace Pathfinding {
 	 * \see #Pathfinding.GraphCollision for documentation on the 'Height Testing' and 'Collision Testing' sections
 	 * of the grid graph settings.
 	 */
-	public class GridGraph : NavGraph, IUpdatableGraph, ITransformedGraph {
+	public class GridGraph : NavGraph, IUpdatableGraph, ITransformedGraph
+		, IRaycastableGraph {
 		/** This function will be called when this graph is destroyed */
 		protected override void OnDestroy () {
 			base.OnDestroy();
@@ -283,6 +284,14 @@ namespace Pathfinding {
 		[JsonMember]
 		public float penaltyAnglePower = 1;
 
+		/** Use jump point search to speed up pathfinding.
+		 * Jump point search can improve pathfinding performance significantly by making use of some assumptions of the graph.
+		 * More specifically it assumes a grid graph with no penalties.
+		 *
+		 * \see https://en.wikipedia.org/wiki/Jump_point_search
+		 */
+		[JsonMember]
+		public bool useJumpPointSearch;
 
 		/** Show an outline of the grid nodes in the Unity Editor */
 		[JsonMember]
@@ -296,6 +305,17 @@ namespace Pathfinding {
 		[JsonMember]
 		public bool showMeshSurface = true;
 
+		/** Holds settings for using a texture as source for a grid graph.
+		 * Texure data can be used for fine grained control over how the graph will look.
+		 * It can be used for positioning, penalty and walkability control.\n
+		 * Below is a screenshot of a grid graph with a penalty map applied.
+		 * It has the effect of the AI taking the longer path along the green (low penalty) areas.\n
+		 * \shadowimage{penaltymap.png}
+		 * Color data is got as 0...255 values.
+		 * \astarpro
+		 * \warning Can only be used with Unity 3.4 and up */
+		[JsonMember]
+		public TextureData textureData = new TextureData();
 
 		/** \} */
 
@@ -362,6 +382,81 @@ namespace Pathfinding {
 		  */
 		public GraphTransform transform { get; private set; }
 
+		/** Used for using a texture as a source for a grid graph.
+		 * \astarpro
+		 */
+		public class TextureData {
+			public bool enabled;
+			public Texture2D source;
+			public float[] factors = new float[3];
+			public ChannelUse[] channels = new ChannelUse[3];
+
+			Color32[] data;
+
+			/** Reads texture data */
+			public void Initialize () {
+				if (enabled && source != null) {
+					for (int i = 0; i < channels.Length; i++) {
+						if (channels[i] != ChannelUse.None) {
+							try {
+								data = source.GetPixels32();
+							} catch (UnityException e) {
+								Debug.LogWarning(e.ToString());
+								data = null;
+							}
+							break;
+						}
+					}
+				}
+			}
+
+			/** Applies the texture to the node */
+			public void Apply (GridNode node, int x, int z) {
+				if (enabled && data != null && x < source.width && z < source.height) {
+					Color32 col = data[z*source.width+x];
+
+					if (channels[0] != ChannelUse.None) {
+						ApplyChannel(node, x, z, col.r, channels[0], factors[0]);
+					}
+
+					if (channels[1] != ChannelUse.None) {
+						ApplyChannel(node, x, z, col.g, channels[1], factors[1]);
+					}
+
+					if (channels[2] != ChannelUse.None) {
+						ApplyChannel(node, x, z, col.b, channels[2], factors[2]);
+					}
+
+					node.WalkableErosion = node.Walkable;
+				}
+			}
+
+			/** Applies a value to the node using the specified ChannelUse */
+			void ApplyChannel (GridNode node, int x, int z, int value, ChannelUse channelUse, float factor) {
+				switch (channelUse) {
+				case ChannelUse.Penalty:
+					node.Penalty += (uint)Mathf.RoundToInt(value*factor);
+					break;
+				case ChannelUse.Position:
+					node.position = GridNode.GetGridGraph(node.GraphIndex).GraphPointToWorld(x, z, value);
+					break;
+				case ChannelUse.WalkablePenalty:
+					if (value == 0) {
+						node.Walkable = false;
+					} else {
+						node.Penalty += (uint)Mathf.RoundToInt((value-1)*factor);
+					}
+					break;
+				}
+			}
+
+			public enum ChannelUse {
+				None,
+				Penalty,
+				Position,
+				WalkablePenalty,
+			}
+		}
 
 		public GridGraph () {
 			unclampedSize = new Vector2(10, 10);
@@ -627,15 +722,15 @@ namespace Pathfinding {
 			// Calculate the closest node and the closest point on that node
 			position = transform.InverseTransform(position);
 
-			float xf = position.x-0.5F;
-			float zf = position.z-0.5f;
-			int x = Mathf.Clamp(Mathf.RoundToInt(xf), 0, width-1);
-			int z = Mathf.Clamp(Mathf.RoundToInt(zf), 0, depth-1);
+			float xf = position.x;
+			float zf = position.z;
+			int x = Mathf.Clamp((int)xf, 0, width-1);
+			int z = Mathf.Clamp((int)zf, 0, depth-1);
 
 			var nn = new NNInfoInternal(nodes[z*width+x]);
 
 			float y = transform.InverseTransform((Vector3)nodes[z*width+x].position).y;
-			nn.clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, x-0.5f, x+0.5f)+0.5f, y, Mathf.Clamp(zf, z-0.5f, z+0.5f)+0.5f));
+			nn.clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, x, x+1f), y, Mathf.Clamp(zf, z, z+1f)));
 
 			return nn;
 		}
@@ -652,10 +747,10 @@ namespace Pathfinding {
 			position = transform.InverseTransform(position);
 
 			// Find the coordinates of the closest node
-			float xf = position.x-0.5F;
-			float zf = position.z-0.5f;
-			int x = Mathf.Clamp(Mathf.RoundToInt(xf), 0, width-1);
-			int z = Mathf.Clamp(Mathf.RoundToInt(zf), 0, depth-1);
+			float xf = position.x;
+			float zf = position.z;
+			int x = Mathf.Clamp((int)xf, 0, width-1);
+			int z = Mathf.Clamp((int)zf, 0, depth-1);
 
 			// Closest node
 			GridNode node = nodes[x+z*width];
@@ -672,7 +767,7 @@ namespace Pathfinding {
 				minNode = node;
 				minDist = ((Vector3)minNode.position-globalPosition).sqrMagnitude;
 				float y = transform.InverseTransform((Vector3)node.position).y;
-				clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, x-0.5f, x+0.5f)+0.5f, y, Mathf.Clamp(zf, z-0.5f, z+0.5f)+0.5f));
+				clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, x, x+1f), y, Mathf.Clamp(zf, z, z+1f)));
 			}
 
 			if (minNode != null) {
@@ -692,9 +787,7 @@ namespace Pathfinding {
 			for (int w = 1;; w++) {
 				//Check if the nodes are within distance limit
 				if (nodeSize*w > maxDist) {
-					nn.node = minNode;
-					nn.clampedPosition = clampedPosition;
-					return nn;
+					break;
 				}
 
 				bool anyInside = false;
@@ -715,7 +808,7 @@ namespace Pathfinding {
 							minNode = nodes[nx+nz2];
 
 							// Closest point on the node if the node is treated as a square
-							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx-0.5f, nx+0.5f)+0.5f, transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz-0.5f, nz+0.5f)+0.5f));
+							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx, nx+1f), transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz, nz+1f)));
 						}
 					}
 				}
@@ -732,7 +825,7 @@ namespace Pathfinding {
 						if (dist < minDist && dist < maxDistSqr) {
 							minDist = dist;
 							minNode = nodes[nx+nz2];
-							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx-0.5f, nx+0.5f)+0.5f, transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz-0.5f, nz+0.5f)+0.5f));
+							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx, nx+1f), transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz, nz+1f)));
 						}
 					}
 				}
@@ -748,7 +841,7 @@ namespace Pathfinding {
 						if (dist < minDist && dist < maxDistSqr) {
 							minDist = dist;
 							minNode = nodes[nx+nz*width];
-							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx-0.5f, nx+0.5f)+0.5f, transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz-0.5f, nz+0.5f)+0.5f));
+							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx, nx+1f), transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz, nz+1f)));
 						}
 					}
 				}
@@ -764,7 +857,7 @@ namespace Pathfinding {
 						if (dist < minDist && dist < maxDistSqr) {
 							minDist = dist;
 							minNode = nodes[nx+nz*width];
-							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx-0.5f, nx+0.5f)+0.5f, transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz-0.5f, nz+0.5f)+0.5f));
+							clampedPosition = transform.Transform(new Vector3(Mathf.Clamp(xf, nx, nx+1f), transform.InverseTransform((Vector3)minNode.position).y, Mathf.Clamp(zf, nz, nz+1f)));
 						}
 					}
 				}
@@ -774,9 +867,7 @@ namespace Pathfinding {
 					// If we don't need to search more, just return
 					// Otherwise search for 'overlap' iterations more
 					if (overlap == 0) {
-						nn.node = minNode;
-						nn.clampedPosition = clampedPosition;
-						return nn;
+						break;
 					}
 					overlap--;
 				}
@@ -785,11 +876,14 @@ namespace Pathfinding {
 				// We will not be able to find any more valid nodes
 				// so just return
 				if (!anyInside) {
-					nn.node = minNode;
-					nn.clampedPosition = clampedPosition;
-					return nn;
+					break;
 				}
 			}
+
+			// Copy fields to the NNInfo struct and return
+			nn.node = minNode;
+			nn.clampedPosition = clampedPosition;
+			return nn;
 		}
 
 		/** Sets up #neighbourOffsets with the current settings. #neighbourOffsets, #neighbourCosts, #neighbourXOffsets and #neighbourZOffsets are set up.\n
@@ -867,6 +961,11 @@ namespace Pathfinding {
 				yield break;
 			}
 
+#if !ASTAR_JPS
+			if (this.useJumpPointSearch) {
+				Debug.LogError("Trying to use Jump Point Search, but support for it is not enabled. Please enable it in the inspector (Grid Graph settings).");
+			}
+#endif
 
 			SetUpOffsetsAndCosts();
 
@@ -892,6 +991,7 @@ namespace Pathfinding {
 			}
 			collision.Initialize(transform, nodeSize);
 
+			textureData.Initialize();
 
 			int progressCounter = 0;
 
@@ -910,6 +1010,9 @@ namespace Pathfinding {
 					// Updates the position of the node
 					// and a bunch of other things
 					RecalculateCell(x, z);
+
+					// Apply texture data if necessary
+					textureData.Apply(nodes[z*width + x], x, z);
 				}
 			}
 
@@ -1370,6 +1473,7 @@ namespace Pathfinding {
 				helper.builder.DrawWireCube(trans, bounds, Color.white);
 
 				int nodeCount = nodes != null ? nodes.Length : -1;
+				if (this is LayerGridGraph) nodeCount = (this as LayerGridGraph).nodes != null ? (this as LayerGridGraph).nodes.Length : -1;
 
 				if (drawNodes && width*depth*LayerCount != nodeCount) {
 					var color = new Color(1, 1, 1, 0.2f);
@@ -1776,6 +1880,11 @@ namespace Pathfinding {
 			int erosion;
 			CalculateAffectedRegions(o, out originalRect, out affectRect, out physicsRect, out willChangeWalkability, out erosion);
 
+#if ASTARDEBUG
+			var debugMatrix = transform * Matrix4x4.TRS(new Vector3(0.5f, 0, 0.5f), Quaternion.identity, Vector3.one);
+
+			originalRect.DebugDraw(debugMatrix, Color.red);
+#endif
 
 			// Rect which covers the whole grid
 			var gridRect = new IntRect(0, 0, width-1, depth-1);
@@ -1822,6 +1931,10 @@ namespace Pathfinding {
 				}
 			}
 
+#if ASTARDEBUG
+			physicsRect.DebugDraw(debugMatrix, Color.blue);
+			affectRect.DebugDraw(debugMatrix, Color.black);
+#endif
 
 			// Recalculate connections
 			if (willChangeWalkability && erosion == 0) {
@@ -1840,6 +1953,10 @@ namespace Pathfinding {
 				erosionRect1 = IntRect.Intersection(erosionRect1, gridRect);
 				erosionRect2 = IntRect.Intersection(erosionRect2, gridRect);
 
+#if ASTARDEBUG
+				erosionRect1.DebugDraw(debugMatrix, Color.magenta);
+				erosionRect2.DebugDraw(debugMatrix, Color.cyan);
+#endif
 
 
 				// * all nodes inside clampedRect might have had their walkability changed
@@ -1894,6 +2011,406 @@ namespace Pathfinding {
 			}
 		}
 
+		/** Returns if there is an obstacle between \a from and \a to on the graph.
+		 * This is not the same as Physics.Linecast, this function traverses the graph and looks for collisions.
+		 *
+		 * \snippet MiscSnippets.cs GridGraph.Linecast2
+		 *
+		 * \shadowimage{linecast.png}
+		 *
+		 * \astarpro
+		 */
+		public bool Linecast (Vector3 from, Vector3 to) {
+			GraphHitInfo hit;
+
+			return Linecast(from, to, null, out hit);
+		}
+
+		/** Returns if there is an obstacle between \a from and \a to on the graph.
+		 * \param [in] from Point to linecast from
+		 * \param [in] to Point to linecast to
+		 * \param [in] hint This parameter is deprecated. It will be ignored.
+		 *
+		 * This is not the same as Physics.Linecast, this function traverses the graph and looks for collisions.
+		 *
+		 * \snippet MiscSnippets.cs GridGraph.Linecast2
+		 *
+		 * \shadowimage{linecast.png}
+		 *
+		 * \astarpro
+		 */
+		public bool Linecast (Vector3 from, Vector3 to, GraphNode hint) {
+			GraphHitInfo hit;
+
+			return Linecast(from, to, hint, out hit);
+		}
+
+		/** Returns if there is an obstacle between \a from and \a to on the graph.
+		 * \param [in] from Point to linecast from
+		 * \param [in] to Point to linecast to
+		 * \param [out] hit Contains info on what was hit, see GraphHitInfo
+		 * \param [in] hint This parameter is deprecated. It will be ignored.
+		 *
+		 * This is not the same as Physics.Linecast, this function traverses the graph and looks for collisions.
+		 *
+		 * \snippet MiscSnippets.cs GridGraph.Linecast2
+		 *
+		 * \shadowimage{linecast.png}
+		 *
+		 * \astarpro
+		 */
+		public bool Linecast (Vector3 from, Vector3 to, GraphNode hint, out GraphHitInfo hit) {
+			return Linecast(from, to, hint, out hit, null);
+		}
+
+		/** Magnitude of the cross product a x b */
+		protected static float CrossMagnitude (Vector2 a, Vector2 b) {
+			return a.x*b.y - b.x*a.y;
+		}
+
+		/** Magnitude of the cross product a x b */
+		protected static long CrossMagnitude (Int2 a, Int2 b) {
+			return (long)a.x*b.y - (long)b.x*a.y;
+		}
+
+		/** Clips a line segment in graph space to the graph bounds.
+		 * That is (0,0,0) is the bottom left corner of the graph and (width,0,depth) is the top right corner.
+		 * The first node is placed at (0.5,y,0.5). One unit distance is the same as nodeSize.
+		 *
+		 * Returns false if the line segment does not intersect the graph at all.
+		 */
+		protected bool ClipLineSegmentToBounds (Vector3 a, Vector3 b, out Vector3 outA, out Vector3 outB) {
+			// If the start or end points are outside
+			// the graph then clamping is needed
+			if (a.x < 0 || a.z < 0 || a.x > width || a.z > depth ||
+				b.x < 0 || b.z < 0 || b.x > width || b.z > depth) {
+				// Boundary of the grid
+				var p1 = new Vector3(0, 0,  0);
+				var p2 = new Vector3(0, 0,  depth);
+				var p3 = new Vector3(width, 0,  depth);
+				var p4 = new Vector3(width, 0,  0);
+
+				int intersectCount = 0;
+
+				bool intersect;
+				Vector3 intersection;
+
+				intersection = VectorMath.SegmentIntersectionPointXZ(a, b, p1, p2, out intersect);
+
+				if (intersect) {
+					intersectCount++;
+					if (!VectorMath.RightOrColinearXZ(p1, p2, a)) {
+						a = intersection;
+					} else {
+						b = intersection;
+					}
+				}
+				intersection = VectorMath.SegmentIntersectionPointXZ(a, b, p2, p3, out intersect);
+
+				if (intersect) {
+					intersectCount++;
+					if (!VectorMath.RightOrColinearXZ(p2, p3, a)) {
+						a = intersection;
+					} else {
+						b = intersection;
+					}
+				}
+				intersection = VectorMath.SegmentIntersectionPointXZ(a, b, p3, p4, out intersect);
+
+				if (intersect) {
+					intersectCount++;
+					if (!VectorMath.RightOrColinearXZ(p3, p4, a)) {
+						a = intersection;
+					} else {
+						b = intersection;
+					}
+				}
+				intersection = VectorMath.SegmentIntersectionPointXZ(a, b, p4, p1, out intersect);
+
+				if (intersect) {
+					intersectCount++;
+					if (!VectorMath.RightOrColinearXZ(p4, p1, a)) {
+						a = intersection;
+					} else {
+						b = intersection;
+					}
+				}
+
+				if (intersectCount == 0) {
+					// The line does not intersect with the grid
+					outA = Vector3.zero;
+					outB = Vector3.zero;
+					return false;
+				}
+			}
+
+			outA = a;
+			outB = b;
+			return true;
+		}
+
+		/** Returns if there is an obstacle between \a from and \a to on the graph.
+		 * \param [in] from Point to linecast from
+		 * \param [in] to Point to linecast to
+		 * \param [out] hit Contains info on what was hit, see GraphHitInfo
+		 * \param [in] hint This parameter is deprecated. It will be ignored.
+		 * \param trace If a list is passed, then it will be filled with all nodes the linecast traverses
+		 *
+		 * This is not the same as Physics.Linecast, this function traverses the graph and looks for collisions.
+		 *
+		 * \snippet MiscSnippets.cs GridGraph.Linecast2
+		 *
+		 * \version In 3.6.8 this method was rewritten to improve accuracy and performance.
+		 * Previously it used a sampling approach which could cut corners of obstacles slightly
+		 * and was pretty inefficient.
+		 *
+		 * \astarpro
+		 *
+		 * \shadowimage{linecast.png}
+		 */
+		public bool Linecast (Vector3 from, Vector3 to, GraphNode hint, out GraphHitInfo hit, List<GraphNode> trace) {
+			hit = new GraphHitInfo();
+
+			hit.origin = from;
+
+			Vector3 fromInGraphSpace = transform.InverseTransform(from);
+			Vector3 toInGraphSpace = transform.InverseTransform(to);
+
+			// Clip the line so that the start and end points are on the graph
+			if (!ClipLineSegmentToBounds(fromInGraphSpace, toInGraphSpace, out fromInGraphSpace, out toInGraphSpace)) {
+				// Line does not intersect the graph
+				// So there are no obstacles we can hit
+				hit.point = to;
+				return false;
+			}
+
+			// Find the closest nodes to the start and end on the part of the segment which is on the graph
+			var startNode = GetNearest(transform.Transform(fromInGraphSpace), NNConstraint.None).node as GridNodeBase;
+			var endNode = GetNearest(transform.Transform(toInGraphSpace), NNConstraint.None).node as GridNodeBase;
+
+			if (!startNode.Walkable) {
+				hit.node = startNode;
+				// Hit point is the point where the segment intersects with the graph boundary
+				// or just #from if it starts inside the graph
+				hit.point = transform.Transform(fromInGraphSpace);
+				hit.tangentOrigin = hit.point;
+				return true;
+			}
+
+			// Throw away components we don't care about (y)
+			// Also subtract 0.5 because nodes have an offset of 0.5 (first node is at (0.5,0.5) not at (0,0))
+			// And it's just more convenient to remove that term here.
+			// The variable names #from and #to are unfortunately already taken, so let's use start and end.
+			var start = new Vector2(fromInGraphSpace.x - 0.5f, fromInGraphSpace.z - 0.5f);
+			var end = new Vector2(toInGraphSpace.x - 0.5f, toInGraphSpace.z - 0.5f);
+
+			// Couldn't find a valid node
+			// This shouldn't really happen unless there are NO nodes in the graph
+			if (startNode == null || endNode == null) {
+				hit.node = null;
+				hit.point = from;
+				return true;
+			}
+
+			var dir = end - start;
+
+			// Primary direction that we will move in
+			// (e.g up and right or down and left)
+			var sign = new Vector2(Mathf.Sign(dir.x), Mathf.Sign(dir.y));
+
+			// How much further we move away from (or towards) the line when walking along #sign
+			// This isn't an actual distance. It is a signed distance so it can be negative (other side of the line)
+			// Also it includes an additional factor, but the same factor is used everywhere
+			// and we only check for if the signed distance is greater or equal to zero so it is ok
+			var primaryDirectionError = CrossMagnitude(dir, sign)*0.5f;
+
+			/*            Y/Z
+			 *             |
+			 *  quadrant   |   quadrant
+			 *     1              0
+			 *             2
+			 *             |
+			 *   ----  3 - X - 1  ----- X
+			 *             |
+			 *             0
+			 *  quadrant       quadrant
+			 *     2       |      3
+			 *             |
+			 */
+
+			// Some XORing to get the quadrant index as shown in the diagram above
+			int quadrant = (dir.y >= 0 ? 0 : 3) ^ (dir.x >= 0 ? 0 : 1);
+			// This will be (1,2) for quadrant 0 and (2,3) for quadrant 1 etc.
+			// & 0x3 is just the same thing as % 4 but it is faster
+			// This is the direction which moves further to the right of the segment (when looking from the start)
+			int directionToReduceError = (quadrant + 1) & 0x3;
+			// This is the direction which moves further to the left of the segment (when looking from the start)
+			int directionToIncreaseError = (quadrant + 2) & 0x3;
+
+			// Current node. Start at n1
+			var current = startNode;
+
+			while (current.NodeInGridIndex != endNode.NodeInGridIndex) {
+				// We visited #current so add it to the trace
+				if (trace != null) {
+					trace.Add(current);
+				}
+
+				// Position of the node in 2D graph/node space
+				// Here the first node in the graph is at (0,0)
+				var p = new Vector2(current.XCoordinateInGrid, current.ZCoordinateInGrid);
+
+				// Calculate the error
+				// This is proportional to the distance between the line and the node
+				var error = CrossMagnitude(dir, p-start);
+
+				// How does the error change we take one step in the primary direction
+				var nerror = error + primaryDirectionError;
+
+				// Check if we need to reduce or increase the error (we want to keep it near zero)
+				// and pick the appropriate direction to move in
+				int ndir = nerror < 0 ? directionToIncreaseError : directionToReduceError;
+
+				// Check we can move in that direction
+				var other = current.GetNeighbourAlongDirection(ndir);
+				if (other != null) {
+					current = other;
+				} else {
+					// Hit obstacle
+					// We know from what direction we moved in
+					// so we can calculate the line which we hit
+
+					// Current direction and current direction ±90 degrees
+					var d1 = new Vector2(neighbourXOffsets[ndir], neighbourZOffsets[ndir]);
+					var d2 = new Vector2(neighbourXOffsets[(ndir-1+4) & 0x3], neighbourZOffsets[(ndir-1+4) & 0x3]);
+					Vector2 lineDirection = new Vector2(neighbourXOffsets[(ndir+1) & 0x3], neighbourZOffsets[(ndir+1) & 0x3]);
+					Vector2 lineOrigin = p + (d1 + d2) * 0.5f;
+
+					// Find the intersection
+					var intersection = VectorMath.LineIntersectionPoint(lineOrigin, lineOrigin+lineDirection, start, end);
+
+					var currentNodePositionInGraphSpace = transform.InverseTransform((Vector3)current.position);
+
+					// The intersection is in graph space (with an offset of 0.5) so we need to transform it to world space
+					var intersection3D = new Vector3(intersection.x + 0.5f, currentNodePositionInGraphSpace.y, intersection.y + 0.5f);
+					var lineOrigin3D = new Vector3(lineOrigin.x + 0.5f, currentNodePositionInGraphSpace.y, lineOrigin.y + 0.5f);
+
+					hit.point = transform.Transform(intersection3D);
+					hit.tangentOrigin = transform.Transform(lineOrigin3D);
+					hit.tangent = transform.TransformVector(new Vector3(lineDirection.x, 0, lineDirection.y));
+					hit.node = current;
+
+					return true;
+				}
+			}
+
+			// Add the last node to the trace
+			if (trace != null) {
+				trace.Add(current);
+			}
+
+			// No obstacles detected
+			if (current == endNode) {
+				hit.point = to;
+				hit.node = current;
+				return false;
+			}
+
+			// Reached node right above or right below n2 but we cannot reach it
+			hit.point = (Vector3)current.position;
+			hit.tangentOrigin = hit.point;
+			return true;
+		}
+
+		/** Returns if there is an obstacle between \a from and \a to on the graph.
+		 * \param [in] from Point to linecast from.
+		 * \param [in] to Point to linecast to.
+		 * \param [out] hit Contains info on what was hit, see GraphHitInfo.
+		 * \param [in] hint This parameter is deprecated. It will be ignored.
+		 *
+		 * This function is different from the other Linecast functions since it snaps the start and end positions to the centers of the closest nodes on the graph.
+		 * This is not the same as Physics.Linecast, this function traverses the graph and looks for collisions.
+		 *
+		 * \version Since 3.6.8 this method uses the same implementation as the other linecast methods so there is no performance boost to using it.
+		 * \version In 3.6.8 this method was rewritten and that fixed a large number of bugs.
+		 * Previously it had not always followed the line exactly as it should have
+		 * and the hit output was not very accurate
+		 * (for example the hit point was just the node position instead of a point on the edge which was hit).
+		 *
+		 * \astarpro
+		 */
+		public bool SnappedLinecast (Vector3 from, Vector3 to, GraphNode hint, out GraphHitInfo hit) {
+			return Linecast(
+				(Vector3)GetNearest(from, NNConstraint.None).node.position,
+				(Vector3)GetNearest(to, NNConstraint.None).node.position,
+				hint,
+				out hit
+				);
+		}
+
+		/** Returns if there is an obstacle between the two nodes on the graph.
+		 * This method is very similar to the other Linecast methods however it is much faster
+		 * due to being able to use only integer math and not having to look up which node is closest to a particular input point.
+		 *
+		 * \snippet MiscSnippets.cs GridGraph.Linecast1
+		 *
+		 * \astarpro
+		 */
+		public bool Linecast (GridNodeBase fromNode, GridNodeBase toNode) {
+			var dir = new Int2(toNode.XCoordinateInGrid - fromNode.XCoordinateInGrid, toNode.ZCoordinateInGrid - fromNode.ZCoordinateInGrid);
+
+			// How much further we move away from (or towards) the line when walking along the primary direction (e.g up and right or down and left).
+			// This isn't an actual distance. It is a signed distance so it can be negative (other side of the line)
+			// Also it includes an additional factor, but the same factor is used everywhere
+			// and we only check for if the signed distance is greater or equal to zero so it is ok
+			long primaryDirectionError = CrossMagnitude(dir, new Int2(System.Math.Sign(dir.x), System.Math.Sign(dir.y)));
+
+			/*            Y/Z
+			 *             |
+			 *  quadrant   |   quadrant
+			 *     1              0
+			 *             2
+			 *             |
+			 *   ----  3 - X - 1  ----- X
+			 *             |
+			 *             0
+			 *  quadrant       quadrant
+			 *     2       |      3
+			 *             |
+			 */
+
+			// Calculate the quadrant index as shown in the diagram above (the axes are part of the quadrants after them in the counter clockwise direction)
+			int quadrant = 0;
+
+			if (dir.x <= 0 && dir.y > 0) quadrant = 1;
+			else if (dir.x < 0 && dir.y <= 0) quadrant = 2;
+			else if (dir.x >= 0 && dir.y < 0) quadrant = 3;
+
+			// This will be (1,2) for quadrant 0 and (2,3) for quadrant 1 etc.
+			// & 0x3 is just the same thing as % 4 but it is faster
+			// This is the direction which moves further to the right of the segment (when looking from the start)
+			int directionToReduceError = (quadrant + 1) & 0x3;
+			// This is the direction which moves further to the left of the segment (when looking from the start)
+			int directionToIncreaseError = (quadrant + 2) & 0x3;
+			int directionDiagonal = (dir.x != 0 && dir.y != 0) ? 4 + ((quadrant + 1) & 0x3) : -1;
+			Int2 offset = new Int2(0, 0);
+			while (fromNode != null && fromNode.NodeInGridIndex != toNode.NodeInGridIndex) {
+				// This is proportional to the distance between the line and the node
+				var error = CrossMagnitude(dir, offset) * 2;
+
+				// How does the error change we take one step in the primary direction
+				var nerror = error + primaryDirectionError;
+
+				// Check if we need to reduce or increase the error (we want to keep it near zero)
+				// and pick the appropriate direction to move in
+				int ndir = nerror < 0 ? directionToIncreaseError : directionToReduceError;
+				if (nerror == 0 && directionDiagonal != -1) ndir = directionDiagonal;
+
+				fromNode = fromNode.GetNeighbourAlongDirection(ndir);
+				offset += new Int2(neighbourXOffsets[ndir], neighbourZOffsets[ndir]);
+			}
+			return fromNode != toNode;
+		}
 
 		/** Returns if \a node is connected to it's neighbour in the specified direction.
 		 * This will also return true if #neighbours = NumNeighbours.Four, the direction is diagonal and one can move through one of the adjacent nodes
@@ -1980,6 +2497,7 @@ namespace Pathfinding {
 			penaltyAnglePower = ctx.reader.ReadSingle();
 			isometricAngle = ctx.reader.ReadSingle();
 			uniformEdgeCosts = ctx.reader.ReadBoolean();
+			useJumpPointSearch = ctx.reader.ReadBoolean();
 		}
 
 		protected override void PostDeserialization (GraphSerializationContext ctx) {

@@ -55,6 +55,7 @@ namespace Pathfinding {
 		}
 
 		public override bool ContainsConnection (GraphNode node) {
+			if (connections == null) return false;
 			for (int i = 0; i < connections.Length; i++) if (connections[i].node == node) return true;
 			return false;
 		}

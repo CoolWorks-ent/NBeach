@@ -172,6 +172,11 @@ namespace Pathfinding {
 		 * \video{bfs.mp4}
 		 */
 		public static List<GraphNode> BFS (GraphNode seed, int depth, int tagMask = -1, System.Func<GraphNode, bool> filter = null) {
+			#if ASTAR_PROFILE
+			System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+			watch.Start();
+			#endif
+
 			BFSQueue = BFSQueue ?? new Queue<GraphNode>();
 			var que = BFSQueue;
 
@@ -225,6 +230,10 @@ namespace Pathfinding {
 			que.Clear();
 			map.Clear();
 
+			#if ASTAR_PROFILE
+			watch.Stop();
+			Debug.Log((1000*watch.Elapsed.TotalSeconds).ToString("0.0 ms"));
+			#endif
 			return result;
 		}
 
@@ -432,7 +441,9 @@ namespace Pathfinding {
 			clearanceRadius *= clearanceRadius;
 
 			if (clearanceRadius > 0 || nodes[0] is TriangleMeshNode
+#if !ASTAR_NO_GRID_GRAPH
 				|| nodes[0] is GridNode
+#endif
 				) {
 				// Accumulated area of all nodes
 				List<float> accs = ListPool<float>.Claim(nodes.Count);

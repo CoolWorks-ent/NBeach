@@ -11,7 +11,11 @@ namespace Pathfinding {
 
 			EditorGUI.BeginProperty(position, label, property);
 			EditorGUI.BeginChangeCheck();
+#if UNITY_2017_3_OR_NEWER
+			Enum enumNew = EditorGUI.EnumFlagsField(position, label, targetEnum);
+#else
 			Enum enumNew = EditorGUI.EnumMaskField(position, label, targetEnum);
+#endif
 			if (EditorGUI.EndChangeCheck() || !property.hasMultipleDifferentValues) {
 				property.intValue = (int)Convert.ChangeType(enumNew, targetEnum.GetType());
 			}

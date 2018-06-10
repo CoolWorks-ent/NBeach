@@ -26,8 +26,10 @@ namespace Pathfinding.Util {
 		/** Internal pool */
 		static readonly List<List<T> > pool = new List<List<T> >();
 
+#if !ASTAR_NO_POOLING
 		static readonly List<List<T> > largePool = new List<List<T> >();
 		static readonly HashSet<List<T> > inPool = new HashSet<List<T> >();
+#endif
 
 		/** When requesting a list with a specified capacity, search max this many lists in the pool before giving up.
 		 * Must be greater or equal to one.
@@ -42,6 +44,9 @@ namespace Pathfinding.Util {
 		 * After usage, this list should be released using the Release function (though not strictly necessary).
 		 */
 		public static List<T> Claim () {
+#if ASTAR_NO_POOLING
+			return new List<T>();
+#else
 			lock (pool) {
 				if (pool.Count > 0) {
 					List<T> ls = pool[pool.Count-1];
@@ -52,6 +57,7 @@ namespace Pathfinding.Util {
 
 				return new List<T>();
 			}
+#endif
 		}
 
 		static int FindCandidate (List<List<T> > pool, int capacity) {
@@ -88,6 +94,9 @@ namespace Pathfinding.Util {
 		 * if possible, otherwise the list with the largest capacity found will be returned.
 		 */
 		public static List<T> Claim (int capacity) {
+#if ASTAR_NO_POOLING
+			return new List<T>(capacity);
+#else
 			lock (pool) {
 				var currentPool = pool;
 				var listIndex = FindCandidate(pool, capacity);
@@ -111,6 +120,7 @@ namespace Pathfinding.Util {
 					return list;
 				}
 			}
+#endif
 		}
 
 		/** Makes sure the pool contains at least \a count pooled items with capacity \a size.
@@ -147,12 +157,15 @@ namespace Pathfinding.Util {
 		 * \see #Claim
 		 */
 		public static void Release (List<T> list) {
+#if !ASTAR_NO_POOLING
 			list.ClearFast();
 
 			lock (pool) {
+#if !ASTAR_OPTIMIZE_POOLING
 				if (!inPool.Add(list)) {
 					throw new InvalidOperationException("You are trying to pool a list twice. Please make sure that you only pool it once.");
 				}
+#endif
 				if (list.Capacity > LargeThreshold) {
 					largePool.Add(list);
 
@@ -165,6 +178,7 @@ namespace Pathfinding.Util {
 					pool.Add(list);
 				}
 			}
+#endif
 		}
 
 		/** Clears the pool for lists of this type.
@@ -172,7 +186,9 @@ namespace Pathfinding.Util {
 		 */
 		public static void Clear () {
 			lock (pool) {
+#if !ASTAR_OPTIMIZE_POOLING && !ASTAR_NO_POOLING
 				inPool.Clear();
+#endif
 				pool.Clear();
 			}
 		}

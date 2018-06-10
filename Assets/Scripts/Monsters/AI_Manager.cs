@@ -37,6 +37,5 @@ public class AI_Manager : MonoBehaviour {
 	public IEnumerator WaitTimer(float timer)
 	{
 		yield return new WaitForSeconds(timer);
-		Debug.LogWarning("Time is up for idle");
 	}
 }

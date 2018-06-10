@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 4235185281520024}
   - component: {fileID: 212983001215991754}
   - component: {fileID: 114294640627254004}
+  - component: {fileID: 95271318006699346}
   m_Layer: 0
   m_Name: Dark Boss_Char
   m_TagString: Untagged
@@ -249,7 +250,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1515900265881932}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 198.44926, y: 45.6, z: 65.7}
+  m_LocalPosition: {x: 198.44926, y: 45.08, z: 65.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4384341301156790}
@@ -637,6 +638,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &95271318006699346
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1857965077292806}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2fa935185ff389548b3ec02bb7dd1e71, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114160446447690622
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -660,14 +678,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6ebef78d6927241b99983bf31b06af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  darknessEnemy: {fileID: 114846825338175836, guid: 1df2a79315f0d6d49bbcddaee5ac5251,
+  darknessEnemy: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
     type: 2}
   spawnRate: 3
   spawnLocs:
   - {fileID: 4507610578215448}
   - {fileID: 4281586431361830}
   - {fileID: 4489060312636652}
-  enemyList: []
   spawningEnemies: 0
 --- !u!114 &114294640627254004
 MonoBehaviour:
@@ -682,6 +699,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MagicPos: {fileID: 1179248069456234}
   target: {fileID: 0}
+  ArmPivot: {fileID: 0}
+  darkHand: {fileID: 0}
   status: 1
   stage: 1
   attackState: 0

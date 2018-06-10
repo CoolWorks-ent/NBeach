@@ -235,6 +235,13 @@ namespace Pathfinding {
 		[UnityEngine.Serialization.FormerlySerializedAs("target")][SerializeField][HideInInspector]
 		Transform targetCompatibility;
 
+		protected AILerp () {
+			// Note that this needs to be set here in the constructor and not in e.g Awake
+			// because it is possible that other code runs and sets the destination property
+			// before the Awake method on this script runs.
+			destination = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+		}
+
 		/** Initializes reference variables.
 		 * If you override this function you should in most cases call base.Awake () at the start of it.
 		 * */

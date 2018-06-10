@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4400177786202110}
   - component: {fileID: 114595640382436030}
   - component: {fileID: 114729928814456672}
+  - component: {fileID: 114950399579548982}
   m_Layer: 0
   m_Name: AI Manager
   m_TagString: Untagged
@@ -35,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1087406834434032}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 178.78412, y: 44.86, z: 77.06829}
+  m_LocalPosition: {x: 178.78412, y: 43.62, z: 77.06829}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -54,11 +55,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   data:
-    dataString: UEsDBBQAAAgIAACAn+sXxltOTwIAAOAEAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVE1z2jAQ/SuMzk3GBprYvbWG0B7yMSGdXnwR1hprkCWPPkJIhv/elSywQ06Yt/vevv2wPwiXpoPKKr3SnN0rBuTHhPhn8m1CaIg9U8sVwiki3KgWrObVT7kVPjdB0EleK90u2RYKZaxBuKbCAIa0sp4tEfqYkLdIOMTfd/87OeJTBdKCHrLSfHadzfMsyWJ6Or+eRcatD83Tm0B0shK07YCt+TsM/OxUJuv1JXYWM3wblRKCm+iL2EMX2i5oZxx2hQmMU+wzOPL5DfBtY/HPdEx+rGsDNvai6WHBNY6rVyW/lG28UkvNrvf1SoXzdbI0nwZTver9l4SraZZP85BSa9X+PhVPE1/INrzaPdNDRY0dTXoMLz67d3JPxY5uBPxrQD6olVZOMgxa7TzVGZguRlLnBosGqt2Q1/u9AF33dbfpsNtjGMFbIXi78cj1vAfWQoWh554DGtfzBw2HWzFRCVFv4q+BF7odH1UM3HFtLIZiQendbZTTPpUsw8x8M84WSksIcPTcgaTCHp5Qxl7u8SI2KnsRuaP+tYnFY+z0VlxQAjzkJ8lF6Entz8syjdrfg2kenRVcwmDaBx5wToWSsj+z8UxOtLXTNa1GtK3j7PN5EcY2+c337HZON5Cmt+nVJqGz2Q0kSTqv87qekXB7XGKfVDz1RuN4cGtyEJd4Z6cPxmSlaRdOnmm6X/H3Vo1GzmWt1pUGkI+9wtk4aCyCryZbMo4DWoO1XIZ9k4+SCFXtgJVnoTJ0unyzmpaDSkk6/qqsR0pShG9JSY7k+B9QSwMEFAAACAgAAICf67SxQJttAAAAeAAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPUMzTSUVBKL0osyCgGihiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf6xfGW05PAgAA4AQAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf67SxQJttAAAAeAAAAAkAJAAAAAAAAAAAAAAAnAIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAABUAwAAAAA=
+    dataString: UEsDBBQAAAgIAACAn+t105t24AEAAK8DAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtUk1P4zAQ/StRzgvKR1PoHrdUcKB0lXBAoD1M7Eli4dhdx6GlVf/7evLRBrEn22/mvfG8maPPKjDALJoUuGgb/6cX/vB8ppXVrVnDfmWMNg6NCEUpM3FA9wyuEwfsQL5DLvEBRVnZIWsEl1LU+Tm1hn0m9Za4cdC/V7zER1SlrYjZgUKlWAqthiqxw5ALq82zkDiAYUKpdgBeviGvZ6RtkHjUlDUtOsSgxA9Q9t7AtspaUwDDteYk69/pJ21T/NsKgz7lQuNscYJLLaXgaEinANngNLjGpvpSYQw8ozEg1P8iBqcMNsinY/wOLQhJXfRGNe/ufvT8D5At/fQqiuPZzcw7UdNQrvuEtz/07ItmUG/PfpGJRluwztdeaE9TcejncB7o7OQKbRjyX7pVvFmicnIXRnibDJwouY4G2txN9xtzKDzygrHWbCzmoI7UVHpHBm5aK4XCiycUeHJzWWqlkNHPp+aPtGGAF5pCMNjYzB2s2ij5+fI6oZWt4F+d9FmQ3wZRuJjHN/N5HCRX4SxOiiRfLPIYEh7kfvdPoYQVIH+jAmlH19wyT6aroO4UU2Rujl63YLRF3MDuXhxqPZm4UIXOmNsCtek1zo25+YN07vFVt/UZWitUSVT/ePJP/wBQSwMEFAAACAgAAICf6xUUHY5vAAAAegAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPUMzTTUVBKL0osyCgGihiCOKWZKSB2tFKyQZKFgZGhpZmxuZmZsYGprqGJsWmaaZKlZZJxommKQZJSLFB9SWVBql9ibipET0BiSUZaZl5KZl66XlBqcmJxiTvIcKXYWgBQSwECLQAUAAAICAAAgJ/rddObduABAACvAwAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rFRQdjm8AAAB6AAAACQAkAAAAAAAAAAAAAAAtAgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAOcCAAAAAA==
     upgradeData: 
-    file_cachedStartup: {fileID: 0}
+    file_cachedStartup: {fileID: 4900000, guid: 21f303a13747b394aac2cb72b2113fdd,
+      type: 3}
     data_cachedStartup: 
-    cacheStartup: 0
+    cacheStartup: 1
   showNavGraphs: 1
   showUnwalkableNodes: 1
   debugMode: 0
@@ -67,7 +69,7 @@ MonoBehaviour:
   manualDebugFloorRoof: 0
   showSearchTree: 0
   unwalkableNodeDebugSize: 0.3
-  logPathResults: 1
+  logPathResults: 4
   maxNearestNodeDistance: 100
   scanOnStartup: 1
   fullGetNearestSearch: 0
@@ -81,7 +83,39 @@ MonoBehaviour:
     _ConnectionHighLerp: {r: 1, g: 0, b: 0, a: 0.5}
     _MeshEdgeColor: {r: 0, g: 0, b: 0, a: 0.5}
     _AreaColors: []
-  tagNames: []
+  tagNames:
+  - Basic Ground
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
   heuristic: 2
   heuristicScale: 1
   threadCount: 1
@@ -109,3 +143,21 @@ MonoBehaviour:
   player: {fileID: 0}
   ActiveDarkness: []
   maxEnemyCount: 0
+--- !u!114 &114950399579548982
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1087406834434032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1764de1de43cc4d19af52679d3eaae06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  desiredSimulationFPS: 20
+  workerThreads: 2
+  doubleBuffering: 0
+  symmetryBreakingBias: 0.1
+  movementPlane: 0
+  drawObstacles: 0

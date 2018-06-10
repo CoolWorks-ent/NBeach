@@ -59,7 +59,9 @@ namespace Pathfinding.Util {
 		/** Internal pool */
 		static List<T> pool = new List<T>();
 
+#if !ASTAR_NO_POOLING
 		static readonly HashSet<T> inPool = new HashSet<T>();
+#endif
 
 		/** Claim a object.
 		 * Returns a pooled object if any are in the pool.
@@ -67,6 +69,9 @@ namespace Pathfinding.Util {
 		 * After usage, this object should be released using the Release function (though not strictly necessary).
 		 */
 		public static T Claim () {
+#if ASTAR_NO_POOLING
+			return new T();
+#else
 			lock (pool) {
 				if (pool.Count > 0) {
 					T ls = pool[pool.Count-1];
@@ -77,6 +82,7 @@ namespace Pathfinding.Util {
 					return new T();
 				}
 			}
+#endif
 		}
 
 		/** Releases an object.
@@ -90,12 +96,16 @@ namespace Pathfinding.Util {
 		 * \see Claim
 		 */
 		public static void Release (ref T obj) {
+#if !ASTAR_NO_POOLING
 			lock (pool) {
+#if !ASTAR_OPTIMIZE_POOLING
 				if (!inPool.Add(obj)) {
 					throw new InvalidOperationException("You are trying to pool an object twice. Please make sure that you only pool it once.");
 				}
+#endif
 				pool.Add(obj);
 			}
+#endif
 			obj = null;
 		}
 
@@ -104,7 +114,9 @@ namespace Pathfinding.Util {
 		 */
 		public static void Clear () {
 			lock (pool) {
+#if !ASTAR_OPTIMIZE_POOLING && !ASTAR_NO_POOLING
 				inPool.Clear();
+#endif
 				pool.Clear();
 			}
 		}
