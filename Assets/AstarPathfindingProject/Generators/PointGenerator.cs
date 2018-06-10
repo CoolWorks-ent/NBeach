@@ -31,8 +31,7 @@ namespace Pathfinding {
 	 *
 	 */
 	[JsonOptIn]
-	public class PointGraph : NavGraph
-		, IUpdatableGraph {
+	public class PointGraph : NavGraph {
 		/** Childs of this transform are treated as nodes */
 		[JsonMember]
 		public Transform root;
@@ -80,30 +79,6 @@ namespace Pathfinding {
 		[JsonMember]
 		public LayerMask mask;
 
-		/** Optimizes the graph for sparse graphs.
-		 *
-		 * This can reduce calculation times for both scanning and for normal path requests by huge amounts.
-		 * It reduces the number of node-node checks that need to be done during scan, and can also optimize getting the nearest node from the graph (such as when querying for a path).
-		 *
-		 * Try enabling and disabling this option, check the scan times logged when you scan the graph to see if your graph is suited for this optimization
-		 * or if it makes it slower.
-		 *
-		 * The gain of using this optimization increases with larger graphs, the default scan algorithm is brute force and requires O(n^2) checks, this optimization
-		 * along with a graph suited for it, requires only O(n) checks during scan (assuming the connection distance limits are reasonable).
-		 *
-		 * \warning
-		 * When you have this enabled, you will not be able to move nodes around using scripting unless you recalculate the lookup structure at the same time.
-		 * \see #RebuildNodeLookup
-		 *
-		 * If you enable this during runtime, you will need to call #RebuildNodeLookup to make sure any existing nodes are added to the lookup structure.
-		 * If the graph doesn't have any nodes yet or if you are going to scan the graph afterwards then you do not need to do this.
-		 *
-		 * \astarpro
-		 */
-		[JsonMember]
-		public bool optimizeForSparseGraph;
-
-		PointKDTree lookupTree = new PointKDTree();
 
 		/** All nodes in this graph.
 		 * Note that only the first #nodeCount will be non-null.
@@ -136,9 +111,6 @@ namespace Pathfinding {
 		NNInfoInternal GetNearestInternal (Vector3 position, NNConstraint constraint, bool fastCheck) {
 			if (nodes == null) return new NNInfoInternal();
 
-			if (optimizeForSparseGraph) {
-				return new NNInfoInternal(lookupTree.GetNearest((Int3)position, fastCheck ? null : constraint));
-			}
 
 			float maxDistSqr = constraint == null || constraint.constrainDistance ? AstarPath.active.maxNearestNodeDistanceSqr : float.PositiveInfinity;
 
@@ -210,7 +182,6 @@ namespace Pathfinding {
 			nodes[nodeCount] = node;
 			nodeCount++;
 
-			if (optimizeForSparseGraph) AddToLookup(node);
 
 			return node;
 		}
@@ -258,15 +229,11 @@ namespace Pathfinding {
 		 * \astarpro
 		 */
 		public void RebuildNodeLookup () {
-			if (!optimizeForSparseGraph || nodes == null) {
-				lookupTree = new PointKDTree();
-			} else {
-				lookupTree.Rebuild(nodes, 0, nodeCount);
-			}
+			// A* Pathfinding Project Pro Only
 		}
 
 		void AddToLookup (PointNode node) {
-			lookupTree.Add(node);
+			// A* Pathfinding Project Pro Only
 		}
 
 		protected virtual PointNode[] CreateNodes (int count) {
@@ -323,29 +290,17 @@ namespace Pathfinding {
 				}
 			}
 
-			if (optimizeForSparseGraph) {
-				yield return new Progress(0.15f, "Building node lookup");
-				RebuildNodeLookup();
-			}
 
-			foreach (var progress in ConnectNodesAsync()) yield return progress.MapTo(0.16f, 1.0f);
-		}
-
-		/** Recalculates connections for all nodes in the graph.
-		 * This is useful if you have created nodes manually using #AddNode and then want to connect them in the same way as the point graph normally connects nodes.
-		 */
-		public void ConnectNodes () {
-			foreach (var progress in ConnectNodesAsync()) {}
+			foreach (var progress in ConnectNodes()) yield return progress.MapTo(0.16f, 1.0f);
 		}
 
 		/** Calculates connections for all nodes in the graph.
 		 * This is an IEnumerable, you can iterate through it using e.g foreach to get progress information.
 		 */
-		IEnumerable<Progress> ConnectNodesAsync () {
+		IEnumerable<Progress> ConnectNodes () {
 			if (maxDistance >= 0) {
 				// To avoid too many allocations, these lists are reused for each node
 				var connections = new List<Connection>();
-				var candidateConnections = new List<GraphNode>();
 
 				long maxSquaredRange;
 				// Max possible squared length of a connection between two nodes
@@ -368,34 +323,18 @@ namespace Pathfinding {
 
 					connections.Clear();
 					var node = nodes[i];
-					if (optimizeForSparseGraph) {
-						candidateConnections.Clear();
-						lookupTree.GetInRange(node.position, maxSquaredRange, candidateConnections);
-						for (int j = 0; j < candidateConnections.Count; j++) {
-							var other = candidateConnections[j] as PointNode;
-							float dist;
-							if (other != node && IsValidConnection(node, other, out dist)) {
-								connections.Add(new Connection(
-										other,
-										/** \todo Is this equal to .costMagnitude */
-										(uint)Mathf.RoundToInt(dist*Int3.FloatPrecision)
-										));
-							}
-						}
-					} else {
-						// Only brute force is available in the free version
-						for (int j = 0; j < nodeCount; j++) {
-							if (i == j) continue;
+					// Only brute force is available in the free version
+					for (int j = 0; j < nodeCount; j++) {
+						if (i == j) continue;
 
-							PointNode other = nodes[j];
-							float dist;
-							if (IsValidConnection(node, other, out dist)) {
-								connections.Add(new Connection(
-										other,
-										/** \todo Is this equal to .costMagnitude */
-										(uint)Mathf.RoundToInt(dist*Int3.FloatPrecision)
-										));
-							}
+						PointNode other = nodes[j];
+						float dist;
+						if (IsValidConnection(node, other, out dist)) {
+							connections.Add(new Connection(
+									other,
+									/** \todo Is this equal to .costMagnitude */
+									(uint)Mathf.RoundToInt(dist*Int3.FloatPrecision)
+									));
 						}
 					}
 					node.connections = connections.ToArray();
@@ -450,90 +389,6 @@ namespace Pathfinding {
 			return false;
 		}
 
-		GraphUpdateThreading IUpdatableGraph.CanUpdateAsync (GraphUpdateObject o) {
-			return GraphUpdateThreading.UnityThread;
-		}
-
-		void IUpdatableGraph.UpdateAreaInit (GraphUpdateObject o) {}
-		void IUpdatableGraph.UpdateAreaPost (GraphUpdateObject o) {}
-
-		/** Updates an area in the list graph.
-		 * Recalculates possibly affected connections, i.e all connectionlines passing trough the bounds of the \a guo will be recalculated
-		 * \astarpro */
-		void IUpdatableGraph.UpdateArea (GraphUpdateObject guo) {
-			if (nodes == null) return;
-
-			for (int i = 0; i < nodeCount; i++) {
-				var node = nodes[i];
-				if (guo.bounds.Contains((Vector3)node.position)) {
-					guo.WillUpdateNode(node);
-					guo.Apply(node);
-				}
-			}
-
-			if (guo.updatePhysics) {
-				// Use a copy of the bounding box, we should not change the GUO's bounding box since it might be used for other graph updates
-				Bounds bounds = guo.bounds;
-
-				if (thickRaycast) {
-					// Expand the bounding box to account for the thick raycast
-					bounds.Expand(thickRaycastRadius*2);
-				}
-
-				// Create a temporary list used for holding connection data
-				List<Connection> tmpList = Pathfinding.Util.ListPool<Connection>.Claim();
-
-				for (int i = 0; i < nodeCount; i++) {
-					PointNode node = nodes[i];
-					var nodePos = (Vector3)node.position;
-
-					List<Connection> conn = null;
-
-					for (int j = 0; j < nodeCount; j++) {
-						if (j == i) continue;
-
-						var otherNodePos = (Vector3)nodes[j].position;
-						// Check if this connection intersects the bounding box.
-						// If it does we need to recalculate that connection.
-						if (VectorMath.SegmentIntersectsBounds(bounds, nodePos, otherNodePos)) {
-							float dist;
-							PointNode other = nodes[j];
-							bool contains = node.ContainsConnection(other);
-							bool validConnection = IsValidConnection(node, other, out dist);
-
-							// Fill the 'conn' list when we need to change a connection
-							if (conn == null && (contains != validConnection)) {
-								tmpList.Clear();
-								conn = tmpList;
-								conn.AddRange(node.connections);
-							}
-
-							if (!contains && validConnection) {
-								// A new connection should be added
-								uint cost = (uint)Mathf.RoundToInt(dist*Int3.FloatPrecision);
-								conn.Add(new Connection(other, cost));
-							} else if (contains && !validConnection) {
-								// A connection should be removed
-								for (int q = 0; q < conn.Count; q++) {
-									if (conn[q].node == other) {
-										conn.RemoveAt(q);
-										break;
-									}
-								}
-							}
-						}
-					}
-
-					// Save the new connections if any were changed
-					if (conn != null) {
-						node.connections = conn.ToArray();
-					}
-				}
-
-				// Release buffers back to the pool
-				Pathfinding.Util.ListPool<Connection>.Release(ref tmpList);
-			}
-		}
 
 #if UNITY_EDITOR
 		public override void OnDrawGizmos (Pathfinding.Util.RetainedGizmos gizmos, bool drawNodes) {
@@ -584,8 +439,6 @@ namespace Pathfinding {
 			recursive = ctx.reader.ReadBoolean();
 			ctx.reader.ReadBoolean(); // Deprecated field
 			mask = (LayerMask)ctx.reader.ReadInt32();
-			optimizeForSparseGraph = ctx.reader.ReadBoolean();
-			ctx.reader.ReadBoolean(); // Deprecated field
 		}
 
 		protected override void SerializeExtraInfo (GraphSerializationContext ctx) {

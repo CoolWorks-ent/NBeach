@@ -10,34 +10,29 @@ public class IdleState : DarkState
     {
         stateType = EnemyState.IDLE;
     }
-    public override void InitializeState(DarkStateController controller)
+    public override void InitializeState(Darkness owner, DarkStateController controller)
     {
-        controller.owner.aIRichPath.canMove = false;
-        //Debug.Log("Entering idle state");
-        controller.animeController.SetTrigger(controller.idleHash);
+        dsStateController = controller;
+        owner.aIPath.canMove = false;
+        Debug.Log("Entering idle state");
+
+        ExitState(owner);
+    }
+
+    public override void UpdateState(Darkness owner)
+    {
+    }
+
+    public override void ExitState(Darkness owner)
+    {
+        AI_Manager.Instance.StartCoroutine(IdleTime(owner));
+        Debug.Log("Exiting idle state");
         
-        ExitState(controller);
     }
 
-    public override void UpdateState(DarkStateController controller)
-    {
-    }
-
-    public override void ExitState(DarkStateController controller)
-    {
-        float idleTime = controller.actionIdle;
-        if(controller.animeController.GetBool(controller.attackAfterHash))
-        {
-            idleTime = idleTime/2;
-            controller.animeController.SetBool(controller.attackAfterHash, true);
-        }
-        AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-    }
-
-    private IEnumerator IdleTime(DarkStateController controller, float idleTime)
+    private IEnumerator IdleTime(Darkness owner)
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
-        controller.owner.aIRichPath.canMove = true;
-        controller.ChangeState(EnemyState.CHASING, controller.owner);
+        dsStateController.ChangeState(EnemyState.CHASING, owner);
     }
 }

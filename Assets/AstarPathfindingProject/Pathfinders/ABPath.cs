@@ -64,10 +64,8 @@ namespace Pathfinding {
 		/** Saved original costs for the end node. \see ResetCosts */
 		protected int[] endNodeCosts;
 
-#if !ASTAR_NO_GRID_GRAPH
 		/** Used in EndPointGridGraphSpecialCase */
 		GridNode gridSpecialCaseNode;
-#endif
 
 		/** @{ @name Constructors */
 
@@ -156,12 +154,9 @@ namespace Pathfinding {
 			hTarget = new Int3();
 			endNodeCosts = null;
 
-#if !ASTAR_NO_GRID_GRAPH
 			gridSpecialCaseNode = null;
-#endif
 		}
 
-#if !ASTAR_NO_GRID_GRAPH
 		/** Applies a special case for grid nodes.
 		 *
 		 * Assume the closest walkable node is a grid node.
@@ -311,7 +306,6 @@ namespace Pathfinding {
 				}
 			}
 		}
-#endif
 
 		/** Prepares the path. Searches for start and end nodes and does some simple checking if a path is at all possible */
 		protected override void Prepare () {
@@ -366,14 +360,11 @@ namespace Pathfinding {
 					return;
 				}
 
-#if !ASTAR_NO_GRID_GRAPH
 				// Potentially we want to special case grid graphs a bit
 				// to better support some kinds of games
 				// If this returns true it will overwrite the
 				// endNode, endPoint, hTarget and hTargetNode fields
-				if (!EndPointGridGraphSpecialCase(endNNInfo.node))
-#endif
-				{
+				if (!EndPointGridGraphSpecialCase(endNNInfo.node)) {
 					// Note, other methods assume hTarget is (Int3)endPoint
 					hTarget = (Int3)endPoint;
 					hTargetNode = endNode;
@@ -455,7 +446,6 @@ namespace Pathfinding {
 				pathEndNode.flag2 = false;
 			}
 
-#if !ASTAR_NO_GRID_GRAPH
 			// Set flag1 and flag2 to false on all nodes we set it to true on
 			// at the start of the path call. Otherwise this state
 			// will leak to other path calculations and cause all
@@ -470,7 +460,6 @@ namespace Pathfinding {
 				SetFlagOnSurroundingGridNodes(gridSpecialCaseNode, 1, false);
 				SetFlagOnSurroundingGridNodes(gridSpecialCaseNode, 2, false);
 			}
-#endif
 		}
 
 		/** Completes the path using the specified target node.
@@ -478,7 +467,6 @@ namespace Pathfinding {
 		 * not just any random node.
 		 */
 		void CompleteWith (GraphNode node) {
-#if !ASTAR_NO_GRID_GRAPH
 			if (endNode == node) {
 				// Common case, no grid graph special case has been applied
 				// Nothing to do
@@ -498,13 +486,6 @@ namespace Pathfinding {
 				// to move to this node
 				endNode = node;
 			}
-#else
-			// This should always be true unless
-			// the grid graph special case has been applied
-			// which can only happen if grid graphs have not
-			// been stripped out with ASTAR_NO_GRID_GRAPH
-			node.MustBeEqual(endNode);
-#endif
 			// Mark the path as completed
 			CompleteState = PathCompleteState.Complete;
 		}

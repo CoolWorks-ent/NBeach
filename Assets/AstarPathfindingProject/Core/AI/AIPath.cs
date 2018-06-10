@@ -82,18 +82,7 @@ namespace Pathfinding {
 		public float slowdownDistance = 0.6F;
 
 		/** How far the AI looks ahead along the path to determine the point it moves to.
-		 * In world units.
-		 * If you enable the #alwaysDrawGizmos toggle this value will be visualized in the scene view as a blue circle around the agent.
 		 * \shadowimage{aipath_variables.png}
-		 *
-		 * Here are a few example videos showing some typical outcomes with good values as well as how it looks when this value is too low and too high.
-		 * <table>
-		 * <tr><td>\video_wide{aipath/picknext/video_02_default.mp4}</td><td>\xmlonly <verbatim><span class="label label-danger">Too low</span><br/></verbatim>\endxmlonly A too low value and a too low acceleration will result in the agent overshooting a lot and not managing to follow the path well.</td></tr>
-		 * <tr><td>\video_wide{aipath/picknext/video_02_100.mp4}</td><td>\xmlonly <verbatim><span class="label label-warning">Ok</span><br/></verbatim>\endxmlonly A low value but a high acceleration works decently to make the AI follow the path more closely. Note that the \link Pathfinding.AILerp AILerp\endlink component is better suited if you want the agent to follow the path without any deviations.</td></tr>
-		 * <tr><td>\video_wide{aipath/picknext/video_07_default.mp4}</td><td>\xmlonly <verbatim><span class="label label-success">Ok</span><br/></verbatim>\endxmlonly A reasonable value in this example.</td></tr>
-		 * <tr><td>\video_wide{aipath/picknext/video_10_default.mp4}</td><td>\xmlonly <verbatim><span class="label label-success">Ok</span><br/></verbatim>\endxmlonly A reasonable value in this example, but the path is followed slightly more loosely than in the previous video.</td></tr>
-		 * <tr><td>\video_wide{aipath/picknext/video_20_default.mp4}</td><td>\xmlonly <verbatim><span class="label label-danger">Too high</span><br/></verbatim>\endxmlonly A too high value will make the agent follow the path too loosely and may cause it to try to move through obstacles.</td></tr>
-		 * </table>
 		 */
 		public float pickNextWaypointDist = 2;
 
@@ -120,33 +109,6 @@ namespace Pathfinding {
 		 * regardless of what this field is set to.
 		 */
 		public CloseToDestinationMode whenCloseToDestination = CloseToDestinationMode.Stop;
-
-		/** Ensure that the character is always on the traversable surface of the navmesh.
-		 * When this option is enabled a \link AstarPath.GetNearest GetNearest\endlink query will be done every frame to find the closest node that the agent can walk on
-		 * and if the agent is not inside that node, then the agent will be moved to it.
-		 *
-		 * This is especially useful together with local avoidance in order to avoid agents pushing each other into walls.
-		 * \see \ref local-avoidance for more info about this.
-		 *
-		 * This option also integrates with local avoidance so that if the agent is say forced into a wall by other agents the local avoidance
-		 * system will be informed about that wall and can take that into account.
-		 *
-		 * Enabling this has some performance impact depending on the graph type (pretty fast for grid graphs, slightly slower for navmesh/recast graphs).
-		 * If you are using a navmesh/recast graph you may want to switch to the \link Pathfinding.RichAI RichAI\endlink movement script which is specifically written for navmesh/recast graphs and
-		 * does this kind of clamping out of the box. In many cases it can also follow the path more smoothly around sharp bends in the path.
-		 *
-		 * It is not recommended that you use this option together with the funnel modifier on grid graphs because the funnel modifier will make the path
-		 * go very close to the border of the graph and this script has a tendency to try to cut corners a bit. This may cause it to try to go slightly outside the
-		 * traversable surface near corners and that will look bad if this option is enabled.
-		 *
-		 * \warning This option makes no sense to use on point graphs because point graphs do not have a surface.
-		 * Enabling this option when using a point graph will lead to the agent being snapped to the closest node every frame which is likely not what you want.
-		 *
-		 * Below you can see an image where several agents using local avoidance were ordered to go to the same point in a corner.
-		 * When not constraining the agents to the graph they are easily pushed inside obstacles.
-		 * \shadowimage{constrained_inside.png}
-		 */
-		public bool constrainInsideGraph = false;
 
 		/** Current path which is followed */
 		protected Path path;
@@ -337,19 +299,6 @@ namespace Pathfinding {
 
 			ApplyGravity(deltaTime);
 
-			if (rvoController != null && rvoController.enabled) {
-				// Send a message to the RVOController that we want to move
-				// with this velocity. In the next simulation step, this
-				// velocity will be processed and it will be fed back to the
-				// rvo controller and finally it will be used by this script
-				// when calling the CalculateMovementDelta method below
-
-				// Make sure that we don't move further than to the end point
-				// of the path. If the RVO simulation FPS is low and we did
-				// not do this, the agent might overshoot the target a lot.
-				var rvoTarget = currentPosition + movementPlane.ToWorld(Vector2.ClampMagnitude(velocity2D, distanceToEnd), 0f);
-				rvoController.SetTarget(rvoTarget, velocity2D.magnitude, maxSpeed);
-			}
 
 			// Set how much the agent wants to move during this frame
 			var delta2D = lastDeltaPosition = CalculateDeltaToMoveThisFrame(movementPlane.ToPlane(currentPosition), distanceToEnd, deltaTime);
@@ -360,16 +309,7 @@ namespace Pathfinding {
 		protected virtual void CalculateNextRotation (float slowdown, out Quaternion nextRotation) {
 			if (lastDeltaTime > 0.00001f) {
 				Vector2 desiredRotationDirection;
-				if (rvoController != null && rvoController.enabled) {
-					// When using local avoidance, use the actual velocity we are moving with if that velocity
-					// is high enough, otherwise fall back to the velocity that we want to move with (velocity2D).
-					// The local avoidance velocity can be very jittery when the character is close to standing still
-					// as it constantly makes small corrections. We do not want the rotation of the character to be jittery.
-					var actualVelocity = lastDeltaPosition/lastDeltaTime;
-					desiredRotationDirection = Vector2.Lerp(velocity2D, actualVelocity, 4 * actualVelocity.magnitude / (maxSpeed + 0.0001f));
-				} else {
-					desiredRotationDirection = velocity2D;
-				}
+				desiredRotationDirection = velocity2D;
 
 				// Rotate towards the direction we are moving in.
 				// Don't rotate when we are very close to the target.
@@ -379,39 +319,6 @@ namespace Pathfinding {
 				// TODO: simulatedRotation
 				nextRotation = rotation;
 			}
-		}
-
-		static NNConstraint cachedNNConstraint = NNConstraint.Default;
-		protected override Vector3 ClampToNavmesh (Vector3 position, out bool positionChanged) {
-			if (constrainInsideGraph) {
-				cachedNNConstraint.tags = seeker.traversableTags;
-				cachedNNConstraint.graphMask = seeker.graphMask;
-				cachedNNConstraint.distanceXZ = true;
-				var clampedPosition = AstarPath.active.GetNearest(position, cachedNNConstraint).position;
-
-				// We cannot simply check for equality because some precision may be lost
-				// if any coordinate transformations are used.
-				var difference = movementPlane.ToPlane(clampedPosition - position);
-				float sqrDifference = difference.sqrMagnitude;
-				if (sqrDifference > 0.001f*0.001f) {
-					// The agent was outside the navmesh. Remove that component of the velocity
-					// so that the velocity only goes along the direction of the wall, not into it
-					velocity2D -= difference * Vector2.Dot(difference, velocity2D) / sqrDifference;
-
-					// Make sure the RVO system knows that there was a collision here
-					// Otherwise other agents may think this agent continued
-					// to move forwards and avoidance quality may suffer
-					if (rvoController != null && rvoController.enabled) {
-						rvoController.SetCollisionNormal(difference);
-					}
-					positionChanged = true;
-					// Return the new position, but ignore any changes in the y coordinate from the ClampToNavmesh method as the y coordinates in the navmesh are rarely very accurate
-					return position + movementPlane.ToWorld(difference);
-				}
-			}
-
-			positionChanged = false;
-			return position;
 		}
 
 	#if UNITY_EDITOR

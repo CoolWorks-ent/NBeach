@@ -36,7 +36,6 @@ namespace Pathfinding {
 						result.Add((Vector3)vertices[i]);
 					}
 				});
-#if !ASTAR_NO_GRID_GRAPH
 			} else if (graph is GridGraph) {
 				GetContours(graph as GridGraph, vertices => {
 					for (int j = vertices.Length - 1, i = 0; i < vertices.Length; j = i, i++) {
@@ -44,7 +43,6 @@ namespace Pathfinding {
 						result.Add((Vector3)vertices[i]);
 					}
 				}, 0);
-#endif
 			}
 			return result;
 		}
@@ -132,7 +130,6 @@ namespace Pathfinding {
 			// Set of all allowed nodes or null if all nodes are allowed
 			HashSet<GridNodeBase> nodeSet = nodes != null ? new HashSet<GridNodeBase>(nodes) : null;
 			// Use all nodes if the nodes parameter is null
-			if (grid is LayerGridGraph) nodes = nodes ?? (grid as LayerGridGraph).nodes;
 			nodes = nodes ?? grid.nodes;
 			int[] neighbourXOffsets = grid.neighbourXOffsets;
 			int[] neighbourZOffsets = grid.neighbourZOffsets;

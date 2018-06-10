@@ -1,35 +1,6 @@
 /** \page changelog Changelog
 \order{-10}
 
-- 4.1.16 (2018-04-26)
-	- Fixed PointNode.ContainsConnection could throw an exception if the node didn't have any connections.
-	- Fixed AILerp's started out with a destination set to (0,0,0) instead of not having a destination set.
-		So if you did not set a destination for it, it would try to move to the world origin.
-
-- 4.1.15 (2018-04-06)
-	- Fixed RichAI.desiredVelocity always being zero. Thanks sukrit1234 for finding the bug.
-	- Added some video examples to \link Pathfinding.AIPath.pickNextWaypointDist AIPath.pickNextWaypointDist\endlink.
-	- Fixed a bug introduced in 4.1.14 which caused scanning recast graphs in the Unity editor to fail with an error sometimes.
-	- Fixed the position returned from querying the closest point on the graph to a point (AstarPath.GetNearest) on layered grid graphs would always be the node center, not the closest point on the node's surface. Thanks Kevin_Jenkins for reporting this.
-		This caused among other things the ClosestOnNode option for the Seeker's StartEndModifier to be identical to the SnapToNode option.
-	- Fixed RVOController.velocity being zero when the game was paused (Time.timeScale = 0).
-
-- 4.1.14 (2018-03-06)
-	- Fixed Pathfinding.GridNode.ClosestPointOnNode being completely broken. Thanks Ivan for reporting this.
-		This was used internally in some cases when pathfinding on grid graphs. So this fixes a few cases of strange pathfinding results too.
-	- It is now possible to use pathfinding from editor scripts. See \ref editor-mode.
-
-- 4.1.13 (2018-03-06)
-	- Fixed LayerGridGraph.GetNode not performing out of bounds checks.
-	- Exposed a public method \link Pathfinding.PointGraph.ConnectNodes PointGraph.ConnectNodes\endlink which can be useful if you are creating a graph from scratch using e.g PointGraph.AddNode.
-	- Improved the \ref multiple-agent-types tutorial.
-	- Improved the \ref custom_movement_script tutorial, among other things it can now also be followed if you are creating a 2D game.
-		The movement script that you write has also been improved.
-	- Improved how the RichAI movement script keeps track of the node it is on. It should now be more stable in some cases, especially when the ground's y-coordinate lines up badly with the y-coordinate of the navmesh.
-	- Added an \link Pathfinding.AIPath.constrainInsideGraph option\endlink to AIPath for constraining the agent to be inside the traversable surface of the graph at all times.
-		I think it should work everywhere without any issues, but please post in the forum if anything seems to break.
-	- Fixed the proper fonts were not imported in the documentation html, so for many browsers it fell back to some other less pretty font.
-
 - 4.1.12 (2018-02-27)
 	- Fixed right clicking on array elements in the Unity inspector would bring up the 'Show in online documentation' context menu instead of the Unity built-in context menu (which is very useful).
 	- Navmesh assets used in the navmesh graph no longer have to be at the root of the Resources folder, they can be in any subfolder to the Resources folder.

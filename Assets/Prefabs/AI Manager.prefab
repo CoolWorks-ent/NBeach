@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4400177786202110}
   - component: {fileID: 114595640382436030}
   - component: {fileID: 114729928814456672}
-  - component: {fileID: 114477791742334388}
   m_Layer: 0
   m_Name: AI Manager
   m_TagString: Untagged
@@ -36,30 +35,12 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1087406834434032}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 178.78412, y: 43.62, z: 77.06829}
+  m_LocalPosition: {x: 178.78412, y: 44.86, z: 77.06829}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114477791742334388
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1087406834434032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1764de1de43cc4d19af52679d3eaae06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  desiredSimulationFPS: 20
-  workerThreads: 2
-  doubleBuffering: 0
-  symmetryBreakingBias: 0.1
-  movementPlane: 0
-  drawObstacles: 0
 --- !u!114 &114595640382436030
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -73,12 +54,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   data:
-    dataString: UEsDBBQAAAgIAACAn+tolPfN6QEAALkDAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtUk1z2jAQ/SuMzw1jbMCmxxImPZTQsXPIJNPDRlrbmgiJSnIgMPz3av0BZtKTpLf73q7e7ilgFRhgDk0GXNQ2+D6ajGffRgHTyunarOGwMkYbj0eEopS5OKJ/hk3aHuQ7vEn8iaKsXJfVg0sptm+X1C0ccql3xI3D9r3iJf5CVbqKmA0oVIal0KqrEnsMuXDaPAmJHTiJUg+7Dnj+grxckNoi8ehbztToEYMSP0C5BwO7Kq9NAQzXmpNscK8ftcvwby0MBpQL1hvjBZdaSsHRkE4B0uIwuEZb3VToA09oDAj1v4hBHGqxTj/rE+7RgZD0jdYp++7vp1HwAbKmVu+m4SIdnenPUK7b8OsferY1c9juLnaRh0Y7cN7WVuZAQ/HoZ3ce6WzkCm0Y8h+6VtwuUXm5K2OSpOMknU464jQez6OOnCTjcJ5Giy8aXQu9QthXnfZlPdSQbKX35OSmdlIovJpGgUc/oKVWChn9wd4GidUN8hpQCAaty/3Bqo2Sn88vA7/LWvBbQ4MiitIiCmfpJIUC+OIuSuMo4fNZGsXzZM5nQdOmUMIJkL9RgXS9fX6pB1NWsG0UM2R+nKNm0WibuIH9gzhu9aB/oQqdM78NatNq9B1avwYgvXl81Wx/js4JVRI1OJ2D8z9QSwMEFAAACAgAAICf68Scx75vAAAAegAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPUMzTTUVBKL0osyCgGihiCOKWZKSB2tFKakZFFmpGBqYWhRWJaYoqlrpGFsZF5ipmphZGxmblZiqlSLFB9SWVBql9ibipET0BiSUZaZl5KZl66XlBqcmJxiTvIcKXYWgBQSwECLQAUAAAICAAAgJ/raJT3zekBAAC5AwAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rxJzHvm8AAAB6AAAACQAkAAAAAAAAAAAAAAA2AgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAPACAAAAAA==
+    dataString: UEsDBBQAAAgIAACAn+sXxltOTwIAAOAEAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVE1z2jAQ/SuMzk3GBprYvbWG0B7yMSGdXnwR1hprkCWPPkJIhv/elSywQ06Yt/vevv2wPwiXpoPKKr3SnN0rBuTHhPhn8m1CaIg9U8sVwiki3KgWrObVT7kVPjdB0EleK90u2RYKZaxBuKbCAIa0sp4tEfqYkLdIOMTfd/87OeJTBdKCHrLSfHadzfMsyWJ6Or+eRcatD83Tm0B0shK07YCt+TsM/OxUJuv1JXYWM3wblRKCm+iL2EMX2i5oZxx2hQmMU+wzOPL5DfBtY/HPdEx+rGsDNvai6WHBNY6rVyW/lG28UkvNrvf1SoXzdbI0nwZTver9l4SraZZP85BSa9X+PhVPE1/INrzaPdNDRY0dTXoMLz67d3JPxY5uBPxrQD6olVZOMgxa7TzVGZguRlLnBosGqt2Q1/u9AF33dbfpsNtjGMFbIXi78cj1vAfWQoWh554DGtfzBw2HWzFRCVFv4q+BF7odH1UM3HFtLIZiQendbZTTPpUsw8x8M84WSksIcPTcgaTCHp5Qxl7u8SI2KnsRuaP+tYnFY+z0VlxQAjzkJ8lF6Entz8syjdrfg2kenRVcwmDaBx5wToWSsj+z8UxOtLXTNa1GtK3j7PN5EcY2+c337HZON5Cmt+nVJqGz2Q0kSTqv87qekXB7XGKfVDz1RuN4cGtyEJd4Z6cPxmSlaRdOnmm6X/H3Vo1GzmWt1pUGkI+9wtk4aCyCryZbMo4DWoO1XIZ9k4+SCFXtgJVnoTJ0unyzmpaDSkk6/qqsR0pShG9JSY7k+B9QSwMEFAAACAgAAICf67SxQJttAAAAeAAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPUMzTSUVBKL0osyCgGihiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf6xfGW05PAgAA4AQAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf67SxQJttAAAAeAAAAAkAJAAAAAAAAAAAAAAAnAIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAABUAwAAAAA=
     upgradeData: 
-    file_cachedStartup: {fileID: 4900000, guid: 5c193394c91c08a47b1fbdb0acbc4b0e,
-      type: 3}
+    file_cachedStartup: {fileID: 0}
     data_cachedStartup: 
-    cacheStartup: 1
+    cacheStartup: 0
   showNavGraphs: 1
   showUnwalkableNodes: 1
   debugMode: 0
@@ -87,7 +67,7 @@ MonoBehaviour:
   manualDebugFloorRoof: 0
   showSearchTree: 0
   unwalkableNodeDebugSize: 0.3
-  logPathResults: 4
+  logPathResults: 1
   maxNearestNodeDistance: 100
   scanOnStartup: 1
   fullGetNearestSearch: 0
@@ -128,4 +108,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   ActiveDarkness: []
-  maxEnemyCount: 5
+  maxEnemyCount: 0

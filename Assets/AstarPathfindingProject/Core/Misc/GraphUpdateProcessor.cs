@@ -386,10 +386,6 @@ namespace Pathfinding {
 		 * \see Pathfinding.Node.area
 		 */
 		public void FloodFill () {
-			#if ASTARDEBUG
-			System.DateTime startTime = System.DateTime.UtcNow;
-			#endif
-
 			var graphs = astar.graphs;
 
 			if (graphs == null) {
@@ -460,10 +456,6 @@ namespace Pathfinding {
 
 			// Put back into the pool
 			Pathfinding.Util.StackPool<GraphNode>.Release(stack);
-
-			#if ASTARDEBUG
-			Debug.Log("Flood fill complete, "+area+" area"+(area > 1 ? "s" : "")+" found - "+((System.DateTime.UtcNow.Ticks-startTime.Ticks)*0.0001).ToString("0.00")+" ms");
-			#endif
 		}
 	}
 }

@@ -39,8 +39,6 @@ namespace Pathfinding {
 				graph.mask = EditorGUILayoutx.LayerMaskField("Mask", graph.mask);
 				EditorGUI.indentLevel--;
 			}
-
-			graph.optimizeForSparseGraph = EditorGUILayout.Toggle(new GUIContent("Optimize For Sparse Graph", "Check online documentation for more information."), graph.optimizeForSparseGraph);
 		}
 	}
 }
