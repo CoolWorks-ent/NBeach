@@ -331,6 +331,7 @@ namespace Pathfinding {
 			// No connection was found between the nodes
 			// Check if there is a node link that connects them
 			if (edge == -1) {
+				#if !ASTAR_NO_POINT_GRAPH
 				for (int i = 0; i < connections.Length; i++) {
 					if (connections[i].node.GraphIndex != GraphIndex) {
 						var mid = connections[i].node as NodeLink3Node;
@@ -341,6 +342,7 @@ namespace Pathfinding {
 						}
 					}
 				}
+				#endif
 
 				return false;
 			}

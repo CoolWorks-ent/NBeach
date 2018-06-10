@@ -131,7 +131,7 @@ namespace Pathfinding {
 		int Lock (bool block) {
 			queue.Block();
 
-			if (block && Application.isPlaying) {
+			if (block) {
 				while (!queue.AllReceiversBlocked) {
 					if (IsUsingMultithreading) {
 						Thread.Sleep(1);
@@ -271,115 +271,121 @@ namespace Pathfinding {
 		 * \astarpro
 		 */
 		void CalculatePathsThreaded (PathHandler pathHandler) {
+#if !ASTAR_FAST_BUT_NO_EXCEPTIONS
 			try {
-				// Max number of ticks we are allowed to continue working in one run.
-				// One tick is 1/10000 of a millisecond.
-				// We need to check once in a while if the thread should be stopped.
-				long maxTicks = (long)(10*10000);
-				long targetTick = System.DateTime.UtcNow.Ticks + maxTicks;
-
-				while (true) {
-					// The path we are currently calculating
-					Path path = queue.Pop();
-					// Access the internal implementation methods
-					IPathInternals ipath = (IPathInternals)path;
-
-					// Trying to prevent simple modding to allow more than one thread
-					if (pathHandler.threadID > 0) {
-						throw new System.Exception("Thread Error");
-					}
-
-					AstarProfiler.StartFastProfile(0);
-					ipath.PrepareBase(pathHandler);
-
-					// Now processing the path
-					// Will advance to Processing
-					ipath.AdvanceState(PathState.Processing);
-
-					// Call some callbacks
-					if (OnPathPreSearch != null) {
-						OnPathPreSearch(path);
-					}
-
-					// Tick for when the path started, used for calculating how long time the calculation took
-					long startTicks = System.DateTime.UtcNow.Ticks;
-
-					// Prepare the path
-					ipath.Prepare();
-
-					AstarProfiler.EndFastProfile(0);
-
-					if (!path.IsDone()) {
-						// For visualization purposes, we set the last computed path to p, so we can view debug info on it in the editor (scene view).
-						astar.debugPathData = ipath.PathHandler;
-						astar.debugPathID = path.pathID;
-
-						AstarProfiler.StartFastProfile(1);
-
-						// Initialize the path, now ready to begin search
-						ipath.Initialize();
-
-						AstarProfiler.EndFastProfile(1);
-
-						// Loop while the path has not been fully calculated
-						while (!path.IsDone()) {
-							// Do some work on the path calculation.
-							// The function will return when it has taken too much time
-							// or when it has finished calculation
-							AstarProfiler.StartFastProfile(2);
-							ipath.CalculateStep(targetTick);
-							AstarProfiler.EndFastProfile(2);
-
-							targetTick = System.DateTime.UtcNow.Ticks + maxTicks;
-
-							// Cancel function (and thus the thread) if no more paths should be accepted.
-							// This is done when the A* object is about to be destroyed
-							// The path is returned and then this function will be terminated
-							if (queue.IsTerminating) {
-								path.FailWithError("AstarPath object destroyed");
-							}
-						}
-
-						path.duration = (System.DateTime.UtcNow.Ticks - startTicks)*0.0001F;
-					}
-
-					// Cleans up node tagging and other things
-					ipath.Cleanup();
-
-					AstarProfiler.StartFastProfile(9);
-
-					if (path.immediateCallback != null) path.immediateCallback(path);
-
-					if (OnPathPostSearch != null) {
-						OnPathPostSearch(path);
-					}
-
-					// Push the path onto the return stack
-					// It will be detected by the main Unity thread and returned as fast as possible (the next late update hopefully)
-					returnQueue.Enqueue(path);
-
-					// Will advance to ReturnQueue
-					ipath.AdvanceState(PathState.ReturnQueue);
-
-					AstarProfiler.EndFastProfile(9);
-				}
-			}
-			catch (System.Exception e) {
-#if !NETFX_CORE
-				if (e is ThreadAbortException || e is ThreadControlQueue.QueueTerminationException)
-#else
-				if (e is ThreadControlQueue.QueueTerminationException)
 #endif
-				{
-					if (astar.logPathResults == PathLog.Heavy)
-						Debug.LogWarning("Shutting down pathfinding thread #" + pathHandler.threadID);
-					return;
+
+			// Max number of ticks we are allowed to continue working in one run.
+			// One tick is 1/10000 of a millisecond.
+			// We need to check once in a while if the thread should be stopped.
+			long maxTicks = (long)(10*10000);
+			long targetTick = System.DateTime.UtcNow.Ticks + maxTicks;
+
+			while (true) {
+				// The path we are currently calculating
+				Path path = queue.Pop();
+				// Access the internal implementation methods
+				IPathInternals ipath = (IPathInternals)path;
+
+
+				AstarProfiler.StartFastProfile(0);
+				ipath.PrepareBase(pathHandler);
+
+				// Now processing the path
+				// Will advance to Processing
+				ipath.AdvanceState(PathState.Processing);
+
+				// Call some callbacks
+				if (OnPathPreSearch != null) {
+					OnPathPreSearch(path);
 				}
-				Debug.LogException(e);
-				Debug.LogError("Unhandled exception during pathfinding. Terminating.");
-				// Unhandled exception, kill pathfinding
-				queue.TerminateReceivers();
+
+				// Tick for when the path started, used for calculating how long time the calculation took
+				long startTicks = System.DateTime.UtcNow.Ticks;
+
+				// Prepare the path
+				ipath.Prepare();
+
+				AstarProfiler.EndFastProfile(0);
+
+				if (!path.IsDone()) {
+					// For visualization purposes, we set the last computed path to p, so we can view debug info on it in the editor (scene view).
+					astar.debugPathData = ipath.PathHandler;
+					astar.debugPathID = path.pathID;
+
+					AstarProfiler.StartFastProfile(1);
+
+					// Initialize the path, now ready to begin search
+					ipath.Initialize();
+
+					AstarProfiler.EndFastProfile(1);
+
+					// Loop while the path has not been fully calculated
+					while (!path.IsDone()) {
+						// Do some work on the path calculation.
+						// The function will return when it has taken too much time
+						// or when it has finished calculation
+						AstarProfiler.StartFastProfile(2);
+						ipath.CalculateStep(targetTick);
+						AstarProfiler.EndFastProfile(2);
+
+						targetTick = System.DateTime.UtcNow.Ticks + maxTicks;
+
+						// Cancel function (and thus the thread) if no more paths should be accepted.
+						// This is done when the A* object is about to be destroyed
+						// The path is returned and then this function will be terminated
+						if (queue.IsTerminating) {
+							path.FailWithError("AstarPath object destroyed");
+						}
+					}
+
+					path.duration = (System.DateTime.UtcNow.Ticks - startTicks)*0.0001F;
+
+#if ProfileAstar
+					System.Threading.Interlocked.Increment(ref AstarPath.PathsCompleted);
+					System.Threading.Interlocked.Add(ref AstarPath.TotalSearchTime, System.DateTime.UtcNow.Ticks - startTicks);
+#endif
+				}
+
+				// Cleans up node tagging and other things
+				ipath.Cleanup();
+
+				AstarProfiler.StartFastProfile(9);
+
+				if (path.immediateCallback != null) path.immediateCallback(path);
+
+				if (OnPathPostSearch != null) {
+					OnPathPostSearch(path);
+				}
+
+				// Push the path onto the return stack
+				// It will be detected by the main Unity thread and returned as fast as possible (the next late update hopefully)
+				returnQueue.Enqueue(path);
+
+				// Will advance to ReturnQueue
+				ipath.AdvanceState(PathState.ReturnQueue);
+
+				AstarProfiler.EndFastProfile(9);
 			}
+#if !ASTAR_FAST_BUT_NO_EXCEPTIONS
+		}
+		catch (System.Exception e) {
+#if !NETFX_CORE
+			if (e is ThreadAbortException || e is ThreadControlQueue.QueueTerminationException)
+#else
+			if (e is ThreadControlQueue.QueueTerminationException)
+#endif
+			{
+				if (astar.logPathResults == PathLog.Heavy)
+					Debug.LogWarning("Shutting down pathfinding thread #" + pathHandler.threadID);
+				return;
+			}
+			Debug.LogException(e);
+			Debug.LogError("Unhandled exception during pathfinding. Terminating.");
+			// Unhandled exception, kill pathfinding
+			queue.TerminateReceivers();
+		}
+#endif
 
 			Debug.LogError("Error : This part should never be reached.");
 			queue.ReceiverTerminated();
@@ -505,6 +511,10 @@ namespace Pathfinding {
 
 					totalTicks += System.DateTime.UtcNow.Ticks-startTicks;
 					p.duration = totalTicks*0.0001F;
+
+					#if ProfileAstar
+					System.Threading.Interlocked.Increment(ref AstarPath.PathsCompleted);
+					#endif
 				}
 
 				// Cleans up node tagging and other things

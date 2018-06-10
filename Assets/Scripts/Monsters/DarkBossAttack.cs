@@ -97,10 +97,10 @@ public class DarkBossAttack : MonoBehaviour {
             //event call for player damaged
             EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
             //kick off destruction animation for rock cover
+            AstarPath.active.UpdateGraphs(collider.bounds);
             Destroy(collider.gameObject);
             //Destroy(this.gameObject);
 
         }
-
     }
 }

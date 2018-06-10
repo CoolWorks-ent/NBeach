@@ -29,17 +29,31 @@ namespace Pathfinding {
 		 */
 		public NavMeshGraph navmesh { get; private set; }
 
+#if !ASTAR_NO_GRID_GRAPH
 		/** Shortcut to the first GridGraph.
 		 * Updated at scanning time
 		 */
 		public GridGraph gridGraph { get; private set; }
 
+		/** Shortcut to the first LayerGridGraph.
+		 * Updated at scanning time.
+		 * \astarpro
+		 */
+		public LayerGridGraph layerGridGraph { get; private set; }
+#endif
 
+#if !ASTAR_NO_POINT_GRAPH
 		/** Shortcut to the first PointGraph.
 		 * Updated at scanning time
 		 */
 		public PointGraph pointGraph { get; private set; }
+#endif
 
+		/** Shortcut to the first RecastGraph.
+		 * Updated at scanning time.
+		 * \astarpro
+		 */
+		public RecastGraph recastGraph { get; private set; }
 
 		/** All supported graph types.
 		 * Populated through reflection search
@@ -51,9 +65,15 @@ namespace Pathfinding {
 		 * If you add any custom graph types, you need to add them to this hard-coded list.
 		 */
 		public static readonly System.Type[] DefaultGraphTypes = new System.Type[] {
+#if !ASTAR_NO_GRID_GRAPH
 			typeof(GridGraph),
+#endif
+#if !ASTAR_NO_POINT_GRAPH
 			typeof(PointGraph),
+#endif
 			typeof(NavMeshGraph),
+			typeof(RecastGraph),
+			typeof(LayerGridGraph)
 		};
 #endif
 
@@ -193,9 +213,16 @@ namespace Pathfinding {
 		public void UpdateShortcuts () {
 			navmesh = (NavMeshGraph)FindGraphOfType(typeof(NavMeshGraph));
 
+#if !ASTAR_NO_GRID_GRAPH
 			gridGraph = (GridGraph)FindGraphOfType(typeof(GridGraph));
+			layerGridGraph = (LayerGridGraph)FindGraphOfType(typeof(LayerGridGraph));
+#endif
 
+#if !ASTAR_NO_POINT_GRAPH
 			pointGraph = (PointGraph)FindGraphOfType(typeof(PointGraph));
+#endif
+
+			recastGraph = (RecastGraph)FindGraphOfType(typeof(RecastGraph));
 		}
 
 		/** Load from data from #file_cachedStartup */
@@ -244,6 +271,9 @@ namespace Pathfinding {
 			sr.SerializeExtraInfo();
 			byte[] bytes = sr.CloseSerialize();
 			checksum = sr.GetChecksum();
+	#if ASTARDEBUG
+			Debug.Log("Got a whole bunch of data, "+bytes.Length+" bytes");
+	#endif
 			graphLock.Release();
 			return bytes;
 		}
@@ -380,6 +410,10 @@ namespace Pathfinding {
 			}
 
 			graphTypes = graphList.ToArray();
+
+#if ASTARDEBUG
+			Debug.Log("Found "+graphTypes.Length+" graph types");
+#endif
 #else
 			graphTypes = DefaultGraphTypes;
 #endif

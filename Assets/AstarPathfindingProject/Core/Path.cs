@@ -26,6 +26,24 @@ namespace Pathfinding {
 
 	/** Base class for all path types */
 	public abstract class Path : IPathInternals {
+#if ASTAR_POOL_DEBUG
+		private string pathTraceInfo = "";
+		private List<string> claimInfo = new List<string>();
+		~Path() {
+			Debug.Log("Destroying " + GetType().Name + " instance");
+			if (claimed.Count > 0) {
+				Debug.LogWarning("Pool Is Leaking. See list of claims:\n" +
+					"Each message below will list what objects are currently claiming the path." +
+					" These objects have removed their reference to the path object but has not called .Release on it (which is bad).\n" + pathTraceInfo+"\n");
+				for (int i = 0; i < claimed.Count; i++) {
+					Debug.LogWarning("- Claim "+ (i+1) + " is by a " + claimed[i].GetType().Name + "\n"+claimInfo[i]);
+				}
+			} else {
+				Debug.Log("Some scripts are not using pooling.\n" + pathTraceInfo + "\n");
+			}
+		}
+#endif
+
 		/** Data for the thread calculating this path */
 		protected PathHandler pathHandler;
 
@@ -276,10 +294,19 @@ namespace Pathfinding {
 			switch (heuristic) {
 			case Heuristic.Euclidean:
 				h = (uint)(((GetHTarget() - node.position).costMagnitude)*heuristicScale);
+				// Inlining this check and the return
+				// for each case saves an extra jump.
+				// This code is pretty hot
+				if (hTargetNode != null) {
+					h = System.Math.Max(h, AstarPath.active.euclideanEmbedding.GetHeuristic(node.NodeIndex, hTargetNode.NodeIndex));
+				}
 				return h;
 			case Heuristic.Manhattan:
 				Int3 p2 = node.position;
 				h = (uint)((System.Math.Abs(hTarget.x-p2.x) + System.Math.Abs(hTarget.y-p2.y) + System.Math.Abs(hTarget.z-p2.z))*heuristicScale);
+				if (hTargetNode != null) {
+					h = System.Math.Max(h, AstarPath.active.euclideanEmbedding.GetHeuristic(node.NodeIndex, hTargetNode.NodeIndex));
+				}
 				return h;
 			case Heuristic.DiagonalManhattan:
 				Int3 p = GetHTarget() - node.position;
@@ -289,6 +316,9 @@ namespace Pathfinding {
 				int diag = System.Math.Min(p.x, p.z);
 				int diag2 = System.Math.Max(p.x, p.z);
 				h = (uint)((((14*diag)/10) + (diag2-diag) + p.y) * heuristicScale);
+				if (hTargetNode != null) {
+					h = System.Math.Max(h, AstarPath.active.euclideanEmbedding.GetHeuristic(node.NodeIndex, hTargetNode.NodeIndex));
+				}
 				return h;
 			}
 			return 0U;
@@ -452,6 +482,11 @@ namespace Pathfinding {
 		 * call the base function in inheriting types with base.Reset().
 		 */
 		protected virtual void Reset () {
+#if ASTAR_POOL_DEBUG
+			pathTraceInfo = "This path was got from the pool or created from here (stacktrace):\n";
+			pathTraceInfo += System.Environment.StackTrace;
+#endif
+
 			if (System.Object.ReferenceEquals(AstarPath.active, null))
 				throw new System.NullReferenceException("No AstarPath object found in the scene. " +
 					"Make sure there is one or do not create paths in Awake");
@@ -529,6 +564,9 @@ namespace Pathfinding {
 			}
 
 			claimed.Add(o);
+#if ASTAR_POOL_DEBUG
+			claimInfo.Add(o.ToString() + "\n\nClaimed from:\n" + System.Environment.StackTrace);
+#endif
 		}
 
 		/** Releases the path silently (pooling).
@@ -560,6 +598,9 @@ namespace Pathfinding {
 				// Need to use ReferenceEquals because it might be called from another thread
 				if (System.Object.ReferenceEquals(claimed[i], o)) {
 					claimed.RemoveAt(i);
+#if ASTAR_POOL_DEBUG
+					claimInfo.RemoveAt(i);
+#endif
 					if (!silent) {
 						releasedNotSilent = true;
 					}

@@ -9,7 +9,7 @@ namespace Pathfinding {
 		static bool tagPenaltiesOpen;
 		static List<Seeker> scripts = new List<Seeker>();
 
-		GUIContent[] exactnessLabels = new [] { new GUIContent("Snap To Node"), new GUIContent("Original"), new GUIContent("Interpolate (deprecated)"), new GUIContent("Closest On Node"), new GUIContent("Node Connection") };
+		GUIContent[] exactnessLabels = new [] { new GUIContent("Node Center (Snap To Node)"), new GUIContent("Original"), new GUIContent("Interpolate (deprecated)"), new GUIContent("Closest On Node Surface"), new GUIContent("Node Connection") };
 		string[] graphLabels = new string[32];
 
 		protected override void Inspector () {
@@ -82,6 +82,7 @@ namespace Pathfinding {
 				}
 				EditorGUILayout.EndVertical();
 
+#if !ASTAR_NoTagPenalty
 				EditorGUILayout.BeginVertical();
 				EditorGUILayout.LabelField("Penalty", EditorStyles.boldLabel, GUILayout.MaxWidth(100));
 				var prop = FindProperty("tagPenalties").FindPropertyRelative("Array");
@@ -100,6 +101,7 @@ namespace Pathfinding {
 					}
 				}
 				EditorGUILayout.EndVertical();
+#endif
 
 				EditorGUILayout.BeginVertical();
 				EditorGUILayout.LabelField("Traversable", EditorStyles.boldLabel, GUILayout.MaxWidth(100));

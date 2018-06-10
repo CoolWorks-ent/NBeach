@@ -2,8 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "Darkness/StateController")]
-public class DarkStateController : ScriptableObject
+public class DarkStateController : MonoBehaviour
 {
     DarkState currentState; 
 
@@ -12,8 +11,19 @@ public class DarkStateController : ScriptableObject
     public DarkState[] darkStates;
     Dictionary<EnemyState, DarkState> States;
 
-    public void OnEnable()
+    public Darkness owner;
+
+    public Animator animeController;
+    public int attackHash = Animator.StringToHash("Attack"),
+                attackAfterHash = Animator.StringToHash("AfterAttack"),
+                chaseHash = Animator.StringToHash("Chase"),
+                idleHash = Animator.StringToHash("Idle");
+    public int actionIdle;
+
+    private void Awake()
     {
+        actionIdle = 3;
+        animeController = GetComponentInChildren<Animator>();
         States = new Dictionary<EnemyState, DarkState>();
         for(int i = 0; i < darkStates.Length; i++)
         {
@@ -21,19 +31,33 @@ public class DarkStateController : ScriptableObject
         }
     }
 
+    private void Start()
+    {
+        owner = GetComponent<Darkness>();
+    }
+
     public void ChangeState(EnemyState eState, Darkness owner)
     {
         previousState = currentState;
         currentState = States[eState];
-        currentState.InitializeState(owner, this);
+        currentState.InitializeState(this);
     }
-    public void ExecuteCurrentState(Darkness owner)
+    public void ExecuteCurrentState()
     {
-        currentState.UpdateState(owner);
+        currentState.UpdateState(this);
     }
 
     public void RevertState(Darkness owner)
     {
         currentState = previousState;
+    }
+
+    public bool TargetWithinAttackDistance(int range)
+    {
+        if(Vector3.Distance(owner.target.position, owner.transform.position) <= range)
+        {
+            return true;
+        }
+        else return false;
     }
 }

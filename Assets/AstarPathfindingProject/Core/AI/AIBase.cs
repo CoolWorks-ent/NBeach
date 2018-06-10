@@ -122,6 +122,8 @@ namespace Pathfinding {
 		/** Cached CharacterController component */
 		protected CharacterController controller;
 
+		/** Cached RVOController component */
+		protected RVOController rvoController;
 
 		/** Plane which this agent is moving in.
 		 * This is used to convert between world space and a movement plane to make it possible to use this script in
@@ -246,6 +248,7 @@ namespace Pathfinding {
 		protected virtual void FindComponents () {
 			tr = transform;
 			seeker = GetComponent<Seeker>();
+			rvoController = GetComponent<RVOController>();
 			// Find attached movement components
 			controller = GetComponent<CharacterController>();
 			rigid = GetComponent<Rigidbody>();
@@ -284,6 +287,7 @@ namespace Pathfinding {
 			if (clearPath) CancelCurrentPathRequest();
 			prevPosition1 = prevPosition2 = simulatedPosition = newPosition;
 			if (updatePosition) tr.position = newPosition;
+			if (rvoController != null) rvoController.Move(Vector3.zero);
 			if (clearPath) SearchPath();
 		}
 
@@ -384,6 +388,10 @@ namespace Pathfinding {
 		 * To solve this the start point of the requested paths is always at the base of the character.
 		 */
 		public virtual Vector3 GetFeetPosition () {
+			if (rvoController != null && rvoController.enabled && rvoController.movementPlane == MovementPlane.XZ) {
+				return position + (rotation * Vector3.up)*(rvoController.center - rvoController.height*0.5f);
+			}
+
 			// Use the base of the CharacterController.
 			// If updatePosition is false then fall back to only using the simulated position
 			if (controller != null && controller.enabled && updatePosition) {
@@ -435,6 +443,11 @@ namespace Pathfinding {
 
 		/** Calculates how far to move during a single frame */
 		protected Vector2 CalculateDeltaToMoveThisFrame (Vector2 position, float distanceToEndOfPath, float deltaTime) {
+			if (rvoController != null && rvoController.enabled) {
+				// Use RVOController to get a processed delta position
+				// such that collisions will be avoided if possible
+				return movementPlane.ToPlane(rvoController.CalculateMovementDelta(movementPlane.ToWorld(position, 0), deltaTime));
+			}
 			// Direction and distance to move during this frame
 			return Vector2.ClampMagnitude(velocity2D * deltaTime, distanceToEndOfPath);
 		}
