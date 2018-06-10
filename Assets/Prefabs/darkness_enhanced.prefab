@@ -318,9 +318,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previousState: {fileID: 0}
   darkStates:
-  - {fileID: 11400000, guid: 10733d2cdaf768a4b91de0b4660cd23d, type: 2}
-  - {fileID: 11400000, guid: 5c60053bf06259548aefd7714c4f2914, type: 2}
-  - {fileID: 11400000, guid: 1125af9bedc6ab5478a5f24d6dfa25f2, type: 2}
+  - {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
+  - {fileID: 11400000, guid: edcbf17dddd70a84f856acedb60796de, type: 2}
+  - {fileID: 11400000, guid: dfd687a29eeed284999ed4a5cf104b69, type: 2}
   owner: {fileID: 0}
   animeController: {fileID: 0}
   attackHash: 1080829965
