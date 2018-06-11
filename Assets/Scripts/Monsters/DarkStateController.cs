@@ -17,7 +17,8 @@ public class DarkStateController : MonoBehaviour
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
-                idleHash = Animator.StringToHash("Idle");
+                idleHash = Animator.StringToHash("Idle"),
+                deathHash = Animator.StringToHash("Death");
     public int actionIdle;
 
     private void Awake()
@@ -34,9 +35,10 @@ public class DarkStateController : MonoBehaviour
     private void Start()
     {
         owner = GetComponent<Darkness>();
+        ChangeState(EnemyState.IDLE);
     }
 
-    public void ChangeState(EnemyState eState, Darkness owner)
+    public void ChangeState(EnemyState eState)
     {
         previousState = currentState;
         currentState = States[eState];

@@ -34,7 +34,7 @@ public class AttackState : DarkState
     public override void ExitState(DarkStateController controller)
     {
         controller.animeController.SetBool(controller.attackAfterHash, true);
-        controller.ChangeState(EnemyState.IDLE, controller.owner);
+        controller.ChangeState(EnemyState.IDLE);
     }
 
 }

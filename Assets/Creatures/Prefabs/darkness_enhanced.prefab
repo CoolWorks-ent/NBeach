@@ -335,10 +335,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   - {fileID: 11400000, guid: edcbf17dddd70a84f856acedb60796de, type: 2}
   - {fileID: 11400000, guid: dfd687a29eeed284999ed4a5cf104b69, type: 2}
+  - {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   owner: {fileID: 0}
   animeController: {fileID: 0}
   attackHash: 1080829965
   attackAfterHash: 530937694
   chaseHash: 1463555229
   idleHash: 2081823275
+  deathHash: 646380074
   actionIdle: 0

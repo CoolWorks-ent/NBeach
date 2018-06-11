@@ -40,7 +40,7 @@ public class ChaseState : DarkState
         if(controller.TargetWithinAttackDistance(controller.owner.attackRange))
         {
             ExitState(controller);
-            controller.ChangeState(EnemyState.ATTACK, controller.owner);
+            controller.ChangeState(EnemyState.ATTACK);
         }
     }
 

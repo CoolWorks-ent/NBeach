@@ -9,4 +9,4 @@ public abstract class DarkState : State<DarkStateController>
 	public abstract void OnEnable();
 }
 
-public enum EnemyState { CHASING, IDLE, ATTACK }
+public enum EnemyState { CHASING, IDLE, ATTACK, DEATH }

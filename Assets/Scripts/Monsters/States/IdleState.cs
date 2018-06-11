@@ -38,6 +38,6 @@ public class IdleState : DarkState
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
         controller.owner.aIRichPath.canMove = true;
-        controller.ChangeState(EnemyState.CHASING, controller.owner);
+        controller.ChangeState(EnemyState.CHASING);
     }
 }

@@ -24,7 +24,6 @@ public class Darkness : MonoBehaviour {
         aIDestSetter = GetComponent<Pathfinding.AIDestinationSetter>();
         aIRichPath = GetComponent<Pathfinding.RichAI>();
         dsController = GetComponent<DarkStateController>();
-        dsController.ChangeState(EnemyState.IDLE, this);
         aIDestSetter.target = target;
 	}
 	
@@ -57,7 +56,7 @@ public class Darkness : MonoBehaviour {
                 //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
                 
                 //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-                dsController.ChangeState(EnemyState.IDLE, this);
+                dsController.ChangeState(EnemyState.DEATH);
                 gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
                 StartCoroutine(deathRoutine());
 
