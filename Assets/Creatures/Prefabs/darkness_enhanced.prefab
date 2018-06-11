@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4849616495344730}
   - component: {fileID: 65578689530358540}
+  - component: {fileID: 65387374068129854}
   - component: {fileID: 114861532283098078}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114768692572685676}
@@ -149,6 +150,18 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: fa98ca6de26ddeb46ac612a15829298a, type: 3}
+--- !u!65 &65387374068129854
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8, y: 1.59, z: 1.3}
+  m_Center: {x: 0, y: 0.85, z: 0.2}
 --- !u!65 &65578689530358540
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -159,8 +172,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 3, z: 2}
-  m_Center: {x: 0, y: 1.5, z: 0.2}
+  m_Size: {x: 1.19, y: 2, z: 1.53}
+  m_Center: {x: 0, y: 1, z: 0.2}
 --- !u!95 &95777162312456306
 Animator:
   serializedVersion: 3
@@ -245,7 +258,8 @@ MonoBehaviour:
   aIDestSetter: {fileID: 0}
   aIRichPath: {fileID: 0}
   dsController: {fileID: 0}
-  attackRange: 5
+  attackRange: 0
+  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
 --- !u!114 &114662073128543118
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -174,8 +174,8 @@ public class DarknessBoss : MonoBehaviour {
     //when not increasing timer it does other stuff
     void UpdateBoss()
     {
-        target = GameObject.FindGameObjectWithTag("Player");
 
+        target = GameObject.FindGameObjectWithTag("Player");
         if (attacks.Count < maxAttacks && changeAttackType)
         {
             animationControl.SetTrigger("NoAttackAlive");
@@ -184,8 +184,7 @@ public class DarknessBoss : MonoBehaviour {
             status = BossStatus.charging;
         }
         else if (animationControl.GetCurrentAnimatorStateInfo(0).IsName("AttackWait") && !changeAttackType && attackState == BossAttackType.Ball)
-        {
-            
+        {   
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
             animationControl.SetBool("DoProjectileAttack", true);
@@ -193,7 +192,6 @@ public class DarknessBoss : MonoBehaviour {
         }
         else if(animationControl.GetCurrentAnimatorStateInfo(0).IsName("AttackWait") && !changeAttackType && attackState == BossAttackType.Smash)
         {
-            
             //doAttack(MagicPos.transform);
             //changeAttackType = true;
             animationControl.SetBool("DoSmashAttack", true);
@@ -207,8 +205,24 @@ public class DarknessBoss : MonoBehaviour {
             //set the target + rotation/position of "HAND" for attack
             //ArmPivot.transform.LookAt(target.transform.position);
             Vector3 tempTarget = new Vector3(0,0,0);
-            tempTarget = new Vector3(target.transform.position.x-20, target.transform.position.y, target.transform.position.z);
-            transform.LookAt(tempTarget);
+            if(GameController.instance.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                tempTarget = new Vector3(rockSmashTarget.transform.position.x - 30, rockSmashTarget.transform.position.y, rockSmashTarget.transform.position.z);
+            else
+                tempTarget = new Vector3(rockSmashTarget.transform.position.x-15, rockSmashTarget.transform.position.y, rockSmashTarget.transform.position.z);
+            float curTime = 0, rotateTime = 2f;
+            //Rotate Boss to lookAt target
+            while (curTime <= rotateTime)
+            {
+                //find the vector pointing from our position to the target
+                Vector3 direction = (tempTarget - transform.position).normalized;
+                Quaternion lookDirection = Quaternion.LookRotation(direction);
+
+                //rotate us over time according to speed until we are in the required rotation
+                transform.rotation = Quaternion.Slerp(transform.rotation, lookDirection, Time.deltaTime * rotateTime);
+                curTime += Time.deltaTime;
+            }
+
+            //transform.LookAt(tempTarget);
             animationControl.SetBool("DoRockSmashAttack", true);
             StartCoroutine(DoAttackCoroutine(ArmPivot.transform, target, false));
         }
@@ -489,7 +503,7 @@ public class DarknessBoss : MonoBehaviour {
     }
 
     //Call this function to force the Boss to use the RockSmash and end the stage...
-    public void DoRockSmash_Interrupt(GameObject rockTransform)
+    public void DoRockSmash_Interrupt(GameObject rockObj)
     {
         //animationControl.SetBool("AttackWait", true);
         //animationControl.SetBool("IsRest", false);
@@ -506,7 +520,7 @@ public class DarknessBoss : MonoBehaviour {
             changeAttackType = false;
             status = BossStatus.charging;
         }
-        rockSmashTarget = rockTransform;
+        rockSmashTarget = rockObj;
     }
 
 

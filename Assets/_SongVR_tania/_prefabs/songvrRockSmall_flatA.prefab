@@ -21,8 +21,8 @@ GameObject:
   - component: {fileID: 4263623679531380}
   - component: {fileID: 33993263551204158}
   - component: {fileID: 23589819677282882}
-  - component: {fileID: 136584235601815904}
   - component: {fileID: 54671548118427748}
+  - component: {fileID: 64565209764282712}
   m_Layer: 13
   m_Name: songvrRockSmall_flatA
   m_TagString: player cover
@@ -97,8 +97,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &136584235601815904
-CapsuleCollider:
+--- !u!64 &64565209764282712
+MeshCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
@@ -106,7 +106,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.9565401
-  m_Height: 1.7362287
-  m_Direction: 1
-  m_Center: {x: -0.030530244, y: -0.004610628, z: 0.028374046}
+  serializedVersion: 2
+  m_Convex: 1
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 4300000, guid: e1dabdf0fa43ff34283da7baf14c9cbf, type: 3}

@@ -74,9 +74,10 @@ public class GameController : MonoBehaviour {
         Application.runInBackground = true;
         Input.backButtonLeavesApp = true;
 
+
         //set default state to "paused"
         //splineControl.sSplineState = SplineState.Paused;
-
+        
         /********************************
          * Song 1
          * ********************************/
@@ -275,6 +276,9 @@ public class GameController : MonoBehaviour {
                 break;
             case "Player_Cover_Destroyed":
                 level.StartCoroutine(level.OnPlayerCoverDestroyed());
+                break;
+            case "CancelSpeedBoost":
+                EventManager.TriggerEvent("CancelPowerUps", "CancelPowerUps");
                 break;
             default:
                 break;

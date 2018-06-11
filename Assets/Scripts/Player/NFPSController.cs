@@ -147,7 +147,7 @@ public class NFPSController : PlayerController {
          * Clamp the movement to the x-axis btw. 170 & 200
          *******/
         
-        nRigidbody.transform.localPosition = new Vector3(Mathf.Clamp(nRigidbody.transform.localPosition.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.localPosition.y, nRigidbody.transform.localPosition.z);
+        //nRigidbody.transform.localPosition = new Vector3(Mathf.Clamp(nRigidbody.transform.localPosition.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.localPosition.y, nRigidbody.transform.localPosition.z);
 
         //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
         //Manage Player's Ammo and check for Firing
@@ -525,6 +525,7 @@ public class NFPSController : PlayerController {
         {
             OnPlayerDamaged(collision.transform);
         }
+
     }
 
     public void OnTriggerEnter(Collider collider)
@@ -538,6 +539,7 @@ public class NFPSController : PlayerController {
         {
             OnPlayerDamaged(collider.transform);
         }
+        
 
         //dodge barriers via trigger volumes
         /*if(collider.gameObject == pBoundary.boundary_left)
@@ -567,7 +569,16 @@ public class NFPSController : PlayerController {
             if (enemy.tag == "Darkness")
                 playerHealth -= 10;
             if (enemy.tag == "DarkBossAttack")
+            {
                 playerHealth -= 10;
+
+                //if player hit with RockSmashAttack, trigger event to fly back and hit island
+                DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+                if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                {
+                    EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                }
+            }
 
             curTime = Time.time;
             t = Time.time;

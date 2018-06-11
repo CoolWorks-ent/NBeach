@@ -57,16 +57,18 @@ public class DarkBossAttack : MonoBehaviour {
     {
         Debug.Log("[Dark Boss] Attack hit!");
         //only destroy rock cover is the boss used the smash attack
-        if (collision.gameObject.tag == "player cover" && attackType == "RockSmash")
-        {
-            Debug.Log("Dark Boss Attack collided with player rock cover");
-            //event call for player damaged
-            EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
-            //kick off destruction animation for rock cover
-            Destroy(collision.gameObject);
-            //Destroy(this.gameObject);
 
-        }
+            if (collision.gameObject.tag == "player cover" && attackType == "RockSmash")
+            {
+                Debug.Log("Dark Boss Attack collided with player rock cover");
+                //event call for player damaged
+                EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
+                //kick off destruction animation for rock cover
+                Destroy(collision.gameObject);
+                //Destroy(this.gameObject);
+
+            }
+            //IF SMASH hits an environment object, then should play SFX & FX
 
         else if (collision.gameObject.tag == "PlayerCube" && attackType == "Ball")
         {
@@ -91,16 +93,22 @@ public class DarkBossAttack : MonoBehaviour {
             Destroy(this.gameObject);
         }
 
-        if (collider.gameObject.tag == "player cover" && attackType == "RockSmash")
-        {
-            Debug.Log("Dark Boss Attack collided with player rock cover");
-            //event call for player damaged
-            EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
-            //kick off destruction animation for rock cover
-            Destroy(collider.gameObject);
-            //Destroy(this.gameObject);
+            if (collider.gameObject.tag == "player cover" && attackType == "RockSmash")
+            {
+                //shake Screen with RockSmash collides with the game world
+                Debug.Log("Dark Boss Attack collided with object");
+                ScreenShake camShake = new ScreenShake();
+                //camShake.Play(.7f, 1);
+                StartCoroutine(camShake.Shake(.2f, .5f));
 
-        }
+                Debug.Log("Dark Boss Attack collided with player rock cover");
+                //event call for player damaged
+                EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
+                //kick off destruction animation for rock cover
+                Destroy(collider.gameObject);
+                //Destroy(this.gameObject);
+
+            }
 
     }
 }
