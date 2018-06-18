@@ -255,10 +255,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  aIDestSetter: {fileID: 0}
-  aIRichPath: {fileID: 0}
   dsController: {fileID: 0}
-  attackRange: 0
+  attackRange: 5
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
 --- !u!114 &114662073128543118
 MonoBehaviour:
@@ -337,6 +335,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dfd687a29eeed284999ed4a5cf104b69, type: 2}
   - {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   owner: {fileID: 0}
+  aIDestSetter: {fileID: 0}
+  aIRichPath: {fileID: 0}
   animeController: {fileID: 0}
   attackHash: 1080829965
   attackAfterHash: 530937694

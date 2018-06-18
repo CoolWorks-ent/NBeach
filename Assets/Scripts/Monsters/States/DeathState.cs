@@ -11,7 +11,7 @@ public class DeathState : DarkState
     }
     public override void InitializeState(DarkStateController controller)
     {
-        controller.owner.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.deathHash);
         
         ExitState(controller);

@@ -9,8 +9,7 @@ using UnityEngine;
 public class Darkness : MonoBehaviour {
 
     public Transform target;
-    public Pathfinding.AIDestinationSetter aIDestSetter;
-    public Pathfinding.RichAI aIRichPath;
+    
     public DarkStateController dsController;
 
     public int attackRange;
@@ -21,10 +20,8 @@ public class Darkness : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        aIDestSetter = GetComponent<Pathfinding.AIDestinationSetter>();
-        aIRichPath = GetComponent<Pathfinding.RichAI>();
+        
         dsController = GetComponent<DarkStateController>();
-        aIDestSetter.target = target;
 	}
 	
 	// Update is called once per frame

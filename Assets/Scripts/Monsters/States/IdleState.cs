@@ -12,7 +12,7 @@ public class IdleState : DarkState
     }
     public override void InitializeState(DarkStateController controller)
     {
-        controller.owner.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
         //Debug.Log("Entering idle state");
         controller.animeController.SetTrigger(controller.idleHash);
         
@@ -37,7 +37,7 @@ public class IdleState : DarkState
     private IEnumerator IdleTime(DarkStateController controller, float idleTime)
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
-        controller.owner.aIRichPath.canMove = true;
+        controller.aIRichPath.canMove = true;
         controller.ChangeState(EnemyState.CHASING);
     }
 }

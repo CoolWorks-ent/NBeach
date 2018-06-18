@@ -17,23 +17,12 @@ public class ChaseState : DarkState
     public override void InitializeState(DarkStateController controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.owner.aIRichPath.canMove = true;
+        controller.aIRichPath.canMove = true;
         //Vector3 pointNearTarget = new Vector3(controller.owner.target.position.x + Random.Range(-5,5), controller.owner.target.position.y, controller.owner.target.position.z + Random.Range(-5,5));
         //controller.owner.target.position = pointNearTarget;
-        controller.owner.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
-        controller.owner.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
+        controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
+        controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
     }
-
-    /*public override void InitializeState(Darkness owner, DarkStateController controller)
-    {
-        dsStateController = controller;   
-        owner.aIPath.canMove = true;
-        owner.aIDestSetter.target = owner.target;
-        owner.aIPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
-        owner.aIPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
-        //Debug.Log("Entering chase sequence");
-
-    }*/
 
     public override void UpdateState(DarkStateController controller)
     {
@@ -47,7 +36,7 @@ public class ChaseState : DarkState
     public override void ExitState(DarkStateController controller)
     {
 
-        controller.owner.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
 
         Debug.LogWarning("Exiting chase sequence");
 

@@ -12,6 +12,8 @@ public class DarkStateController : MonoBehaviour
     Dictionary<EnemyState, DarkState> States;
 
     public Darkness owner;
+    public Pathfinding.AIDestinationSetter aIDestSetter;
+    public Pathfinding.RichAI aIRichPath;
 
     public Animator animeController;
     public int attackHash = Animator.StringToHash("Attack"),
@@ -35,6 +37,9 @@ public class DarkStateController : MonoBehaviour
     private void Start()
     {
         owner = GetComponent<Darkness>();
+        aIDestSetter = GetComponent<Pathfinding.AIDestinationSetter>();
+        aIRichPath = GetComponent<Pathfinding.RichAI>();
+        aIDestSetter.target = owner.target;
         ChangeState(EnemyState.IDLE);
     }
 
@@ -56,7 +61,7 @@ public class DarkStateController : MonoBehaviour
 
     public bool TargetWithinAttackDistance(int range)
     {
-        if(Vector3.Distance(owner.target.position, owner.transform.position) <= range)
+        if(Vector3.Distance(owner.target.position, transform.position) <= range)
         {
             return true;
         }

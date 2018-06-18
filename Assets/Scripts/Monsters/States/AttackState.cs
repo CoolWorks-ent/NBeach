@@ -12,16 +12,16 @@ public class AttackState : DarkState
     }
     public override void InitializeState(DarkStateController controller)
     {   
-        controller.owner.aIRichPath.canMove = true;
-        controller.owner.aIRichPath.maxSpeed *= attackSpeedModifier;
+        controller.aIRichPath.canMove = true;
+        controller.aIRichPath.maxSpeed *= attackSpeedModifier;
         //ExitState(controller);
     }
 
     public override void UpdateState(DarkStateController controller)
     {
-        controller.owner.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.attackHash);
-        controller.owner.aIRichPath.maxSpeed /= attackSpeedModifier;
+        controller.aIRichPath.maxSpeed /= attackSpeedModifier;
         ExitState(controller);
         /*if(Quaternion.Angle(Quaternion.LookRotation(controller.owner.target.position, controller.owner.transform.position), controller.owner.transform.rotation) <= 10)
             controller.animeController.SetTrigger(controller.attackHash);
