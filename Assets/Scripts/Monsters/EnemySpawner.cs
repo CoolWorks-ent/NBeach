@@ -11,7 +11,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField]
     Darkness darknessEnemy;
     [SerializeField]
-    public int spawnRate = 10; //The greater the slower, 1 every x seconds
+    public float spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
     Transform[] spawnLocs;
 

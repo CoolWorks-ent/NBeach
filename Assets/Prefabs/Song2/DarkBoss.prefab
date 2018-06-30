@@ -129,7 +129,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1338938340241644}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -23.50055, z: -33.7}
+  m_LocalPosition: {x: 213.27487, y: 30.700481, z: 50.77155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4903050744087822}
@@ -232,16 +232,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MagicPos: {fileID: 1490709899246204}
   target: {fileID: 0}
+  ArmPivot: {fileID: 0}
+  darkHand: {fileID: 0}
+  status: 1
   stage: 0
-  attackStage: 0
+  attackState: 0
   attackTimer: 0
   maxAttackTimer: 8
   isDead: 0
   spRenderer: {fileID: 0}
   hitCount: 4
   WoodIcon: {fileID: 0}
-  WaterIcon: {fileID: 0}
   FireIcon: {fileID: 0}
+  doRockSmash: 0
+  DarkBallFX: {fileID: 0}
 --- !u!212 &212054811549077518
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -34,7 +34,12 @@ public class AI_Manager : MonoBehaviour {
 		updatedDarkness.target = player;
 	}
 
-	public IEnumerator WaitTimer(float timer)
+    public void RemoveFromDarknessList(Darkness updatedDarkness)
+    {
+        ActiveDarkness.Remove(updatedDarkness);
+    }
+
+    public IEnumerator WaitTimer(float timer)
 	{
 		yield return new WaitForSeconds(timer);
 	}

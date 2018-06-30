@@ -44,9 +44,9 @@ public class song2_lvl : Level {
     float stage1StartTime = 120; //in seconds
     float stage2StartTime = 180; //3min in seconds
     float stage3StartTime = 240; //4min in seconds
-    int darkSpawnRate_Stage1 = 10;
-    int darkSpawnRate_Stage2 = 7;
-    int darkSpawnRate_Stage3 = 4;
+    float darkSpawnRate_Stage1 = 10;
+    float darkSpawnRate_Stage2 = 4;
+    float darkSpawnRate_Stage3 = .5f;
 
     int numOfShells = 0;
     int maxShellCount = 5;
@@ -507,7 +507,9 @@ public class song2_lvl : Level {
         //snap player transform to face dark boss after reaching the new stage position
         gController.playerStage.transform.LookAt(darkBoss.transform);
 
+        //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
+        AI_Manager.Instance.maxEnemyCount = 15;
 
         float waitTime = stage3StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
@@ -579,6 +581,7 @@ public class song2_lvl : Level {
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
+        AI_Manager.Instance.maxEnemyCount = 30;
 
         float tempWaitTime = 5;
         yield return new WaitForSeconds(tempWaitTime);

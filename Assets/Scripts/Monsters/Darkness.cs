@@ -47,8 +47,10 @@ public class Darkness : MonoBehaviour {
                 Debug.Log("Darkness Destroyed");
 
                 //AI_Manager.Instance.AddtoDarknessList(this);
+                //Remove from list of darkness
+                AI_Manager.Instance.RemoveFromDarknessList(this);
+                //AI_Manager.Instance.AddtoDarknessList(this);
 
-                AI_Manager.Instance.AddtoDarknessList(this);
                 GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
                 //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
                 
