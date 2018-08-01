@@ -20,15 +20,14 @@ GameObject:
   m_Component:
   - component: {fileID: 4849616495344730}
   - component: {fileID: 65578689530358540}
-  - component: {fileID: 65387374068129854}
+  - component: {fileID: 114861532283098078}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
   - component: {fileID: 114662073128543118}
   - component: {fileID: 114372473262131794}
-  - component: {fileID: 114576353925070576}
-  - component: {fileID: 114188613122282872}
+  - component: {fileID: 114712269329263896}
   m_Layer: 0
-  m_Name: darkness_enhanced
+  m_Name: darkness_enhanced 1
   m_TagString: Darkness
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -149,18 +148,6 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: fa98ca6de26ddeb46ac612a15829298a, type: 3}
---- !u!65 &65387374068129854
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.8, y: 1.59, z: 1.3}
-  m_Center: {x: 0, y: 0.85, z: 0.2}
 --- !u!65 &65578689530358540
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -213,30 +200,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags: -4097
-  tagPenalties: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f401000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  traversableTags: -1
+  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask: -1
---- !u!114 &114188613122282872
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb6a34d769a1e4ac7b0b30e433aa443c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  smoothType: 1
-  subdivisions: 3
-  iterations: 2
-  strength: 0.5
-  uniformLength: 1
-  maxSegmentLength: 2
-  bezierTangentLength: 0.5
-  offset: 0.2
-  factor: 0.1
 --- !u!114 &114372473262131794
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -252,15 +218,15 @@ MonoBehaviour:
   radius: 1
   height: 2
   locked: 0
-  lockWhenNotMoving: 0
+  lockWhenNotMoving: 1
   agentTimeHorizon: 2
   obstacleTimeHorizon: 2
-  maxNeighbours: 2
+  maxNeighbours: 10
   layer: 1
   collidesWith: -1
   wallAvoidForce: 1
   wallAvoidFalloff: 1
-  priority: 0.752
+  priority: 0.5
   center: 1
   debug: 0
 --- !u!114 &114511842479999518
@@ -275,35 +241,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  attackInitiationRange: 4
-  attackPriority: 0
+  dsController: {fileID: 0}
+  attackRange: 5
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
-  aIRichPath: {fileID: 0}
-  animeController: {fileID: 0}
-  attackHash: 1080829965
-  attackAfterHash: 530937694
-  chaseHash: 1463555229
-  wanderHash: 918399791
-  idleHash: 2081823275
-  deathHash: 646380074
-  actionIdle: 0
-  previousState: {fileID: 0}
-  currentState: {fileID: 0}
-  canAttack: 0
---- !u!114 &114576353925070576
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  penalty: 1000
-  randomStep: 2
 --- !u!114 &114662073128543118
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -336,3 +276,43 @@ MonoBehaviour:
   funnelSimplification: 0
   slowWhenNotFacingTarget: 1
   animCompatibility: {fileID: 0}
+--- !u!114 &114712269329263896
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  target: {fileID: 0}
+--- !u!114 &114861532283098078
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ca55b8e2272424b9fd4c8422c7dcf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  previousState: {fileID: 0}
+  darkStates:
+  - {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
+  - {fileID: 11400000, guid: edcbf17dddd70a84f856acedb60796de, type: 2}
+  - {fileID: 11400000, guid: dfd687a29eeed284999ed4a5cf104b69, type: 2}
+  - {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
+  owner: {fileID: 0}
+  aIDestSetter: {fileID: 0}
+  aIRichPath: {fileID: 0}
+  animeController: {fileID: 0}
+  attackHash: 1080829965
+  attackAfterHash: 530937694
+  chaseHash: 1463555229
+  idleHash: 2081823275
+  deathHash: 646380074
+  actionIdle: 0

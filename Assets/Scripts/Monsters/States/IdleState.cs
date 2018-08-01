@@ -10,20 +10,19 @@ public class IdleState : DarkState
     {
         stateType = EnemyState.IDLE;
     }
-    public override void InitializeState(DarkStateController controller)
+    public override void InitializeState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
-        //Debug.Log("Entering idle state");
         controller.animeController.SetTrigger(controller.idleHash);
         
         ExitState(controller);
     }
 
-    public override void UpdateState(DarkStateController controller)
+    public override void UpdateState(Darkness controller)
     {
     }
 
-    public override void ExitState(DarkStateController controller)
+    public override void ExitState(Darkness controller)
     {
         float idleTime = controller.actionIdle;
         if(controller.animeController.GetBool(controller.attackAfterHash))
@@ -34,10 +33,12 @@ public class IdleState : DarkState
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
     }
 
-    private IEnumerator IdleTime(DarkStateController controller, float idleTime)
+    private IEnumerator IdleTime(Darkness controller, float idleTime)
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
         controller.aIRichPath.canMove = true;
-        controller.ChangeState(EnemyState.CHASING);
+        if(!controller.canAttack)
+            controller.ChangeState(EnemyState.WANDER);
+        else controller.ChangeState(EnemyState.CHASING);
     }
 }

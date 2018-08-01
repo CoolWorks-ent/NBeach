@@ -1,22 +1,25 @@
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Darkness/State/ChaseState")]
-public class ChaseState : DarkState
+[CreateAssetMenu (menuName = "Darkness/State/WanderNearState")]
+public class WanderNearState : DarkState
 {
 
     [Range(0.5f,12.0f)]
     public float minRepathRate, maxRepathRate;
     [Range(1.0f,10.0f)]
     public float minSpeedRange, maxSpeedRange;
-    
+
+    [Range(2.05f, 14.0f)]
+    public float wanderRange;
+
     public override void OnEnable()
     {
-        stateType = EnemyState.CHASING;
+        stateType = EnemyState.WANDER;
     }
 
     public override void InitializeState(Darkness controller)
     {
-        controller.animeController.SetTrigger(controller.chaseHash);
+        controller.animeController.SetTrigger(controller.wanderHash);
         if(controller.ai != null) 
             controller.ai.onSearchPath += controller.ExecuteCurrentState;
         else Debug.LogError("AI not set. Attach IAstar component to object");
@@ -28,11 +31,19 @@ public class ChaseState : DarkState
     public override void UpdateState(Darkness controller)
     {
         controller.ai.destination = controller.target.position;
-        if(controller.TargetWithinDistance(controller.attackInitiationRange))
+        if(controller.TargetWithinDistance(controller.attackInitiationRange*2))
         {
             AI_Manager.OnAttackRequest(controller.queueID);
-            ExitState(controller);
-            controller.ChangeState(EnemyState.ATTACK);
+            if(controller.canAttack)
+            {
+                ExitState(controller);
+                controller.ChangeState(EnemyState.CHASING);
+            }
+            else 
+            {
+                ExitState(controller); 
+                controller.ChangeState(EnemyState.IDLE);
+            }
         }
     }
 
@@ -40,5 +51,6 @@ public class ChaseState : DarkState
     {
         controller.aIRichPath.canMove = false;
         controller.ai.onSearchPath -= controller.ExecuteCurrentState;
+        //controller.ChangeState(EnemyState.IDLE);
     }
 }

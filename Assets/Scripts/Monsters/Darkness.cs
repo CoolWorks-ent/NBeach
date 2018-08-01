@@ -5,28 +5,79 @@ using UnityEngine;
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
- [RequireComponent(typeof(DarkStateController))]
 public class Darkness : MonoBehaviour {
 
     public Transform target;
     
-    public DarkStateController dsController;
-
-    public int attackRange;
+    ///<summary>Sets the initiation range for darkness units. Units will be qeued for attack in this range</summary>
+    public int attackInitiationRange, actionIdle, queueID;
 
     public GameObject deathFX;
 
+    public Pathfinding.RichAI aIRichPath;
 
+    public Animator animeController;
+    public int attackHash = Animator.StringToHash("Attack"),
+                attackAfterHash = Animator.StringToHash("AfterAttack"),
+                chaseHash = Animator.StringToHash("Chase"),
+                wanderHash = Animator.StringToHash("Wander"),
+                idleHash = Animator.StringToHash("Idle"),
+                deathHash = Animator.StringToHash("Death");
+    public Pathfinding.IAstarAI ai;
 
-    // Use this for initialization
+    public DarkState previousState, currentState;
+
+    private HashSet<DarkState> darkStates;
+    Dictionary<EnemyState, DarkState> States;
+
+    public bool canAttack;
+
     void Start () {
-        
-        dsController = GetComponent<DarkStateController>();
+        darkStates = new HashSet<DarkState>(Resources.LoadAll<DarkState>("Darkness States"));
+        Debug.Log("Darkness states count " + darkStates.Count + "for this object " + this.gameObject);
+        actionIdle = 3;
+        canAttack = false;
+        queueID = 0;
+        animeController = GetComponentInChildren<Animator>();
+        ai = GetComponent<Pathfinding.IAstarAI>();
+        States = new Dictionary<EnemyState, DarkState>();
+        foreach(DarkState dS in darkStates)
+        {
+            States.Add(dS.stateType, dS);
+        }
+        aIRichPath = GetComponent<Pathfinding.RichAI>();
+        //aIDestSetter.target = owner.target;
+        ChangeState(EnemyState.IDLE);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        dsController.ExecuteCurrentState();
+        ExecuteCurrentState();
+    }
+
+    public void ChangeState(EnemyState eState)
+    {
+        previousState = currentState;
+        currentState = States[eState];
+        currentState.InitializeState(this);
+    }
+    public void ExecuteCurrentState()
+    {
+        currentState.UpdateState(this);
+    }
+
+    public void RevertState(Darkness owner)
+    {
+        currentState = previousState;
+    }
+
+    public bool TargetWithinDistance(int range)
+    {
+        if(Vector3.Distance(target.position, transform.position) <= range)
+        {
+            return true;
+        }
+        else return false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -46,16 +97,11 @@ public class Darkness : MonoBehaviour {
             {
                 Debug.Log("Darkness Destroyed");
 
-                //AI_Manager.Instance.AddtoDarknessList(this);
-                //Remove from list of darkness
-                AI_Manager.Instance.RemoveFromDarknessList(this);
-                //AI_Manager.Instance.AddtoDarknessList(this);
-
                 GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
                 //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
                 
                 //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-                dsController.ChangeState(EnemyState.DEATH);
+                ChangeState(EnemyState.DEATH);
                 gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
                 StartCoroutine(deathRoutine());
 

@@ -5,8 +5,10 @@ using UnityEngine;
 public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
-	public List<Darkness> ActiveDarkness;
-
+	public Dictionary<int, Darkness> ActiveDarkness;
+	private Queue<int> AttackQueue;
+	[SerializeField]
+	private int darknessQueueID, darknessAttackCount, attacksCurrentlyProcessed;
 	public int maxEnemyCount;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
@@ -16,25 +18,73 @@ public class AI_Manager : MonoBehaviour {
 
 	void Awake()
 	{
-		maxEnemyCount = 10;
+		maxEnemyCount = 6;
+		darknessAttackCount = 2;
+		darknessQueueID = 0;
 		if(instance != null && instance != this)
 		{
 			//Debug.LogError("Instance of AI Manager already exist in this scene");
 		}
 		else instance = this;
 
-		ActiveDarkness = new List<Darkness>();
-
-		player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
+		ActiveDarkness = new Dictionary<int, Darkness>();
+		AddDarkness += AddtoDarknessList;
+		RemoveDarkness += RemoveFromDarknessList;
+		AttackRequest += CreateAttackRequest;
+		AttackQueue = new Queue<int>();
+		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
 
-	public void AddtoDarknessList(Darkness updatedDarkness)
+	void Update()
 	{
-		ActiveDarkness.Add(updatedDarkness);
+		if(AttackQueue.Count > 0)
+			ProcessAttackRequest();
+	}
+
+	///<summary>Notify AI manager to add a Darkness unit to the queue to decide which units can attack next</summary>
+	private void CreateAttackRequest(int d)
+	{
+		AttackQueue.Enqueue(d);
+	}
+
+	///<summary>
+	///Checks the status of the AI on the top of the queue to see if the attack has finished or was interrupted. 
+	///Once a result has been sent the units will be dequeued.
+	///</summary>
+	private void ProcessAttackRequest()
+	{
+		//TODO check if current darkness 
+		if(attacksCurrentlyProcessed <= darknessAttackCount)
+		{
+			if(ActiveDarkness.ContainsKey(AttackQueue.Peek()))
+			{
+				ActiveDarkness[AttackQueue.Peek()].canAttack = true;
+				ActiveDarkness[AttackQueue.Dequeue()].ChangeState(EnemyState.CHASING);
+				attacksCurrentlyProcessed++;
+			}
+			else 
+			{
+				AttackQueue.Dequeue();
+			}
+		}
+		// if(AttackQueue.Count >= 0 && attackConfirmations <= attackPriorityCount)
+		// {
+		// 	for(int i = 0; i <= darknessAttackCount || i <= AttackQueue.Count; i++)
+		// 	{
+		// 		attackConfirmations++;	
+		// 	}
+		// }
+	}
+
+	private void AddtoDarknessList(Darkness updatedDarkness)
+	{
+		darknessQueueID++;
+		ActiveDarkness.Add(darknessQueueID, updatedDarkness);
+		updatedDarkness.queueID = darknessQueueID;
 		updatedDarkness.target = player;
 	}
 
-    public void RemoveFromDarknessList(Darkness updatedDarkness)
+    private void RemoveFromDarknessList(int updatedDarkness)
     {
         ActiveDarkness.Remove(updatedDarkness);
     }
@@ -42,5 +92,35 @@ public class AI_Manager : MonoBehaviour {
     public IEnumerator WaitTimer(float timer)
 	{
 		yield return new WaitForSeconds(timer);
+	}
+
+	public delegate void AIEvent<T>(T obj);
+	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
+	public static event AIEvent<int> AttackRequest;
+	public static event AIEvent<int> AttackEnded;
+	public static event AIEvent<Darkness> AddDarkness;
+	public static event AIEvent<int> RemoveDarkness;
+
+	public static void OnAttackRequest(int d)
+	{
+		if(AttackRequest != null)
+			AttackRequest(d);			
+	}
+
+	public static void OnAttackEnded(int d)
+	{
+		if(AttackEnded != null)
+			AttackEnded(d);
+	}
+
+	public static void OnDarknessAdded(Darkness d)
+	{
+		if(AddDarkness != null)
+			AddDarkness(d);
+	}
+	public static void OnDarknessRemoved(int d)
+	{
+		if(RemoveDarkness != null)
+			RemoveDarkness(d);
 	}
 }
