@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 321631e0ff148a8489512b5e8a91d978, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 20808976201972220, guid: c22487087a79715428da8276254e9541, type: 2}
 --- !u!212 &212363610224607380
 SpriteRenderer:
   m_ObjectHideFlags: 1

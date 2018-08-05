@@ -10,6 +10,7 @@ public class AI_Manager : MonoBehaviour {
 	[SerializeField]
 	private int darknessQueueID, darknessAttackCount, attacksCurrentlyProcessed;
 	public int maxEnemyCount;
+    public int minEnemyCount;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
 	{
@@ -18,9 +19,10 @@ public class AI_Manager : MonoBehaviour {
 
 	void Awake()
 	{
-		maxEnemyCount = 6;
 		darknessAttackCount = 2;
 		darknessQueueID = 0;
+		maxEnemyCount = 5;
+        minEnemyCount = 3;
 		if(instance != null && instance != this)
 		{
 			//Debug.LogError("Instance of AI Manager already exist in this scene");

@@ -25,6 +25,7 @@ public class DarknessBoss : MonoBehaviour {
     public BossStage stage = BossStage.stage1;
     public BossAttackType attackState = BossAttackType.none;
     public float attackTimer = 0f, maxAttackTimer = 4f; //seconds between attacks
+    public float ballMoveSpeed = 0f;
     //public FlashShield flashShield;
     public bool isDead;
     public SpriteRenderer spRenderer;
@@ -70,6 +71,8 @@ public class DarknessBoss : MonoBehaviour {
         sm.PlayMusic(6);
         sm.PlayDarkWizardVox(0);
 
+        ballMoveSpeed = 20f;
+
         //spellIcon = transform.Find("SpellIcon").GetComponent<SpriteRenderer>();
     }
 
@@ -82,7 +85,7 @@ public class DarknessBoss : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        MagicPos.transform.LookAt(target.transform.position);
+        //MagicPos.transform.LookAt(target.transform.position);
         /*	if (attacks.Count < 1)
                 animationControl.SetBool ("NoAttackAlive", true);
             else
@@ -175,7 +178,7 @@ public class DarknessBoss : MonoBehaviour {
     void UpdateBoss()
     {
 
-        target = GameObject.FindGameObjectWithTag("Player");
+        //target = GameObject.FindGameObjectWithTag("Player");
         if (attacks.Count < maxAttacks && changeAttackType)
         {
             animationControl.SetTrigger("NoAttackAlive");
@@ -297,9 +300,9 @@ public class DarknessBoss : MonoBehaviour {
         float value = Random.Range(0f, 100f);
         if (doRockSmash == true)
             value = 101;
-        do
-        {
-            if (value >= 66)
+       // do
+        //{
+            if (value >= 70)
             {
                 attackState = BossAttackType.Smash;
                 index = 2;
@@ -315,7 +318,7 @@ public class DarknessBoss : MonoBehaviour {
                 index = 0;
             }
             value = Random.Range(0f, 100f);
-        } while (lastAttack == index);
+        //} while (lastAttack == index);
         lastAttack = index;
 
         return index;
@@ -330,7 +333,7 @@ public class DarknessBoss : MonoBehaviour {
             value = 101;
         do
         {
-            if (value >= 66)
+            if (value >= 70)
             {
                 attackState = BossAttackType.Smash;
                 index = 2;
@@ -404,6 +407,8 @@ public class DarknessBoss : MonoBehaviour {
             //status = BossStatus.charging;
             changeAttackType = true;
             GameObject newGb;// = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
+            GameObject newGb_ball2 = null;
+            GameObject newGb_ball3 = null;
             if (attackState == BossAttackType.RockSmash)
             {
                 //newGb.SetActive(false);
@@ -413,16 +418,49 @@ public class DarknessBoss : MonoBehaviour {
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
             }
+            else if(attackState == BossAttackType.Smash)
+            {
+                
+                //Ball1
+                newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
+                newGb.GetComponent<DarkBossAttack>().Target = target;
+                newGb.GetComponent<DarkBossAttack>().attackType = "Smash";
+                newGb.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
+
+                //Ball2
+                newGb_ball2 = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
+                newGb_ball2.GetComponent<DarkBossAttack>().Target = target;
+                newGb_ball2.GetComponent<DarkBossAttack>().attackType = "Smash";
+                newGb_ball2.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
+
+                //Ball3
+                newGb_ball3 = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
+                newGb_ball3.GetComponent<DarkBossAttack>().Target = target;
+                newGb_ball3.GetComponent<DarkBossAttack>().attackType = "Smash";
+                newGb_ball3.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
+            }
             else
             {
                 newGb = Instantiate(Resources.Load<GameObject>(path), transf.position + offset, Quaternion.identity) as GameObject;
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "Ball";
+                newGb.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
             }
+
             Debug.Log("[Dark Boss] Attack: " + attackState);
             newGb.transform.parent = transf;
             attacks.Add(newGb);
             attacksInProgress.Add(newGb);
+            if(newGb_ball2 != null)
+            {
+                newGb_ball2.transform.parent = transf;
+                newGb_ball3.transform.parent = transf;
+
+                attacks.Add(newGb_ball2);
+                attacksInProgress.Add(newGb_ball2);
+                attacks.Add(newGb_ball3);
+                attacksInProgress.Add(newGb_ball3);
+            }
             //Wait for attack animation to finish
             /*
             yield return new WaitUntil(() => attackAnimFinished == true);
@@ -544,8 +582,32 @@ public class DarknessBoss : MonoBehaviour {
             //projectile attack will move after the animation 
             if (attack.GetComponent<DarkBossAttack>().attackType == "Ball")
             {
-                attack.GetComponent<DarkBossAttack>().moveAttack();
+                attack.GetComponent<DarkBossAttack>().moveAttack(Vector3.zero);
                 attacks.Remove(attack);
+            }
+            else if (attack.GetComponent<DarkBossAttack>().attackType == "Smash")
+            {
+
+                Vector3 basePos = attack.GetComponent<DarkBossAttack>().Target.transform.position; //GameObject.FindGameObjectWithTag("PlayerContainer").transform.position;
+                Vector3 targetPos = new Vector3(basePos.x + 7, basePos.y, basePos.z);
+                Vector3 targetPos2 = new Vector3(basePos.x - 7, basePos.y, basePos.z);
+
+                GameObject attack3;
+                GameObject attack2;
+                attack2 = attacksInProgress[0];
+                attack3 = attacksInProgress[1];
+
+                attack.GetComponent<DarkBossAttack>().moveAttack(Vector3.zero);
+                attack2.GetComponent<DarkBossAttack>().moveAttack(targetPos);
+                attack3.GetComponent<DarkBossAttack>().moveAttack(targetPos2);
+                
+                //DarkBossAttack temp = attack.GetComponent<DarkBossAttack>();
+               // attack.GetComponent<DarkBossAttack>().moveAttack(temp.Target.transform.position);
+                attacks.Remove(attack);
+                attacks.Remove(attack2);
+                attacks.Remove(attack3);
+                attacksInProgress.RemoveAt(0);
+                attacksInProgress.RemoveAt(0);
             }
             else if (attack.GetComponent<DarkBossAttack>().attackType == "RockSmash")
             {

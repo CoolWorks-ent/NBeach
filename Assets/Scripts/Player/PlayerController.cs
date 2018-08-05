@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using VRStandardAssets.Common;
 
 public enum PlayerState { MOVING, SWIMMING, JUMPING, NOTMOVING }
+public enum PLAYER_STATUS { ALIVE, HURT, DEAD }
 
 public class PlayerController : MonoBehaviour {
 
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour {
     GameController gameController;
     UnderwaterScript underwaterScript;
     public PlayerState playerState { get; set; }
+    public PLAYER_STATUS playerStatus { get; set; }
     public bool CanMove = true; //is player allowed to move or not?
 
     Rigidbody rigidbody;
