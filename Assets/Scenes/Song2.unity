@@ -8055,7 +8055,7 @@ Prefab:
         type: 2}
       propertyPath: darkBoss
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1618677632}
     - target: {fileID: 114795370930730580, guid: a79ac96491fac394db07f5a01b0827cc,
         type: 2}
       propertyPath: RainFX
@@ -61441,7 +61441,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 957796667}
-  ActiveDarkness: []
+  darknessQueueID: 0
+  darknessAttackCount: 0
+  attacksCurrentlyProcessed: 0
   maxEnemyCount: 0
 --- !u!54 &957796669
 Rigidbody:
@@ -86119,6 +86121,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6e05b86df3368fe4387d0ba4a3e029a5, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1618677632 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114905598389558032, guid: 6e05b86df3368fe4387d0ba4a3e029a5,
+    type: 2}
+  m_PrefabInternal: {fileID: 1618677631}
+  m_Script: {fileID: 11500000, guid: 971714733682618498d12d48dd11e861, type: 3}
 --- !u!4 &1630074792 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4288484291572582, guid: 5bc9ba2938d9e5842a52b594c353d585,

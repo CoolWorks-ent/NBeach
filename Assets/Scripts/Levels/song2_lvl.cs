@@ -62,7 +62,7 @@ public class song2_lvl : Level {
 
     }
 
-    public new void Initialize()
+    public void Initialize()
     {
         EventManager.StartListening("DarknessDeath", DarknessDestroyed);
         EventManager.StartListening("PickUpShell", Evt_ShellPickedUp);
