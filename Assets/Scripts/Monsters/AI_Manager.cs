@@ -8,6 +8,7 @@ public class AI_Manager : MonoBehaviour {
 	public List<Darkness> ActiveDarkness;
 
 	public int maxEnemyCount;
+    public int minEnemyCount;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
 	{
@@ -16,7 +17,8 @@ public class AI_Manager : MonoBehaviour {
 
 	void Awake()
 	{
-		maxEnemyCount = 10;
+		maxEnemyCount = 5;
+        minEnemyCount = 3;
 		if(instance != null && instance != this)
 		{
 			//Debug.LogError("Instance of AI Manager already exist in this scene");

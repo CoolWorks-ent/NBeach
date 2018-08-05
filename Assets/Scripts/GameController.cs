@@ -96,8 +96,10 @@ public class GameController : MonoBehaviour {
             waveColor = new Color(waveColor.r, waveColor.g, waveColor.b, 0f);
             wave.GetComponent<Renderer>().material.color = waveColor;
 
+            /*DISABLE SPECIAL FISH TEMPORARILY
             specialFish = GameObject.Find("ClownFish_Special").GetComponent<MagicFish>();
             specialFish.gameObject.SetActive(false);
+            */
 
             pathControl.playOnStart = false;
             StartCoroutine(Level1Start());

@@ -61,6 +61,8 @@ public class NFPSController : PlayerController {
 
         public GameController gController;
         int playerHealth;
+        int playerRechargeAmt = 0;
+        int playerRechargeAmtMax = 10;
         public int playerAmmo;
         public int maxAmmo;
         public PlayerBoundary pBoundary;
@@ -127,8 +129,11 @@ public class NFPSController : PlayerController {
 
     private void FixedUpdate()
     {
-        //function to excute the player's dodge
-        PlayerDodge();
+        if (playerStatus != PLAYER_STATUS.HURT)
+        {
+            //function to excute the player's dodge
+            PlayerDodge();
+        }
 
     }
 
@@ -139,33 +144,50 @@ public class NFPSController : PlayerController {
         ammoText.text = playerAmmo.ToString();
         healthText.text = playerHealth.ToString();
 
+        //Monitor Player's Health and change HUD based upon health amt
+        //HUD intensity increases while player health decreases
+        Camera.main.GetComponent<BWEffect>().intensity = 1 - (playerHealth / 100.0f);
 
-
-
-        /*******
-         * Default - Clamp Player's Movement (only during gameplay)
-         * Clamp the movement to the x-axis btw. 170 & 200
-         *******/
-        
-        //nRigidbody.transform.localPosition = new Vector3(Mathf.Clamp(nRigidbody.transform.localPosition.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.localPosition.y, nRigidbody.transform.localPosition.z);
-
-        //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
-        //Manage Player's Ammo and check for Firing
-        if (playerAmmo > 0)
+        if (playerStatus == PLAYER_STATUS.HURT)
+        {
+            //call function that handles the HURT state
+            //playerRechargeAmt = PlayerHurtState(playerRechargeAmt);
+            Debug.Log("Recharge: " + playerRechargeAmt);
+            playerHealth = playerRechargeAmt;
+            //player tilt hit from side to side to charge
+            if (playerRechargeAmt == playerRechargeAmtMax)
             {
-                
+                playerStatus = PLAYER_STATUS.ALIVE;
+                playerHealth = 100;
+                playerRechargeAmt = 0;
+            }
+        }
+        else //If player is NOT HURT
+        {
+            /*******
+             * Default - Clamp Player's Movement (only during gameplay)
+             * Clamp the movement to the x-axis btw. 170 & 200
+             *******/
+
+            //nRigidbody.transform.localPosition = new Vector3(Mathf.Clamp(nRigidbody.transform.localPosition.x, nRigidbody.transform.localPosition.x - 21, nRigidbody.transform.localPosition.x + 10), nRigidbody.transform.localPosition.y, nRigidbody.transform.localPosition.z);
+
+            //playerContainer.transform.position = new Vector3(Mathf.Clamp(playerContainer.transform.position.x, 170, 200), playerContainer.transform.position.y, playerContainer.transform.position.z);
+            //Manage Player's Ammo and check for Firing
+            if (playerAmmo > 0)
+            {
+
                 if (bReloading == true)
                 {
                     Transform shootPoint = m_GunEnd;
                     Quaternion shootRot = Quaternion.Euler(90 + shootPoint.rotation.eulerAngles.x, 90 + shootPoint.rotation.eulerAngles.y,
                     NewProjectile.transform.rotation.z + shootPoint.rotation.z);
-                    Projectile_Shell projectile = Instantiate<Projectile_Shell>(NewProjectile, shootPoint.transform.position,shootRot);
-                    projectile.Initialize(m_GunEnd);    
+                    Projectile_Shell projectile = Instantiate<Projectile_Shell>(NewProjectile, shootPoint.transform.position, shootRot);
+                    projectile.Initialize(m_GunEnd);
                     bReloading = false;
                     bProjectileInHand = true;
                     nextFire = Time.time + fireRate;
-            }
-                else if(bProjectileInHand == false)
+                }
+                else if (bProjectileInHand == false)
                 {
                     StopCoroutine("CreateNewProjectile");
                     StartCoroutine(CreateNewProjectile());
@@ -173,10 +195,10 @@ public class NFPSController : PlayerController {
                 }
             }
 
-        //create delay btw firing time, 0.5 sec between each shot
-            if (Input.GetButtonDown("Fire1") && Time.time > nextFire )
+            //create delay btw firing time, 0.5 sec between each shot
+            if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
             {
-                
+
                 // If the game isn't playing don't do anything.
                 if (GameController.instance.gameState != GameState.IsPlaying)
                     return;
@@ -233,7 +255,7 @@ public class NFPSController : PlayerController {
                     StartCoroutine(Fire(targetPos));
                 }
             }
-
+        }
 
             /*
              * Smoothly interpolate the weapon rotation towards that of the user/camera.  NOT USING NOW
@@ -514,6 +536,69 @@ public class NFPSController : PlayerController {
 
         yield return null;
         }
+
+    IEnumerator PlayerHurtStateRoutine(int rechargeAmt)
+    {
+        Debug.Log("Player in Hurt State Routine!");
+
+        // initials
+       // Quaternion headRotation = Camera.main.transform.localRotation;
+        int dodgeAmt = 100;
+
+        //intensity of the black/white effect is MAX now!
+        Camera.main.GetComponent<BWEffect>().intensity = 1;
+
+        //Tilt to Recover Mechanic
+        Quaternion centerRot = new Quaternion(0, 0, 0, 0);
+        float centerRotMin = -1 * Mathf.Deg2Rad;
+        float centerRotMax = 1 * Mathf.Deg2Rad;
+        float normMin = 2 * Mathf.PI + centerRotMin;
+        float normTargetZ = 0;
+        //headRotation = (pitch, yaw, roll        
+
+        while (rechargeAmt < playerRechargeAmtMax)
+        {
+         // initials
+            Quaternion headRotation = Camera.main.transform.localRotation;
+            //check for head rotation
+            float zRotation = headRotation.eulerAngles.z;
+
+            if (zRotation >= 180) //normalize btw. -180 < z < 180
+            {
+                normZ = zRotation - 360;
+            }
+            else
+            {
+                normZ = zRotation;
+            }
+
+            //only check for tilt if player's head has returned to middle
+            if (resetRot == true)
+            {
+                //Check for left or right tilt
+                if ((normZ > minLeftRoll && normZ < maxLeftRoll))
+                {
+                    playerRechargeAmt += 1;
+                    resetRot = false;
+                }
+                else if ((normZ < minRightRoll && normZ > maxRightRoll))
+                {
+                    playerRechargeAmt += 1;
+                    resetRot = false;
+                }
+            }
+
+            //reset dodge conditions when player returns neutral head rotation
+            if ((normZ < minLeftRoll) && (normZ > minRightRoll))
+            {
+                resetRot = true;
+            }
+            yield return null;
+        }
+
+        yield return rechargeAmt;
+    }
+
     public void OnCollisionEnter(Collision collision)
     {
         if(collision.transform.tag == "Darkness")
@@ -560,24 +645,34 @@ public class NFPSController : PlayerController {
     {
         float curTime;
         float t;
-        if (invincibleState == false)
+        //player can't be damaged if in HURT state
+        if (invincibleState == false && playerStatus != PLAYER_STATUS.HURT)
         {
             //show damage overlay when hurt
             StartCoroutine(OnPlayerDamaged_corout());
 
-            //player loses health based upon the type of darkness or attack. I'm hard scripting the values for now
-            if (enemy.tag == "Darkness")
-                playerHealth -= 10;
-            if (enemy.tag == "DarkBossAttack")
+            if (playerHealth > 0)
             {
-                playerHealth -= 10;
-
-                //if player hit with RockSmashAttack, trigger event to fly back and hit island
-                DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-                if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                //player loses health based upon the type of darkness or attack. I'm hard scripting the values for now
+                if (enemy.tag == "Darkness")
+                    playerHealth -= 10;
+                if (enemy.tag == "DarkBossAttack")
                 {
-                    EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                    playerHealth -= 10;
+
+                    //if player hit with RockSmashAttack, trigger event to fly back and hit island
+                    DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+                    if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                    {
+                        EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                    }
                 }
+            }
+            //set player into "hurt" state if their health is too low
+            if (playerHealth <= 1)
+            {
+                playerStatus = PLAYER_STATUS.HURT;
+                StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
             }
 
             curTime = Time.time;
