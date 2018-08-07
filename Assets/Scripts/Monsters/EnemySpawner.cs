@@ -52,7 +52,7 @@ public class EnemySpawner : MonoBehaviour
                         //reset timer
                         spawnWait = 0;
                         //add enemy to management list
-                        AI_Manager.Instance.AddtoDarknessList(enemy);
+                        AI_Manager.OnDarknessAdded(enemy);
                         Debug.Log("darkness spawned");
                     }
 

@@ -25,23 +25,24 @@ public class Darkness : MonoBehaviour {
                 deathHash = Animator.StringToHash("Death");
     public Pathfinding.IAstarAI ai;
 
-    public DarkState previousState, currentState;
+    public AI_State<Darkness> previousState, currentState;
+    public List<AI_State<Darkness>> AIStates;
 
-    private HashSet<DarkState> darkStates;
-    Dictionary<EnemyState, DarkState> States;
+    private HashSet<AI_State<Darkness>> darkStates;
+    Dictionary<EnemyState, AI_State<Darkness>> States;
 
     public bool canAttack;
 
     void Start () {
-        darkStates = new HashSet<DarkState>(Resources.LoadAll<DarkState>("Darkness States"));
+        darkStates = new HashSet<AI_State<Darkness>>(AIStates);
         Debug.Log("Darkness states count " + darkStates.Count + "for this object " + this.gameObject);
         actionIdle = 3;
         canAttack = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
         ai = GetComponent<Pathfinding.IAstarAI>();
-        States = new Dictionary<EnemyState, DarkState>();
-        foreach(DarkState dS in darkStates)
+        States = new Dictionary<EnemyState, AI_State<Darkness>>();
+        foreach(AI_State<Darkness> dS in darkStates)
         {
             States.Add(dS.stateType, dS);
         }
@@ -52,7 +53,7 @@ public class Darkness : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        ExecuteCurrentState();
+        currentState.UpdateState(this);
     }
 
     public void ChangeState(EnemyState eState)
@@ -60,10 +61,6 @@ public class Darkness : MonoBehaviour {
         previousState = currentState;
         currentState = States[eState];
         currentState.InitializeState(this);
-    }
-    public void ExecuteCurrentState()
-    {
-        currentState.UpdateState(this);
     }
 
     public void RevertState(Darkness owner)

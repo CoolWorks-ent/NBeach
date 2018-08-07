@@ -20,9 +20,7 @@ public class WanderNearState : DarkState
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.wanderHash);
-        if(controller.ai != null) 
-            controller.ai.onSearchPath += controller.ExecuteCurrentState;
-        else Debug.LogError("AI not set. Attach IAstar component to object");
+        
         controller.aIRichPath.canMove = true;
         controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -30,6 +28,9 @@ public class WanderNearState : DarkState
 
     public override void UpdateState(Darkness controller)
     {
+        if(controller.ai != null) 
+            controller.ai.SearchPath();
+        else Debug.LogError("AI not set. Attach IAstar component to object");
         controller.ai.destination = controller.target.position;
         if(controller.TargetWithinDistance(controller.attackInitiationRange*2))
         {
@@ -50,7 +51,6 @@ public class WanderNearState : DarkState
     public override void ExitState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
-        controller.ai.onSearchPath -= controller.ExecuteCurrentState;
         //controller.ChangeState(EnemyState.IDLE);
     }
 }

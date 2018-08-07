@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu (menuName = "Darkness/State/DeathState")]
-public class DeathState : DarkState 
+public class DeathState : DarkState
 {
 	    public override void OnEnable()
     {
