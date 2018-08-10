@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Darkness/State/WanderNearState")]
-public class WanderNearState : DarkState
+[CreateAssetMenu (menuName = "AI/Darkness/State/WanderNearState")]
+public class WanderNearState : AI_State
 {
 
     [Range(0.5f,12.0f)]
@@ -12,12 +12,8 @@ public class WanderNearState : DarkState
     [Range(2.05f, 14.0f)]
     public float wanderRange;
 
-    public override void OnEnable()
-    {
-        stateType = EnemyState.WANDER;
-    }
 
-    public override void InitializeState(Darkness controller)
+    public void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.wanderHash);
         
@@ -26,13 +22,13 @@ public class WanderNearState : DarkState
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
     }
 
-    public override void UpdateState(Darkness controller)
+    public void UpdateState(Darkness controller)
     {
         if(controller.ai != null) 
             controller.ai.SearchPath();
         else Debug.LogError("AI not set. Attach IAstar component to object");
         controller.ai.destination = controller.target.position;
-        if(controller.TargetWithinDistance(controller.attackInitiationRange*2))
+        /*if(controller.TargetWithinDistance(controller.attackInitiationRange*2))
         {
             AI_Manager.OnAttackRequest(controller.queueID);
             if(controller.canAttack)
@@ -45,10 +41,10 @@ public class WanderNearState : DarkState
                 ExitState(controller); 
                 controller.ChangeState(EnemyState.IDLE);
             }
-        }
+        }*/
     }
 
-    public override void ExitState(Darkness controller)
+    public void ExitState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
         //controller.ChangeState(EnemyState.IDLE);

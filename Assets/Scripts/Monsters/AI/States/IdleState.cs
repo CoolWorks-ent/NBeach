@@ -2,15 +2,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[CreateAssetMenu (menuName = "Darkness/State/IdleState")]
-public class IdleState : DarkState
+[CreateAssetMenu (menuName = "AI/Darkness/State/IdleState")]
+public class IdleState : AI_State
 {
     public float idleTime;
-    public override void OnEnable()
-    {
-        stateType = EnemyState.IDLE;
-    }
-    public override void InitializeState(Darkness controller)
+    public void InitializeState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
@@ -18,11 +14,11 @@ public class IdleState : DarkState
         ExitState(controller);
     }
 
-    public override void UpdateState(Darkness controller)
+    public void UpdateState(Darkness controller)
     {
     }
 
-    public override void ExitState(Darkness controller)
+    public void ExitState(Darkness controller)
     {
         float idleTime = controller.actionIdle;
         if(controller.animeController.GetBool(controller.attackAfterHash))

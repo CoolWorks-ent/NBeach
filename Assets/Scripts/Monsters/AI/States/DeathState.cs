@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Darkness/State/DeathState")]
-public class DeathState : DarkState
+[CreateAssetMenu (menuName = "AI/Darkness/State/DeathState")]
+public class DeathState : AI_State
 {
-	    public override void OnEnable()
-    {
-        stateType = EnemyState.DEATH;
-    }
-    public override void InitializeState(Darkness controller)
+    public void InitializeState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.deathHash);
@@ -17,11 +13,11 @@ public class DeathState : DarkState
         ExitState(controller);
     }
 
-    public override void UpdateState(Darkness controller)
+    public void UpdateState(Darkness controller)
     {
     }
 
-    public override void ExitState(Darkness controller)
+    public void ExitState(Darkness controller)
     {
         AI_Manager.OnDarknessRemoved(controller.queueID);
     }

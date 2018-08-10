@@ -2,16 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AI_State<T_Controller> : ScriptableObject
+[CreateAssetMenu(menuName ="Darkness/State")]
+public  class AI_State : ScriptableObject
 {
+    public AI_Action[] actions;
+    public AI_Transition[] transitions;
+
     public EnemyState stateType;
+    public void UpdateState(Darkness controller)
+    {
+        ExecuteActions(controller);
+        CheckTransitions(controller);
+    }
 
-	public abstract void OnEnable();
+    public void ExecuteActions(Darkness controller)
+    {
+        for(int i = 0; i < actions.Length; i++)
+            actions[i].Act(controller);
+    }
 
-    public virtual void OnEnable(T_Controller controller) { }
-    public virtual void InitializeState(T_Controller controller) { }
-    public abstract void UpdateState(T_Controller controller);
-    public abstract void ExitState(T_Controller controller);
+    public void CheckTransitions(Darkness controller)
+    {
+        for(int i = 0; i < transitions.Length; i++)
+        {
+            bool decisionSucceeded = transitions[i].decision.Decide(controller);
+            if(decisionSucceeded)
+                controller.TransitionToState(transitions[i].trueState);
+            else controller.TransitionToState(transitions[i].falseState);
+        }   
+    }
 }
 
 public enum EnemyState { CHASING, WANDER, IDLE, ATTACK, DEATH }

@@ -5,7 +5,7 @@ using UnityEngine;
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
-public class Darkness : MonoBehaviour {
+public class Darkness : AI_StateController {
 
     public Transform target;
     
@@ -25,24 +25,24 @@ public class Darkness : MonoBehaviour {
                 deathHash = Animator.StringToHash("Death");
     public Pathfinding.IAstarAI ai;
 
-    public AI_State<Darkness> previousState, currentState;
-    public List<AI_State<Darkness>> AIStates;
+    public AI_State previousState, currentState;
+    public List<AI_State> AIStates;
 
-    private HashSet<AI_State<Darkness>> darkStates;
-    Dictionary<EnemyState, AI_State<Darkness>> States;
+    private HashSet<AI_State> darkStates;
+    Dictionary<EnemyState, AI_State> States;
 
     public bool canAttack;
 
     void Start () {
-        darkStates = new HashSet<AI_State<Darkness>>(AIStates);
+        darkStates = new HashSet<AI_State>(AIStates);
         Debug.Log("Darkness states count " + darkStates.Count + "for this object " + this.gameObject);
         actionIdle = 3;
         canAttack = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
         ai = GetComponent<Pathfinding.IAstarAI>();
-        States = new Dictionary<EnemyState, AI_State<Darkness>>();
-        foreach(AI_State<Darkness> dS in darkStates)
+        States = new Dictionary<EnemyState, AI_State>();
+        foreach(AI_State dS in darkStates)
         {
             States.Add(dS.stateType, dS);
         }
@@ -53,28 +53,34 @@ public class Darkness : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        currentState.UpdateState(this);
+        //currentState.UpdateState(this);
+    }
+
+    public override void InitializeAI()
+    {
+
+    }
+
+    public override void TransitionToState(AI_State state)
+    {
+        
+    }
+
+    public override void OnExitState()
+    {
+        
     }
 
     public void ChangeState(EnemyState eState)
     {
         previousState = currentState;
         currentState = States[eState];
-        currentState.InitializeState(this);
+        //currentState.InitializeState(this);
     }
 
     public void RevertState(Darkness owner)
     {
         currentState = previousState;
-    }
-
-    public bool TargetWithinDistance(int range)
-    {
-        if(Vector3.Distance(target.position, transform.position) <= range)
-        {
-            return true;
-        }
-        else return false;
     }
 
     private void OnCollisionEnter(Collision collision)
