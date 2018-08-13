@@ -25,7 +25,7 @@ public class AttackState : AI_State
     {
         //AI_Manager.OnAttackResult();
         controller.animeController.SetBool(controller.attackAfterHash, true);
-        controller.ChangeState(EnemyState.IDLE);
+        //controller.ChangeState(EnemyState.IDLE);
     }
 
 }

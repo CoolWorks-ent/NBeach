@@ -61,7 +61,7 @@ public class AI_Manager : MonoBehaviour {
 			if(ActiveDarkness.ContainsKey(AttackQueue.Peek()))
 			{
 				ActiveDarkness[AttackQueue.Peek()].canAttack = true;
-				ActiveDarkness[AttackQueue.Dequeue()].ChangeState(EnemyState.CHASING);
+				//ActiveDarkness[AttackQueue.Dequeue()].ChangeState(EnemyState.CHASING);
 				attacksCurrentlyProcessed++;
 			}
 			else 
@@ -81,6 +81,7 @@ public class AI_Manager : MonoBehaviour {
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
 		darknessQueueID++;
+		updatedDarkness.InitializeAI();
 		ActiveDarkness.Add(darknessQueueID, updatedDarkness);
 		updatedDarkness.queueID = darknessQueueID;
 		updatedDarkness.target = player;

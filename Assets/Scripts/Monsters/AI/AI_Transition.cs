@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AI_Transition
+[System.Serializable]
+public class AI_Transition
 {
     public AI_Decision decision;
     public AI_State trueState;

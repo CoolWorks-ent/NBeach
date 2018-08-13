@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName ="Darkness/State")]
+[CreateAssetMenu(menuName ="AI/State")]
 public  class AI_State : ScriptableObject
 {
     public AI_Action[] actions;

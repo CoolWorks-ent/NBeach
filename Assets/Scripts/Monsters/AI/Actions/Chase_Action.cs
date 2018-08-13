@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Darkness/Actions/Chase")]
+[CreateAssetMenu(menuName = "AI/Actions/Chase")]
 public class Chase_Action : AI_Action {
 
 	[Range(0.5f,12.0f)]
@@ -12,7 +12,8 @@ public class Chase_Action : AI_Action {
 	
 	public override void Act(Darkness controller)
 	{
-		controller.aIRichPath.canMove = true;
+        if(!controller.aIRichPath.canMove)
+		    controller.aIRichPath.canMove = true;
         controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
 

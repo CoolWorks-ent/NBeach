@@ -278,6 +278,7 @@ MonoBehaviour:
   attackInitiationRange: 4
   actionIdle: 0
   queueID: 0
+  stateUpdateRate: 2
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
   aIRichPath: {fileID: 0}
   animeController: {fileID: 0}
@@ -287,7 +288,10 @@ MonoBehaviour:
   wanderHash: 918399791
   idleHash: 2081823275
   deathHash: 646380074
+  previousState: {fileID: 0}
+  currentState: {fileID: 11400000, guid: 321b666adaf06f54585d5a0e5d5b9b7f, type: 2}
   canAttack: 0
+  updateStates: 0
 --- !u!114 &114576353925070576
 MonoBehaviour:
   m_ObjectHideFlags: 1

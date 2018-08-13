@@ -10,7 +10,7 @@ public class Darkness : AI_StateController {
     public Transform target;
     
     ///<summary>Sets the initiation range for darkness units. Units will be qeued for attack in this range</summary>
-    public int attackInitiationRange, actionIdle, queueID;
+    public int attackInitiationRange, actionIdle, queueID, stateUpdateRate;
 
     public GameObject deathFX;
 
@@ -26,61 +26,61 @@ public class Darkness : AI_StateController {
     public Pathfinding.IAstarAI ai;
 
     public AI_State previousState, currentState;
-    public List<AI_State> AIStates;
 
-    private HashSet<AI_State> darkStates;
-    Dictionary<EnemyState, AI_State> States;
-
-    public bool canAttack;
+    public bool canAttack, idleFinished, updateStates;
 
     void Start () {
-        darkStates = new HashSet<AI_State>(AIStates);
-        Debug.Log("Darkness states count " + darkStates.Count + "for this object " + this.gameObject);
         actionIdle = 3;
-        canAttack = false;
+        canAttack = idleFinished = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
         ai = GetComponent<Pathfinding.IAstarAI>();
-        States = new Dictionary<EnemyState, AI_State>();
-        foreach(AI_State dS in darkStates)
-        {
-            States.Add(dS.stateType, dS);
-        }
         aIRichPath = GetComponent<Pathfinding.RichAI>();
-        //aIDestSetter.target = owner.target;
-        ChangeState(EnemyState.IDLE);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        //currentState.UpdateState(this);
+        currentState.UpdateState(this);
     }
 
     public override void InitializeAI()
     {
-
+        updateStates = true;
+        //StartCoroutine(UpdateState());
     }
 
-    public override void TransitionToState(AI_State state)
+    public override void TransitionToState(AI_State nextState)
     {
-        
+        if(nextState != currentState)
+        {
+            currentState = nextState;
+        }
     }
+    
+    /*protected override IEnumerator UpdateState()
+    {
+        while(updateStates)
+            currentState.UpdateState(this);
+
+        yield return new WaitForSeconds(stateUpdateRate);
+    }*/
 
     public override void OnExitState()
     {
         
     }
 
-    public void ChangeState(EnemyState eState)
+
+    public void SetMovementParameters(bool canMove, float repathRate, float maxSpeed)
     {
-        previousState = currentState;
-        currentState = States[eState];
-        //currentState.InitializeState(this);
+        aIRichPath.canMove = canMove;
+        aIRichPath.repathRate = repathRate;
+        aIRichPath.maxSpeed = maxSpeed;
     }
 
-    public void RevertState(Darkness owner)
+    public void RevertMovementParameters()
     {
-        currentState = previousState;
+        
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -104,7 +104,6 @@ public class Darkness : AI_StateController {
                 //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
                 
                 //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-                ChangeState(EnemyState.DEATH);
                 gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
                 StartCoroutine(deathRoutine());
 

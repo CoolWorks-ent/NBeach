@@ -33,8 +33,8 @@ public class IdleState : AI_State
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
         controller.aIRichPath.canMove = true;
-        if(!controller.canAttack)
+        /*if(!controller.canAttack)
             controller.ChangeState(EnemyState.WANDER);
-        else controller.ChangeState(EnemyState.CHASING);
+        else controller.ChangeState(EnemyState.CHASING);*/
     }
 }
