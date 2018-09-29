@@ -16,7 +16,7 @@ namespace UnityStandardAssets.ImageEffects
 
 
         public AberrationMode mode = AberrationMode.Simple;
-        public float intensity = 0.375f;                    // intensity == 0 disables pre pass (optimization)
+        public float intensity = 5f;                    // intensity == 0 disables pre pass (optimization)
         public float chromaticAberration = 0.2f;
         public float axialAberration = 0.5f;
         public float blur = 0.0f;                           // blur == 0 disables blur pass (optimization)
@@ -60,7 +60,7 @@ namespace UnityStandardAssets.ImageEffects
 
             bool  doPrepass = (Mathf.Abs(blur)>0.0f || Mathf.Abs(intensity)>0.0f);
 
-            float widthOverHeight = (1.0f * rtW) / (1.0f * rtH);
+            float widthOverHeight = (2.0f * rtW) / (2.0f * rtH);
             const float oneOverBaseSize = 1.0f / 512.0f;
 
             RenderTexture color = null;

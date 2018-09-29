@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Rain Spawn Script for Enemies
+ * Script that handles spawning of enemies based upong rain particle collision with water
+ */
 public class rainSpawnScript : MonoBehaviour {
     [SerializeField]
     EnemySpawner enemySpawner;

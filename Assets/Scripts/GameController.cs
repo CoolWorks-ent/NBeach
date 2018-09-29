@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     GameObject debugMenuPrefab;
 
+    public TimeManager timeManager;
     GameObject player;
     GameObject wave;
     GameObject waveTunnel;
@@ -128,6 +129,9 @@ public class GameController : MonoBehaviour {
          * load different resources based upon the Scene loaded
          */
         EventManager.StartListening("Player_Stop", ResetPlayer);
+        //timeManager = GetComponent<TimeManager>();
+        Time.fixedDeltaTime = Time.timeScale * .02f;
+
         if (SceneManager.GetActiveScene().name == "Song1_V2")
         {
             waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
@@ -166,6 +170,7 @@ public class GameController : MonoBehaviour {
             Debug.Log("[Camera Path]: Finished");
         else if (evt == "StopAudio")
             Debug.Log("[Sound Manager]: Audio Stopped");
+        
     }
 
     // Update is called once per frame

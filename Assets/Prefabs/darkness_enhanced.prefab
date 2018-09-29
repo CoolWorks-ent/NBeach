@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 114662073128543118}
   - component: {fileID: 114372473262131794}
   - component: {fileID: 114712269329263896}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 64614841458248028}
   - component: {fileID: 95777162312456306}
   - component: {fileID: 54403178235137582}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: darkness_model
   m_TagString: Darkness
   m_Icon: {fileID: 0}

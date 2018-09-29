@@ -41,6 +41,16 @@ public class AI_Manager : MonoBehaviour {
         ActiveDarkness.Remove(updatedDarkness);
     }
 
+    public void KillAllDarkness()
+    {
+        Debug.Log("[AI] All Darkness AI kill call");
+        for(int i = 0; i < ActiveDarkness.Count;i++)
+        {
+            Destroy(ActiveDarkness[i].gameObject);
+            ActiveDarkness.RemoveAt(i);
+        }
+    }
+
     public IEnumerator WaitTimer(float timer)
 	{
 		yield return new WaitForSeconds(timer);

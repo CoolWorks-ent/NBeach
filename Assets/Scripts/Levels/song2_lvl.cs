@@ -21,7 +21,13 @@ public class song2_lvl : Level {
     [SerializeField]
     DarknessBoss darkBoss;
     [SerializeField]
+    GameObject[] lightningBolts;
+    [SerializeField]
     ParticleSystem RainFX;
+    [SerializeField]
+    ParticleSystem RainFX_2;
+    [SerializeField]
+    ParticleSystem RainFX_3;
     [SerializeField]
     ParticleSystem RainFX_Wide;
     [SerializeField]
@@ -35,9 +41,11 @@ public class song2_lvl : Level {
     [SerializeField]
     SimpleAnimator2D animator2D;
     [SerializeField]
-    int bossAttackSpeed_stage1 = 1, bossAttackSpeed_stage2 = 2, bossAttackSpeed_stage3 = 3;
+    int bossAttackSpeed_stage1 = 4, bossAttackSpeed_stage2 = 5, bossAttackSpeed_stage3 = 6;
     [SerializeField]
     float bossTimeBtwAttacks_stage1 = 1, bossTimeBtwAttacks_stage2 = 1.5f, bossTimeBtwAttacks_stage3 = 1.5f;
+    [SerializeField]
+    Transform darkBossEndPos;
 
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
@@ -47,14 +55,15 @@ public class song2_lvl : Level {
     float curSongTime = 0;
     float songStartTime = 0;
     public int stageNum = 0;
-    float stage1StartTime = 30; //120; //in seconds
-    float stage2StartTime = 90; //180; //3min in seconds
-    float stage3StartTime = 160; //240; //4min in seconds
-    float stage3EndTime = 320; //5+min in seconds
-    float darkSpawnRate_Stage0 = 8;
-    float darkSpawnRate_Stage1 = 2;
-    float darkSpawnRate_Stage2 = 1;
-    float darkSpawnRate_Stage3 = .5f;
+    float stage1StartTime = 20; //120; //in seconds
+    float stage2StartTime = 40; //180; //3min in seconds
+    float stage3StartTime = 60; //240; //4min in seconds
+    float stage3EndTime = 80; //320 //5+min in seconds (current total song time = 5:15)
+    float darkSpawnRate_Stage0 = 6;
+    float darkSpawnRate_Stage0_1 = 5;
+    float darkSpawnRate_Stage1 = 4;
+    float darkSpawnRate_Stage2 = 2f;
+    float darkSpawnRate_Stage3 = 1f;
     int rainEmissionRate_stage1 = 0, rainEmissionRate_stage2 = 0, rainEmissionRate_stage3 = 0, rainEmissionRate_stage3End = 0;
 
     int numOfShells = 0;
@@ -93,6 +102,8 @@ public class song2_lvl : Level {
         darkBoss.gameObject.SetActive(false);
         darkBossObj = darkBoss.transform.parent.gameObject;
         RainFX.Stop();
+        RainFX_2.Stop();
+        RainFX_3.Stop();
         RainFX_Wide.Stop();
 
         shellArray = new List<ShellPickup>();
@@ -112,7 +123,8 @@ public class song2_lvl : Level {
 
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
 
         //get current time based upon when stage0 started
         curSongTime = Time.time - songStartTime;
@@ -120,6 +132,10 @@ public class song2_lvl : Level {
         //call function to handle spawning of throwable shells
         ShellSpawner();
 
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            DebugFunc("Song2_Stage3");
+        }
     }
 
     void StartNextStage()
@@ -154,6 +170,8 @@ public class song2_lvl : Level {
             Debug.Log("[Camera Path]: Finished");
         else if (evt == "StopAudio")
             Debug.Log("[Sound Manager]: Audio Stopped");
+        else if (evt == "Song2_Stage3")
+            Debug.Log("[Level Manager]: Skip to Song2 Stage 3");
     }
 
     void DarknessDestroyed(string evt)
@@ -222,6 +240,7 @@ public class song2_lvl : Level {
     {
         for (int i = 0; i < shellArray.Count; i++)
         {
+            //add a object == nil check?
             if (shellArray[i].name == str)
                 shellArray.RemoveAt(i);
         }
@@ -271,6 +290,12 @@ public class song2_lvl : Level {
     //function to make player run to next rock when old rock is destroyed Via Spline
     public IEnumerator RunToNewRock(int rockNum)
     {
+        /*
+        * Prevent Enemies from Attacking Player
+        */
+        darkBoss.status = DarknessBoss.BossStatus.rest;
+        //gController.playerControl.GetComponent<BoxCollider>().enabled = false;
+
         //begin spline
         pathControl.Play();
         gController.playerControl.CanMove = false;
@@ -302,10 +327,20 @@ public class song2_lvl : Level {
                 Destroy(s.gameObject);
         }
         shellArray.Clear();
+        //destroy ALL darkness previously spawned to start over
+        AI_Manager.Instance.KillAllDarkness();
 
         //increment state number because player has reach next rock
         stageNum += 1;
         Debug.Log("Rock " + stageNum + " Reached.");
+
+        /*
+         * Allow Enemies To Attack Player
+         */
+        darkBoss.status = DarknessBoss.BossStatus.charging;
+        //enabled Player's box collider
+        //gController.playerControl.GetComponent<BoxCollider>().enabled = false;
+
         StartNextStage();
         //remove speed boost and other FX
         //gController.playerControl.Reset();
@@ -335,11 +370,14 @@ public class song2_lvl : Level {
         //change skybox to night
         print("night sky");
         RenderSettings.skybox = nightSkybox;
+
         yield return new WaitForSeconds(0.1f);
         blackOverlay.gameObject.SetActive(false);
 
+
+
         //increase rain FX amount & intensity
-        StartCoroutine(AdjustRainAmt(rainEmissionRateMax));
+        StartCoroutine(AdjustRainAmt(RainFX, rainEmissionRateMax));
 
         //begin spawning enemies
         enemySpawners.spawningEnemies = true;
@@ -350,8 +388,10 @@ public class song2_lvl : Level {
         Vector3 startPos = darkBossObj.transform.position;
         Vector3 endPos = new Vector3(startPos.x, GameObject.Find("OceanSurfaceQuad").transform.position.y, startPos.z);
 
-        //[PLAY MUSIC] start playing bg song
-        //gController.soundManager.FadeInMusic(1);
+        /*
+         * [PLAY BG MUSIC] start playing bg song
+         */ 
+        gController.soundManager.FadeInMusic(1);
 
         while (t <= moveTime)
         {
@@ -404,9 +444,83 @@ public class song2_lvl : Level {
         //Display eye-open animation and show world. disable black overlay too
         animator2D.Play("eyeOpen");
         blackOverlay.gameObject.SetActive(false);
+        yield return new WaitForSeconds(1);
+
+        foreach (GameObject bolt in lightningBolts)
+        {
+            bolt.SetActive(true);
+            bolt.GetComponent<LightningBoltScript>().Trigger();
+        }
+        
+        //TEST LIGHTNING FLASH
+        GameObject flashSphere = GameObject.Find("FlashSphere");
+        Renderer renderer = flashSphere.GetComponent<Renderer>();
+        Material mat = flashSphere.GetComponent<Renderer>().material;
+        Color alpha1 = new Color(mat.color.r, mat.color.g, mat.color.b, 0f);
+        Color alpha2 = new Color(mat.color.r, mat.color.g, mat.color.b, .2f);
+        Color alpha3 = new Color(mat.color.r, mat.color.g, mat.color.b, .5f);
+        float elapsedTime = 0;
+        float time = .02f;
+        int flashCount = 0;
+        int maxFlashCount = 12;
+        Debug.Log(renderer.material.HasProperty("_Color"));
+
+        renderer.material.SetColor("_Color",alpha2);
+        while (flashCount < maxFlashCount)
+        {
+            if (renderer.material.color == alpha2)
+            {
+                while (elapsedTime < time)
+                {
+                    renderer.material.color = Color.Lerp(renderer.material.color, alpha3, elapsedTime / time);
+                    elapsedTime += Time.deltaTime;
+                    yield return null;
+                }
+                renderer.material.color = alpha3;
+            }
+            else if (renderer.material.color == alpha3)
+            {
+                while (elapsedTime < time)
+                {
+                    renderer.material.color = Color.Lerp(renderer.material.color, alpha2, elapsedTime / time);
+                    elapsedTime += Time.deltaTime;
+                    yield return null;
+                }
+                renderer.material.color = alpha2;
+            }
+            else
+            {
+                while (elapsedTime < time)
+                {
+                    renderer.material.color = Color.Lerp(renderer.material.color, alpha1, elapsedTime / time);
+                    elapsedTime += Time.deltaTime;
+                    yield return null;
+                }
+                renderer.material.color = alpha1;
+            }
+            elapsedTime = 0;
+            flashCount += 1;
+            yield return null;
+        }
+
+        //destroy lightning bolts
+        foreach (GameObject bolt in lightningBolts)
+        {
+            //bolt.SetActive(false);
+        }
+
+        //reset color to transparent while (elapsedTime < time)
+        while (elapsedTime < time)
+        {
+            renderer.material.color = Color.Lerp(renderer.material.color, alpha1, elapsedTime / time);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        renderer.material.color = alpha1;
+        //renderer.material.SetColor("_Color", alpha1);
 
         //increase rain FX amount & intensity
-        StartCoroutine(AdjustRainAmt(rainEmissionRate_stage1));
+        StartCoroutine(AdjustRainAmt(RainFX, rainEmissionRate_stage1));
 
         //begin spawning enemies
         enemySpawners.spawningEnemies = true;
@@ -417,8 +531,10 @@ public class song2_lvl : Level {
         Vector3 startPos = darkBossObj.transform.position;
         Vector3 endPos = new Vector3(startPos.x, GameObject.Find("OceanSurfaceQuad").transform.position.y, startPos.z);
 
-        //[PLAY MUSIC] start playing bg song
-        //gController.soundManager.FadeInMusic(1);
+        /*
+         * [PLAY BG MUSIC] start playing bg song
+         */
+        gController.soundManager.FadeInMusic(2);
 
         while (t <= moveTime)
         {
@@ -430,12 +546,13 @@ public class song2_lvl : Level {
         //start the dark boss' attack sequence
         darkBoss.stage = DarknessBoss.BossStage.stage1;
         darkBoss.status = DarknessBoss.BossStatus.start;
+        darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage1;
 
+        enemySpawners.spawnRate = darkSpawnRate_Stage0;
         float waitTime = stage1StartTime - curSongTime;
-        Debug.Log("time till next stage = " + (waitTime * (.25f)));
-        //float tempWaitTime = 15;
+        Debug.Log("time till next stage = " + (waitTime * (.5f)));
         //This is the length of time the rest of the stage should play out
-        yield return new WaitForSeconds(waitTime * (.25f));
+        yield return new WaitForSeconds(waitTime * (.5f));
 
         //Pause coroutine until player is not in HURT state
         while (gController.playerControl.playerStatus == PLAYER_STATUS.HURT)
@@ -451,11 +568,11 @@ public class song2_lvl : Level {
          * Stage1.2 - wave 2
         */
         print("Enemy Wave 2");
-        enemySpawners.spawnRate = darkSpawnRate_Stage0;
-        AI_Manager.Instance.maxEnemyCount = 6;
+        enemySpawners.spawnRate = darkSpawnRate_Stage0_1;
+        AI_Manager.Instance.maxEnemyCount = 7;
 
-        Debug.Log("time till next stage = " + (waitTime * (.75f)));
-        yield return new WaitForSeconds(waitTime * .75f);
+        Debug.Log("time till next stage = " + (waitTime * (.5f)));
+        yield return new WaitForSeconds(waitTime * .5f);
 
         //Pause coroutine until player is not in HURT state
         while (gController.playerControl.playerStatus == PLAYER_STATUS.HURT)
@@ -475,6 +592,12 @@ public class song2_lvl : Level {
     {
         Debug.Log("Stage 1 Start");
         //Set Enemy Stage to face the Player Container Position
+        RainFX.GetComponent<rainSpawnScript>().enabled = false;
+        RainFX_2.Play();
+        //increase rain FX of stage 2 
+        StartCoroutine(AdjustRainAmt(RainFX_2, rainEmissionRate_stage2));
+        //decrease rainFX of stage1 to 0
+        StartCoroutine(AdjustRainAmt(RainFX, 0));
 
         Transform target = gController.playerControl.GetComponent<NFPSController>().playerContainer.transform;
         float rotateTime = 2f;
@@ -493,7 +616,7 @@ public class song2_lvl : Level {
         }
         //enemyStageObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform,);
         //Reset Dark Boss rotation
-        darkBoss.transform.rotation = new Quaternion(0, 0, 0, 0);
+        darkBossObj.transform.rotation = new Quaternion(0, 0, 0, 0);
 
         //snap player transform to face dark boss after reaching the new stage position
         gController.playerStage.transform.LookAt(darkBoss.transform);
@@ -502,14 +625,11 @@ public class song2_lvl : Level {
         
         AI_Manager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
-        darkBoss.maxAttackTimer = darkBoss.maxAttackTimer - bossTimeBtwAttacks_stage1;
+        darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage1;
         //Increase speed of dark ball attack
         darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage1;
         //resume spawning AI for next wave
         enemySpawners.pauseSpawning = false;
-
-        //increase rain FX amount & intensity
-        StartCoroutine(AdjustRainAmt(rainEmissionRate_stage2));
 
         float waitTime = stage2StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
@@ -532,6 +652,12 @@ public class song2_lvl : Level {
     IEnumerator Stage2Routine()
     {
         Debug.Log("Stage 2 Start");
+        RainFX_2.GetComponent<rainSpawnScript>().enabled = false;
+        RainFX_3.Play();
+        //increase rain FX of stage 2 
+        StartCoroutine(AdjustRainAmt(RainFX_3, rainEmissionRate_stage3));
+        //decrease rainFX of stage1 to 0
+        StartCoroutine(AdjustRainAmt(RainFX_2, 0));
 
         //Set Enemy Stage to face the Player Container Position
         //Transform target = gController.playerControl.GetComponent<NFPSController>().transform;
@@ -556,14 +682,11 @@ public class song2_lvl : Level {
 
         //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
-        AI_Manager.Instance.maxEnemyCount = 20;
+        AI_Manager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
-        darkBoss.maxAttackTimer = darkBoss.maxAttackTimer - bossTimeBtwAttacks_stage2;
+        darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage2;
         //Increase speed of dark ball attack
         darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage2;
-
-        //increase rain FX amount & intensity
-        StartCoroutine(AdjustRainAmt(rainEmissionRate_stage3));
 
         float waitTime = stage3StartTime - curSongTime;
         Debug.Log("time till next stage = " + waitTime);
@@ -590,7 +713,7 @@ public class song2_lvl : Level {
         //wait for an event for when the rock is destroyed by the dark boss.
         //tell boss to destroy the player's last cover rock
         darkBoss.DoRockSmash_Interrupt(coverRocks[2]);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(4);
 
         //!Dark Boss moves closer!
 
@@ -608,9 +731,11 @@ public class song2_lvl : Level {
 
     }
 
+    //[Stage3] Final Stand, no more cover during this stage
     IEnumerator Stage3Routine()
     {
         Debug.Log("Stage 3 Start");
+
         //Set Enemy Stage to face the Player Container Position
         //Transform target = gController.playerControl.GetComponent<NFPSController>().transform;
         Transform target = gController.playerControl.gameObject.transform;
@@ -635,22 +760,28 @@ public class song2_lvl : Level {
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
-        AI_Manager.Instance.maxEnemyCount = 30;
-        StartCoroutine(AdjustRainAmt(rainEmissionRate_stage3End));
+        AI_Manager.Instance.maxEnemyCount = 20;
+        StartCoroutine(AdjustRainAmt(RainFX_3, rainEmissionRate_stage3End));
 
         //Decrease Time between attacks
-        darkBoss.maxAttackTimer = darkBoss.maxAttackTimer - bossTimeBtwAttacks_stage3; 
+        darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage3; 
         //Increase speed of dark ball attack
         darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage3;
 
         float waitTime = stage3EndTime - curSongTime;
+        Debug.Log("time till end = " + waitTime);
         //float tempWaitTime = 5;
         yield return new WaitForSeconds(waitTime);
 
         //ijncrease size of hand to guarantee collision with player
-        darkBoss.darkHand.GetComponent<BoxCollider>().size = new Vector3(5, 5, 5);
+        Vector3 boxSize = darkBoss.darkHand.GetComponent<BoxCollider>().size;
+        darkBoss.darkHand.GetComponent<BoxCollider>().size = new Vector3(boxSize.x, .1f, .1f);
 
         darkBoss.DoRockSmash_Interrupt(gController.playerControl.gameObject);
+        yield return new WaitForSeconds(4f);
+        gController.timeManager.DoSlowMo(15f);
+        yield return new WaitUntil(() => gController.timeManager.slowMoOn == false);
+        Debug.Log("song finished");
 
         //StartCoroutine(Song2_EndCutscene());
 
@@ -672,9 +803,9 @@ public class song2_lvl : Level {
         //begin spline
         pathControl_EndScene.Play();
         SpeedBoost spdBoost = Instantiate(speedBoostPowerUp, playerPos.position, playerPos.rotation);
+        //EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
         gController.playerControl.CanMove = false;
         gController.playerControl.playerState = PlayerState.MOVING;
-
         yield return 0;
     }
 
@@ -699,6 +830,27 @@ public class song2_lvl : Level {
         gController.playerControl.CanMove = false;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
 
+        /* [CREEP Ending]
+         * MOVE Dark Boss to the Island and slowly creep into player's view
+         */ 
+        float tempSpeed = 3;
+        //Teleport Boss close to player's position
+        darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x-5, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-5);
+        //set boss to look in player's direction on the island
+        darkBossObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform);
+        //rotate boss to face downwards and in player's view
+        darkBossObj.transform.localRotation = new Quaternion(23.365f, darkBossObj.transform.rotation.y, darkBossObj.transform.rotation.z, darkBossObj.transform.rotation.w);
+
+        //slowly move boss towards player's position within their view
+        yield return new WaitForSeconds(1);
+        float t = 0;
+        float moveTime = 3;
+        while (t < moveTime)
+        {
+            darkBossObj.transform.position = Vector3.MoveTowards(darkBossObj.transform.position, darkBossEndPos.transform.position, Time.deltaTime * tempSpeed);
+            yield return null;
+        }
+
         yield return new WaitForSeconds(3);
         
         Destroy(impactFX);
@@ -711,26 +863,28 @@ public class song2_lvl : Level {
         //scene fades to black as player's eyes close
         if (blackOverlay != null)
         {
-                //display eye-blink overrlay and block the change of the skybox
+                //display eye-blink overrlay
                 animator2D.Play("eyeClose");
                 yield return new WaitForSeconds(0.1f);
                 blackOverlay.gameObject.SetActive(true);
                 blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
                 yield return new WaitForSeconds(0.1f);
         }
+        //FADE OUT Music
+        gController.soundManager.StopBGAudio();
     }
 
     /*
      *Adjust Rain Effects to be more/less intense by amount and speed 
      */ 
-    IEnumerator AdjustRainAmt(int newRainEmissionRate)
+    IEnumerator AdjustRainAmt(ParticleSystem rainFX, int newRainEmissionRate)
     {
         float t = 0;
         float rainIncreaseTime = 5;
         //increase the rains RateOverTime gradually - MORE INTENSE & Faster
         while (t < rainIncreaseTime)
         {
-            UnityEngine.ParticleSystem.EmissionModule em = RainFX.emission;
+            UnityEngine.ParticleSystem.EmissionModule em = rainFX.emission;
             UnityEngine.ParticleSystem.EmissionModule em2 = RainFX_Wide.emission;
             float currentRate = em.rateOverTime.constant;
             em.rateOverTime = Mathf.Lerp(currentRate, newRainEmissionRate, t / rainIncreaseTime);

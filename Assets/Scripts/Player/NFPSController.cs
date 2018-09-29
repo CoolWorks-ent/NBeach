@@ -58,6 +58,8 @@ public class NFPSController : PlayerController {
         private Text healthText;
         [SerializeField]
         public GameObject playerContainer;
+        [SerializeField]
+        bool invincibleState = false;
 
         public GameController gController;
         int playerHealth;
@@ -72,10 +74,9 @@ public class NFPSController : PlayerController {
      */
         float nextFire = 1f;
         float fireRate = 1f; //fire once per second
-        int invincibleTime = 1; //time player invincible after being hit 
+        int invincibleTime = 2; //time player invincible after being hit 
         Projectile_Shell tempProjectile;
         bool projectileFired = false;
-        bool invincibleState = false; 
         private const float k_DampingCoef = -20f;                                       // This is the coefficient used to ensure smooth damping of this gameobject.
         private LineRenderer laserLine;
         float weaponRange = 50f;
@@ -96,6 +97,8 @@ public class NFPSController : PlayerController {
         float normZ = 0;
         bool resetRot = true;
         bool canDodgeRight = true, canDodgeLeft = true;
+
+        Coroutine HurtCoroutine;
 
         
 
@@ -154,12 +157,14 @@ public class NFPSController : PlayerController {
             //playerRechargeAmt = PlayerHurtState(playerRechargeAmt);
             Debug.Log("Recharge: " + playerRechargeAmt);
             playerHealth = playerRechargeAmt;
-            //player tilt hit from side to side to charge
+            //player tilt from side to side to charge
             if (playerRechargeAmt == playerRechargeAmtMax)
             {
                 playerStatus = PLAYER_STATUS.ALIVE;
+                Debug.Log("Player Alive!");
                 playerHealth = 100;
                 playerRechargeAmt = 0;
+                StopCoroutine(HurtCoroutine);
             }
         }
         else //If player is NOT HURT
@@ -181,6 +186,7 @@ public class NFPSController : PlayerController {
                     Transform shootPoint = m_GunEnd;
                     Quaternion shootRot = Quaternion.Euler(90 + shootPoint.rotation.eulerAngles.x, 90 + shootPoint.rotation.eulerAngles.y,
                     NewProjectile.transform.rotation.z + shootPoint.rotation.z);
+
                     Projectile_Shell projectile = Instantiate<Projectile_Shell>(NewProjectile, shootPoint.transform.position, shootRot);
                     projectile.Initialize(m_GunEnd);
                     bReloading = false;
@@ -315,7 +321,6 @@ public class NFPSController : PlayerController {
         {
             //Vector3 curPos = transform.position;
             bool canMove = false;
-
             //dodge left
             if ((normZ > minLeftRoll && normZ < maxLeftRoll))
             {
@@ -542,8 +547,6 @@ public class NFPSController : PlayerController {
         Debug.Log("Player in Hurt State Routine!");
 
         // initials
-       // Quaternion headRotation = Camera.main.transform.localRotation;
-        int dodgeAmt = 100;
 
         //intensity of the black/white effect is MAX now!
         Camera.main.GetComponent<BWEffect>().intensity = 1;
@@ -595,7 +598,11 @@ public class NFPSController : PlayerController {
             }
             yield return null;
         }
-
+        while ((normZ > minLeftRoll) && (normZ < minRightRoll))
+        {
+            yield return null;
+        }
+        Camera.main.transform.localRotation = new Quaternion(0, 0, 0, 0);
         yield return rechargeAmt;
     }
 
@@ -604,11 +611,11 @@ public class NFPSController : PlayerController {
         if(collision.transform.tag == "Darkness")
         {
             //call damage function
-            OnPlayerDamaged(collision.transform);
+            //OnPlayerDamaged(collision.transform);
         }
         if (collision.gameObject.tag == "DarkBossAttack")
         {
-            OnPlayerDamaged(collision.transform);
+           // OnPlayerDamaged(collision.transform);
         }
 
     }
@@ -618,11 +625,11 @@ public class NFPSController : PlayerController {
         if (collider.transform.tag == "Darkness")
         {
             //call damage function
-            OnPlayerDamaged(collider.transform);
+            StartCoroutine(OnPlayerDamaged(collider.transform));
         }
         if(collider.gameObject.tag == "DarkBossAttack")
         {
-            OnPlayerDamaged(collider.transform);
+            StartCoroutine(OnPlayerDamaged(collider.transform));
         }
         
 
@@ -641,52 +648,71 @@ public class NFPSController : PlayerController {
         }*/
     }
 
-    private void OnPlayerDamaged(Transform enemy)
+    IEnumerator OnPlayerDamaged(Transform enemy)
     {
-        float curTime;
-        float t;
+        float curTime = 0;
+        float t = 0;
+
         //player can't be damaged if in HURT state
         if (invincibleState == false && playerStatus != PLAYER_STATUS.HURT)
         {
-            //show damage overlay when hurt
-            StartCoroutine(OnPlayerDamaged_corout());
 
             if (playerHealth > 0)
             {
-                //player loses health based upon the type of darkness or attack. I'm hard scripting the values for now
-                if (enemy.tag == "Darkness")
-                    playerHealth -= 10;
-                if (enemy.tag == "DarkBossAttack")
+                if (invincibleState != true)
                 {
-                    playerHealth -= 10;
+                    //show damage overlay when hurt
+                    StartCoroutine(OnPlayerDamaged_corout());
 
-                    //if player hit with RockSmashAttack, trigger event to fly back and hit island
-                    DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-                    if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                    //player loses health based upon the type of darkness or attack. I'm hard scripting the values for now
+                    if (enemy.tag == "Darkness")
+                        playerHealth -= 10;
+                    else if (enemy.tag == "DarkBossAttack")
                     {
-                        EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                        playerHealth -= 10;
+
+                        //if player hit with RockSmashAttack, trigger event to fly back and hit island
+                        DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                        {
+                            EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                        }
                     }
                 }
-            }
-            //set player into "hurt" state if their health is too low
-            if (playerHealth <= 1)
-            {
-                playerStatus = PLAYER_STATUS.HURT;
-                StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
+                    curTime = 0;
+                    invincibleState = true;
+                    yield return new WaitForSeconds(invincibleTime);
+
+                    /*while (curTime < invincibleTime)
+                    {
+
+                        curTime += Time.deltaTime;
+                        Debug.Log((invincibleTime) - curTime);
+
+                    }*/
+                    Debug.Log("Invincibility Off");
+                    invincibleState = false;
+                
             }
 
-            curTime = Time.time;
-            t = Time.time;
-            invincibleState = true;
-            while (curTime < t + invincibleTime)
-            {
-
-                curTime += Time.deltaTime;
-            }
-            invincibleState = false;
         }
-        
-        
+        else if(playerStatus != PLAYER_STATUS.HURT)
+        {
+            //if player hit with RockSmashAttack, trigger event to fly back and hit island
+            DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+            if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+            {
+                EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+            }
+        }
+        //set player into "hurt" state if their health is too low
+        if (playerHealth <= 1 && playerStatus != PLAYER_STATUS.HURT)
+        {
+            playerStatus = PLAYER_STATUS.HURT;
+            HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
+            
+        }
+        yield return 0;
     }
 
     //Coroutine to player effect when player is damaged
