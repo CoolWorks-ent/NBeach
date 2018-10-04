@@ -8,7 +8,7 @@ public class AI_Manager : MonoBehaviour {
 	public Dictionary<int, Darkness> ActiveDarkness;
 	private Queue<int> AttackQueue;
 	[SerializeField]
-	private int darknessQueueID, darknessAttackCount, attacksCurrentlyProcessed;
+	private int darknessQueueID, darknessConcurrentAttackLimit, attacksCurrentlyProcessed;
 	public int maxEnemyCount;
     public int minEnemyCount;
 	private static AI_Manager instance;
@@ -19,9 +19,9 @@ public class AI_Manager : MonoBehaviour {
 
 	void Awake()
 	{
-		darknessAttackCount = 2;
+		darknessConcurrentAttackLimit = 2;
 		darknessQueueID = 0;
-		maxEnemyCount = 5;
+		maxEnemyCount = 2;
         minEnemyCount = 3;
 		if(instance != null && instance != this)
 		{
@@ -32,21 +32,30 @@ public class AI_Manager : MonoBehaviour {
 		ActiveDarkness = new Dictionary<int, Darkness>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
-		AttackRequest += CreateAttackRequest;
+		AttackRequest += UpdateAttackRequest;
 		AttackQueue = new Queue<int>();
 		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
 
 	void Update()
 	{
-		if(AttackQueue.Count > 0)
-			ProcessAttackRequest();
+		/*if(AttackQueue.Count > 0)
+			ProcessAttackRequest();*/
 	}
 
 	///<summary>Notify AI manager to add a Darkness unit to the queue to decide which units can attack next</summary>
-	private void CreateAttackRequest(int d)
+	private void UpdateAttackRequest(int iD, bool requested)
 	{
-		AttackQueue.Enqueue(d);
+		if(!requested)
+		{
+			AttackQueue.Enqueue(iD); 
+			Debug.Log("<b><color=green>AI Manager:</color></b> Darkness #" + iD + " request has been processed");
+		}
+		else
+		{
+			Debug.LogWarning("<b><color=red>AI Manager:</color></b> Darkness #" + iD + " has already requested to attack");
+			ProcessAttackRequest();
+		} 
 	}
 
 	///<summary>
@@ -56,13 +65,14 @@ public class AI_Manager : MonoBehaviour {
 	private void ProcessAttackRequest()
 	{
 		//TODO check if current darkness 
-		if(attacksCurrentlyProcessed <= darknessAttackCount)
+		if(attacksCurrentlyProcessed <= darknessConcurrentAttackLimit)
 		{
 			if(ActiveDarkness.ContainsKey(AttackQueue.Peek()))
 			{
 				ActiveDarkness[AttackQueue.Peek()].canAttack = true;
-				//ActiveDarkness[AttackQueue.Dequeue()].ChangeState(EnemyState.CHASING);
 				attacksCurrentlyProcessed++;
+				AttackQueue.Dequeue();
+				ProcessAttackRequest();
 			}
 			else 
 			{
@@ -81,7 +91,6 @@ public class AI_Manager : MonoBehaviour {
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
 		darknessQueueID++;
-		updatedDarkness.InitializeAI();
 		ActiveDarkness.Add(darknessQueueID, updatedDarkness);
 		updatedDarkness.queueID = darknessQueueID;
 		updatedDarkness.target = player;
@@ -99,15 +108,15 @@ public class AI_Manager : MonoBehaviour {
 
 	public delegate void AIEvent<T>(T obj);
 	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
-	public static event AIEvent<int> AttackRequest;
+	public static event AIEvent<int, bool> AttackRequest;
 	public static event AIEvent<int> AttackEnded;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<int> RemoveDarkness;
 
-	public static void OnAttackRequest(int d)
+	public static void OnAttackRequest(int iD, bool request)
 	{
 		if(AttackRequest != null)
-			AttackRequest(d);			
+			AttackRequest(iD, request);			
 	}
 
 	public static void OnAttackEnded(int d)

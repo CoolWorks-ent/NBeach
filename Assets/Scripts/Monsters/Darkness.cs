@@ -5,7 +5,7 @@ using UnityEngine;
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
-public class Darkness : AI_StateController {
+public class Darkness : MonoBehaviour {
 
     public Transform target;
     
@@ -25,51 +25,41 @@ public class Darkness : AI_StateController {
                 deathHash = Animator.StringToHash("Death");
     public Pathfinding.IAstarAI ai;
 
-    public AI_State previousState, currentState;
+    public Dark_State previousState, currentState;
 
-    public bool canAttack, idleFinished, updateStates;
+    public bool canAttack, idleFinished, updateStates, attackRequested;
 
     void Start () {
         actionIdle = 3;
-        canAttack = idleFinished = false;
+        canAttack = idleFinished = attackRequested = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
         ai = GetComponent<Pathfinding.IAstarAI>();
         aIRichPath = GetComponent<Pathfinding.RichAI>();
+        currentState.InitializeState(this);
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        ExecuteCurrentState();
+    }
+
+    public void ExecuteCurrentState()
+    {
         currentState.UpdateState(this);
     }
 
-    public override void InitializeAI()
+    public void ChangeState(Dark_State nextState)
     {
-        updateStates = true;
-        //StartCoroutine(UpdateState());
-    }
-
-    public override void TransitionToState(AI_State nextState)
-    {
-        if(nextState != currentState)
+        if(currentState != nextState)
         {
+            /*string memes = "Switching from current <color = red><b>" + currentState.stateType + "</b></color> state to next <color = green><b>" + nextState.stateType +  "</b></color> state";
+            Debug.Log(memes);*/
             currentState = nextState;
+            currentState.InitializeState(this);
+            previousState = currentState;
         }
     }
-    
-    /*protected override IEnumerator UpdateState()
-    {
-        while(updateStates)
-            currentState.UpdateState(this);
-
-        yield return new WaitForSeconds(stateUpdateRate);
-    }*/
-
-    public override void OnExitState()
-    {
-        
-    }
-
 
     public void SetMovementParameters(bool canMove, float repathRate, float maxSpeed)
     {
@@ -99,38 +89,11 @@ public class Darkness : AI_StateController {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
-
-                GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
-                //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
-                
-                //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-                gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
-                StartCoroutine(deathRoutine());
-
+                //ChangeState(DeathState);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
         }
     }
 
-    IEnumerator deathRoutine()
-    {
-        float fxTime = 1;
-        //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
-        int maxPower = 10;
-        MeshRenderer renderer = gameObject.GetComponentInChildren<MeshRenderer>();
-        float curPower = renderer.material.GetFloat("_MainTexturePower");
-        float curTime = 0;
-        while(curTime < fxTime)
-        {
-            curPower = curTime * maxPower;
-            renderer.material.SetFloat("_MainTexturePower", curPower);
-            curTime += Time.deltaTime;
-            yield return 0;
-        }
-       
-        //yield return new WaitForSeconds(fxTime);
-        Destroy(this.gameObject);
-        yield return 0;
-    }
 
 }

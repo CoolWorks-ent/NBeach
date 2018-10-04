@@ -8,9 +8,12 @@ public class AttackDecision : AI_Decision
         return(TargetWithinDistance(controller));
     }
 
+    /// <summary>
+    /// Check to see if the darkness is within distance to attack the controller.
+    /// </summary>
     public bool TargetWithinDistance(Darkness controller)
     {
-        if(Vector3.Distance(controller.target.position, controller.transform.position) <= controller.attackInitiationRange && controller.canAttack)
+        if(Vector3.Distance(controller.target.position, controller.transform.position) <= (float)controller.attackInitiationRange && controller.canAttack)
         {
             controller.canAttack = false;
             return true;

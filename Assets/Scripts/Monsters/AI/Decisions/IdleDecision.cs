@@ -7,12 +7,6 @@ public class IdleDecision : AI_Decision {
 
 	public override bool Decide(Darkness controller)
 	{
-		if(controller.idleFinished)
-		{
-			controller.idleFinished = false;
-			return true;
-		}
-		else return false;
+		return controller.canAttack;
 	}
-
 }

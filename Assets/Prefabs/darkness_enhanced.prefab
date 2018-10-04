@@ -26,7 +26,7 @@ GameObject:
   - component: {fileID: 114662073128543118}
   - component: {fileID: 114372473262131794}
   - component: {fileID: 114576353925070576}
-  - component: {fileID: 114188613122282872}
+  - component: {fileID: 114126506158291322}
   m_Layer: 0
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -190,6 +190,19 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114126506158291322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  target: {fileID: 0}
 --- !u!114 &114150173797437670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -216,27 +229,6 @@ MonoBehaviour:
   traversableTags: -4097
   tagPenalties: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f401000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask: -1
---- !u!114 &114188613122282872
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb6a34d769a1e4ac7b0b30e433aa443c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  smoothType: 1
-  subdivisions: 3
-  iterations: 2
-  strength: 0.5
-  uniformLength: 1
-  maxSegmentLength: 2
-  bezierTangentLength: 0.5
-  offset: 0.2
-  factor: 0.1
 --- !u!114 &114372473262131794
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -275,7 +267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  attackInitiationRange: 4
+  attackInitiationRange: 5
   actionIdle: 0
   queueID: 0
   stateUpdateRate: 2
@@ -288,10 +280,12 @@ MonoBehaviour:
   wanderHash: 918399791
   idleHash: 2081823275
   deathHash: 646380074
-  previousState: {fileID: 0}
-  currentState: {fileID: 11400000, guid: 321b666adaf06f54585d5a0e5d5b9b7f, type: 2}
+  previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
+  currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   canAttack: 0
-  updateStates: 0
+  idleFinished: 0
+  updateStates: 1
+  attackRequested: 0
 --- !u!114 &114576353925070576
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -332,7 +326,7 @@ MonoBehaviour:
   acceleration: 5
   rotationSpeed: 425
   slowdownTime: 0.5
-  endReachedDistance: 0.01
+  endReachedDistance: 1
   wallForce: 3
   wallDist: 1
   funnelSimplification: 0

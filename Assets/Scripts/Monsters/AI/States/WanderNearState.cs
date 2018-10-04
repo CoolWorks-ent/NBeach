@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu (menuName = "AI/Darkness/State/WanderNearState")]
-public class WanderNearState : AI_State
+public class WanderNearState : Dark_State
 {
 
     [Range(0.5f,12.0f)]
@@ -13,7 +13,7 @@ public class WanderNearState : AI_State
     public float wanderRange;
 
 
-    public void InitializeState(Darkness controller)
+    public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.wanderHash);
         
@@ -22,7 +22,7 @@ public class WanderNearState : AI_State
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
     }
 
-    public void UpdateState(Darkness controller)
+    public override void UpdateState(Darkness controller)
     {
         if(controller.ai != null) 
             controller.ai.SearchPath();
@@ -44,7 +44,7 @@ public class WanderNearState : AI_State
         }*/
     }
 
-    public void ExitState(Darkness controller)
+    protected override void ExitState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
         //controller.ChangeState(EnemyState.IDLE);

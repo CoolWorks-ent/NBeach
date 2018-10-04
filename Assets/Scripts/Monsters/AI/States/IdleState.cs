@@ -3,23 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 [CreateAssetMenu (menuName = "AI/Darkness/State/IdleState")]
-public class IdleState : AI_State
+public class IdleState : Dark_State
 {
+    [Range(1, 5)]
     public float idleTime;
-    public void InitializeState(Darkness controller)
+    public override void InitializeState(Darkness controller)
     {
         controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
         
-        ExitState(controller);
-    }
-
-    public void UpdateState(Darkness controller)
-    {
-    }
-
-    public void ExitState(Darkness controller)
-    {
         float idleTime = controller.actionIdle;
         if(controller.animeController.GetBool(controller.attackAfterHash))
         {
@@ -29,12 +21,19 @@ public class IdleState : AI_State
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
     }
 
-    private IEnumerator IdleTime(Darkness controller, float idleTime)
+    public override void UpdateState(Darkness controller)
+    {
+        
+    }
+
+    protected override void ExitState(Darkness controller)
+    {
+        AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
+    }
+
+    protected IEnumerator IdleTime(Darkness controller, float idleTime)
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
-        controller.aIRichPath.canMove = true;
-        /*if(!controller.canAttack)
-            controller.ChangeState(EnemyState.WANDER);
-        else controller.ChangeState(EnemyState.CHASING);*/
+        CheckTransitions(controller);
     }
 }

@@ -179,7 +179,7 @@ public class song2_lvl : Level {
                 ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
                 ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
                 shellArray.Add(reloadShell);
-                Debug.Log("pickup shell spawned");
+//                Debug.Log("pickup shell spawned");
                 shellSpawnTime = 0;
             }
             else
@@ -450,11 +450,11 @@ public class song2_lvl : Level {
         /*
          * Stage1.2 - wave 2
         */
-        print("Enemy Wave 2");
+        //print("Enemy Wave 2");
         enemySpawners.spawnRate = darkSpawnRate_Stage0;
         AI_Manager.Instance.maxEnemyCount = 6;
 
-        Debug.Log("time till next stage = " + (waitTime * (.75f)));
+        //Debug.Log("time till next stage = " + (waitTime * (.75f)));
         yield return new WaitForSeconds(waitTime * .75f);
 
         //Pause coroutine until player is not in HURT state
