@@ -816,6 +816,7 @@ MonoBehaviour:
   attackState: 0
   attackTimer: 0
   maxAttackTimer: 4
+  ballMoveSpeed: 0
   isDead: 0
   spRenderer: {fileID: 0}
   hitCount: 4
@@ -836,6 +837,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Target: {fileID: 1516372193599818, guid: 7c4809a66ce8eed4989868b3fa664ff6, type: 2}
   attackType: RockSmash
+  attackSpeed: 20
 --- !u!198 &198054196076579224
 ParticleSystem:
   m_ObjectHideFlags: 1

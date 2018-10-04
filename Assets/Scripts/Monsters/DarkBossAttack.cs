@@ -35,11 +35,12 @@ public class DarkBossAttack : MonoBehaviour {
                 if (curTime < ballMoveTime)
                 {
                     //move attack towards player's last known position
-
+                    transform.LookAt(targetPos);
                     //transform.position = Vector3.MoveTowards(transform.position, targetPos, ballMoveTime * Time.deltaTime * attackSpeed);
                     Vector3 normalizeDirection = (targetPos - transform.position).normalized;
                     //normalizeDirection = new Vector3(normalizeDirection.x, normalizeDirection.y-.2f, normalizeDirection.z+2).normalized;
-                    transform.position += (normalizeDirection * Time.deltaTime) * attackSpeed;
+                    //transform.position += (normalizeDirection * Time.deltaTime) * attackSpeed;
+                    transform.Translate((Vector3.forward * Time.deltaTime) * attackSpeed, Space.Self);
                     curTime += Time.deltaTime;
                 }
                 else
@@ -80,9 +81,15 @@ public class DarkBossAttack : MonoBehaviour {
                 Debug.Log("Dark Boss Attack collided with player rock cover");
                 //event call for player damaged
                 EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
+
+                ScreenShake camShake = new ScreenShake();
+                //camShake.Play(.7f, 1);
+                StartCoroutine(camShake.Shake(.15f, .5f));
+
                 //kick off destruction animation for rock cover
                 Destroy(collision.gameObject);
-                //Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+
 
             }
             //IF SMASH hits an environment object, then should play SFX & FX
@@ -128,7 +135,7 @@ public class DarkBossAttack : MonoBehaviour {
                 Debug.Log("Dark Boss Attack collided with object");
                 ScreenShake camShake = new ScreenShake();
                 //camShake.Play(.7f, 1);
-                StartCoroutine(camShake.Shake(.2f, .5f));
+                StartCoroutine(camShake.Shake(.15f, .5f));
 
                 Debug.Log("Dark Boss Attack collided with player rock cover");
                 //event call for player damaged

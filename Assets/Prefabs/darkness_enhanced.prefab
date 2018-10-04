@@ -21,13 +21,14 @@ GameObject:
   - component: {fileID: 4849616495344730}
   - component: {fileID: 65578689530358540}
   - component: {fileID: 65387374068129854}
+  - component: {fileID: 114861532283098078}
   - component: {fileID: 114511842479999518}
+  - component: {fileID: 114768692572685676}
   - component: {fileID: 114150173797437670}
   - component: {fileID: 114662073128543118}
   - component: {fileID: 114372473262131794}
-  - component: {fileID: 114576353925070576}
-  - component: {fileID: 114126506158291322}
-  m_Layer: 0
+  - component: {fileID: 114712269329263896}
+  m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
   m_Icon: {fileID: 0}
@@ -47,7 +48,7 @@ GameObject:
   - component: {fileID: 64614841458248028}
   - component: {fileID: 95777162312456306}
   - component: {fileID: 54403178235137582}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: darkness_model
   m_TagString: Darkness
   m_Icon: {fileID: 0}
@@ -190,19 +191,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114126506158291322
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  target: {fileID: 0}
 --- !u!114 &114150173797437670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -226,8 +214,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags: -4097
-  tagPenalties: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f401000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  traversableTags: -1
+  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask: -1
 --- !u!114 &114372473262131794
 MonoBehaviour:
@@ -244,15 +232,15 @@ MonoBehaviour:
   radius: 1
   height: 2
   locked: 0
-  lockWhenNotMoving: 0
+  lockWhenNotMoving: 1
   agentTimeHorizon: 2
   obstacleTimeHorizon: 2
-  maxNeighbours: 2
+  maxNeighbours: 10
   layer: 1
   collidesWith: -1
   wallAvoidForce: 1
   wallAvoidFalloff: 1
-  priority: 0.752
+  priority: 0.5
   center: 1
   debug: 0
 --- !u!114 &114511842479999518
@@ -267,39 +255,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  attackInitiationRange: 5
-  actionIdle: 0
-  queueID: 0
-  stateUpdateRate: 2
+  dsController: {fileID: 0}
+  attackRange: 5
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
-  aIRichPath: {fileID: 0}
-  animeController: {fileID: 0}
-  attackHash: 1080829965
-  attackAfterHash: 530937694
-  chaseHash: 1463555229
-  wanderHash: 918399791
-  idleHash: 2081823275
-  deathHash: 646380074
-  previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
-  currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
-  canAttack: 0
-  idleFinished: 0
-  updateStates: 1
-  attackRequested: 0
---- !u!114 &114576353925070576
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  penalty: 1000
-  randomStep: 2
 --- !u!114 &114662073128543118
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -326,9 +284,63 @@ MonoBehaviour:
   acceleration: 5
   rotationSpeed: 425
   slowdownTime: 0.5
-  endReachedDistance: 1
+  endReachedDistance: 0.01
   wallForce: 3
   wallDist: 1
   funnelSimplification: 0
   slowWhenNotFacingTarget: 1
   animCompatibility: {fileID: 0}
+--- !u!114 &114712269329263896
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  target: {fileID: 0}
+--- !u!114 &114768692572685676
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  penalty: 1000
+  randomStep: 8
+--- !u!114 &114861532283098078
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ca55b8e2272424b9fd4c8422c7dcf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  previousState: {fileID: 0}
+  darkStates:
+  - {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
+  - {fileID: 11400000, guid: edcbf17dddd70a84f856acedb60796de, type: 2}
+  - {fileID: 11400000, guid: dfd687a29eeed284999ed4a5cf104b69, type: 2}
+  - {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
+  owner: {fileID: 0}
+  aIDestSetter: {fileID: 0}
+  aIRichPath: {fileID: 0}
+  animeController: {fileID: 0}
+  attackHash: 1080829965
+  attackAfterHash: 530937694
+  chaseHash: 1463555229
+  idleHash: 2081823275
+  deathHash: 646380074
+  actionIdle: 0
