@@ -1,0 +1,437 @@
+fileFormatVersion: 2
+guid: 2b16434cc29ef6c44a463cd71001bd1c
+timeCreated: 1539465171
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: ankle
+    100002: eye
+    100004: eye.001
+    100006: eye.001_end
+    100008: foot
+    100010: foot_end
+    100012: foot_IP_TARG
+    100014: foot_IP_TARG_end
+    100016: grunt
+    100018: grunt_rig
+    100020: head_base
+    100022: head_IK_TARG
+    100024: head_IK_TARG_end
+    100026: head_top
+    100028: jaw_base
+    100030: jaw_front
+    100032: jaw_front_end
+    100034: neck_base
+    100036: neck_mid
+    100038: neck_top
+    100040: root_control
+    100042: //RootNode
+    100044: snout
+    100046: snout_end
+    400000: ankle
+    400002: eye
+    400004: eye.001
+    400006: eye.001_end
+    400008: foot
+    400010: foot_end
+    400012: foot_IP_TARG
+    400014: foot_IP_TARG_end
+    400016: grunt
+    400018: grunt_rig
+    400020: head_base
+    400022: head_IK_TARG
+    400024: head_IK_TARG_end
+    400026: head_top
+    400028: jaw_base
+    400030: jaw_front
+    400032: jaw_front_end
+    400034: neck_base
+    400036: neck_mid
+    400038: neck_top
+    400040: root_control
+    400042: //RootNode
+    400044: snout
+    400046: snout_end
+    4300000: grunt
+    7400000: grunt_rig|grunt_rigAction
+    7400002: grunt_rig|gruntAction
+    7400004: darkgrunt_attack
+    7400006: darkgrunt_walk
+    7400008: darkgrunt_idle
+    9500000: //RootNode
+    13700000: grunt
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: grunt_rig|grunt_rigAction
+      takeName: grunt_rig|grunt_rigAction
+      firstFrame: 0
+      lastFrame: 150
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: grunt
+        weight: 1
+      - path: grunt_rig
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG/foot_IP_TARG_end
+        weight: 1
+      - path: grunt_rig/head_IK_TARG
+        weight: 1
+      - path: grunt_rig/head_IK_TARG/head_IK_TARG_end
+        weight: 1
+      - path: grunt_rig/root_control
+        weight: 1
+      - path: grunt_rig/root_control/ankle
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot/foot_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001/eye.001_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout/snout_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front/jaw_front_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: darkgrunt_attack
+      takeName: grunt_rig|grunt_rigAction
+      firstFrame: 0
+      lastFrame: 32
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: grunt
+        weight: 1
+      - path: grunt_rig
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG/foot_IP_TARG_end
+        weight: 1
+      - path: grunt_rig/head_IK_TARG
+        weight: 1
+      - path: grunt_rig/head_IK_TARG/head_IK_TARG_end
+        weight: 1
+      - path: grunt_rig/root_control
+        weight: 1
+      - path: grunt_rig/root_control/ankle
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot/foot_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001/eye.001_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout/snout_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front/jaw_front_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: darkgrunt_walk
+      takeName: grunt_rig|grunt_rigAction
+      firstFrame: 60
+      lastFrame: 99
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: grunt
+        weight: 1
+      - path: grunt_rig
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG/foot_IP_TARG_end
+        weight: 1
+      - path: grunt_rig/head_IK_TARG
+        weight: 1
+      - path: grunt_rig/head_IK_TARG/head_IK_TARG_end
+        weight: 1
+      - path: grunt_rig/root_control
+        weight: 1
+      - path: grunt_rig/root_control/ankle
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot/foot_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001/eye.001_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout/snout_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front/jaw_front_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: darkgrunt_idle
+      takeName: grunt_rig|grunt_rigAction
+      firstFrame: 130
+      lastFrame: 150
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: grunt
+        weight: 1
+      - path: grunt_rig
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG/foot_IP_TARG_end
+        weight: 1
+      - path: grunt_rig/head_IK_TARG
+        weight: 1
+      - path: grunt_rig/head_IK_TARG/head_IK_TARG_end
+        weight: 1
+      - path: grunt_rig/root_control
+        weight: 1
+      - path: grunt_rig/root_control/ankle
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot/foot_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001/eye.001_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout/snout_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front/jaw_front_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.3
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: root_control
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -10,7 +10,7 @@ public class Darkness : MonoBehaviour {
     public Transform target;
     
     ///<summary>Sets the initiation range for darkness units. Units will be qeued for attack in this range</summary>
-    public int attackInitiationRange, actionIdle, queueID, stateUpdateRate;
+    public int attackInitiationRange, actionIdle, queueID;
 
     public GameObject deathFX;
 
@@ -27,10 +27,10 @@ public class Darkness : MonoBehaviour {
 
     public Dark_State previousState, currentState;
 
-    public bool canAttack, idleFinished, updateStates, attackRequested;
+    public bool canAttack, idleFinished, attackRequested;
 
     void Start () {
-        actionIdle = 3;
+        actionIdle = attackInitiationRange = 3;
         canAttack = idleFinished = attackRequested = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
@@ -71,6 +71,16 @@ public class Darkness : MonoBehaviour {
     public void RevertMovementParameters()
     {
         
+    }
+
+    public bool TargetWithinDistance()
+    {
+        if(Vector3.Distance(target.position, transform.position) <= (float)attackInitiationRange && canAttack)
+        {
+            canAttack = false;
+            return true;
+        }
+        else return false;
     }
 
     private void OnCollisionEnter(Collision collision)

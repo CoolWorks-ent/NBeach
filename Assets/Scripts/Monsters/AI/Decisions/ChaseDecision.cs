@@ -10,13 +10,12 @@ public class ChaseDecision : AI_Decision
 
     public bool ApproachTarget(Darkness controller)
     {
-        if(Vector3.Distance(controller.target.position, controller.transform.position) >= controller.attackInitiationRange)
+        if(!controller.TargetWithinDistance())//Vector3.Distance(controller.target.position, controller.transform.position) >= controller.attackInitiationRange)
         {
-            return true;
+            return true; //keep chasing if not in initiation range
         }
         else 
         {
-            controller.attackRequested = true;
             Debug.Log("<b><color=blue>Chase:</color></b> Darkness #" + controller.queueID + " request has been processed");
             AI_Manager.OnAttackRequest(controller.queueID, controller.attackRequested);
             return false;

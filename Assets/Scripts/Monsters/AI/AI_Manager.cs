@@ -48,7 +48,12 @@ public class AI_Manager : MonoBehaviour {
 	{
 		if(!requested)
 		{
-			AttackQueue.Enqueue(iD); 
+			Darkness dark;
+			if(ActiveDarkness.TryGetValue(iD, out dark))
+			{
+				dark.attackRequested = true;
+				AttackQueue.Enqueue(iD); 
+			}
 			Debug.Log("<b><color=green>AI Manager:</color></b> Darkness #" + iD + " request has been processed");
 		}
 		else
@@ -99,6 +104,16 @@ public class AI_Manager : MonoBehaviour {
     private void RemoveFromDarknessList(int updatedDarkness)
     {
         ActiveDarkness.Remove(updatedDarkness);
+    }
+
+	public void KillAllDarkness()
+    {
+        Debug.Log("[AI] All Darkness AI kill call");
+        foreach(KeyValuePair<int, Darkness>dark in ActiveDarkness)
+        {
+            Destroy(dark.Value);
+            ActiveDarkness.Remove(dark.Key);
+        }
     }
 
     public IEnumerator WaitTimer(float timer)
