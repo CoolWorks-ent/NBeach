@@ -63,6 +63,7 @@ public class NFPSController : PlayerController {
 
         public GameController gController;
         int playerHealth;
+        int playerHealthMax = 100;
         int playerRechargeAmt = 0;
         int playerRechargeAmtMax = 10;
         public int playerAmmo;
@@ -148,8 +149,9 @@ public class NFPSController : PlayerController {
         healthText.text = playerHealth.ToString();
 
         //Monitor Player's Health and change HUD based upon health amt
-        //HUD intensity increases while player health decreases
-        Camera.main.GetComponent<BWEffect>().intensity = 1 - (playerHealth / 100.0f);
+        //HUD intensity increases while player health decreases, after player health is less than 30%
+        if(playerHealth < playerHealthMax*.3)
+            Camera.main.GetComponent<BWEffect>().intensity = 1 - (playerHealth / (playerHealthMax * .3f));
 
         if (playerStatus == PLAYER_STATUS.HURT)
         {
@@ -165,6 +167,13 @@ public class NFPSController : PlayerController {
                 playerHealth = 100;
                 playerRechargeAmt = 0;
                 StopCoroutine(HurtCoroutine);
+                EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+
+                //Disable BWEffect on Camera 
+                Camera.main.GetComponent<BWEffect>().intensity = 0;
+
+                //Turn Off TiltHint upon recovery
+                EventManager.TriggerEvent("Player_TiltHintOff", "Player_TiltHint");
             }
         }
         else //If player is NOT HURT
@@ -559,6 +568,9 @@ public class NFPSController : PlayerController {
         float normTargetZ = 0;
         //headRotation = (pitch, yaw, roll        
 
+        //Play Hint Gif
+        EventManager.TriggerEvent("Player_TiltHintOn", "Player_TiltHint");
+
         while (rechargeAmt < playerRechargeAmtMax)
         {
          // initials
@@ -603,6 +615,7 @@ public class NFPSController : PlayerController {
             yield return null;
         }
         Camera.main.transform.localRotation = new Quaternion(0, 0, 0, 0);
+
         yield return rechargeAmt;
     }
 
@@ -710,7 +723,8 @@ public class NFPSController : PlayerController {
         {
             playerStatus = PLAYER_STATUS.HURT;
             HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
-            
+            EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+
         }
         yield return 0;
     }

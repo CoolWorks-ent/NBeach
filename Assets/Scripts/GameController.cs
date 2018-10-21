@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum GameState { IsPlaying, IsPaused, IsOver, InMenu}
+public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused}
 
 public class GameController : MonoBehaviour {
 
@@ -129,6 +129,7 @@ public class GameController : MonoBehaviour {
          * load different resources based upon the Scene loaded
          */
         EventManager.StartListening("Player_Stop", ResetPlayer);
+        EventManager.StartListening("PauseWorld", OnWorldPaused);
         //timeManager = GetComponent<TimeManager>();
         Time.fixedDeltaTime = Time.timeScale * .02f;
 
@@ -180,6 +181,21 @@ public class GameController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        //Press 'W' to pause the game's world state and update. Causes everything to stop moving except for the player.
+        if(Input.GetKeyDown(KeyCode.W))
+        {
+            if (gameState == GameState.IsPlaying)
+            {
+                gameState = GameState.IsWorldPaused;
+                EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+            }
+            else if (gameState == GameState.IsWorldPaused)
+            {
+                gameState = GameState.IsPlaying;
+                EventManager.TriggerEvent("ResumeWorld", "ResumeWorld");
+            }
         }
 
         //if "P" pressed, pause spline
@@ -243,6 +259,23 @@ public class GameController : MonoBehaviour {
         playerControl.Reset();
         //cancel FX
         //cancel powerUps
+    }
+
+    private void OnWorldPaused(string evt)
+    {
+        if (gameState == GameState.IsWorldPaused)
+        {
+            Debug.Log("World State UnPaused");
+            gameState = GameState.IsPlaying;
+            soundManager.ResumeBGAudio();
+        }
+        else
+        { 
+            Debug.Log("World State Paused");
+            gameState = GameState.IsWorldPaused;
+            //Also PAUSE BG AUDIO
+            soundManager.PauseBGAudio();
+        }
     }
 
     //function that contains what each event in song 1 should do

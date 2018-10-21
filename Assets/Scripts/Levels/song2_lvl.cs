@@ -55,10 +55,10 @@ public class song2_lvl : Level {
     float curSongTime = 0;
     float songStartTime = 0;
     public int stageNum = 0;
-    float stage1StartTime = 20; //120; //in seconds
-    float stage2StartTime = 40; //180; //3min in seconds
-    float stage3StartTime = 60; //240; //4min in seconds
-    float stage3EndTime = 80; //320 //5+min in seconds (current total song time = 5:15)
+    float stage1StartTime = 120; //120; //in seconds
+    float stage2StartTime = 180; //180; //3min in seconds
+    float stage3StartTime = 240; //240; //4min in seconds
+    float stage3EndTime = 320; //320 //5+min in seconds (current total song time = 5:15)
     float darkSpawnRate_Stage0 = 6;
     float darkSpawnRate_Stage0_1 = 5;
     float darkSpawnRate_Stage1 = 4;
@@ -74,6 +74,7 @@ public class song2_lvl : Level {
     int rainEmissionRateMax = 40;
     Material nightSkybox;
 
+    bool stagePlaying = true;
 
     // Use this for initialization
     void Start() {
@@ -90,6 +91,7 @@ public class song2_lvl : Level {
         EventManager.StartListening("Stage4Start", delegate { DebugFunc("Stage4Start"); });
         EventManager.StartListening("Song2_End_Cutscene_Start", delegate { StartCoroutine(Song2_EndCutscene()); });
         EventManager.StartListening("OnPlayerHitIsland", OnPlayerHitIsland);
+        EventManager.StartListening("PauseWorld", OnStagePaused);
 
         gController = GameController.instance;
         pathControl = gController.pathControl;
@@ -137,6 +139,38 @@ public class song2_lvl : Level {
             DebugFunc("Song2_Stage3");
         }
     }
+
+    /// <summary>
+    /// World Pause. Pauses all actions in the world except for the player's and the player's input. 
+    /// Used primarily for the player's HURT state
+    /// </summary>
+    /// <param name="evt"></param>
+         
+    void OnStagePaused(string evt)
+    {
+        //Set timescale to 0
+        //Time.timeScale = 0;
+        stagePlaying = false;
+    }
+
+    void OnStageResumed(string evt)
+    {
+        //Set timescale to 1
+        //Time.timeScale = 1;
+        stagePlaying = true;
+    }
+
+    /// <summary>
+    /// Game Pause.  Pauses the entire game state and brings up the pause menu
+    /// </summary>
+    /// <param name="evt"></param>
+    void OnGamePaused(string evt)
+    {
+
+    }
+
+    void OnGameResumed(string evt)
+    { }
 
     void StartNextStage()
     {
@@ -551,18 +585,35 @@ public class song2_lvl : Level {
         enemySpawners.spawnRate = darkSpawnRate_Stage0;
         float waitTime = stage1StartTime - curSongTime;
         Debug.Log("time till next stage = " + (waitTime * (.5f)));
+
+        /*
+         * TIME LOOP to replace WaitForSeconds
+         */
+
+        //create custom internal timer
+        //only iterates through loop while the world state is not paused. so this should help control coroutine better
+        float savedSongTime = curSongTime;
+        float tempWaitTime = waitTime * .5f;
+        float timer = 0f;
+        Debug.Log("wait time " + tempWaitTime);
+        while ((timer < tempWaitTime))
+        {
+            if (gController.gameState != GameState.IsWorldPaused)
+            {
+                timer += Time.deltaTime;
+                //savedSongTime += Time.deltaTime; //count by seconds passed
+                //curWaitTime = tempWaitTime - savedSongTime;                
+            }
+            //MUST INCLUDE WAITFORSECONDS FOR while loops. so wait for 1 millisecond
+            yield return null;
+        }
+
         //This is the length of time the rest of the stage should play out
-        yield return new WaitForSeconds(waitTime * (.5f));
+        //yield return new WaitForSeconds(waitTime * (.5f));
 
         //Pause coroutine until player is not in HURT state
-        while (gController.playerControl.playerStatus == PLAYER_STATUS.HURT)
-            yield return null;
-
-        /*while (t <= (waitTime * (.25f)))
-        {
-            t += Time.deltaTime;
-            yield return null;
-        }*/
+        /*while (gController.playerControl.playerStatus == PLAYER_STATUS.HURT)
+            yield return null; */
 
         /*
          * Stage1.2 - wave 2
@@ -572,7 +623,19 @@ public class song2_lvl : Level {
         AI_Manager.Instance.maxEnemyCount = 7;
 
         Debug.Log("time till next stage = " + (waitTime * (.5f)));
-        yield return new WaitForSeconds(waitTime * .5f);
+        //yield return new WaitForSeconds(waitTime * .5f);
+        tempWaitTime = waitTime * .5f;
+        timer = 0f;
+        Debug.Log("wait time " + tempWaitTime);
+        while ((timer < tempWaitTime))
+        {
+            if (gController.gameState != GameState.IsWorldPaused)
+            {
+                timer += Time.deltaTime;               
+            }
+            //MUST INCLUDE WAITFORSECONDS FOR while loops. so wait for 1 millisecond
+            yield return null;
+        }
 
         //Pause coroutine until player is not in HURT state
         while (gController.playerControl.playerStatus == PLAYER_STATUS.HURT)
