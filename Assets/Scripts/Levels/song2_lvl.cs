@@ -328,7 +328,7 @@ public class song2_lvl : Level {
         }
         shellArray.Clear();
         //destroy ALL darkness previously spawned to start over
-        AI_Manager.Instance.KillAllDarkness();
+        //AI_Manager.Instance.KillAllDarkness();
 
         //increment state number because player has reach next rock
         stageNum += 1;

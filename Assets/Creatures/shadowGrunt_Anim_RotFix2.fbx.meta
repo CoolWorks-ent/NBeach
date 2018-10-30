@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 2b16434cc29ef6c44a463cd71001bd1c
-timeCreated: 1539465171
+guid: d18d31b3a4bbfdf40bab5de81092654d
+timeCreated: 1540173720
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -56,9 +56,9 @@ ModelImporter:
     4300000: grunt
     7400000: grunt_rig|grunt_rigAction
     7400002: grunt_rig|gruntAction
-    7400004: darkgrunt_attack
-    7400006: darkgrunt_walk
-    7400008: darkgrunt_idle
+    7400004: grunt_attack
+    7400006: grunt_chase
+    7400008: grunt_idle
     9500000: //RootNode
     13700000: grunt
   materials:
@@ -70,7 +70,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    motionNodeName: 
+    motionNodeName: <Root Transform>
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
@@ -161,10 +161,10 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: darkgrunt_attack
-      takeName: grunt_rig|grunt_rigAction
+      name: grunt_rig|gruntAction
+      takeName: grunt_rig|gruntAction
       firstFrame: 0
-      lastFrame: 32
+      lastFrame: 1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -237,22 +237,22 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: darkgrunt_walk
+      name: grunt_attack
       takeName: grunt_rig|grunt_rigAction
-      firstFrame: 60
-      lastFrame: 99
+      firstFrame: 0
+      lastFrame: 29
       wrapMode: 0
-      orientationOffsetY: 0
+      orientationOffsetY: -90
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -313,10 +313,10 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: darkgrunt_idle
+      name: grunt_chase
       takeName: grunt_rig|grunt_rigAction
-      firstFrame: 130
-      lastFrame: 150
+      firstFrame: 60
+      lastFrame: 99
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -328,7 +328,83 @@ ModelImporter:
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: grunt
+        weight: 1
+      - path: grunt_rig
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG
+        weight: 1
+      - path: grunt_rig/foot_IP_TARG/foot_IP_TARG_end
+        weight: 1
+      - path: grunt_rig/head_IK_TARG
+        weight: 1
+      - path: grunt_rig/head_IK_TARG/head_IK_TARG_end
+        weight: 1
+      - path: grunt_rig/root_control
+        weight: 1
+      - path: grunt_rig/root_control/ankle
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot
+        weight: 1
+      - path: grunt_rig/root_control/ankle/foot/foot_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/eye/eye.001/eye.001_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/head_base/head_top/snout/snout_end
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front
+        weight: 1
+      - path: grunt_rig/root_control/neck_base/neck_mid/neck_top/jaw_base/jaw_front/jaw_front_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: grunt_idle
+      takeName: grunt_rig|grunt_rigAction
+      firstFrame: 130
+      lastFrame: 149
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -392,7 +468,7 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 1
     addColliders: 0
     importBlendShapes: 0
     swapUVChannels: 0

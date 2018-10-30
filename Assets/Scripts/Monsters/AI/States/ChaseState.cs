@@ -12,9 +12,6 @@ public class ChaseState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);
-        if(controller.ai != null) 
-            controller.ai.onSearchPath += controller.ExecuteCurrentState;
-        else Debug.LogError("AI not set. Attach IAstar component to object");
         controller.aIRichPath.canMove = true;
         controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -22,8 +19,8 @@ public class ChaseState : Dark_State
 
     public override void UpdateState(Darkness controller)
     {
-        controller.ai.destination = controller.target.position;
-
+        controller.aIMovement.aI.destination = controller.target.position;
+        controller.aIMovement.aI.onSearchPath();
         CheckTransitions(controller);
         /*if(controller.TargetWithinDistance(controller.attackInitiationRange))
         {
@@ -35,7 +32,6 @@ public class ChaseState : Dark_State
 
     protected override void ExitState(Darkness controller)
     {
-        controller.ai.onSearchPath -= controller.ExecuteCurrentState;
         //controller.aIRichPath.canMove = false;
     }
 }

@@ -10,7 +10,7 @@ public class Darkness : MonoBehaviour {
     public Transform target;
     
     ///<summary>Sets the initiation range for darkness units. Units will be qeued for attack in this range</summary>
-    public int attackInitiationRange, actionIdle, queueID;
+    public int attackInitiationRange, actionIdle, queueID, stateUpdateRate;
 
     public GameObject deathFX;
 
@@ -20,33 +20,40 @@ public class Darkness : MonoBehaviour {
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
-                wanderHash = Animator.StringToHash("Wander"),
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death");
-    public Pathfinding.IAstarAI ai;
+    public AI_Movement aIMovement;
 
     public Dark_State previousState, currentState;
 
-    public bool canAttack, idleFinished, attackRequested;
+    public bool canAttack, idleFinished, attackRequested, updateStates;
 
     void Start () {
         actionIdle = attackInitiationRange = 3;
         canAttack = idleFinished = attackRequested = false;
         queueID = 0;
         animeController = GetComponentInChildren<Animator>();
-        ai = GetComponent<Pathfinding.IAstarAI>();
+        aIMovement = GetComponent<AI_Movement>();
         aIRichPath = GetComponent<Pathfinding.RichAI>();
         currentState.InitializeState(this);
+        updateStates = true;
+        stateUpdateRate = 1;
+        StartCoroutine(ExecuteCurrentState());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        ExecuteCurrentState();
+        
     }
 
-    public void ExecuteCurrentState()
+    public IEnumerator ExecuteCurrentState()
     {
-        currentState.UpdateState(this);
+        while(updateStates)
+        {
+            currentState.UpdateState(this);
+            yield return new WaitForSeconds(stateUpdateRate);
+        }
+        yield return null;
     }
 
     public void ChangeState(Dark_State nextState)
@@ -104,6 +111,4 @@ public class Darkness : MonoBehaviour {
             }
         }
     }
-
-
 }

@@ -99,6 +99,7 @@ public class AI_Manager : MonoBehaviour {
 		ActiveDarkness.Add(darknessQueueID, updatedDarkness);
 		updatedDarkness.queueID = darknessQueueID;
 		updatedDarkness.target = player;
+		//updatedDarkness.GetComponent<AI_Movement>().target = player;
 	}
 
     private void RemoveFromDarknessList(int updatedDarkness)

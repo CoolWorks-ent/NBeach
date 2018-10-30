@@ -116,7 +116,7 @@ public class Projectile_Shell : MonoBehaviour {
         {
             if (projectileFired == true)
             {
-                collider.GetComponentInParent<Darkness>().DestroyDarkness();
+                //collider.GetComponentInParent<Darkness>().DestroyDarkness();
                 //collider.gameObject.GetComponent<Darkness>().DestroyDarkness();
                 //Destroy(this.gameObject);
             }
