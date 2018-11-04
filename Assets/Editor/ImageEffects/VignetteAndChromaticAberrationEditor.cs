@@ -38,7 +38,7 @@ namespace UnityStandardAssets.ImageEffects
 
             EditorGUILayout.LabelField("Simulates the common lens artifacts 'Vignette' and 'Aberration'", EditorStyles.miniLabel);
 
-            EditorGUILayout.Slider(m_Intensity, 0.0f, 1.0f, new GUIContent("Vignetting"));
+            EditorGUILayout.Slider(m_Intensity, 0.0f, 5.0f, new GUIContent("Vignetting"));
             EditorGUILayout.Slider(m_Blur, 0.0f, 1.0f, new GUIContent(" Blurred Corners"));
             if (m_Blur.floatValue>0.0f)
                 EditorGUILayout.Slider(m_BlurSpread, 0.0f, 1.0f, new GUIContent(" Blur Distance"));

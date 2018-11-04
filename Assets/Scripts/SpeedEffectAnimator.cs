@@ -13,6 +13,8 @@ public class SpeedEffectAnimator : MonoBehaviour {
     private Texture[] m_AnimTextures;              // The textures that will be looped through.
     [SerializeField]
     private Image speedFxOverlay;
+    [SerializeField]
+    Animator animationControl;
 
 
     private WaitForSeconds m_FrameRateWait;                         // The delay between frames.
@@ -31,6 +33,8 @@ public class SpeedEffectAnimator : MonoBehaviour {
         //set to invisible
         speedFxOverlay.color = new Color(speedFxOverlay.color.r,speedFxOverlay.color.g,speedFxOverlay.color.b,0);
         baseColor = speedFxOverlay.color;
+
+        animationControl = GetComponent<Animator>();
     }
 
 
@@ -64,6 +68,7 @@ public class SpeedEffectAnimator : MonoBehaviour {
     {
         m_Playing = true;        
         StartCoroutine(PlayTextures());
+        animationControl.SetBool("IsPlaying", true);
     }
 
 
@@ -71,6 +76,7 @@ public class SpeedEffectAnimator : MonoBehaviour {
     { 
         m_Playing = false;
         StartCoroutine(PlayTextures());
+        animationControl.SetBool("IsPlaying", false);
     }
 
 

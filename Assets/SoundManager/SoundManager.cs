@@ -29,7 +29,7 @@ public class SoundManager : MonoBehaviour {
 	//private int[] results = new int[] {15, 1645, 135, 567};
 	
 	//Music
-	private string[] music = new string[] {"NB!2", "Cooly2", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
+	private string[] music = new string[] {"NB!2", "Cooly2","Cooly2_edit", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
 	
 	//Foley sounds
 	private string[] foleySounds = new string[] {"wavesIncoming", "wavesCrashing"};
@@ -201,8 +201,26 @@ public class SoundManager : MonoBehaviour {
             audioS.Stop();
         }
     }
-	
-	public void CrossFadeMusicIntroScene()
+
+    public void StopBGAudio()
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.Stop();
+    }
+
+    public void PauseBGAudio()
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.Pause();
+    }
+
+    public void ResumeBGAudio()
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.UnPause();
+    }
+
+    public void CrossFadeMusicIntroScene()
 	{
 		AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath,music[8]), typeof(AudioClip));
 		GameObject newMusic = (GameObject)Instantiate (newSound);

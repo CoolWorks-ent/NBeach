@@ -31,7 +31,11 @@ public class Darkness : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-      //EventManager.TriggerEvent("DarknessDeath", gameObject.);
+        //EventManager.TriggerEvent("DarknessDeath", gameObject.);
+        if (collision.gameObject.tag == "Projectile")
+        {
+            Debug.Log("collision");
+        }
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -40,9 +44,9 @@ public class Darkness : MonoBehaviour {
         {
             Debug.Log("Darkness collided with Player");
         }
-        else if (collider.gameObject.tag == "Projectile")
+        else if (collider.tag == "Projectile")
         {
-            if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
+            if (collider.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
 
@@ -62,6 +66,24 @@ public class Darkness : MonoBehaviour {
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
         }
+    }
+
+    public void DestroyDarkness()
+    {
+        Debug.Log("Darkness Destroyed");
+
+        //AI_Manager.Instance.AddtoDarknessList(this);
+        //Remove from list of darkness
+        AI_Manager.Instance.RemoveFromDarknessList(this);
+        //AI_Manager.Instance.AddtoDarknessList(this);
+
+        GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
+        //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
+
+        //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
+        dsController.ChangeState(EnemyState.DEATH);
+        gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
+        StartCoroutine(deathRoutine());
     }
 
     IEnumerator deathRoutine()

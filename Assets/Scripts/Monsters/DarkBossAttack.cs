@@ -8,8 +8,8 @@ public class DarkBossAttack : MonoBehaviour {
     public string attackType; //Ball, RockSmash, Smash
 
     Vector3 targetPos;
-    float moveTime = 5f; //higher this value, the faster the attack moves and the longer it lasts...
-    float attackSpeed = 3f;
+    float ballMoveTime = 5f; //higher this value, the faster the attack moves and the longer it lasts...
+    public float attackSpeed = 20f;
     float curTime = 0;
     bool move;
     
@@ -32,10 +32,15 @@ public class DarkBossAttack : MonoBehaviour {
         {
             if (move == true)
             { 
-                if (curTime < moveTime)
+                if (curTime < ballMoveTime)
                 {
-                    //move attacck towards player's last known position
-                    transform.position = Vector3.MoveTowards(transform.position, targetPos, moveTime * Time.deltaTime * attackSpeed);
+                    //move attack towards player's last known position
+                    transform.LookAt(targetPos);
+                    //transform.position = Vector3.MoveTowards(transform.position, targetPos, ballMoveTime * Time.deltaTime * attackSpeed);
+                    Vector3 normalizeDirection = (targetPos - transform.position).normalized;
+                    //normalizeDirection = new Vector3(normalizeDirection.x, normalizeDirection.y-.2f, normalizeDirection.z+2).normalized;
+                    //transform.position += (normalizeDirection * Time.deltaTime) * attackSpeed;
+                    transform.Translate((Vector3.forward * Time.deltaTime) * attackSpeed, Space.Self);
                     curTime += Time.deltaTime;
                 }
                 else
@@ -47,10 +52,23 @@ public class DarkBossAttack : MonoBehaviour {
         }
 	}
 
-    public void moveAttack()
+    public void moveAttack(Vector3 toPos)
     {
-        targetPos = Target.transform.position;
+        if (toPos != Vector3.zero)
+        {
+            targetPos = toPos;
+        }
+        else
+        {
+            //Vector3 tempPos = new Vector3(Target.transform.position.x, Target.transform.position.y, Target.transform.position.z + 20);
+            targetPos = Target.transform.position;
+        }
         move = true;
+    }
+
+    public void moveAttack_3Ball()
+    {
+
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -63,9 +81,15 @@ public class DarkBossAttack : MonoBehaviour {
                 Debug.Log("Dark Boss Attack collided with player rock cover");
                 //event call for player damaged
                 EventManager.TriggerEvent("Player_Cover_Destroyed", "Player_Cover_Destroyed");
+
+                ScreenShake camShake = new ScreenShake();
+                //camShake.Play(.7f, 1);
+                StartCoroutine(camShake.Shake(.15f, .5f));
+
                 //kick off destruction animation for rock cover
                 Destroy(collision.gameObject);
-                //Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+
 
             }
             //IF SMASH hits an environment object, then should play SFX & FX
@@ -78,7 +102,7 @@ public class DarkBossAttack : MonoBehaviour {
         }
 
         //destroy attack if it hits a NORMAL environment object
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Environment") && attackType == "Ball")
+        if(collision.gameObject.tag == "player_cover" && (attackType == "Ball" || attackType == "Smash"))
         {
             Destroy(this.gameObject);
         }
@@ -86,20 +110,32 @@ public class DarkBossAttack : MonoBehaviour {
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.tag == "PlayerCube" && attackType == "Ball")
+
+        if (collider.gameObject.tag == "PlayerCube" && (attackType == "Ball" || attackType == "Smash"))
         {
             Debug.Log("Dark Boss Attack collided with Player");
             //event call for player damaged
             Destroy(this.gameObject);
         }
+        //Check if attack hits the trigger wall behind player, if so, then destroy attack because it has already passed player
+        else if(collider.gameObject.name == "p_attack_wall" && (attackType == "Ball" || attackType == "Smash"))
+        {
+            Debug.Log("Destroy dark ball attack");
+            Destroy(this.gameObject);
+        }
+        else if (collider.gameObject.tag == "player cover" && (attackType == "Ball" || attackType == "Smash"))
+        {
+            Debug.Log("Destroy dark ball attack");
+            Destroy(this.gameObject);
+        }
 
-            if (collider.gameObject.tag == "player cover" && attackType == "RockSmash")
+        if (collider.gameObject.tag == "player cover" && attackType == "RockSmash")
             {
                 //shake Screen with RockSmash collides with the game world
                 Debug.Log("Dark Boss Attack collided with object");
                 ScreenShake camShake = new ScreenShake();
                 //camShake.Play(.7f, 1);
-                StartCoroutine(camShake.Shake(.2f, .5f));
+                StartCoroutine(camShake.Shake(.15f, .5f));
 
                 Debug.Log("Dark Boss Attack collided with player rock cover");
                 //event call for player damaged
