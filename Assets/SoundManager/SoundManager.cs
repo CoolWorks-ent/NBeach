@@ -220,6 +220,12 @@ public class SoundManager : MonoBehaviour {
         curAudio.UnPause();
     }
 
+    public void ChangeBgmPlaybackPos(float newTime)
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.time = newTime;
+    }
+
     public void CrossFadeMusicIntroScene()
 	{
 		AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath,music[8]), typeof(AudioClip));

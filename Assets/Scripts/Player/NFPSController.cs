@@ -667,12 +667,12 @@ public class NFPSController : PlayerController {
         float t = 0;
 
         //player can't be damaged if in HURT state
-        if (invincibleState == false && playerStatus != PLAYER_STATUS.HURT)
+        if (playerStatus != PLAYER_STATUS.HURT)
         {
-
-            if (playerHealth > 0)
+            //if player not already invincible, then damage player
+            if (invincibleState == false)
             {
-                if (invincibleState != true)
+                if (playerHealth > 0)
                 {
                     //show damage overlay when hurt
                     StartCoroutine(OnPlayerDamaged_corout());
@@ -686,12 +686,11 @@ public class NFPSController : PlayerController {
 
                         //if player hit with RockSmashAttack, trigger event to fly back and hit island
                         DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum >= 3)
                         {
                             EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
                         }
                     }
-                }
                     curTime = 0;
                     invincibleState = true;
                     yield return new WaitForSeconds(invincibleTime);
@@ -705,21 +704,22 @@ public class NFPSController : PlayerController {
                     }*/
                     Debug.Log("Invincibility Off");
                     invincibleState = false;
-                
+
+                }
             }
 
-        }
-        else if(playerStatus != PLAYER_STATUS.HURT)
-        {
-            //if player hit with RockSmashAttack, trigger event to fly back and hit island
-            DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-            if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+            if (enemy != null && enemy.GetComponent<DarkBossAttack>() != null)
             {
-                EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                //if player hit with RockSmashAttack, trigger event to fly back and hit island
+                DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+                if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                {
+                    EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                }
             }
         }
         //set player into "hurt" state if their health is too low
-        if (playerHealth <= 1 && playerStatus != PLAYER_STATUS.HURT)
+        else if (playerHealth <= 1)
         {
             playerStatus = PLAYER_STATUS.HURT;
             HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));

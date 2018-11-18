@@ -80,7 +80,7 @@ Material:
     - _GlossyReflections: 1
     - _Intensity: 1
     - _LM: 1
-    - _LMPower: 3.54
+    - _LMPower: 2
     - _MainTexturePower: 0
     - _Metallic: 0
     - _Mode: 0
@@ -105,7 +105,7 @@ Material:
     - _Color_T: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LMColor: {r: 1, g: 1, b: 1, a: 1}
+    - _LMColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 1}
     - _UpVector: {r: 0, g: 1, b: 0, a: 0}

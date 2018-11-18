@@ -277,6 +277,71 @@ public class GameController : MonoBehaviour {
             soundManager.PauseBGAudio();
         }
     }
+    /// <summary>
+    ///  Scene Skip Implementation
+    ///  1. Determine the new time to skip the scene too
+    ///  2. Turn on player's camSpline until they are in the proper position for that stage or time in the level. (unless there is a way to skip the spline to the player's point...)
+    /// (possibly use the start percentage and change it to match the new time
+    ///  3. Change the BGM playback position to the new time 
+    ///  4. Call function that start this section of the level
+    /// </summary>
+    /// <param name="evt"></param>
+    /// <param name="newBgmPlaybackTime"></param>
+    public void SceneSkip(string evt, float newBgmPlaybackTime)
+    {
+        Debug.Log("[Scene Skip] Skip to " + evt);
+        switch (evt)
+        {
+            case "Song2_Opening":
+                break;
+            case "Song2_Stage1":
+                //change start percentage for camera path
+                pathControl.startPercent = .3f;
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(1));
+                break;
+            case "Song2_Stage2":
+                //change start percentage for camera path
+                pathControl.startPercent = .6f;
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(2));
+                break;
+            case "Song2_Stage3":
+                //change start percentage for camera path
+                //pathControl.Play();
+                //pathControl.startPercent = .6f;
+                pathControl.Seek(.8f);                
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(3));
+                break;
+        }
+    }
+
+    IEnumerator SceneSkipCoroutine(int section)
+    {
+        song2_lvl level = lvlManager.currentLvl.GetComponent<song2_lvl>();
+        //start stage 1
+        level.StopAllCoroutines(); //stop all current running coroutines in song2, which are stage coroutines
+        switch (section)
+        {
+            case 1:
+                level.Stage1();
+                break;
+            case 2:
+                level.Stage2();
+                break;
+            case 3:
+                level.Stage3();
+                break;
+        }
+        yield return 0;
+    }
 
     //function that contains what each event in song 1 should do
     void Scene1Events(string evt)

@@ -46,6 +46,12 @@ public class song2_lvl : Level {
     float bossTimeBtwAttacks_stage1 = 1, bossTimeBtwAttacks_stage2 = 1.5f, bossTimeBtwAttacks_stage3 = 1.5f;
     [SerializeField]
     Transform darkBossEndPos;
+    [SerializeField]
+    Material rockMaterial;
+    [SerializeField]
+    Material rockMaterial_2;
+    [SerializeField]
+    Material cloudMaterial;
 
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
@@ -57,8 +63,9 @@ public class song2_lvl : Level {
     public int stageNum = 0;
     float stage1StartTime = 120; //120; //in seconds
     float stage2StartTime = 180; //180; //3min in seconds
-    float stage3StartTime = 240; //240; //4min in seconds
-    float stage3EndTime = 320; //320 //5+min in seconds (current total song time = 5:15)
+    float stage3StartTime = 230; //240; //4min in seconds
+    float stage3EndTime = 250; //320 //5+min in seconds 
+    float finalStageEndTime = 320; //(current total song time = 5:15)
     float darkSpawnRate_Stage0 = 6;
     float darkSpawnRate_Stage0_1 = 5;
     float darkSpawnRate_Stage1 = 4;
@@ -73,6 +80,8 @@ public class song2_lvl : Level {
     int rainEmissionRateDefault = 8;
     int rainEmissionRateMax = 40;
     Material nightSkybox;
+    Material daySkybox;
+   
 
     bool stagePlaying = true;
 
@@ -100,6 +109,8 @@ public class song2_lvl : Level {
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
         blackOverlay.gameObject.SetActive(false);
         nightSkybox = (Material)Resources.Load("Skyboxes/Night 01A", typeof(Material));
+        daySkybox = (Material)Resources.Load("Skyboxes/Day 01A", typeof(Material));
+
         //start Intro First
         darkBoss.gameObject.SetActive(false);
         darkBossObj = darkBoss.transform.parent.gameObject;
@@ -128,15 +139,26 @@ public class song2_lvl : Level {
     void Update()
     {
 
-        //get current time based upon when stage0 started
+        //get current time based upon when stage0 started and the music started
         curSongTime = Time.time - songStartTime;
 
         //call function to handle spawning of throwable shells
         ShellSpawner();
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            DebugFunc("Song2_Stage1");
+            gController.SceneSkip("Song2_Stage1", stage1StartTime);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            DebugFunc("Song2_Stage2");
+            gController.SceneSkip("Song2_Stage2", stage2StartTime);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             DebugFunc("Song2_Stage3");
+            gController.SceneSkip("Song2_Stage3", stage3StartTime);
         }
     }
 
@@ -172,6 +194,10 @@ public class song2_lvl : Level {
     void OnGameResumed(string evt)
     { }
 
+    /// <summary>
+    /// Function called to start the next sequential stage in the level.
+    /// Condition for Starting the Next Stage is: the player needs to reach the next Cover Rock. 
+    /// </summary>
     void StartNextStage()
     {
         if (stageNum == 1) //&& curSongTime >= stage1StartTime)
@@ -206,6 +232,10 @@ public class song2_lvl : Level {
             Debug.Log("[Sound Manager]: Audio Stopped");
         else if (evt == "Song2_Stage3")
             Debug.Log("[Level Manager]: Skip to Song2 Stage 3");
+        else
+        {
+            Debug.Log(evt);
+        }
     }
 
     void DarknessDestroyed(string evt)
@@ -286,7 +316,7 @@ public class song2_lvl : Level {
      *****Level Stage Functions ****************
      ************/
 
-    void Stage0()
+    public void Stage0()
     {
         stageNum = 0;
         songStartTime = Time.time;
@@ -295,23 +325,31 @@ public class song2_lvl : Level {
         StartCoroutine(Stage0Routine());
 
     }
-    void Stage1()
+    public void Stage1()
     {
         stageNum = 1;
+        songStartTime = stage1StartTime;
         StartCoroutine(Stage1Routine());
     }
 
-    void Stage2()
+    public void Stage2()
     {
         stageNum = 2;
+        songStartTime = stage2StartTime;
         StartCoroutine(Stage2Routine());
     }
 
-    void Stage3()
+    public void Stage3()
     {
         stageNum = 3;
+        songStartTime = stage3StartTime;
         StartCoroutine(Stage3Routine());
     }
+
+    /// <summary>
+    /// Cover Destroyed Function. Is called once player's rock cover is destroyed.
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator OnPlayerCoverDestroyed()
     {
         //slight delay after rock is destroyed  before player should run
@@ -321,7 +359,7 @@ public class song2_lvl : Level {
         yield return 0;
     }
 
-    //function to make player run to next rock when old rock is destroyed Via Spline
+    //function to make player run to next rock when old rock is destroyed Via Cam pathSpline
     public IEnumerator RunToNewRock(int rockNum)
     {
         /*
@@ -378,6 +416,28 @@ public class song2_lvl : Level {
         StartNextStage();
         //remove speed boost and other FX
         //gController.playerControl.Reset();
+    }
+
+    void StageReset()
+    {
+        //change skybox & lighting to night
+        Color lightingColor_Night;
+        Color lightingColor_Day;  //"B0B0B0"
+        ColorUtility.TryParseHtmlString("#56577A", out lightingColor_Night);
+        ColorUtility.TryParseHtmlString("#B0B0B0", out lightingColor_Day);
+
+        print("day sky");
+        RenderSettings.skybox = nightSkybox;
+        RenderSettings.ambientLight = lightingColor_Day;
+
+        //change lighting on rocks and environment objects
+        float dayColor_rocks = 0f;
+        float nightColor_rocks = 0.6f;
+        float dayColor_clouds = 0f;
+        float nightColor_clouds = 2f;
+        rockMaterial.SetFloat("_LMPower", dayColor_rocks);
+        rockMaterial_2.SetFloat("_LMPower", dayColor_rocks);
+        cloudMaterial.SetFloat("_LMPower", dayColor_clouds);
     }
 
     /*
@@ -471,10 +531,27 @@ public class song2_lvl : Level {
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
         yield return new WaitForSeconds(0.1f);
 
-        //change skybox to night
+        //change skybox & lighting to night
+        Color lightingColor_Night;
+        Color lightingColor_Day;  //"B0B0B0"
+        ColorUtility.TryParseHtmlString("#56577A", out lightingColor_Night);
+        ColorUtility.TryParseHtmlString("#B0B0B0", out lightingColor_Day);
+
         print("night sky");
         RenderSettings.skybox = nightSkybox;
+        RenderSettings.ambientLight = lightingColor_Night;
+
+        //change lighting on rocks and environment objects
+        float dayColor_rocks = 0f;
+        float nightColor_rocks = 0.6f;
+        float dayColor_clouds = 0f;
+        float nightColor_clouds = 2f;
+        rockMaterial.SetFloat("_LMPower", nightColor_rocks);
+        rockMaterial_2.SetFloat("_LMPower", nightColor_rocks);
+        cloudMaterial.SetFloat("_LMPower", nightColor_clouds);
+
         yield return new WaitForSeconds(0.3f);
+
         //Display eye-open animation and show world. disable black overlay too
         animator2D.Play("eyeOpen");
         blackOverlay.gameObject.SetActive(false);
@@ -569,6 +646,8 @@ public class song2_lvl : Level {
          * [PLAY BG MUSIC] start playing bg song
          */
         gController.soundManager.FadeInMusic(2);
+        //BG song now playing, set startTime
+        songStartTime = Time.time;
 
         while (t <= moveTime)
         {
@@ -694,7 +773,7 @@ public class song2_lvl : Level {
         //resume spawning AI for next wave
         enemySpawners.pauseSpawning = false;
 
-        float waitTime = stage2StartTime - curSongTime;
+        float waitTime = stage2StartTime - songStartTime;
         Debug.Log("time till next stage = " + waitTime);
        // float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
@@ -751,7 +830,7 @@ public class song2_lvl : Level {
         //Increase speed of dark ball attack
         darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage2;
 
-        float waitTime = stage3StartTime - curSongTime;
+        float waitTime = stage3StartTime - songStartTime;
         Debug.Log("time till next stage = " + waitTime);
         //float tempWaitTime = 5;
         //This is the length of time the rest of the stage should play out
@@ -831,7 +910,7 @@ public class song2_lvl : Level {
         //Increase speed of dark ball attack
         darkBoss.ballMoveSpeed = darkBoss.ballMoveSpeed + bossAttackSpeed_stage3;
 
-        float waitTime = stage3EndTime - curSongTime;
+        float waitTime = stage3EndTime - songStartTime;
         Debug.Log("time till end = " + waitTime);
         //float tempWaitTime = 5;
         yield return new WaitForSeconds(waitTime);
@@ -841,10 +920,12 @@ public class song2_lvl : Level {
         darkBoss.darkHand.GetComponent<BoxCollider>().size = new Vector3(boxSize.x, .1f, .1f);
 
         darkBoss.DoRockSmash_Interrupt(gController.playerControl.gameObject);
-        yield return new WaitForSeconds(4f);
+        //yield return new WaitForSeconds(4f);
+        yield return new WaitUntil(() => darkBoss.GetComponent<Animator>().GetBool("DoRockSmashAttack") == true);
+        yield return new WaitForSeconds(1f);
         gController.timeManager.DoSlowMo(15f);
         yield return new WaitUntil(() => gController.timeManager.slowMoOn == false);
-        Debug.Log("song finished");
+
 
         //StartCoroutine(Song2_EndCutscene());
 
@@ -935,6 +1016,7 @@ public class song2_lvl : Level {
         }
         //FADE OUT Music
         gController.soundManager.StopBGAudio();
+        Debug.Log("song finished");
     }
 
     /*
