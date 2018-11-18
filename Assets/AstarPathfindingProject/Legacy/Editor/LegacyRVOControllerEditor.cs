@@ -1,12 +1,4 @@
-using UnityEditor;
 
-namespace Pathfinding.Legacy {
-	[CustomEditor(typeof(LegacyRVOController))]
-	[CanEditMultipleObjects]
-	public class LegacyRVOControllerEditor : Pathfinding.RVO.RVOControllerEditor {
-		protected override void Inspector () {
-			DrawDefaultInspector();
-			LegacyEditorHelper.UpgradeDialog(targets, typeof(Pathfinding.RVO.RVOController));
-		}
-	}
-}
+// This file has been removed from the project. Since UnityPackages cannot
+// delete files, only replace them, this message is left here to prevent old
+// files from causing compiler errors

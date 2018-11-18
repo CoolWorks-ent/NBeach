@@ -111,7 +111,7 @@ namespace Pathfinding.Recast {
 			}
 		}
 
-		/** Find all relevant RecastMeshObj components and create ExtraMeshes for them */
+		/// <summary>Find all relevant RecastMeshObj components and create ExtraMeshes for them</summary>
 		public void CollectRecastMeshObjs (List<RasterizationMesh> buffer) {
 			var buffer2 = Util.ListPool<RecastMeshObj>.Claim();
 
@@ -127,7 +127,7 @@ namespace Pathfinding.Recast {
 				MeshFilter filter = buffer2[i].GetMeshFilter();
 				Renderer rend = filter != null ? filter.GetComponent<Renderer>() : null;
 
-				if (filter != null && rend != null) {
+				if (filter != null && rend != null && filter.sharedMesh != null) {
 					Mesh mesh = filter.sharedMesh;
 					RasterizationMesh smesh;
 
@@ -242,12 +242,12 @@ namespace Pathfinding.Recast {
 			}
 		}
 
-		/** Returns ceil(lhs/rhs), i.e lhs/rhs rounded up */
+		/// <summary>Returns ceil(lhs/rhs), i.e lhs/rhs rounded up</summary>
 		static int CeilDivision (int lhs, int rhs) {
 			return (lhs + rhs - 1)/rhs;
 		}
 
-		/** Generates a terrain chunk mesh */
+		/// <summary>Generates a terrain chunk mesh</summary>
 		RasterizationMesh GenerateHeightmapChunk (float[, ] heights, Vector3 sampleSize, Vector3 offset, int x0, int z0, int width, int depth, int stride) {
 			// Downsample to a smaller mesh (full resolution will take a long time to rasterize)
 			// Round up the width to the nearest multiple of terrainSampleSize and then add 1
@@ -321,18 +321,19 @@ namespace Pathfinding.Recast {
 
 				var collider = prot.prefab.GetComponent<Collider>();
 				var treePosition = terrain.transform.position +  Vector3.Scale(instance.position, data.size);
+				var scale = new Vector3(instance.widthScale, instance.heightScale, instance.widthScale);
+				scale = Vector3.Scale(scale, prot.prefab.transform.localScale);
 
 				if (collider == null) {
 					var instanceBounds = new Bounds(terrain.transform.position + Vector3.Scale(instance.position, data.size), new Vector3(instance.widthScale, instance.heightScale, instance.widthScale));
 
-					Matrix4x4 matrix = Matrix4x4.TRS(treePosition, Quaternion.identity, new Vector3(instance.widthScale, instance.heightScale, instance.widthScale)*0.5f);
+					Matrix4x4 matrix = Matrix4x4.TRS(treePosition, Quaternion.identity, scale*0.5f);
 
 					var mesh = new RasterizationMesh(BoxColliderVerts, BoxColliderTris, instanceBounds, matrix);
 
 					result.Add(mesh);
 				} else {
 					// The prefab has a collider, use that instead
-					var scale = new Vector3(instance.widthScale, instance.heightScale, instance.widthScale);
 
 					// Generate a mesh from the collider
 					RasterizationMesh mesh = RasterizeCollider(collider, Matrix4x4.TRS(treePosition, Quaternion.identity, scale));
@@ -350,7 +351,7 @@ namespace Pathfinding.Recast {
 		}
 
 		public void CollectColliderMeshes (List<RasterizationMesh> result) {
-			/** \todo Use Physics.OverlapBox on newer Unity versions */
+			/// <summary>TODO: Use Physics.OverlapBox on newer Unity versions</summary>
 			// Find all colliders that could possibly be inside the bounds
 			var colls = Physics.OverlapSphere(bounds.center, bounds.size.magnitude, -1, QueryTriggerInteraction.Ignore);
 
@@ -371,9 +372,10 @@ namespace Pathfinding.Recast {
 			capsuleCache.Clear();
 		}
 
-		/** Box Collider triangle indices can be reused for multiple instances.
-		 * \warning This array should never be changed
-		 */
+		/// <summary>
+		/// Box Collider triangle indices can be reused for multiple instances.
+		/// Warning: This array should never be changed
+		/// </summary>
 		private readonly static int[] BoxColliderTris = {
 			0, 1, 2,
 			0, 2, 3,
@@ -394,9 +396,10 @@ namespace Pathfinding.Recast {
 			3, 7, 4
 		};
 
-		/** Box Collider vertices can be reused for multiple instances.
-		 * \warning This array should never be changed
-		 */
+		/// <summary>
+		/// Box Collider vertices can be reused for multiple instances.
+		/// Warning: This array should never be changed
+		/// </summary>
 		private readonly static Vector3[] BoxColliderVerts = {
 			new Vector3(-1, -1, -1),
 			new Vector3(1, -1, -1),
@@ -409,7 +412,7 @@ namespace Pathfinding.Recast {
 			new Vector3(-1, 1, 1),
 		};
 
-		/** Holds meshes for capsules to avoid generating duplicate capsule meshes for identical capsules */
+		/// <summary>Holds meshes for capsules to avoid generating duplicate capsule meshes for identical capsules</summary>
 		private List<CapsuleCache> capsuleCache = new List<CapsuleCache>();
 
 		class CapsuleCache {
@@ -419,18 +422,20 @@ namespace Pathfinding.Recast {
 			public int[] tris;
 		}
 
-		/** Rasterizes a collider to a mesh.
-		 * This will pass the col.transform.localToWorldMatrix to the other overload of this function.
-		 */
+		/// <summary>
+		/// Rasterizes a collider to a mesh.
+		/// This will pass the col.transform.localToWorldMatrix to the other overload of this function.
+		/// </summary>
 		RasterizationMesh RasterizeCollider (Collider col) {
 			return RasterizeCollider(col, col.transform.localToWorldMatrix);
 		}
 
-		/** Rasterizes a collider to a mesh assuming it's vertices should be multiplied with the matrix.
-		 * Note that the bounds of the returned RasterizationMesh is based on collider.bounds. So you might want to
-		 * call myExtraMesh.RecalculateBounds on the returned mesh to recalculate it if the collider.bounds would
-		 * not give the correct value.
-		 */
+		/// <summary>
+		/// Rasterizes a collider to a mesh assuming it's vertices should be multiplied with the matrix.
+		/// Note that the bounds of the returned RasterizationMesh is based on collider.bounds. So you might want to
+		/// call myExtraMesh.RecalculateBounds on the returned mesh to recalculate it if the collider.bounds would
+		/// not give the correct value.
+		/// </summary>
 		RasterizationMesh RasterizeCollider (Collider col, Matrix4x4 localToWorldMatrix) {
 			RasterizationMesh result = null;
 

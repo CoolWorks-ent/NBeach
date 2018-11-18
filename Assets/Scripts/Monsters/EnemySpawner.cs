@@ -48,7 +48,7 @@ public class EnemySpawner : MonoBehaviour
                     if (spawnWait >= spawnRate)
                     {
                         Vector3 randomloc = Random.insideUnitCircle * 5;
-                        Darkness enemy = Instantiate(darknessEnemy, spawnPos, darknessEnemy.transform.rotation);
+                        Darkness enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
                         //add enemy to management list

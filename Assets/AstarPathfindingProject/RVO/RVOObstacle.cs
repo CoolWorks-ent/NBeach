@@ -2,100 +2,109 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Pathfinding.RVO {
-	/** Base class for simple RVO colliders.
-	 *
-	 * This is a helper base class for RVO colliders. It provides automatic gizmos
-	 * and helps with the winding order of the vertices as well as automatically updating the obstacle when moved.
-	 *
-	 * Extend this class to create custom RVO obstacles.
-	 *
-	 * \see writing-rvo-colliders
-	 * \see RVOSquareObstacle
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Base class for simple RVO colliders.
+	///
+	/// This is a helper base class for RVO colliders. It provides automatic gizmos
+	/// and helps with the winding order of the vertices as well as automatically updating the obstacle when moved.
+	///
+	/// Extend this class to create custom RVO obstacles.
+	///
+	/// See: writing-rvo-colliders (view in online documentation for working links)
+	/// See: RVOSquareObstacle
+	/// </summary>
 	public abstract class RVOObstacle : VersionedMonoBehaviour {
-		/** Mode of the obstacle.
-		 * Determines winding order of the vertices */
+		/// <summary>
+		/// Mode of the obstacle.
+		/// Determines winding order of the vertices
+		/// </summary>
 		public ObstacleVertexWinding obstacleMode;
 
 		public RVOLayer layer = RVOLayer.DefaultObstacle;
 
-		/** RVO Obstacle Modes.
-		 * Determines winding order of obstacle vertices */
+		/// <summary>
+		/// RVO Obstacle Modes.
+		/// Determines winding order of obstacle vertices
+		/// </summary>
 		public enum ObstacleVertexWinding {
-			/** Keeps agents from entering the obstacle */
+			/// <summary>Keeps agents from entering the obstacle</summary>
 			KeepOut,
-			/** Keeps agents inside the obstacle */
+			/// <summary>Keeps agents inside the obstacle</summary>
 			KeepIn,
 		}
 
-		/** Reference to simulator */
+		/// <summary>Reference to simulator</summary>
 		protected Pathfinding.RVO.Simulator sim;
 
-		/** All obstacles added */
+		/// <summary>All obstacles added</summary>
 		private List<ObstacleVertex> addedObstacles;
 
-		/** Original vertices for the obstacles */
+		/// <summary>Original vertices for the obstacles</summary>
 		private List<Vector3[]> sourceObstacles;
 
-		/** Create Obstacles.
-		 * Override this and add logic for creating obstacles.
-		 * You should not use the simulator's function calls directly.
-		 *
-		 * \see AddObstacle
-		 */
+		/// <summary>
+		/// Create Obstacles.
+		/// Override this and add logic for creating obstacles.
+		/// You should not use the simulator's function calls directly.
+		///
+		/// See: AddObstacle
+		/// </summary>
 		protected abstract void CreateObstacles ();
 
-		/** Enable executing in editor to draw gizmos.
-		 * If enabled, the CreateObstacles function will be executed in the editor as well
-		 * in order to draw gizmos.
-		 */
+		/// <summary>
+		/// Enable executing in editor to draw gizmos.
+		/// If enabled, the CreateObstacles function will be executed in the editor as well
+		/// in order to draw gizmos.
+		/// </summary>
 		protected abstract bool ExecuteInEditor { get; }
 
-		/** If enabled, all coordinates are handled as local.
-		 */
+		/// <summary>If enabled, all coordinates are handled as local.</summary>
 		protected abstract bool LocalCoordinates { get; }
 
-		/** Static or dynamic.
-		 * This determines if the obstacle can be updated by e.g moving the transform
-		 * around in the scene.
-		 */
+		/// <summary>
+		/// Static or dynamic.
+		/// This determines if the obstacle can be updated by e.g moving the transform
+		/// around in the scene.
+		/// </summary>
 		protected abstract bool StaticObstacle { get; }
 
 		protected abstract float Height { get; }
-		/** Called in the editor.
-		 * This function should return true if any variables which can change the shape or position of the obstacle
-		 * has changed since the last call to this function. Take a look at the RVOSquareObstacle for an example.
-		 */
+		/// <summary>
+		/// Called in the editor.
+		/// This function should return true if any variables which can change the shape or position of the obstacle
+		/// has changed since the last call to this function. Take a look at the RVOSquareObstacle for an example.
+		/// </summary>
 		protected abstract bool AreGizmosDirty ();
 
-		/** Enabled if currently in OnDrawGizmos */
+		/// <summary>Enabled if currently in OnDrawGizmos</summary>
 		private bool gizmoDrawing = false;
 
-		/** Vertices for gizmos */
+		/// <summary>Vertices for gizmos</summary>
 		private List<Vector3[]> gizmoVerts;
 
-		/** Last obstacle mode.
-		 * Used to check if the gizmos should be updated
-		 */
+		/// <summary>
+		/// Last obstacle mode.
+		/// Used to check if the gizmos should be updated
+		/// </summary>
 		private ObstacleVertexWinding _obstacleMode;
 
-		/** Last matrix the obstacle was updated with.
-		 * Used to check if the obstacle should be updated */
+		/// <summary>
+		/// Last matrix the obstacle was updated with.
+		/// Used to check if the obstacle should be updated
+		/// </summary>
 		private Matrix4x4 prevUpdateMatrix;
 
-		/** Draws Gizmos */
+		/// <summary>Draws Gizmos</summary>
 		public void OnDrawGizmos () {
 			OnDrawGizmos(false);
 		}
 
-		/** Draws Gizmos */
+		/// <summary>Draws Gizmos</summary>
 		public void OnDrawGizmosSelected () {
 			OnDrawGizmos(true);
 		}
 
-		/** Draws Gizmos */
+		/// <summary>Draws Gizmos</summary>
 		public void OnDrawGizmos (bool selected) {
 			gizmoDrawing = true;
 
@@ -146,17 +155,19 @@ namespace Pathfinding.RVO {
 			gizmoDrawing = false;
 		}
 
-		/** Get's the matrix to use for vertices.
-		 * Can be overriden for custom matrices.
-		 * \returns transform.localToWorldMatrix if LocalCoordinates is true, otherwise Matrix4x4.identity
-		 */
+		/// <summary>
+		/// Get's the matrix to use for vertices.
+		/// Can be overriden for custom matrices.
+		/// Returns: transform.localToWorldMatrix if LocalCoordinates is true, otherwise Matrix4x4.identity
+		/// </summary>
 		protected virtual Matrix4x4 GetMatrix () {
 			return LocalCoordinates ? transform.localToWorldMatrix : Matrix4x4.identity;
 		}
 
-		/** Disables the obstacle.
-		 * Do not override this function
-		 */
+		/// <summary>
+		/// Disables the obstacle.
+		/// Do not override this function
+		/// </summary>
 		public void OnDisable () {
 			if (addedObstacles != null) {
 				if (sim == null) throw new System.Exception("This should not happen! Make sure you are not overriding the OnEnable function");
@@ -167,9 +178,10 @@ namespace Pathfinding.RVO {
 			}
 		}
 
-		/** Enabled the obstacle.
-		 * Do not override this function
-		 */
+		/// <summary>
+		/// Enabled the obstacle.
+		/// Do not override this function
+		/// </summary>
 		public void OnEnable () {
 			if (addedObstacles != null) {
 				if (sim == null) throw new System.Exception("This should not happen! Make sure you are not overriding the OnDisable function");
@@ -188,7 +200,7 @@ namespace Pathfinding.RVO {
 			}
 		}
 
-		/** Creates obstacles */
+		/// <summary>Creates obstacles</summary>
 		public void Start () {
 			addedObstacles = new List<ObstacleVertex>();
 			sourceObstacles = new List<Vector3[]>();
@@ -196,8 +208,10 @@ namespace Pathfinding.RVO {
 			CreateObstacles();
 		}
 
-		/** Updates obstacle if required.
-		 * Checks for if the obstacle should be updated (e.g if it has moved) */
+		/// <summary>
+		/// Updates obstacle if required.
+		/// Checks for if the obstacle should be updated (e.g if it has moved)
+		/// </summary>
 		public void Update () {
 			Matrix4x4 m = GetMatrix();
 
@@ -210,19 +224,22 @@ namespace Pathfinding.RVO {
 		}
 
 
-		/** Finds a simulator in the scene.
-		 *
-		 * Saves found simulator in #sim.
-		 *
-		 * \throws System.InvalidOperationException When no RVOSimulator could be found.
-		 */
+		/// <summary>
+		/// Finds a simulator in the scene.
+		///
+		/// Saves found simulator in <see cref="sim"/>.
+		///
+		/// \throws System.InvalidOperationException When no RVOSimulator could be found.
+		/// </summary>
 		protected void FindSimulator () {
 			if (RVOSimulator.active == null) throw new System.InvalidOperationException("No RVOSimulator could be found in the scene. Please add one to any GameObject");
 			sim = RVOSimulator.active.GetSimulator();
 		}
 
-		/** Adds an obstacle with the specified vertices.
-		 * The vertices array might be changed by this function. */
+		/// <summary>
+		/// Adds an obstacle with the specified vertices.
+		/// The vertices array might be changed by this function.
+		/// </summary>
 		protected void AddObstacle (Vector3[] vertices, float height) {
 			if (vertices == null) throw new System.ArgumentNullException("Vertices Must Not Be Null");
 			if (height < 0) throw new System.ArgumentOutOfRangeException("Height must be non-negative");
@@ -247,17 +264,19 @@ namespace Pathfinding.RVO {
 			AddObstacleInternal(vertices, height);
 		}
 
-		/** Adds an obstacle.
-		 * Winding is assumed to be correct and very little error checking is done.
-		 */
+		/// <summary>
+		/// Adds an obstacle.
+		/// Winding is assumed to be correct and very little error checking is done.
+		/// </summary>
 		private void AddObstacleInternal (Vector3[] vertices, float height) {
 			addedObstacles.Add(sim.AddObstacle(vertices, height, GetMatrix(), layer));
 			sourceObstacles.Add(vertices);
 		}
 
-		/** Winds the vertices correctly.
-		 * Winding order is determined from #obstacleMode.
-		 */
+		/// <summary>
+		/// Winds the vertices correctly.
+		/// Winding order is determined from <see cref="obstacleMode"/>.
+		/// </summary>
 		private void WindCorrectly (Vector3[] vertices) {
 			int leftmost = 0;
 			float leftmostX = float.PositiveInfinity;

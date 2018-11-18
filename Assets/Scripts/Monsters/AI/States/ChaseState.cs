@@ -19,8 +19,8 @@ public class ChaseState : Dark_State
 
     public override void UpdateState(Darkness controller)
     {
-        controller.aIMovement.aI.destination = controller.target.position;
-        controller.aIMovement.aI.onSearchPath();
+        //controller.aIMovement.target = controller.target;
+        //controller.aIMovement.UpdatePath();
         CheckTransitions(controller);
         /*if(controller.TargetWithinDistance(controller.attackInitiationRange))
         {

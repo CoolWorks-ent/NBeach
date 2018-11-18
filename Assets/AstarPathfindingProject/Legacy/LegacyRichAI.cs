@@ -6,25 +6,27 @@ using Pathfinding.RVO;
 namespace Pathfinding.Legacy {
 	[RequireComponent(typeof(Seeker))]
 	[AddComponentMenu("Pathfinding/Legacy/AI/Legacy RichAI (3D, for navmesh)")]
-	/** Advanced AI for navmesh based graphs.
-	 *
-	 * \deprecated Use the RichAI class instead. This class only exists for compatibility reasons.
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Advanced AI for navmesh based graphs.
+	///
+	/// Deprecated: Use the RichAI class instead. This class only exists for compatibility reasons.
+	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_legacy_1_1_legacy_rich_a_i.php")]
 	public class LegacyRichAI : RichAI {
-		/** Use a 3rd degree equation for calculating slowdown acceleration instead of a 2nd degree.
-		 * A 3rd degree equation can also make sure that the velocity when reaching the target is roughly zero and therefore
-		 * it will have a more direct stop. In contrast solving a 2nd degree equation which will just make sure the target is reached but
-		 * will usually have a larger velocity when reaching the target and therefore look more "bouncy".
-		 */
+		/// <summary>
+		/// Use a 3rd degree equation for calculating slowdown acceleration instead of a 2nd degree.
+		/// A 3rd degree equation can also make sure that the velocity when reaching the target is roughly zero and therefore
+		/// it will have a more direct stop. In contrast solving a 2nd degree equation which will just make sure the target is reached but
+		/// will usually have a larger velocity when reaching the target and therefore look more "bouncy".
+		/// </summary>
 		public bool preciseSlowdown = true;
 
 		public bool raycastingForGroundPlacement = false;
 
-		/** Current velocity of the agent.
-		 * Includes eventual velocity due to gravity */
+		/// <summary>
+		/// Current velocity of the agent.
+		/// Includes eventual velocity due to gravity
+		/// </summary>
 		new Vector3 velocity;
 
 		Vector3 lastTargetPoint;
@@ -38,10 +40,10 @@ namespace Pathfinding.Legacy {
 			}
 		}
 
-		/** Smooth delta time to avoid getting overly affected by e.g GC */
+		/// <summary>Smooth delta time to avoid getting overly affected by e.g GC</summary>
 		static float deltaTime;
 
-		/** Update is called once per frame */
+		/// <summary>Update is called once per frame</summary>
 		protected override void Update () {
 			deltaTime = Mathf.Min(Time.smoothDeltaTime*2, Time.deltaTime);
 
@@ -257,7 +259,7 @@ namespace Pathfinding.Legacy {
 		new Vector3 RaycastPosition (Vector3 position, float lasty) {
 			if (raycastingForGroundPlacement) {
 				RaycastHit hit;
-				float up = Mathf.Max(centerOffset, lasty-position.y+centerOffset);
+				float up = Mathf.Max(height*0.5f, lasty-position.y+height*0.5f);
 
 				if (Physics.Raycast(position+Vector3.up*up, Vector3.down, out hit, up, groundMask)) {
 					if (hit.distance < up) {
@@ -270,7 +272,7 @@ namespace Pathfinding.Legacy {
 			return position;
 		}
 
-		/** Rotates along the Y-axis the transform towards \a trotdir */
+		/// <summary>Rotates along the Y-axis the transform towards trotdir</summary>
 		bool RotateTowards (Vector3 trotdir) {
 			trotdir.y = 0;
 			if (trotdir != Vector3.zero) {

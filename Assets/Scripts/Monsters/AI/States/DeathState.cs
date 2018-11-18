@@ -7,7 +7,7 @@ public class DeathState : Dark_State
 {
     public override void InitializeState(Darkness controller)
     {
-        controller.aIRichPath.canMove = false;
+        //controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.deathHash);
         
         GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;

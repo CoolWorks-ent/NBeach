@@ -5,24 +5,25 @@ using System.Collections.Generic;
 #endif
 
 namespace Pathfinding.Voxels {
-	/** Stores a voxel field. \astarpro */
+	/// <summary>Stores a voxel field. </summary>
 	public class VoxelArea {
 		public const uint MaxHeight = 65536;
 		public const int MaxHeightInt = 65536;
 
-		/** Constant for default LinkedVoxelSpan top and bottom values.
-		 * It is important with the U since ~0 != ~0U
-		 * This can be used to check if a LinkedVoxelSpan is valid and not just the default span
-		 */
+		/// <summary>
+		/// Constant for default LinkedVoxelSpan top and bottom values.
+		/// It is important with the U since ~0 != ~0U
+		/// This can be used to check if a LinkedVoxelSpan is valid and not just the default span
+		/// </summary>
 		public const uint InvalidSpanValue = ~0U;
 
-		/** Initial estimate on the average number of spans (layers) in the voxel representation. Should be greater or equal to 1 */
+		/// <summary>Initial estimate on the average number of spans (layers) in the voxel representation. Should be greater or equal to 1</summary>
 		public const float AvgSpanLayerCountEstimate = 8;
 
-		/** The width of the field along the x-axis. [Limit: >= 0] [Units: vx] */
+		/// <summary>The width of the field along the x-axis. [Limit: >= 0] [Units: vx]</summary>
 		public readonly int width = 0;
 
-		/** The depth of the field along the z-axis. [Limit: >= 0] [Units: vx] */
+		/// <summary>The depth of the field along the z-axis. [Limit: >= 0] [Units: vx]</summary>
 		public readonly int depth = 0;
 
 #if ASTAR_RECAST_CLASS_BASED_LINKED_LIST
@@ -179,6 +180,7 @@ namespace Pathfinding.Voxels {
 #if ASTAR_RECAST_CLASS_BASED_LINKED_LIST
 			cells[index].AddSpan(bottom, top, area, voxelWalkableClimb);
 #else
+			var linkedSpans = this.linkedSpans;
 			// linkedSpans[index] is the span with the lowest y-coordinate at the position x,z such that index=x+z*width
 			// i.e linkedSpans is a 2D array laid out in a 1D array (for performance and simplicity)
 
@@ -194,32 +196,33 @@ namespace Pathfinding.Voxels {
 			int oindex = index;
 
 			while (index != -1) {
-				if (linkedSpans[index].bottom > top) {
+				var current = linkedSpans[index];
+				if (current.bottom > top) {
 					// If the current span's bottom higher up than the span we want to insert's top, then they do not intersect
 					// and we should just insert a new span here
 					break;
-				} else if (linkedSpans[index].top < bottom) {
+				} else if (current.top < bottom) {
 					// The current span and the span we want to insert do not intersect
 					// so just skip to the next span (it might intersect)
 					prev = index;
-					index = linkedSpans[index].next;
+					index = current.next;
 				} else {
 					// Intersection! Merge the spans
 
 					// Find the new bottom and top for the merged span
-					bottom = System.Math.Min(linkedSpans[index].bottom, bottom);
-					top = System.Math.Max(linkedSpans[index].top, top);
+					bottom = System.Math.Min(current.bottom, bottom);
+					top = System.Math.Max(current.top, top);
 
 					// voxelWalkableClimb is flagMergeDistance, when a walkable flag is favored before an unwalkable one
 					// So if a walkable span intersects an unwalkable span, the walkable span can be up to voxelWalkableClimb
 					// below the unwalkable span and the merged span will still be walkable
-					if (System.Math.Abs((int)top - (int)linkedSpans[index].top) <= voxelWalkableClimb) {
+					if (System.Math.Abs((int)top - (int)current.top) <= voxelWalkableClimb) {
 						// linkedSpans[index] is the lowest span, but we might use that span's area anyway if it is walkable
-						area = System.Math.Max(area, linkedSpans[index].area);
+						area = System.Math.Max(area, current.area);
 					}
 
 					// Find the next span in the linked list
-					int next = linkedSpans[index].next;
+					int next = current.next;
 					if (prev != -1) {
 						// There is a previous span
 						// Remove this span from the linked list
@@ -260,14 +263,13 @@ namespace Pathfinding.Voxels {
 				LinkedVoxelSpan[] tmp = linkedSpans;
 				int count = linkedSpanCount;
 				int popped = removedStackCount;
-				linkedSpans = new LinkedVoxelSpan[linkedSpans.Length*2];
+				this.linkedSpans = linkedSpans = new LinkedVoxelSpan[linkedSpans.Length*2];
 				ResetLinkedVoxelSpans();
 				linkedSpanCount = count;
 				removedStackCount = popped;
 				for (int i = 0; i < linkedSpanCount; i++) {
 					linkedSpans[i] = tmp[i];
 				}
-				Debug.Log("Layer estimate too low, doubling size of buffer.\nThis message is harmless.");
 			}
 
 			// Take a node from the recycling stack if possible
@@ -319,49 +321,45 @@ namespace Pathfinding.Voxels {
 		}
 	}
 
-	/** Represents a mesh. \deprecated Use RasterizationMesh instead */
-	[System.Obsolete("Use RasterizationMesh instead")]
-	public class ExtraMesh : RasterizationMesh {
-		public ExtraMesh (Vector3[] vertices, int[] triangles, Bounds bounds) : base(vertices, triangles, bounds) {}
-		public ExtraMesh (Vector3[] vertices, int[] triangles, Bounds bounds, Matrix4x4 matrix) : base(vertices, triangles, bounds, matrix) {}
-	}
-
-	/** Represents a mesh which will be rasterized.
-	 * The vertices will be multiplied with the matrix when rasterizing it to voxels.
-	 * The vertices and triangles array may be used in multiple instances, it is not changed when voxelizing.
-	 *
-	 * \see SceneMesh
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Represents a mesh which will be rasterized.
+	/// The vertices will be multiplied with the matrix when rasterizing it to voxels.
+	/// The vertices and triangles array may be used in multiple instances, it is not changed when voxelizing.
+	///
+	/// See: SceneMesh
+	/// </summary>
 	public class RasterizationMesh {
-		/** Source of the mesh.
-		 * May be null if the source was not a mesh filter
-		 */
+		/// <summary>
+		/// Source of the mesh.
+		/// May be null if the source was not a mesh filter
+		/// </summary>
 		public MeshFilter original;
 
 		public int area;
 		public Vector3[] vertices;
 		public int[] triangles;
 
-		/** Number of vertices in the #vertices array.
-		 * The vertices array is often pooled and then it sometimes makes sense to use a larger array than is actually necessary.
-		 */
+		/// <summary>
+		/// Number of vertices in the <see cref="vertices"/> array.
+		/// The vertices array is often pooled and then it sometimes makes sense to use a larger array than is actually necessary.
+		/// </summary>
 		public int numVertices;
 
-		/** Number of triangles in the #triangles array.
-		 * The triangles array is often pooled and then it sometimes makes sense to use a larger array than is actually necessary.
-		 */
+		/// <summary>
+		/// Number of triangles in the <see cref="triangles"/> array.
+		/// The triangles array is often pooled and then it sometimes makes sense to use a larger array than is actually necessary.
+		/// </summary>
 		public int numTriangles;
 
-		/** World bounds of the mesh. Assumed to already be multiplied with the matrix */
+		/// <summary>World bounds of the mesh. Assumed to already be multiplied with the matrix</summary>
 		public Bounds bounds;
 
 		public Matrix4x4 matrix;
 
-		/** If true, the vertex and triangle arrays will be pooled after they have been used.
-		 * Should be used only if the vertex and triangle arrays were originally taken from a pool.
-		 */
+		/// <summary>
+		/// If true, the vertex and triangle arrays will be pooled after they have been used.
+		/// Should be used only if the vertex and triangle arrays were originally taken from a pool.
+		/// </summary>
 		public bool pool;
 
 		public RasterizationMesh () {
@@ -389,7 +387,7 @@ namespace Pathfinding.Voxels {
 			area = 0;
 		}
 
-		/** Recalculate the bounds based on #vertices and #matrix */
+		/// <summary>Recalculate the bounds based on <see cref="vertices"/> and <see cref="matrix"/></summary>
 		public void RecalculateBounds () {
 			Bounds b = new Bounds(matrix.MultiplyPoint3x4(vertices[0]), Vector3.zero);
 
@@ -401,7 +399,7 @@ namespace Pathfinding.Voxels {
 			bounds = b;
 		}
 
-		/** Pool the #vertices and #triangles arrays if the #pool field is true */
+		/// <summary>Pool the <see cref="vertices"/> and <see cref="triangles"/> arrays if the <see cref="pool"/> field is true</summary>
 		public void Pool () {
 			if (pool) {
 				Util.ArrayPool<int>.Release(ref triangles);
@@ -410,17 +408,13 @@ namespace Pathfinding.Voxels {
 		}
 	}
 
-	/** VoxelContourSet used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>VoxelContourSet used for recast graphs.</summary>
 	public class VoxelContourSet {
 		public List<VoxelContour> conts;        // Pointer to all contours.
 		public Bounds bounds;                   // Bounding box of the heightfield.
 	}
 
-	/** VoxelContour used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>VoxelContour used for recast graphs.</summary>
 	public struct VoxelContour {
 		public int nverts;
 		public int[] verts;         // Vertex coordinates, each vertex contains 4 components.
@@ -430,25 +424,22 @@ namespace Pathfinding.Voxels {
 		public int area;            // Area ID of the contour.
 	}
 
-	/** VoxelMesh used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>VoxelMesh used for recast graphs.</summary>
 	public struct VoxelMesh {
-		/** Vertices of the mesh */
+		/// <summary>Vertices of the mesh</summary>
 		public Int3[] verts;
 
-		/** Triangles of the mesh.
-		 * Each element points to a vertex in the #verts array
-		 */
+		/// <summary>
+		/// Triangles of the mesh.
+		/// Each element points to a vertex in the <see cref="verts"/> array
+		/// </summary>
 		public int[] tris;
 
-		/** Area index for each triangle */
+		/// <summary>Area index for each triangle</summary>
 		public int[] areas;
 	}
 
-	/** VoxelCell used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>VoxelCell used for recast graphs.</summary>
 	public struct VoxelCell {
 		public VoxelSpan firstSpan;
 
@@ -504,9 +495,7 @@ namespace Pathfinding.Voxels {
 		}
 	}
 
-	/** CompactVoxelCell used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>CompactVoxelCell used for recast graphs.</summary>
 	public struct CompactVoxelCell {
 		public uint index;
 		public uint count;
@@ -517,9 +506,7 @@ namespace Pathfinding.Voxels {
 		}
 	}
 
-	/** CompactVoxelSpan used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>CompactVoxelSpan used for recast graphs.</summary>
 	public struct CompactVoxelSpan {
 		public ushort y;
 		public uint con;
@@ -544,9 +531,7 @@ namespace Pathfinding.Voxels {
 		}
 	}
 
-	/** VoxelSpan used for recast graphs.
-	 * \astarpro
-	 */
+	/// <summary>VoxelSpan used for recast graphs.</summary>
 	public class VoxelSpan {
 		public uint bottom;
 		public uint top;

@@ -1,16 +1,4 @@
-using UnityEditor;
 
-namespace Pathfinding.Legacy {
-	[CustomEditor(typeof(LegacyAIPath))]
-	[CanEditMultipleObjects]
-	public class LegacyAIPathEditor : BaseAIEditor {
-		protected override void Inspector () {
-			base.Inspector();
-			if (!gravity.hasMultipleDifferentValues && !float.IsNaN(gravity.vector3Value.x)) {
-				gravity.vector3Value = new UnityEngine.Vector3(float.NaN, float.NaN, float.NaN);
-				serializedObject.ApplyModifiedPropertiesWithoutUndo();
-			}
-			LegacyEditorHelper.UpgradeDialog(targets, typeof(AIPath));
-		}
-	}
-}
+// This file has been removed from the project. Since UnityPackages cannot
+// delete files, only replace them, this message is left here to prevent old
+// files from causing compiler errors

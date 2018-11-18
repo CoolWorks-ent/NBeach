@@ -1,14 +1,22 @@
 using UnityEngine;
 using UnityEditor;
+#if UNITY_2018_1_OR_NEWER
+using UnityEngine.Networking;
+#endif
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Pathfinding {
-	/** Handles update checking for the A* Pathfinding Project */
+	/// <summary>Handles update checking for the A* Pathfinding Project</summary>
 	[InitializeOnLoad]
 	public static class AstarUpdateChecker {
-		/** Used for downloading new version information */
+#if UNITY_2018_1_OR_NEWER
+		/// <summary>Used for downloading new version information</summary>
+		static UnityWebRequest updateCheckDownload;
+#else
+		/// <summary>Used for downloading new version information</summary>
 		static WWW updateCheckDownload;
+#endif
 
 		static System.DateTime _lastUpdateCheck;
 		static bool _lastUpdateCheckRead;
@@ -17,18 +25,18 @@ namespace Pathfinding {
 
 		static System.Version _latestBetaVersion;
 
-		/** Description of the latest update of the A* Pathfinding Project */
+		/// <summary>Description of the latest update of the A* Pathfinding Project</summary>
 		static string _latestVersionDescription;
 
 		static bool hasParsedServerMessage;
 
-		/** Number of days between update checks */
+		/// <summary>Number of days between update checks</summary>
 		const double updateCheckRate = 1F;
 
-		/** URL to the version file containing the latest version number. */
+		/// <summary>URL to the version file containing the latest version number.</summary>
 		const string updateURL = "http://www.arongranberg.com/astar/version.php";
 
-		/** Last time an update check was made */
+		/// <summary>Last time an update check was made</summary>
 		public static System.DateTime lastUpdateCheck {
 			get {
 				try {
@@ -50,7 +58,7 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Latest version of the A* Pathfinding Project */
+		/// <summary>Latest version of the A* Pathfinding Project</summary>
 		public static System.Version latestVersion {
 			get {
 				RefreshServerMessage();
@@ -61,7 +69,7 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Latest beta version of the A* Pathfinding Project */
+		/// <summary>Latest beta version of the A* Pathfinding Project</summary>
 		public static System.Version latestBetaVersion {
 			get {
 				RefreshServerMessage();
@@ -72,7 +80,7 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Summary of the latest update */
+		/// <summary>Summary of the latest update</summary>
 		public static string latestVersionDescription {
 			get {
 				RefreshServerMessage();
@@ -83,9 +91,10 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Holds various URLs and text for the editor.
-		 * This info can be updated when a check for new versions is done to ensure that there are no invalid links.
-		 */
+		/// <summary>
+		/// Holds various URLs and text for the editor.
+		/// This info can be updated when a check for new versions is done to ensure that there are no invalid links.
+		/// </summary>
 		static Dictionary<string, string> astarServerData = new Dictionary<string, string> {
 			{ "URL:modifiers", "http://www.arongranberg.com/astar/docs/modifiers.php" },
 			{ "URL:astarpro", "http://arongranberg.com/unity/a-pathfinding/astarpro/" },
@@ -100,7 +109,9 @@ namespace Pathfinding {
 		static AstarUpdateChecker() {
 			// Add a callback so that we can parse the message when it has been downloaded
 			EditorApplication.update += UpdateCheckLoop;
+			EditorBase.getDocumentationURL = () => GetURL("documentation");
 		}
+
 
 		static void RefreshServerMessage () {
 			if (!hasParsedServerMessage) {
@@ -120,7 +131,7 @@ namespace Pathfinding {
 			return url ?? "";
 		}
 
-		/** Initiate a check for updates now, regardless of when the last check was done */
+		/// <summary>Initiate a check for updates now, regardless of when the last check was done</summary>
 		public static void CheckForUpdatesNow () {
 			lastUpdateCheck = System.DateTime.UtcNow.AddDays(-5);
 
@@ -131,10 +142,10 @@ namespace Pathfinding {
 			EditorApplication.update += UpdateCheckLoop;
 		}
 
-		/**
-		 * Checking for updates...
-		 * Should be called from EditorApplication.update
-		 */
+		/// <summary>
+		/// Checking for updates...
+		/// Should be called from EditorApplication.update
+		/// </summary>
 		static void UpdateCheckLoop () {
 			// Go on until the update check has been completed
 			if (!CheckForUpdates()) {
@@ -142,10 +153,11 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Checks for updates if there was some time since last check.
-		 * It must be called repeatedly to ensure that the result is processed.
-		 * \returns True if an update check is progressing (WWW request)
-		 */
+		/// <summary>
+		/// Checks for updates if there was some time since last check.
+		/// It must be called repeatedly to ensure that the result is processed.
+		/// Returns: True if an update check is progressing (WWW request)
+		/// </summary>
 		static bool CheckForUpdates () {
 			if (updateCheckDownload != null && updateCheckDownload.isDone) {
 				if (!string.IsNullOrEmpty(updateCheckDownload.error)) {
@@ -155,7 +167,12 @@ namespace Pathfinding {
 					updateCheckDownload = null;
 					return false;
 				}
+#if UNITY_2018_1_OR_NEWER
+				UpdateCheckCompleted(updateCheckDownload.downloadHandler.text);
+				updateCheckDownload.Dispose();
+#else
 				UpdateCheckCompleted(updateCheckDownload.text);
+#endif
 				updateCheckDownload = null;
 			}
 
@@ -202,11 +219,16 @@ namespace Pathfinding {
 						   "&unityversion="+Application.unityVersion +
 						   "&branch="+AstarPath.Branch;
 
+#if UNITY_2018_1_OR_NEWER
+			updateCheckDownload = UnityWebRequest.Get(query);
+			updateCheckDownload.SendWebRequest();
+#else
 			updateCheckDownload = new WWW(query);
+#endif
 			lastUpdateCheck = System.DateTime.UtcNow;
 		}
 
-		/** Handles the data from the update page */
+		/// <summary>Handles the data from the update page</summary>
 		static void UpdateCheckCompleted (string result) {
 			EditorPrefs.SetString("AstarServerMessage", result);
 			ParseServerMessage(result);
@@ -253,6 +275,7 @@ namespace Pathfinding {
 		}
 
 		static void ShowUpdateWindowIfRelevant () {
+#if !ASTAR_ATAVISM
 			try {
 				System.DateTime remindDate;
 				var remindVersion = new System.Version(EditorPrefs.GetString("AstarRemindUpdateVersion", "0.0.0.0"));
@@ -278,6 +301,7 @@ namespace Pathfinding {
 
 				AstarUpdateWindow.Init(latestVersion, latestVersionDescription);
 			}
+#endif
 		}
 	}
 }

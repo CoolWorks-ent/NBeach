@@ -4,19 +4,18 @@ using System.Collections.Generic;
 using Pathfinding.Serialization;
 
 namespace Pathfinding {
-	/** Grid Graph, supports layered worlds.
-	 * The GridGraph is great in many ways, reliable, easily configured and updatable during runtime.
-	 * But it lacks support for worlds which have multiple layers, such as a building with multiple floors.\n
-	 * That's where this graph type comes in. It supports basically the same stuff as the grid graph, but also multiple layers.
-	 * It uses a more memory, and is probably a bit slower.
-	 * \note Does not support 8 connections per node, only 4.
-	 *
-	 * \ingroup graphs
-	 * \shadowimage{layergridgraph_graph.png}
-	 * \shadowimage{layergridgraph_inspector.png}
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Grid Graph, supports layered worlds.
+	/// The GridGraph is great in many ways, reliable, easily configured and updatable during runtime.
+	/// But it lacks support for worlds which have multiple layers, such as a building with multiple floors.\n
+	/// That's where this graph type comes in. It supports basically the same stuff as the grid graph, but also multiple layers.
+	/// It uses a more memory, and is probably a bit slower.
+	/// Note: Does not support 8 connections per node, only 4.
+	///
+	/// \ingroup graphs
+	/// [Open online documentation to see images]
+	/// [Open online documentation to see images]
+	/// </summary>
 	public class LayerGridGraph : GridGraph, IUpdatableGraph {
 		// This function will be called when this graph is destroyed
 		protected override void OnDestroy () {
@@ -30,28 +29,36 @@ namespace Pathfinding {
 			LevelGridNode.SetGridGraph(active.data.GetGraphIndex(this), null);
 		}
 
-		/** Number of layers.
-		 * \warning Do not modify this variable
-		 */
+		/// <summary>
+		/// Number of layers.
+		/// Warning: Do not modify this variable
+		/// </summary>
 		[JsonMember]
 		internal int layerCount;
 
-		/** If two layered nodes are too close, they will be merged */
+		/// <summary>If two layered nodes are too close, they will be merged</summary>
 		[JsonMember]
 		public float mergeSpanRange = 0.5F;
 
-		/** Nodes with a short distance to the node above it will be set unwalkable */
+		/// <summary>Nodes with a short distance to the node above it will be set unwalkable</summary>
 		[JsonMember]
 		public float characterHeight = 0.4F;
 
 		internal int lastScannedWidth;
 		internal int lastScannedDepth;
 
-		/** All nodes in this graph.
-		 * \snippet MiscSnippets.cs LayerGridGraph.nodes1
-		 *
-		 * \see #GetNodes
-		 */
+		/// <summary>
+		/// All nodes in this graph.
+		/// <code>
+		/// var gg = AstarPath.active.data.layerGridGraph;
+		/// int x = 5;
+		/// int z = 8;
+		/// int y = 2; // Layer
+		/// LevelGridNode node = gg.nodes[y*gg.width*gg.depth + z*gg.width + x];
+		/// </code>
+		///
+		/// See: <see cref="GetNodes"/>
+		/// </summary>
 		public new LevelGridNode[] nodes;
 
 		public override bool uniformWidthDepthGrid {
@@ -143,11 +150,12 @@ namespace Pathfinding {
 			return inArea;
 		}
 
-		/** Get all nodes in a rectangle.
-		 * \param rect Region in which to return nodes. It will be clamped to the grid.
-		 * \param buffer Buffer in which the nodes will be stored. Should be at least as large as the number of nodes that can exist in that region.
-		 * \returns The number of nodes written to the buffer.
-		 */
+		/// <summary>
+		/// Get all nodes in a rectangle.
+		/// Returns: The number of nodes written to the buffer.
+		/// </summary>
+		/// <param name="rect">Region in which to return nodes. It will be clamped to the grid.</param>
+		/// <param name="buffer">Buffer in which the nodes will be stored. Should be at least as large as the number of nodes that can exist in that region.</param>
 		public override int GetNodesInRegion (IntRect rect, GridNodeBase[] buffer) {
 			// Clamp the rect to the grid
 			// Rect which covers the whole grid
@@ -180,27 +188,34 @@ namespace Pathfinding {
 			return counter;
 		}
 
-		/** Node in the specified cell in the first layer.
-		* Returns null if the coordinate is outside the grid.
-		*
-		* \snippet MiscSnippets.cs GridGraph.GetNode
-		*
-		* If you know the coordinate is inside the grid and you are looking to maximize performance then you
-		* can look up the node in the internal array directly which is slightly faster.
-		* \see #nodes
-		*/
+		/// <summary>
+		/// Node in the specified cell in the first layer.
+		/// Returns null if the coordinate is outside the grid.
+		///
+		/// <code>
+		/// var gg = AstarPath.active.data.gridGraph;
+		/// int x = 5;
+		/// int z = 8;
+		/// GridNodeBase node = gg.GetNode(x, z);
+		/// </code>
+		///
+		/// If you know the coordinate is inside the grid and you are looking to maximize performance then you
+		/// can look up the node in the internal array directly which is slightly faster.
+		/// See: <see cref="nodes"/>
+		/// </summary>
 		public override GridNodeBase GetNode (int x, int z) {
 			if (x < 0 || z < 0 || x >= width || z >= depth) return null;
 			return nodes[x + z*width];
 		}
 
-		/** Node in the specified cell.
-		 * Returns null if the coordinate is outside the grid.
-		 *
-		 * If you know the coordinate is inside the grid and you are looking to maximize performance then you
-		 * can look up the node in the internal array directly which is slightly faster.
-		 * \see #nodes
-		 */
+		/// <summary>
+		/// Node in the specified cell.
+		/// Returns null if the coordinate is outside the grid.
+		///
+		/// If you know the coordinate is inside the grid and you are looking to maximize performance then you
+		/// can look up the node in the internal array directly which is slightly faster.
+		/// See: <see cref="nodes"/>
+		/// </summary>
 		public GridNodeBase GetNode (int x, int z, int layer) {
 			if (x < 0 || z < 0 || x >= width || z >= depth || layer < 0 || layer >= layerCount) return null;
 			return nodes[x + z*width + layer*width*depth];
@@ -384,52 +399,21 @@ namespace Pathfinding {
 			// This is also enforced in the inspector, but just in case it was set from a script we enforce it here as well
 			maxClimb = Mathf.Clamp(maxClimb, 0, characterHeight);
 
-			var linkedCells = new LinkedLevelNode[width*depth];
-
 			collision = collision ?? new GraphCollision();
 			collision.Initialize(transform, nodeSize);
 
 			int progressCounter = 0;
 			const int YieldEveryNNodes = 1000;
 
-			for (int z = 0; z < depth; z++) {
-				// Yield with a progress value at most every N nodes
-				if (progressCounter >= YieldEveryNNodes) {
-					progressCounter = 0;
-					yield return new Progress(Mathf.Lerp(0.1f, 0.5f, z/(float)depth), "Calculating positions");
-				}
-
-				progressCounter += width;
-
-				for (int x = 0; x < width; x++) {
-					linkedCells[z*width+x] = SampleCell(x, z);
-				}
-			}
-
-
-			layerCount = 0;
-			// Count the total number of layers in the graph
-			for (int i = 0; i < linkedCells.Length; i++) {
-				int cellCount = 0;
-				for (var lln = linkedCells[i]; lln != null; lln = lln.next) {
-					cellCount++;
-				}
-				layerCount = System.Math.Max(layerCount, cellCount);
-			}
-
-			if (layerCount > LevelGridNode.MaxLayerCount) {
-				Debug.LogError("Too many layers, a maximum of " + LevelGridNode.MaxLayerCount + " (LevelGridNode.MaxLayerCount) layers are allowed (found "+layerCount+")");
-				yield break;
-			}
-
-			// Create an array to hold all nodes
+			// Create an array to hold all nodes (if there is more than one layer, this array will be expanded)
+			layerCount = 1;
 			nodes = new LevelGridNode[width*depth*layerCount];
 
 			for (int z = 0; z < depth; z++) {
 				// Yield with a progress value at most every N nodes
 				if (progressCounter >= YieldEveryNNodes) {
 					progressCounter = 0;
-					yield return new Progress(Mathf.Lerp(0.5f, 0.8f, z/(float)depth), "Creating nodes");
+					yield return new Progress(Mathf.Lerp(0.0f, 0.8f, z/(float)depth), "Creating nodes");
 				}
 
 				progressCounter += width;
@@ -469,95 +453,114 @@ namespace Pathfinding {
 			ErodeWalkableArea();
 		}
 
-		LinkedLevelNode SampleCell (int x, int z) {
-			LinkedLevelNode root = null;
-			Vector3 pos = transform.Transform(new Vector3(x+0.5F, 0, z+0.5F));
-
-			RaycastHit[] hits = collision.CheckHeightAll(pos);
-			var up = transform.WorldUpAtGraphPosition(pos);
-
-			// Reverse array
-			for (int i = 0; i < hits.Length/2; i++) {
-				RaycastHit tmp = hits[i];
-
-				hits[i] = hits[hits.Length-1-i];
-				hits[hits.Length-1-i] = tmp;
-			}
-
-			if (hits.Length > 0) {
-				LinkedLevelNode prev = null;
-
-				for (int i = 0; i < hits.Length; i++) {
-					var current = new LinkedLevelNode();
-					current.position = hits[i].point;
-
-					if (prev != null) {
-						/** \todo Use hit.distance instead */
-						if (Vector3.Dot(current.position - prev.position, up) <= mergeSpanRange) {
-							prev.position = current.position;
-							prev.hit = hits[i];
-							prev.walkable = collision.Check(current.position);
-							continue;
-						}
-					}
-
-					current.walkable = collision.Check(current.position);
-					current.hit = hits[i];
-					current.height = float.PositiveInfinity;
-
-					if (root == null) {
-						root = current;
-						prev = current;
-					} else {
-						prev.next = current;
-						prev.height = Vector3.Dot(current.position - prev.position, up);
-						prev = prev.next;
-					}
-				}
-			} else {
-				var current = new LinkedLevelNode();
-				current.position = pos;
-				current.height = float.PositiveInfinity;
-				current.walkable = !collision.unwalkableWhenNoGround && collision.Check(pos);
-				root = current;
-			}
-
-			return root;
+		/// <summary>Struct returned by <see cref="SampleHeights"/></summary>
+		protected struct HeightSample {
+			public Vector3 position;
+			public RaycastHit hit;
+			public float height;
+			public bool walkable;
 		}
 
-		/** Recalculates single cell.
-		 *
-		 * For a layered grid graph this will recalculate all nodes at a specific (x,z) coordinate in the grid.
-		 * For grid graphs this will simply recalculate the single node at those coordinates.
-		 *
-		 * \param x X coordinate of the cell
-		 * \param z Z coordinate of the cell
-		 * \param resetPenalties If true, the penalty of the nodes will be reset to the initial value as if the graph had just been scanned.
-		 * \param resetTags If true, the penalty will be reset to zero (the default tag).
-		 *
-		 * \note This must only be called when it is safe to update nodes.
-		 *  For example when scanning the graph or during a graph update.
-		 *
-		 * \note This will not recalculate any connections as this method is often run for several adjacent nodes at a time.
-		 *  After you have recalculated all the nodes you will have to recalculate the connections for the changed nodes
-		 *  as well as their neighbours.
-		 *  \see CalculateConnections
-		 */
+		/// <summary>Sorts RaycastHits by distance</summary>
+		class HitComparer : IComparer<RaycastHit> {
+			public int Compare (RaycastHit a, RaycastHit b) {
+				return a.distance.CompareTo(b.distance);
+			}
+		}
+
+		/// <summary>Sorts RaycastHits by distance</summary>
+		static readonly HitComparer comparer = new HitComparer();
+
+		/// <summary>Internal buffer used by <see cref="SampleHeights"/></summary>
+		static HeightSample[] heightSampleBuffer = new HeightSample[4];
+
+		/// <summary>
+		/// Fires a ray from the sky and returns a sample for everything it hits.
+		/// The samples are ordered from the ground up.
+		/// Samples that are close together are merged (see <see cref="Pathfinding.LayerGridGraph.mergeSpanRange)"/>.
+		///
+		/// Warning: The returned array is ephermal. It will be invalidated when this method is called again.
+		/// If you need persistent results you should copy it.
+		///
+		/// The returned array may be larger than the actual number of hits, the numHits out parameter indicates how many hits there actually were.
+		///
+		/// See: GraphCollision.
+		/// </summary>
+		protected static HeightSample[] SampleHeights (GraphCollision collision, float mergeSpanRange, Vector3 position, out int numHits) {
+			int raycastHits;
+			var hits = collision.CheckHeightAll(position, out raycastHits);
+
+			// Sort by distance in increasing order (so hits are ordered from highest y coordinate to lowest)
+			System.Array.Sort(hits, 0, raycastHits, comparer);
+
+			if (raycastHits > heightSampleBuffer.Length) heightSampleBuffer = new HeightSample[Mathf.Max(heightSampleBuffer.Length*2, raycastHits)];
+			var buffer = heightSampleBuffer;
+
+			if (raycastHits == 0) {
+				buffer[0] = new HeightSample {
+					position = position,
+					height = float.PositiveInfinity,
+					walkable = !collision.unwalkableWhenNoGround && collision.Check(position),
+				};
+				numHits = 1;
+				return buffer;
+			} else {
+				int dstIndex = 0;
+				for (int i = raycastHits - 1; i >= 0; i--) {
+					// Merge together collider hits which are very close to each other
+					if (i > 0 && hits[i].distance - hits[i-1].distance <= mergeSpanRange) i--;
+					buffer[dstIndex] = new HeightSample {
+						position = hits[i].point,
+						hit = hits[i],
+						walkable = collision.Check(hits[i].point),
+						height = i > 0 ? hits[i].distance - hits[i-1].distance : float.PositiveInfinity,
+					};
+					dstIndex++;
+				}
+				numHits = dstIndex;
+				return buffer;
+			}
+		}
+
+		/// <summary>
+		/// Recalculates single cell.
+		///
+		/// For a layered grid graph this will recalculate all nodes at a specific (x,z) coordinate in the grid.
+		/// For grid graphs this will simply recalculate the single node at those coordinates.
+		///
+		/// Note: This must only be called when it is safe to update nodes.
+		///  For example when scanning the graph or during a graph update.
+		///
+		/// Note: This will not recalculate any connections as this method is often run for several adjacent nodes at a time.
+		///  After you have recalculated all the nodes you will have to recalculate the connections for the changed nodes
+		///  as well as their neighbours.
+		///  See: CalculateConnections
+		/// </summary>
+		/// <param name="x">X coordinate of the cell</param>
+		/// <param name="z">Z coordinate of the cell</param>
+		/// <param name="resetPenalties">If true, the penalty of the nodes will be reset to the initial value as if the graph had just been scanned.</param>
+		/// <param name="resetTags">If true, the penalty will be reset to zero (the default tag).</param>
 		public override void RecalculateCell (int x, int z, bool resetPenalties = true, bool resetTags = true) {
 			// Cosine of the maximum slope angle
 			float cosAngle = Mathf.Cos(maxSlope*Mathf.Deg2Rad);
 
-			int layerIndex = 0;
+			// Get samples of points when firing a ray from the sky down towards the ground
+			// The cell sampler handles some nice things like merging spans that are really close together
+			int numHeightSamples;
+			var heightSamples = SampleHeights(collision, mergeSpanRange, transform.Transform(new Vector3(x+0.5F, 0, z+0.5F)), out numHeightSamples);
 
-			for (LinkedLevelNode lln = SampleCell(x, z); lln != null; lln = lln.next, layerIndex++) {
-				if (layerIndex >= layerCount) {
-					if (layerIndex+1 > LevelGridNode.MaxLayerCount) {
-						Debug.LogError("Too many layers, a maximum of " + LevelGridNode.MaxLayerCount + " are allowed (required "+(layerIndex+1)+")");
-						return;
-					}
-
-					AddLayers(1);
+			if (numHeightSamples > layerCount) {
+				if (numHeightSamples > LevelGridNode.MaxLayerCount) {
+					Debug.LogError("Too many layers, a maximum of " + LevelGridNode.MaxLayerCount + " are allowed (required " + numHeightSamples + ")");
+					return;
 				}
+
+				AddLayers(numHeightSamples - layerCount);
+			}
+
+			int layerIndex = 0;
+			for (; layerIndex < numHeightSamples; layerIndex++) {
+				var sample = heightSamples[layerIndex];
 
 				var index = z*width+x + width*depth*layerIndex;
 				var node = nodes[index];
@@ -577,10 +580,10 @@ namespace Pathfinding {
 				}
 
 #if ASTAR_SET_LEVELGRIDNODE_HEIGHT
-				node.height = lln.height;
+				node.height = sample.height;
 #endif
-				node.position = (Int3)lln.position;
-				node.Walkable = lln.walkable;
+				node.position = (Int3)sample.position;
+				node.Walkable = sample.walkable;
 				node.WalkableErosion = node.Walkable;
 
 				if (isNewNode || resetPenalties) {
@@ -595,10 +598,10 @@ namespace Pathfinding {
 					node.Tag = 0;
 				}
 
-				//Adjust penalty based on the surface slope
-				if (lln.hit.normal != Vector3.zero && (penaltyAngle || cosAngle > 0.0001f)) {
+				// Adjust penalty based on the surface slope
+				if (sample.hit.normal != Vector3.zero && (penaltyAngle || cosAngle > 0.0001f)) {
 					// Take the dot product to find out the cosinus of the angle it has (faster than Vector3.Angle)
-					float angle = Vector3.Dot(lln.hit.normal.normalized, collision.up);
+					float angle = Vector3.Dot(sample.hit.normal.normalized, collision.up);
 
 					// Add penalty based on normal
 					if (resetTags && penaltyAngle) {
@@ -611,7 +614,7 @@ namespace Pathfinding {
 					}
 				}
 
-				if (lln.height < characterHeight) {
+				if (sample.height < characterHeight) {
 					node.Walkable = false;
 				}
 
@@ -626,7 +629,7 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Increases the capacity of the nodes array to hold more layers */
+		/// <summary>Increases the capacity of the nodes array to hold more layers</summary>
 		void AddLayers (int count) {
 			int newLayerCount = layerCount + count;
 
@@ -637,7 +640,7 @@ namespace Pathfinding {
 
 			LevelGridNode[] tmp = nodes;
 			nodes = new LevelGridNode[width*depth*newLayerCount];
-			for (int i = 0; i < tmp.Length; i++) nodes[i] = tmp[i];
+			tmp.CopyTo(nodes, 0);
 			layerCount = newLayerCount;
 		}
 
@@ -663,36 +666,29 @@ namespace Pathfinding {
 			return false;
 		}
 
-		/** Calculates the grid connections for a single node.
-		 * \deprecated CalculateConnections no longer takes a node array, it just uses the one on the graph
-		 */
-		[System.Obsolete("CalculateConnections no longer takes a node array, it just uses the one on the graph")]
-		public void CalculateConnections (LevelGridNode[] nodes, LevelGridNode node, int x, int z, int layerIndex) {
-			CalculateConnections(x, z, layerIndex);
-		}
-
 		public override void CalculateConnections (GridNodeBase baseNode) {
 			var node = baseNode as LevelGridNode;
 
 			CalculateConnections(node.XCoordinateInGrid, node.ZCoordinateInGrid, node.LayerCoordinateInGrid);
 		}
 
-		/** Calculates the layered grid graph connections for a single node.
-		 * \deprecated Use CalculateConnections(x,z,layerIndex) or CalculateConnections(node) instead
-		  */
+		/// <summary>
+		/// Calculates the layered grid graph connections for a single node.
+		/// Deprecated: Use CalculateConnections(x,z,layerIndex) or CalculateConnections(node) instead
+		/// </summary>
 		[System.Obsolete("Use CalculateConnections(x,z,layerIndex) or CalculateConnections(node) instead")]
 		public void CalculateConnections (int x, int z, int layerIndex, LevelGridNode node) {
 			CalculateConnections(x, z, layerIndex);
 		}
 
-		/** Calculates connections for all nodes in a cell (there may be multiple layers of nodes) */
+		/// <summary>Calculates connections for all nodes in a cell (there may be multiple layers of nodes)</summary>
 		public override void CalculateConnections (int x, int z) {
 			for (int i = 0; i < layerCount; i++) {
 				CalculateConnections(x, z, i);
 			}
 		}
 
-		/** Calculates the layered grid graph connections for a single node */
+		/// <summary>Calculates the layered grid graph connections for a single node</summary>
 		public void CalculateConnections (int x, int z, int layerIndex) {
 			var node = nodes[z*width+x + width*depth*layerIndex];
 
@@ -894,9 +890,10 @@ namespace Pathfinding {
 			return nn;
 		}
 
-		/** Returns if \a node is connected to it's neighbour in the specified direction.
-		 * \deprecated Use node.GetConnection instead
-		 */
+		/// <summary>
+		/// Returns if node is connected to it's neighbour in the specified direction.
+		/// Deprecated: Use node.GetConnection instead
+		/// </summary>
 		[System.Obsolete("Use node.GetConnection instead")]
 		public static bool CheckConnection (LevelGridNode node, int dir) {
 			return node.GetConnection(dir);
@@ -971,18 +968,10 @@ namespace Pathfinding {
 		}
 	}
 
-	/** Internal class used by the LayerGridGraph */
-	class LinkedLevelNode {
-		public Vector3 position;
-		public bool walkable;
-		public RaycastHit hit;
-		public float height;
-		public LinkedLevelNode next;
-	}
-
-	/** Describes a single node for the LayerGridGraph.
-	 * Works almost the same as a grid node, except that it also stores to which layer the connections go to
-	 */
+	/// <summary>
+	/// Describes a single node for the LayerGridGraph.
+	/// Works almost the same as a grid node, except that it also stores to which layer the connections go to
+	/// </summary>
 	public class LevelGridNode : GridNodeBase {
 		public LevelGridNode (AstarPath astar) : base(astar) {
 		}
@@ -1026,7 +1015,7 @@ namespace Pathfinding {
 #endif
 		public const int MaxLayerCount = ConnectionMask;
 
-		/** Removes all grid connections from this node */
+		/// <summary>Removes all grid connections from this node</summary>
 		public void ResetAllGridConnections () {
 			unchecked {
 #if ASTAR_LEVELGRIDNODE_FEW_LAYERS
@@ -1035,9 +1024,10 @@ namespace Pathfinding {
 				gridConnections = (ulong)-1;
 #endif
 			}
+			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
 		}
 
-		/** Does this node have any grid connections */
+		/// <summary>Does this node have any grid connections</summary>
 		public bool HasAnyGridConnections () {
 			unchecked {
 #if ASTAR_LEVELGRIDNODE_FEW_LAYERS
@@ -1055,18 +1045,19 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Layer coordinate of the node in the grid.
-		 * If there are multiple nodes in the same (x,z) cell, then they will be stored in different layers.
-		 * Together with NodeInGridIndex, you can look up the node in the nodes array
-		 * \code
-		 * int index = node.NodeInGridIndex + node.LayerCoordinateInGrid * graph.width * graph.depth;
-		 * Assert(node == graph.nodes[index]);
-		 * \endcode
-		 *
-		 * \see XCoordInGrid
-		 * \see ZCoordInGrid
-		 * \see NodeInGridIndex
-		 */
+		/// <summary>
+		/// Layer coordinate of the node in the grid.
+		/// If there are multiple nodes in the same (x,z) cell, then they will be stored in different layers.
+		/// Together with NodeInGridIndex, you can look up the node in the nodes array
+		/// <code>
+		/// int index = node.NodeInGridIndex + node.LayerCoordinateInGrid * graph.width * graph.depth;
+		/// Assert(node == graph.nodes[index]);
+		/// </code>
+		///
+		/// See: XCoordInGrid
+		/// See: ZCoordInGrid
+		/// See: NodeInGridIndex
+		/// </summary>
 		public int LayerCoordinateInGrid { get { return nodeInGridIndex >> NodeInGridIndexLayerOffset; } set { nodeInGridIndex = (nodeInGridIndex & NodeInGridIndexMask) | (value << NodeInGridIndexLayerOffset); } }
 
 		public void SetPosition (Int3 position) {
@@ -1130,51 +1121,28 @@ namespace Pathfinding {
 #endif
 		}
 
-		public override void FloodFill (Stack<GraphNode> stack, uint region) {
-			int index = NodeInGridIndex;
-
-			LayerGridGraph graph = GetGridGraph(GraphIndex);
-
-			int[] neighbourOffsets = graph.neighbourOffsets;
-			LevelGridNode[] nodes = graph.nodes;
-
-			for (int i = 0; i < 4; i++) {
-				int conn = GetConnectionValue(i);
-				if (conn != LevelGridNode.NoConnection) {
-					LevelGridNode other = nodes[index+neighbourOffsets[i] + graph.lastScannedWidth*graph.lastScannedDepth*conn];
-					if (other != null && other.Area != region) {
-						other.Area = region;
-						stack.Push(other);
-					}
-				}
-			}
-
-#if !ASTAR_GRID_NO_CUSTOM_CONNECTIONS
-			base.FloodFill(stack, region);
-#endif
-		}
-
-		/** Is there a grid connection in that direction */
+		/// <summary>Is there a grid connection in that direction</summary>
 		public bool GetConnection (int i) {
 			return ((gridConnections >> i*ConnectionStride) & ConnectionMask) != NoConnection;
 		}
 
-		/** Set which layer a grid connection goes to.
-		 * \param dir Direction for the connection.
-		 * \param value The layer of the connected node or #NoConnection if there should be no connection in that direction.
-		 */
+		/// <summary>Set which layer a grid connection goes to.</summary>
+		/// <param name="dir">Direction for the connection.</param>
+		/// <param name="value">The layer of the connected node or #NoConnection if there should be no connection in that direction.</param>
 		public void SetConnectionValue (int dir, int value) {
 #if ASTAR_LEVELGRIDNODE_FEW_LAYERS
 			gridConnections = gridConnections & ~(((uint)NoConnection << dir*ConnectionStride)) | ((uint)value << dir*ConnectionStride);
 #else
 			gridConnections = gridConnections & ~(((ulong)NoConnection << dir*ConnectionStride)) | ((ulong)value << dir*ConnectionStride);
 #endif
+			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
 		}
 
-		/** Which layer a grid connection goes to.
-		 * \param dir Direction for the connection.
-		 * \returns The layer of the connected node or #NoConnection if there is no connection in that direction.
-		 */
+		/// <summary>
+		/// Which layer a grid connection goes to.
+		/// Returns: The layer of the connected node or <see cref="NoConnection"/> if there is no connection in that direction.
+		/// </summary>
+		/// <param name="dir">Direction for the connection.</param>
 		public int GetConnectionValue (int dir) {
 			return (int)((gridConnections >> dir*ConnectionStride) & ConnectionMask);
 		}
@@ -1315,15 +1283,16 @@ namespace Pathfinding {
 		}
 	}
 
-	/** GraphUpdateObject with more settings for the LayerGridGraph.
-	 * \see Pathfinding.GraphUpdateObject
-	 * \see Pathfinding.LayerGridGraph
-	 */
+	/// <summary>
+	/// GraphUpdateObject with more settings for the LayerGridGraph.
+	/// See: Pathfinding.GraphUpdateObject
+	/// See: Pathfinding.LayerGridGraph
+	/// </summary>
 	public class LayerGridGraphUpdate : GraphUpdateObject {
-		/** Recalculate nodes in the graph. Nodes might be created, moved or destroyed depending on how the world has changed. */
+		/// <summary>Recalculate nodes in the graph. Nodes might be created, moved or destroyed depending on how the world has changed.</summary>
 		public bool recalculateNodes;
 
-		/** If true, nodes will be reused. This can be used to preserve e.g penalty values when recalculating */
+		/// <summary>If true, nodes will be reused. This can be used to preserve e.g penalty values when recalculating</summary>
 		public bool preserveExistingNodes = true;
 	}
 }

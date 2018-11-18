@@ -5,10 +5,10 @@ using UnityEngine;
 namespace Pathfinding {
 	[AddComponentMenu("Pathfinding/Modifiers/Advanced Smooth")]
 	[System.Serializable]
-	/** \ingroup modifiers
-	 * Smoothing by dividing path into turns and straight segments.
-	 *
-	 * \astarpro */
+	/// <summary>
+	/// \ingroup modifiers
+	/// Smoothing by dividing path into turns and straight segments.
+	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_advanced_smooth.php")]
 	public class AdvancedSmooth : MonoModifier {
 		public override int Order { get { return 40; } }
@@ -80,8 +80,7 @@ namespace Pathfinding {
 		}
 
 		[System.Serializable]
-		/** Type of turn.
-		 *  \astarpro */
+		/// <summary>Type of turn.</summary>
 		public class MaxTurn : TurnConstructor {
 			Vector3 preRightCircleCenter = Vector3.zero;
 			Vector3 preLeftCircleCenter = Vector3.zero;
@@ -313,8 +312,7 @@ namespace Pathfinding {
 		}
 
 		[System.Serializable]
-		/** Constant turning speed.
-		 *  \astarpro */
+		/// <summary>Constant turning speed.</summary>
 		public class ConstantTurn : TurnConstructor {
 			Vector3 circleCenter;
 			double gamma1;
@@ -367,17 +365,20 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Abstract turn constructor.
-		 *  \astarpro */
+		/// <summary>Abstract turn constructor.</summary>
 		public abstract class TurnConstructor {
-			/** Constant bias to add to the path lengths.
-			 * This can be used to favor certain turn types before others.\n
-			 * By for example setting this to -5, paths from this path constructor will be chosen
-			 * if there are no other paths more than 5 world units shorter than this one (as opposed to just any shorter path) */
+			/// <summary>
+			/// Constant bias to add to the path lengths.
+			/// This can be used to favor certain turn types before others.\n
+			/// By for example setting this to -5, paths from this path constructor will be chosen
+			/// if there are no other paths more than 5 world units shorter than this one (as opposed to just any shorter path)
+			/// </summary>
 			public float constantBias = 0;
 
-			/** Bias to multiply the path lengths with. This can be used to favor certain turn types before others.
-			 * \see #constantBias */
+			/// <summary>
+			/// Bias to multiply the path lengths with. This can be used to favor certain turn types before others.
+			/// See: <see cref="constantBias"/>
+			/// </summary>
 			public float factorBias =   1;
 
 			public static float turningRadius = 1.0F;
@@ -485,17 +486,17 @@ namespace Pathfinding {
 				}
 			}
 
-			/** Returns the length of an circular arc with a radius and angle. Angle is specified in radians */
+			/// <summary>Returns the length of an circular arc with a radius and angle. Angle is specified in radians</summary>
 			public double GetLengthFromAngle (double angle, double radius) {
 				return radius * angle;
 			}
 
-			/** Returns the angle between \a from and \a to in a clockwise direction */
+			/// <summary>Returns the angle between from and to in a clockwise direction</summary>
 			public double ClockwiseAngle (double from, double to) {
 				return ClampAngle(to - from);
 			}
 
-			/** Returns the angle between \a from and \a to in a counter-clockwise direction */
+			/// <summary>Returns the angle between from and to in a counter-clockwise direction</summary>
 			public double CounterClockwiseAngle (double from, double to) {
 				return ClampAngle(from - to);
 			}
@@ -520,8 +521,7 @@ namespace Pathfinding {
 		}
 
 		//Turn class
-		/** Represents a turn in a path.
-		 *  \astarpro */
+		/// <summary>Represents a turn in a path.</summary>
 		public struct Turn : IComparable<Turn> {
 			public float length;
 			public int id;

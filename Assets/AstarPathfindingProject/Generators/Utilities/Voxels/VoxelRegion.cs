@@ -1,157 +1,20 @@
+//#define ASTAR_DEBUGREPLAY
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pathfinding.Voxels {
 	public partial class Voxelize {
-		public ushort[] ExpandRegions (int maxIterations, uint level, ushort[] srcReg, ushort[] srcDist, ushort[] dstReg, ushort[] dstDist, List<int> stack) {
-			AstarProfiler.StartProfile("---Expand 1");
-			int w = voxelArea.width;
-			int d = voxelArea.depth;
-
-			int wd = w*d;
-
-#if ASTAR_RECAST_BFS && FALSE
-			List<int> st1 = new List<int>();
-			List<int> st2 = new List<int>();
-
-			for (int z = 0, pz = 0; z < wd; z += w, pz++) {
-				for (int x = 0; x < voxelArea.width; x++) {
-					CompactVoxelCell c = voxelArea.compactCells[z+x];
-
-					for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; i++) {
-						if (voxelArea.dist[i] >= level && srcReg[i] == 0 && voxelArea.areaTypes[i] != UnwalkableArea) {
-							st2.Add(x);
-							st2.Add(z);
-							st2.Add(i);
-							//Debug.DrawRay (ConvertPosition(x,z,i),Vector3.up*0.5F,Color.cyan);
-						}
-					}
-				}
-			}
-			throw new System.NotImplementedException();
-			return null;
-#else
-			// Find cells revealed by the raised level.
-			stack.Clear();
-
-			for (int z = 0, pz = 0; z < wd; z += w, pz++) {
-				for (int x = 0; x < voxelArea.width; x++) {
-					CompactVoxelCell c = voxelArea.compactCells[z+x];
-
-					for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; i++) {
-						if (voxelArea.dist[i] >= level && srcReg[i] == 0 && voxelArea.areaTypes[i] != UnwalkableArea) {
-							stack.Add(x);
-							stack.Add(z);
-							stack.Add(i);
-							//Debug.DrawRay (ConvertPosition(x,z,i),Vector3.up*0.5F,Color.cyan);
-						}
-					}
-				}
-			}
-
-			AstarProfiler.EndProfile("---Expand 1");
-			AstarProfiler.StartProfile("---Expand 2");
-
-			int iter = 0;
-
-			int stCount = stack.Count;
-
-			if (stCount > 0) while (true) {
-					int failed = 0;
-
-					AstarProfiler.StartProfile("---- Copy");
-
-					// Copy srcReg and srcDist to dstReg and dstDist (but faster than a normal loop)
-					System.Buffer.BlockCopy(srcReg, 0, dstReg, 0, srcReg.Length*sizeof(ushort));
-					System.Buffer.BlockCopy(srcDist, 0, dstDist, 0, dstDist.Length*sizeof(ushort));
-
-					AstarProfiler.EndProfile("---- Copy");
-
-					for (int j = 0; j < stCount; j += 3) {
-						if (j >= stCount) break;
-
-						int x = stack[j];
-						int z = stack[j+1];
-						int i = stack[j+2];
-
-						if (i < 0) {
-							//Debug.DrawRay (ConvertPosition(x,z,i),Vector3.up*2,Color.blue);
-							failed++;
-							continue;
-						}
-
-						ushort r = srcReg[i];
-						ushort d2 = 0xffff;
-
-						CompactVoxelSpan s = voxelArea.compactSpans[i];
-						int area = voxelArea.areaTypes[i];
-
-						for (int dir = 0; dir < 4; dir++) {
-							if (s.GetConnection(dir) == NotConnected) { continue; }
-
-							int nx = x + voxelArea.DirectionX[dir];
-							int nz = z + voxelArea.DirectionZ[dir];
-
-							int ni = (int)voxelArea.compactCells[nx+nz].index + s.GetConnection(dir);
-
-							if (area != voxelArea.areaTypes[ni]) { continue; }
-
-							if (srcReg[ni] > 0 && (srcReg[ni] & BorderReg) == 0) {
-								if ((int)srcDist[ni]+2 < (int)d2) {
-									r = srcReg[ni];
-									d2 = (ushort)(srcDist[ni]+2);
-								}
-							}
-						}
-
-						if (r != 0) {
-							stack[j+2] = -1; // mark as used
-							dstReg[i] = r;
-							dstDist[i] = d2;
-						} else {
-							failed++;
-							//Debug.DrawRay (ConvertPosition(x,z,i),Vector3.up*2,Color.red);
-						}
-					}
-
-					// Swap source and dest.
-					ushort[] tmp = srcReg;
-					srcReg = dstReg;
-					dstReg = tmp;
-
-					tmp = srcDist;
-					srcDist = dstDist;
-					dstDist = tmp;
-
-					if (failed*3 >= stCount) {
-						//Debug.Log("Failed count broke "+failed);
-						break;
-					}
-
-					if (level > 0) {
-						iter++;
-
-						if (iter >= maxIterations) {
-							//Debug.Log("Iterations broke");
-							break;
-						}
-					}
-				}
-
-			AstarProfiler.EndProfile("---Expand 2");
-
-			return srcReg;
-#endif
-		}
-
-		public bool FloodRegion (int x, int z, int i, uint level, ushort r, ushort[] srcReg, ushort[] srcDist, List<int> stack) {
+		public bool FloodRegion (int x, int z, int i, uint level, ushort r, ushort[] srcReg, ushort[] srcDist, Int3[] stack, int[] flags = null, bool[] closed = null) {
 			int area = voxelArea.areaTypes[i];
 
-			// Flood fill mark region.
-			stack.Clear();
+			// Flood f mark region.
+			int stackSize = 1;
 
-			stack.Add(x);
-			stack.Add(z);
-			stack.Add(i);
+			stack[0] = new Int3 {
+				x = x,
+				y = i,
+				z = z,
+			};
 
 			srcReg[i] = r;
 			srcDist[i] = 0;
@@ -160,16 +23,23 @@ namespace Pathfinding.Voxels {
 
 			int count = 0;
 
+			// Store these in local variables (for performance, avoids an extra indirection)
+			var DirectionX = voxelArea.DirectionX;
+			var DirectionZ = voxelArea.DirectionZ;
+			var compactCells = voxelArea.compactCells;
+			var compactSpans = voxelArea.compactSpans;
+			var areaTypes = voxelArea.areaTypes;
+			var dist = voxelArea.dist;
 
-
-			while (stack.Count > 0) {
+			while (stackSize > 0) {
+				stackSize--;
+				var c = stack[stackSize];
 				//Similar to the Pop operation of an array, but Pop is not implemented in List<>
-				int ci = stack[stack.Count-1]; stack.RemoveAt(stack.Count-1);
-				int cz = stack[stack.Count-1]; stack.RemoveAt(stack.Count-1);
-				int cx = stack[stack.Count-1]; stack.RemoveAt(stack.Count-1);
+				int ci = c.y;
+				int cx = c.x;
+				int cz = c.z;
 
-
-				CompactVoxelSpan cs = voxelArea.compactSpans[ci];
+				CompactVoxelSpan cs = compactSpans[ci];
 
 				//Debug.DrawRay (ConvertPosition(cx,cz,ci),Vector3.up, Color.cyan);
 
@@ -182,12 +52,12 @@ namespace Pathfinding.Voxels {
 				for (int dir = 0; dir < 4; dir++) {
 					// 8 connected
 					if (cs.GetConnection(dir) != NotConnected) {
-						int ax = cx + voxelArea.DirectionX[dir];
-						int az = cz + voxelArea.DirectionZ[dir];
+						int ax = cx + DirectionX[dir];
+						int az = cz + DirectionZ[dir];
 
-						int ai = (int)voxelArea.compactCells[ax+az].index + cs.GetConnection(dir);
+						int ai = (int)compactCells[ax+az].index + cs.GetConnection(dir);
 
-						if (voxelArea.areaTypes[ai] != area)
+						if (areaTypes[ai] != area)
 							continue;
 
 						ushort nr = srcReg[ai];
@@ -201,21 +71,24 @@ namespace Pathfinding.Voxels {
 							break;
 						}
 
-						CompactVoxelSpan aspan = voxelArea.compactSpans[ai];
-
 						// Rotate dir 90 degrees
 						int dir2 = (dir+1) & 0x3;
+						var neighbour2 = compactSpans[ai].GetConnection(dir2);
 						// Check the diagonal connection
-						if (aspan.GetConnection(dir2) != NotConnected) {
-							int ax2 = ax + voxelArea.DirectionX[dir2];
-							int az2 = az + voxelArea.DirectionZ[dir2];
+						if (neighbour2 != NotConnected) {
+							int ax2 = ax + DirectionX[dir2];
+							int az2 = az + DirectionZ[dir2];
 
-							int ai2 = (int)voxelArea.compactCells[ax2+az2].index + aspan.GetConnection(dir2);
+							int ai2 = (int)compactCells[ax2+az2].index + neighbour2;
 
-							if (voxelArea.areaTypes[ai2] != area)
+							if (areaTypes[ai2] != area)
 								continue;
 
 							ushort nr2 = srcReg[ai2];
+
+							if ((nr2 & BorderReg) == BorderReg) // Do not take borders into account.
+								continue;
+
 							if (nr2 != 0 && nr2 != r) {
 								ar = nr2;
 								// Found a valid region, skip checking the rest
@@ -227,27 +100,40 @@ namespace Pathfinding.Voxels {
 
 				if (ar != 0) {
 					srcReg[ci] = 0;
+					srcDist[ci] = (ushort)0xFFFF;
 					continue;
 				}
 				count++;
+				if (closed != null) {
+					closed[ci] = true;
+				}
+
 
 				// Expand neighbours.
 				for (int dir = 0; dir < 4; ++dir) {
 					if (cs.GetConnection(dir) != NotConnected) {
-						int ax = cx + voxelArea.DirectionX[dir];
-						int az = cz + voxelArea.DirectionZ[dir];
-						int ai = (int)voxelArea.compactCells[ax+az].index + cs.GetConnection(dir);
+						int ax = cx + DirectionX[dir];
+						int az = cz + DirectionZ[dir];
+						int ai = (int)compactCells[ax+az].index + cs.GetConnection(dir);
 
-						if (voxelArea.areaTypes[ai] != area)
+						if (areaTypes[ai] != area)
 							continue;
 
-						if (voxelArea.dist[ai] >= lev && srcReg[ai] == 0) {
-							srcReg[ai] = r;
-							srcDist[ai] = 0;
+						if (srcReg[ai] == 0) {
+							if (dist[ai] >= lev && flags[ai] == 0) {
+								srcReg[ai] = r;
+								srcDist[ai] = 0;
 
-							stack.Add(ax);
-							stack.Add(az);
-							stack.Add(ai);
+								stack[stackSize] = new Int3 {
+									x = ax,
+									y = ai,
+									z = az,
+								};
+								stackSize++;
+							} else if (flags != null) {
+								flags[ai] = r;
+								srcDist[ai] = 2;
+							}
 						}
 					}
 				}
@@ -450,6 +336,19 @@ namespace Pathfinding.Voxels {
 				maxDist = System.Math.Max(src[i], maxDist);
 			}
 
+#if ASTAR_DEBUGREPLAY && FALSE
+			DebugReplay.BeginGroup("Distance Field");
+			for (int z = wd-voxelArea.width; z >= 0; z -= voxelArea.width) {
+				for (int x = voxelArea.width-1; x >= 0; x--) {
+					CompactVoxelCell c = voxelArea.compactCells[x+z];
+
+					for (int i = (int)c.index, ci = (int)(c.index+c.count); i < ci; i++) {
+						DebugReplay.DrawCube(CompactSpanToVector(x, z/voxelArea.width, i), Vector3.one*cellSize, new Color((float)src[i]/maxDist, (float)src[i]/maxDist, (float)src[i]/maxDist));
+					}
+				}
+			}
+			DebugReplay.EndGroup();
+#endif
 
 			return maxDist;
 		}
@@ -508,61 +407,39 @@ namespace Pathfinding.Voxels {
 			return dst;
 		}
 
-		void FloodOnes (List<Int3> st1, ushort[] regs, uint level, ushort reg) {
-			for (int j = 0; j < st1.Count; j++) {
-				int x = st1[j].x;
-				int i = st1[j].y;
-				int z = st1[j].z;
-				regs[i] = reg;
-
-				CompactVoxelSpan s = voxelArea.compactSpans[i];
-				int area = voxelArea.areaTypes[i];
-
-				for (int dir = 0; dir < 4; dir++) {
-					if (s.GetConnection(dir) == NotConnected) { continue; }
-
-					int nx = x + voxelArea.DirectionX[dir];
-					int nz = z + voxelArea.DirectionZ[dir];
-
-					int ni = (int)voxelArea.compactCells[nx+nz].index + s.GetConnection(dir);
-
-					if (area != voxelArea.areaTypes[ni]) { continue; }
-
-
-					if (regs[ni] == 1) {
-						regs[ni] = reg;
-						st1.Add(new Int3(nx, ni, nz));
-					}
-				}
-			}
-		}
-
 		public void BuildRegions () {
-			AstarProfiler.StartProfile("Build Regions");
+			/*System.Diagnostics.Stopwatch w0 = new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch w1 = new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch w2 = new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch w3 = new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch w4 = new System.Diagnostics.Stopwatch();
+			System.Diagnostics.Stopwatch w5 = new System.Diagnostics.Stopwatch();
+			w3.Start();*/
 
 			int w = voxelArea.width;
 			int d = voxelArea.depth;
-
 			int wd = w*d;
-
 			int spanCount = voxelArea.compactSpanCount;
 
-
-#if ASTAR_RECAST_BFS
-			ushort[] srcReg = voxelArea.tmpUShortArr;
-			if (srcReg.Length < spanCount) {
-				srcReg = voxelArea.tmpUShortArr = new ushort[spanCount];
-			}
-			Pathfinding.Util.Memory.MemSet<ushort>(srcReg, 0, sizeof(ushort));
-#else
 			int expandIterations = 8;
 
-			List<int> stack = Pathfinding.Util.ListPool<int>.Claim(1024);
-			ushort[] srcReg = new ushort[spanCount];
-			ushort[] srcDist = new ushort[spanCount];
-			ushort[] dstReg = new ushort[spanCount];
-			ushort[] dstDist = new ushort[spanCount];
-#endif
+			ushort[] srcReg = Util.ArrayPool<ushort>.Claim(spanCount);
+			ushort[] srcDist = Util.ArrayPool<ushort>.Claim(spanCount);
+			bool[] closed = Util.ArrayPool<bool>.Claim(spanCount);
+			int[] spanFlags = Util.ArrayPool<int>.Claim(spanCount);
+			Int3[] stack = Util.ArrayPool<Int3>.Claim(spanCount);
+
+			// The array pool arrays may contain arbitrary data. We need to zero it out.
+			Util.Memory.MemSet(srcReg, (ushort)0, sizeof(ushort));
+			Util.Memory.MemSet(srcDist, (ushort)0xFFFF, sizeof(ushort));
+			Util.Memory.MemSet(closed, false, sizeof(bool));
+			Util.Memory.MemSet(spanFlags, 0, sizeof(int));
+
+			var DirectionX = voxelArea.DirectionX;
+			var DirectionZ = voxelArea.DirectionZ;
+			var spanDistances = voxelArea.dist;
+			var areaTypes = voxelArea.areaTypes;
+			var compactCells = voxelArea.compactCells;
 
 			ushort regionId = 2;
 			MarkRectWithRegion(0, borderSize, 0, d,    (ushort)(regionId | BorderReg), srcReg);    regionId++;
@@ -570,314 +447,146 @@ namespace Pathfinding.Voxels {
 			MarkRectWithRegion(0, w, 0, borderSize,    (ushort)(regionId | BorderReg), srcReg);    regionId++;
 			MarkRectWithRegion(0, w, d-borderSize, d,  (ushort)(regionId | BorderReg), srcReg);    regionId++;
 
+			Int3[][] buckedSortedSpans = new Int3[(voxelArea.maxDistance)/2 + 1][];
+			int[] sortedSpanCounts = new int[buckedSortedSpans.Length];
+			for (int i = 0; i < buckedSortedSpans.Length; i++) buckedSortedSpans[i] = new Int3[16];
 
+			//w3.Stop();
+			//w5.Start();
 
-
-
-#if ASTAR_RECAST_BFS
-			uint level = 0;
-
-			List<Int3> basins = Pathfinding.Util.ListPool<Int3>.Claim(100);
-
-			// Find "basins"
+			// Bucket sort the spans based on distance
 			for (int z = 0, pz = 0; z < wd; z += w, pz++) {
 				for (int x = 0; x < voxelArea.width; x++) {
-					CompactVoxelCell c = voxelArea.compactCells[z+x];
+					CompactVoxelCell c = compactCells[z+x];
 
 					for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; i++) {
-						CompactVoxelSpan s = voxelArea.compactSpans[i];
-						bool anyBelow = false;
-
-						if (voxelArea.areaTypes[i] == UnwalkableArea || srcReg[i] != 0) continue;
-
-						for (int dir = 0; dir < 4; dir++) {
-							if (s.GetConnection(dir) != NotConnected) {
-								int nx = x+voxelArea.DirectionX[dir];
-								int nz = z+voxelArea.DirectionZ[dir];
-
-								int ni2 = (int)(voxelArea.compactCells[nx+nz].index+s.GetConnection(dir));
-
-								if (voxelArea.dist[i] < voxelArea.dist[ni2]) {
-									anyBelow = true;
-									break;
-								}
-
-
-								//CompactVoxelSpan ns = voxelArea.compactSpans[ni];
-							}
-						}
-						if (!anyBelow) {
-							basins.Add(new Int3(x, i, z));
-							level = System.Math.Max(level, voxelArea.dist[i]);
-						}
-					}
-				}
-			}
-
-			//Start at maximum possible distance. & ~1 is rounding down to an even value
-			level = (uint)((level+1) & ~1);
-
-
-			List<Int3> st1 = Pathfinding.Util.ListPool<Int3>.Claim(300);
-			List<Int3> st2 = Pathfinding.Util.ListPool<Int3>.Claim(300);
-
-			// Some debug code
-			//bool visited = new bool[voxelArea.compactSpanCount];
-
-			for (;; level -= 2) {
-				int ocount = st1.Count;
-				int expandCount = 0;
-
-				if (ocount == 0) {
-					//int c = 0;
-					for (int q = 0; q < basins.Count; q++) {
-						if (srcReg[basins[q].y] == 0 && voxelArea.dist[basins[q].y] >= level) {
-							srcReg[basins[q].y] = 1;
-							st1.Add(basins[q]);
-
-							// Some debug code
-							//c++;
-							//visited[basins[i].y] = true;
-						}
-					}
-				}
-
-				for (int j = 0; j < st1.Count; j++) {
-					int x = st1[j].x;
-					int i = st1[j].y;
-					int z = st1[j].z;
-
-					ushort r = srcReg[i];
-
-					CompactVoxelSpan s = voxelArea.compactSpans[i];
-					int area = voxelArea.areaTypes[i];
-
-
-					bool anyAbove = false;
-					for (int dir = 0; dir < 4; dir++) {
-						if (s.GetConnection(dir) == NotConnected) { continue; }
-
-						int nx = x + voxelArea.DirectionX[dir];
-						int nz = z + voxelArea.DirectionZ[dir];
-
-						int ni = (int)voxelArea.compactCells[nx+nz].index + s.GetConnection(dir);
-
-						if (area != voxelArea.areaTypes[ni]) { continue; }
-
-						if (voxelArea.dist[ni] < level) {
-							anyAbove = true;
+						if ((srcReg[i] & BorderReg) == BorderReg) // Do not take borders into account.
 							continue;
+						if (areaTypes[i] == UnwalkableArea)
+							continue;
+
+						int distIndex = voxelArea.dist[i] / 2;
+						if (sortedSpanCounts[distIndex] >= buckedSortedSpans[distIndex].Length) {
+							var newBuffer = new Int3[sortedSpanCounts[distIndex]*2];
+							buckedSortedSpans[distIndex].CopyTo(newBuffer, 0);
+							buckedSortedSpans[distIndex] = newBuffer;
 						}
 
-
-						if (srcReg[ni] == 0) {
-							bool same = false;
-							for (int v = (int)voxelArea.compactCells[nx+nz].index, vt = (int)voxelArea.compactCells[nx+nz].index+(int)voxelArea.compactCells[nx+nz].count; v < vt; v++) {
-								if (srcReg[v] == srcReg[i]) {
-									same = true;
-									break;
-								}
-							}
-
-							if (!same) {
-								srcReg[ni] = r;
-								//Debug.DrawRay (ConvertPosition(x,z,i),Vector3.up,AstarMath.IntToColor((int)level,0.6f));
-
-								st1.Add(new Int3(nx, ni, nz));
-							}
-						}
-					}
-
-					//Still on the edge
-					if (anyAbove) {
-						st2.Add(st1[j]);
-					}
-
-					if (j == ocount-1) {
-						expandCount++;
-						ocount = st1.Count;
-
-						if (expandCount == 8 || j == st1.Count-1) {
-							//int c = 0;
-							for (int q = 0; q < basins.Count; q++) {
-								if (srcReg[basins[q].y] == 0 && voxelArea.dist[basins[q].y] >= level) {
-									srcReg[basins[q].y] = 1;
-									st1.Add(basins[q]);
-
-									// Debug code
-									//c++;
-									//visited[basins[i].y] = true;
-								}
-							}
-						}
+						buckedSortedSpans[distIndex][sortedSpanCounts[distIndex]++] = new Int3(x, i, z);
 					}
 				}
-
-
-
-				List<Int3> tmpList = st1;
-				st1 = st2;
-				st2 = tmpList;
-				st2.Clear();
-
-				//System.Console.WriteLine ("Flooding basins");
-
-				for (int i = 0; i < basins.Count; i++) {
-					if (srcReg[basins[i].y] == 1) {
-						st2.Add(basins[i]);
-						FloodOnes(st2, srcReg, level, regionId); regionId++;
-						st2.Clear();
-					}
-				}
-
-
-				if (level == 0) break;
 			}
 
+			//w5.Stop();
 
-			Pathfinding.Util.ListPool<Int3>.Release(st1);
-			Pathfinding.Util.ListPool<Int3>.Release(st2);
-			Pathfinding.Util.ListPool<Int3>.Release(basins);
-			// Filter out small regions.
-			voxelArea.maxRegions = regionId;
+			Queue<Int3> srcQue = new Queue<Int3>();
+			Queue<Int3> dstQue = new Queue<Int3>();
 
-			FilterSmallRegions(srcReg, minRegionSize, voxelArea.maxRegions);
+			// Go through spans in reverse order (i.e largest distances first)
+			for (int distIndex = buckedSortedSpans.Length - 1; distIndex >= 0; distIndex--) {
+				var level = (uint)distIndex * 2;
+				var spans = buckedSortedSpans[distIndex];
+				var spansAtLevel = sortedSpanCounts[distIndex];
+				for (int i = 0; i < spansAtLevel; i++) {
+					int spanIndex = spans[i].y;
 
-
-			// Write the result out.
-			for (int i = 0; i < voxelArea.compactSpanCount; i++) {
-				voxelArea.compactSpans[i].reg = srcReg[i];
-			}
-#else       /// ====== Use original recast code ====== //
-			//Start at maximum possible distance. & ~1 is rounding down to an even value
-			uint level = (uint)((voxelArea.maxDistance+1) & ~1);
-
-			int count = 0;
-
-
-
-			while (level > 0) {
-				level = level >= 2 ? level-2 : 0;
-
-				AstarProfiler.StartProfile("--Expand Regions");
-				if (ExpandRegions(expandIterations, level, srcReg, srcDist, dstReg, dstDist, stack) != srcReg) {
-					ushort[] tmp = srcReg;
-					srcReg = dstReg;
-					dstReg = tmp;
-
-					tmp = srcDist;
-					srcDist = dstDist;
-					dstDist = tmp;
+					// This span is adjacent to a region, so we should start the BFS search from it
+					if (spanFlags[spanIndex] != 0 && srcReg[spanIndex] == 0) {
+						srcReg[spanIndex] = (ushort)spanFlags[spanIndex];
+						srcQue.Enqueue(spans[i]);
+						closed[spanIndex] = true;
+					}
 				}
 
-				AstarProfiler.EndProfile("--Expand Regions");
+				// Expand a few iterations out from every known node
+				for (int expansionIteration = 0; expansionIteration < expandIterations && srcQue.Count > 0; expansionIteration++) {
+					while (srcQue.Count > 0) {
+						Int3 spanInfo = srcQue.Dequeue();
+						var area = areaTypes[spanInfo.y];
+						var span = voxelArea.compactSpans[spanInfo.y];
+						var region = srcReg[spanInfo.y];
+						closed[spanInfo.y] = true;
+						ushort nextDist = (ushort)(srcDist[spanInfo.y] + 2);
 
-				AstarProfiler.StartProfile("--Mark Regions");
+						// Go through the neighbours of the span
+						for (int dir = 0; dir < 4; dir++) {
+							var neighbour = span.GetConnection(dir);
+							if (neighbour == NotConnected) continue;
 
+							int nx = spanInfo.x + DirectionX[dir];
+							int nz = spanInfo.z + DirectionZ[dir];
 
-				// Mark new regions with IDs.
-				// Find "basins"
-				for (int z = 0, pz = 0; z < wd; z += w, pz++) {
-					for (int x = 0; x < voxelArea.width; x++) {
-						CompactVoxelCell c = voxelArea.compactCells[z+x];
+							int ni = (int)compactCells[nx+nz].index + neighbour;
 
-						for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; i++) {
-							if (voxelArea.dist[i] < level || srcReg[i] != 0 || voxelArea.areaTypes[i] == UnwalkableArea)
+							if ((srcReg[ni] & BorderReg) == BorderReg) // Do not take borders into account.
 								continue;
 
-							if (FloodRegion(x, z, i, level, regionId, srcReg, srcDist, stack))
-								regionId++;
+							// Do not combine different area types
+							if (area == areaTypes[ni]) {
+								if (nextDist < srcDist[ni]) {
+									if (spanDistances[ni] < level) {
+										srcDist[ni] = nextDist;
+										spanFlags[ni] = region;
+									} else if (!closed[ni]) {
+										srcDist[ni] = nextDist;
+										if (srcReg[ni] == 0) dstQue.Enqueue(new Int3(nx, ni, nz));
+										srcReg[ni] = region;
+									}
+								}
+							}
+						}
+					}
+					Util.Memory.Swap(ref srcQue, ref dstQue);
+				}
+
+				// Find the first span that has not been seen yet and start a new region that expands from there
+				for (int i = 0; i < spansAtLevel; i++) {
+					var info = spans[i];
+					if (srcReg[info.y] == 0) {
+						if (!FloodRegion(info.x, info.z, info.y, level, regionId, srcReg, srcDist, stack, spanFlags, closed)) {
+							// The starting voxel was already adjacent to an existing region so we skip flooding it.
+							// It will be visited in the next area expansion.
+						} else {
+							regionId++;
 						}
 					}
 				}
-
-
-				AstarProfiler.EndProfile("--Mark Regions");
-
-				count++;
 			}
 
-			if (ExpandRegions(expandIterations*8, 0, srcReg, srcDist, dstReg, dstDist, stack) != srcReg) {
-				ushort[] tmp = srcReg;
-				srcReg = dstReg;
-				dstReg = tmp;
-
-				tmp = srcDist;
-				srcDist = dstDist;
-				dstDist = tmp;
-			}
-
-			// Filter out small regions.
 			voxelArea.maxRegions = regionId;
 
+			// Filter out small regions.
 			FilterSmallRegions(srcReg, minRegionSize, voxelArea.maxRegions);
 
 			// Write the result out.
-			for (int i = 0; i < voxelArea.compactSpanCount; i++) {
-				voxelArea.compactSpans[i].reg = srcReg[i];
+			var compactSpans = voxelArea.compactSpans;
+			for (int i = 0; i < spanCount; i++) {
+				compactSpans[i].reg = srcReg[i];
 			}
 
-			Pathfinding.Util.ListPool<int>.Release(ref stack);
 
-
-			// Some debug code not currently used
-			/*
-			 * int sCount = voxelArea.GetSpanCount ();
-			 * Vector3[] debugPointsTop = new Vector3[sCount];
-			 * Vector3[] debugPointsBottom = new Vector3[sCount];
-			 * Color[] debugColors = new Color[sCount];
-			 *
-			 * int debugPointsCount = 0;
-			 * //int wd = voxelArea.width*voxelArea.depth;
-			 *
-			 * for (int z=0, pz = 0;z < wd;z += voxelArea.width, pz++) {
-			 *  for (int x=0;x < voxelArea.width;x++) {
-			 *
-			 *      Vector3 p = new Vector3(x,0,pz)*cellSize+forcedBounds.min;
-			 *
-			 *      //CompactVoxelCell c = voxelArea.compactCells[x+z];
-			 *      CompactVoxelCell c = voxelArea.compactCells[x+z];
-			 *      //if (c.count == 0) {
-			 *      //	Debug.DrawRay (p,Vector3.up,Color.red);
-			 *      //}
-			 *
-			 *      //for (int i=(int)c.index, ni = (int)(c.index+c.count);i<ni;i++)
-			 *
-			 *      for (int i = (int)c.index; i < c.index+c.count; i++) {
-			 *          CompactVoxelSpan s = voxelArea.compactSpans[i];
-			 *          //CompactVoxelSpan s = voxelArea.compactSpans[i];
-			 *
-			 *          p.y = ((float)(s.y+0.1F))*cellHeight+forcedBounds.min.y;
-			 *
-			 *          debugPointsTop[debugPointsCount] = p;
-			 *
-			 *          p.y = ((float)s.y)*cellHeight+forcedBounds.min.y;
-			 *          debugPointsBottom[debugPointsCount] = p;
-			 *
-			 *          debugColors[debugPointsCount] = Pathfinding.AstarMath.IntToColor(s.reg,0.7f);//s.reg == 1 ? Color.green : (s.reg == 2 ? Color.yellow : Color.red);
-			 *          debugPointsCount++;
-			 *
-			 *          //Debug.DrawRay (p,Vector3.up*0.5F,Color.green);
-			 *      }
-			 *  }
-			 * }
-			 *
-			 * DebugUtility.DrawCubes (debugPointsTop,debugPointsBottom,debugColors, cellSize);*/
-#endif
-			AstarProfiler.EndProfile("Build Regions");
+			// Pool arrays
+			Util.ArrayPool<ushort>.Release(ref srcReg);
+			Util.ArrayPool<ushort>.Release(ref srcDist);
+			Util.ArrayPool<bool>.Release(ref closed);
+			Util.ArrayPool<int>.Release(ref spanFlags);
+			Util.ArrayPool<Int3>.Release(ref stack);
+			//Debug.Log(w0.Elapsed.TotalMilliseconds.ToString("0.0") + " " + w1.Elapsed.TotalMilliseconds.ToString("0.0") + " " + w2.Elapsed.TotalMilliseconds.ToString("0.0") + " " + w3.Elapsed.TotalMilliseconds.ToString("0.0") + " " + w4.Elapsed.TotalMilliseconds.ToString("0.0") + " " + w5.Elapsed.TotalMilliseconds.ToString("0.0"));
 		}
 
-		/** Find method in the UnionFind data structure.
-		 * \see https://en.wikipedia.org/wiki/Disjoint-set_data_structure
-		 */
+		/// <summary>
+		/// Find method in the UnionFind data structure.
+		/// See: https://en.wikipedia.org/wiki/Disjoint-set_data_structure
+		/// </summary>
 		static int union_find_find (int[] arr, int x) {
 			if (arr[x] < 0) return x;
 			return arr[x] = union_find_find(arr, arr[x]);
 		}
 
-		/** Join method in the UnionFind data structure.
-		 * \see https://en.wikipedia.org/wiki/Disjoint-set_data_structure
-		 */
+		/// <summary>
+		/// Join method in the UnionFind data structure.
+		/// See: https://en.wikipedia.org/wiki/Disjoint-set_data_structure
+		/// </summary>
 		static void union_find_union (int[] arr, int a, int b) {
 			a = union_find_find(arr, a);
 			b = union_find_find(arr, b);
@@ -891,8 +600,7 @@ namespace Pathfinding.Voxels {
 			arr[b] = a;
 		}
 
-		/** Filters out or merges small regions.
-		 */
+		/// <summary>Filters out or merges small regions.</summary>
 		public void FilterSmallRegions (ushort[] reg, int minRegionSize, int maxRegions) {
 			RelevantGraphSurface c = RelevantGraphSurface.Root;
 			// Need to use ReferenceEquals because it might be called from another thread

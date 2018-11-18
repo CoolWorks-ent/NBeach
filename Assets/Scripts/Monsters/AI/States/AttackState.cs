@@ -9,7 +9,7 @@ public class AttackState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
-        controller.aIRichPath.canMove = false;
+        //controller.aIRichPath.canMove = false;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
         //controller.animeController.SetTrigger(controller.attackHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));

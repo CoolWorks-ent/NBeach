@@ -11,67 +11,79 @@ namespace Pathfinding.Util {
 	using Pathfinding;
 	using Pathfinding.Poly2Tri;
 
-	/** Utility class for updating tiles of navmesh/recast graphs.
-	 * Primarily used by the TileHandlerHelper for navmesh cutting.
-	 *
-	 * Most operations that this class does are asynchronous.
-	 * They will be added as work items to the AstarPath class
-	 * and executed when the pathfinding threads have finished
-	 * calculating their current paths.
-	 *
-	 * \see TileHandlerHelper
-	 */
+	/// <summary>
+	/// Utility class for updating tiles of navmesh/recast graphs.
+	///
+	/// Most operations that this class does are asynchronous.
+	/// They will be added as work items to the AstarPath class
+	/// and executed when the pathfinding threads have finished
+	/// calculating their current paths.
+	///
+	/// See: navmeshcutting (view in online documentation for working links)
+	/// See: <see cref="Pathfinding.NavmeshUpdates"/>
+	/// </summary>
 	public class TileHandler {
-		/** The underlaying graph which is handled by this instance */
+		/// <summary>The underlaying graph which is handled by this instance</summary>
 		public readonly NavmeshBase graph;
 
-		/** Number of tiles along the x axis */
+		/// <summary>Number of tiles along the x axis</summary>
 		readonly int tileXCount;
 
-		/** Number of tiles along the z axis */
+		/// <summary>Number of tiles along the z axis</summary>
 		readonly int tileZCount;
 
-		/** Handles polygon clipping operations */
+		/// <summary>Handles polygon clipping operations</summary>
 		readonly Clipper clipper = new Clipper();
 
-		/** Cached dictionary to avoid excessive allocations */
+		/// <summary>Cached dictionary to avoid excessive allocations</summary>
 		readonly Dictionary<Int2, int> cached_Int2_int_dict = new Dictionary<Int2, int>();
 
-		/** Which tile type is active on each tile index.
-		 * This array will be tileXCount*tileZCount elements long.
-		 */
+		/// <summary>
+		/// Which tile type is active on each tile index.
+		/// This array will be tileXCount*tileZCount elements long.
+		/// </summary>
 		readonly TileType[] activeTileTypes;
 
-		/** Rotations of the active tiles */
+		/// <summary>Rotations of the active tiles</summary>
 		readonly int[] activeTileRotations;
 
-		/** Offsets along the Y axis of the active tiles */
+		/// <summary>Offsets along the Y axis of the active tiles</summary>
 		readonly int[] activeTileOffsets;
 
-		/** A flag for each tile that is set to true if it has been reloaded while batching is in progress */
+		/// <summary>A flag for each tile that is set to true if it has been reloaded while batching is in progress</summary>
 		readonly bool[] reloadedInBatch;
 
-		/** NavmeshCut and NavmeshAdd components registered to this tile handler.
-		 * This is updated by the TileHandlerHelper component.
-		 * \see TileHandlerHelper
-		 */
+		/// <summary>
+		/// NavmeshCut and NavmeshAdd components registered to this tile handler.
+		/// This is updated by the <see cref="Pathfinding.NavmeshUpdates"/> class.
+		/// See: <see cref="Pathfinding.NavmeshUpdates"/>
+		/// </summary>
 		public readonly GridLookup<NavmeshClipper> cuts;
 
-		/** True while batching tile updates.
-		 * Batching tile updates has a positive effect on performance
-		 */
-		bool isBatching;
+		/// <summary>
+		/// Positive while batching tile updates.
+		/// Batching tile updates has a positive effect on performance
+		/// </summary>
+		int batchDepth;
 
-		/** Utility for clipping polygons to rectangles.
-		 * Implemented as a struct and not a bunch of static methods
-		 * because it needs some buffer arrays that are best cached
-		 * to avoid excessive allocations
-		 */
-		readonly Pathfinding.Voxels.VoxelPolygonClipper simpleClipper;
+		/// <summary>
+		/// True while batching tile updates.
+		/// Batching tile updates has a positive effect on performance
+		/// </summary>
+		bool isBatching { get { return batchDepth > 0; } }
 
-		/** True if the tile handler still has the same number of tiles and tile layout as the graph.
-		 * If the graph is rescanned the tile handler will get out of sync and needs to be recreated.
-		 */
+		/// <summary>
+		/// Utility for clipping polygons to rectangles.
+		/// Implemented as a struct and not a bunch of static methods
+		/// because it needs some buffer arrays that are best cached
+		/// to avoid excessive allocations
+		/// </summary>
+		readonly Pathfinding.Voxels.Int3PolygonClipper simpleClipper;
+
+		/// <summary>
+		/// True if the tile handler still has the same number of tiles and tile layout as the graph.
+		/// If the graph is rescanned the tile handler will get out of sync and needs to be recreated.
+		/// </summary>
 		public bool isValid {
 			get {
 				return graph != null && graph.exists && tileXCount == graph.tileXCount && tileZCount == graph.tileZCount;
@@ -91,47 +103,37 @@ namespace Pathfinding.Util {
 			this.graph = graph;
 		}
 
-		/** Call to update the specified tiles with new information based on the navmesh/recast graph.
-		 * This is usually called right after a navmesh/recast graph has recalculated some tiles
-		 * and thus some calculations need to be done to take navmesh cutting into account
-		 * as well.
-		 *
-		 * Will reload all tiles in the list.
-		 */
+		/// <summary>
+		/// Call to update the specified tiles with new information based on the navmesh/recast graph.
+		/// This is usually called right after a navmesh/recast graph has recalculated some tiles
+		/// and thus some calculations need to be done to take navmesh cutting into account
+		/// as well.
+		///
+		/// Will reload all tiles in the list.
+		/// </summary>
 		public void OnRecalculatedTiles (NavmeshTile[] recalculatedTiles) {
 			for (int i = 0; i < recalculatedTiles.Length; i++) {
 				UpdateTileType(recalculatedTiles[i]);
 			}
 
-			bool batchStarted = StartBatchLoad();
+			StartBatchLoad();
 
 			for (int i = 0; i < recalculatedTiles.Length; i++) {
 				ReloadTile(recalculatedTiles[i].x, recalculatedTiles[i].z);
 			}
 
-			if (batchStarted) EndBatchLoad();
+			EndBatchLoad();
 		}
 
-		/** Rotation of the specified tile relative to the original rotation of the tile type.
-		 * A result N means that the tile has been rotated N*90 degrees.
-		 */
+		/// <summary>
+		/// Rotation of the specified tile relative to the original rotation of the tile type.
+		/// A result N means that the tile has been rotated N*90 degrees.
+		/// </summary>
 		public int GetActiveRotation (Int2 p) {
 			return activeTileRotations[p.x + p.y*tileXCount];
 		}
 
-		/** \deprecated */
-		[System.Obsolete("Use the result from RegisterTileType instead")]
-		public TileType GetTileType (int index) {
-			throw new System.Exception("This method has been deprecated. Use the result from RegisterTileType instead.");
-		}
-
-		/** \deprecated */
-		[System.Obsolete("Use the result from RegisterTileType instead")]
-		public int GetTileTypeCount () {
-			throw new System.Exception("This method has been deprecated. Use the result from RegisterTileType instead.");
-		}
-
-		/** A template for a single tile in a navmesh/recast graph */
+		/// <summary>A template for a single tile in a navmesh/recast graph</summary>
 		public class TileType {
 			Int3[] verts;
 			int[] tris;
@@ -153,15 +155,16 @@ namespace Pathfinding.Util {
 				}
 			}
 
-			/** Matrices for rotation.
-			 * Each group of 4 elements is a 2x2 matrix.
-			 * The XZ position is multiplied by this.
-			 * So
-			 * \code
-			 * //A rotation by 90 degrees clockwise, second matrix in the array
-			 * (5,2) * ((0, 1), (-1, 0)) = (2,-5)
-			 * \endcode
-			 */
+			/// <summary>
+			/// Matrices for rotation.
+			/// Each group of 4 elements is a 2x2 matrix.
+			/// The XZ position is multiplied by this.
+			/// So
+			/// <code>
+			/// //A rotation by 90 degrees clockwise, second matrix in the array
+			/// (5,2) * ((0, 1), (-1, 0)) = (2,-5)
+			/// </code>
+			/// </summary>
 			private static readonly int[] Rotations = {
 				1, 0,  // Identity matrix
 				0, 1,
@@ -205,17 +208,17 @@ namespace Pathfinding.Util {
 				this.depth = depth;
 			}
 
-			/** Create a new TileType.
-			 * First all vertices of the source mesh are offseted by the \a centerOffset.
-			 * The source mesh is assumed to be centered (after offsetting). Corners of the tile should be at tileSize*0.5 along all axes.
-			 * When width or depth is not 1, the tileSize param should not change, but corners of the tile are assumed to lie further out.
-			 *
-			 * \param source The navmesh as a unity Mesh
-			 * \param width The number of base tiles this tile type occupies on the x-axis
-			 * \param depth The number of base tiles this tile type occupies on the z-axis
-			 * \param tileSize Size of a single tile, the y-coordinate will be ignored.
-			 * \param centerOffset This offset will be added to all vertices
-			 */
+			/// <summary>
+			/// Create a new TileType.
+			/// First all vertices of the source mesh are offseted by the centerOffset.
+			/// The source mesh is assumed to be centered (after offsetting). Corners of the tile should be at tileSize*0.5 along all axes.
+			/// When width or depth is not 1, the tileSize param should not change, but corners of the tile are assumed to lie further out.
+			/// </summary>
+			/// <param name="source">The navmesh as a unity Mesh</param>
+			/// <param name="width">The number of base tiles this tile type occupies on the x-axis</param>
+			/// <param name="depth">The number of base tiles this tile type occupies on the z-axis</param>
+			/// <param name="tileSize">Size of a single tile, the y-coordinate will be ignored.</param>
+			/// <param name="centerOffset">This offset will be added to all vertices</param>
 			public TileType (Mesh source, Int3 tileSize, Int3 centerOffset, int width = 1, int depth = 1) {
 				if (source == null) throw new ArgumentNullException("source");
 
@@ -243,12 +246,13 @@ namespace Pathfinding.Util {
 				this.depth = depth;
 			}
 
-			/** Load a tile, result given by the vert and tris array.
-			 * \warning For performance and memory reasons, the returned arrays are internal arrays, so they must not be modified in any way or
-			 * subsequent calls to Load may give corrupt output. The contents of the verts array is only valid until the next call to Load since
-			 * different rotations and y offsets can be applied.
-			 * If you need persistent arrays, please copy the returned ones.
-			 */
+			/// <summary>
+			/// Load a tile, result given by the vert and tris array.
+			/// Warning: For performance and memory reasons, the returned arrays are internal arrays, so they must not be modified in any way or
+			/// subsequent calls to Load may give corrupt output. The contents of the verts array is only valid until the next call to Load since
+			/// different rotations and y offsets can be applied.
+			/// If you need persistent arrays, please copy the returned ones.
+			/// </summary>
 			public void Load (out Int3[] verts, out int[] tris, int rotation, int yoffset) {
 				//Make sure it is a number 0 <= x < 4
 				rotation = ((rotation % 4) + 4) % 4;
@@ -278,16 +282,16 @@ namespace Pathfinding.Util {
 			}
 		}
 
-		/** Register that a tile can be loaded from \a source.
-		 * \param centerOffset Assumes that the mesh has its pivot point at the center of the tile.
-		 * If it has not, you can supply a non-zero \a centerOffset to offset all vertices.
-		 *
-		 * \param width width of the tile. In base tiles, not world units.
-		 * \param depth depth of the tile. In base tiles, not world units.
-		 * \param source Source mesh, must be readable.
-		 *
-		 * \returns Identifier for loading that tile type
-		 */
+		/// <summary>
+		/// Register that a tile can be loaded from source.
+		///
+		/// Returns: Identifier for loading that tile type
+		/// </summary>
+		/// <param name="centerOffset">Assumes that the mesh has its pivot point at the center of the tile.
+		/// If it has not, you can supply a non-zero centerOffset to offset all vertices.</param>
+		/// <param name="width">width of the tile. In base tiles, not world units.</param>
+		/// <param name="depth">depth of the tile. In base tiles, not world units.</param>
+		/// <param name="source">Source mesh, must be readable.</param>
 		public TileType RegisterTileType (Mesh source, Int3 centerOffset, int width = 1, int depth = 1) {
 			return new TileType(source, (Int3) new Vector3(graph.TileWorldSizeX, 0, graph.TileWorldSizeZ), centerOffset, width, depth);
 		}
@@ -326,83 +330,83 @@ namespace Pathfinding.Util {
 			activeTileOffsets[index] = 0;
 		}
 
-		/** Start batch loading.
-		 * \returns True if batching wasn't started yet, and thus EndBatchLoad should be called,
-		 * False if batching was already started by some other part of the code and you should not call EndBatchLoad
-		 */
-		public bool StartBatchLoad () {
-			//if (isBatching) throw new Exception ("Starting batching when batching has already been started");
-			if (isBatching) return false;
-
-			isBatching = true;
+		/// <summary>
+		/// Start batch loading.
+		/// Every call to this method must be matched by exactly one call to EndBatchLoad.
+		/// </summary>
+		public void StartBatchLoad () {
+			batchDepth++;
+			if (batchDepth > 1) return;
 
 			AstarPath.active.AddWorkItem(new AstarWorkItem(force => {
 				graph.StartBatchTileUpdate();
 				return true;
 			}));
-
-			return true;
 		}
 
 		public void EndBatchLoad () {
-			if (!isBatching) throw new Exception("Ending batching when batching has not been started");
+			if (batchDepth <= 0) throw new Exception("Ending batching when batching has not been started");
+			batchDepth--;
 
 			for (int i = 0; i < reloadedInBatch.Length; i++) reloadedInBatch[i] = false;
-			isBatching = false;
 
-			AstarPath.active.AddWorkItem(new AstarWorkItem(force => {
+			AstarPath.active.AddWorkItem(new AstarWorkItem((ctx, force) => {
+				Profiler.BeginSample("Apply Tile Modifications");
 				graph.EndBatchTileUpdate();
 
 				// Trigger post update event
 				// This can trigger for example recalculation of navmesh links
-				GraphModifier.TriggerEvent(GraphModifier.EventType.PostUpdate);
+				ctx.SetGraphDirty(graph);
+				Profiler.EndSample();
 				return true;
 			}));
 		}
 
 		[Flags]
 		public enum CutMode {
-			/** Cut holes in the navmesh */
+			/// <summary>Cut holes in the navmesh</summary>
 			CutAll = 1,
-			/** Cut the navmesh but do not remove the interior of the cuts */
+			/// <summary>Cut the navmesh but do not remove the interior of the cuts</summary>
 			CutDual = 2,
-			/** Also cut using the extra shape that was provided */
+			/// <summary>Also cut using the extra shape that was provided</summary>
 			CutExtra = 4
 		}
 
-		/** Internal class describing a single NavmeshCut */
+		/// <summary>Internal class describing a single NavmeshCut</summary>
 		class Cut {
-			/** Bounds in XZ space */
+			/// <summary>Bounds in XZ space</summary>
 			public IntRect bounds;
 
-			/** X is the lower bound on the y axis, Y is the upper bounds on the Y axis */
+			/// <summary>X is the lower bound on the y axis, Y is the upper bounds on the Y axis</summary>
 			public Int2 boundsY;
 			public bool isDual;
 			public bool cutsAddedGeom;
 			public List<IntPoint> contour;
 		}
 
-		/** Internal class representing a mesh which is the result of the CutPoly method */
+		/// <summary>Internal class representing a mesh which is the result of the CutPoly method</summary>
 		struct CuttingResult {
 			public Int3[] verts;
 			public int[] tris;
 		}
 
-		/** Cuts a piece of navmesh using navmesh cuts.
-		 *
-		 * \note I am sorry for the really messy code in this method.
-		 * It really needs to be refactored.
-		 *
-		 * \param verts Vertices that are going to be cut. Should be in graph space.
-		 * \param tris Triangles describing a mesh using the vertices.
-		 * \param extraShape If supplied the resulting mesh will be the intersection of the input mesh and this mesh.
-		 * \param graphTransform Transform mapping graph space to world space.
-		 *      \see NavmeshBase.transform
-		 * \param tiles Tiles in the recast graph which the mesh covers.
-		 * \param mode \see CutMode
-		 * \param perturbate Move navmesh cuts around randomly a bit, the larger the value the more they are moved around.
-		 *      Used to prevent edge cases that can cause the clipping to fail.
-		 */
+		/// <summary>
+		/// Cuts a piece of navmesh using navmesh cuts.
+		///
+		/// Note: I am sorry for the really messy code in this method.
+		/// It really needs to be refactored.
+		///
+		/// See: NavmeshBase.transform
+		/// See: CutMode
+		/// </summary>
+		/// <param name="verts">Vertices that are going to be cut. Should be in graph space.</param>
+		/// <param name="tris">Triangles describing a mesh using the vertices.</param>
+		/// <param name="extraShape">If supplied the resulting mesh will be the intersection of the input mesh and this mesh.</param>
+		/// <param name="graphTransform">Transform mapping graph space to world space.</param>
+		/// <param name="tiles">Tiles in the recast graph which the mesh covers.</param>
+		/// <param name="mode"></param>
+		/// <param name="perturbate">Move navmesh cuts around randomly a bit, the larger the value the more they are moved around.
+		///      Used to prevent edge cases that can cause the clipping to fail.</param>
 		CuttingResult CutPoly (Int3[] verts, int[] tris, Int3[] extraShape, GraphTransform graphTransform, IntRect tiles, CutMode mode = CutMode.CutAll | CutMode.CutDual, int perturbate = -1) {
 			// Nothing to do here
 			if (verts.Length == 0 || tris.Length == 0) {
@@ -730,11 +734,12 @@ namespace Pathfinding.Util {
 			return result;
 		}
 
-		/** Generates a list of cuts from the navmesh cut components.
-		 * Each cut has a single contour (NavmeshCut components may contain multiple).
-		 *
-		 * \a transform should transform a point from cut space to world space.
-		 */
+		/// <summary>
+		/// Generates a list of cuts from the navmesh cut components.
+		/// Each cut has a single contour (NavmeshCut components may contain multiple).
+		///
+		/// transform should transform a point from cut space to world space.
+		/// </summary>
 		static List<Cut> PrepareNavmeshCutsForCutting (List<NavmeshCut> navmeshCuts, GraphTransform transform, IntRect cutSpaceBounds, int perturbate, bool anyNavmeshAdds) {
 			System.Random rnd = null;
 			if (perturbate > 0) {
@@ -881,13 +886,14 @@ namespace Pathfinding.Util {
 			clipper.Execute(ClipType.ctIntersection, result, PolyFillType.pftEvenOdd, PolyFillType.pftNonZero);
 		}
 
-		/** Clips the input polygon against a rectangle with one corner at the origin and one at size in XZ space.
-		 * \param clipIn Input vertices
-		 * \param clipOut Output vertices. This buffer must be large enough to contain all output vertices.
-		 * \param size The clipping rectangle has one corner at the origin and one at this position in XZ space.
-		 *
-		 * \returns Number of output vertices
-		 */
+		/// <summary>
+		/// Clips the input polygon against a rectangle with one corner at the origin and one at size in XZ space.
+		///
+		/// Returns: Number of output vertices
+		/// </summary>
+		/// <param name="clipIn">Input vertices</param>
+		/// <param name="clipOut">Output vertices. This buffer must be large enough to contain all output vertices.</param>
+		/// <param name="size">The clipping rectangle has one corner at the origin and one at this position in XZ space.</param>
 		int ClipAgainstRectangle (Int3[] clipIn, Int3[] clipOut, Int2 size) {
 			int ct;
 
@@ -907,7 +913,7 @@ namespace Pathfinding.Util {
 			return ct;
 		}
 
-		/** Copy mesh from (vertices, triangles) to (outVertices, outTriangles) */
+		/// <summary>Copy mesh from (vertices, triangles) to (outVertices, outTriangles)</summary>
 		static void CopyMesh (Int3[] vertices, int[] triangles, List<Int3> outVertices, List<int> outTriangles) {
 			outTriangles.Capacity = Math.Max(outTriangles.Capacity, triangles.Length);
 			outVertices.Capacity = Math.Max(outVertices.Capacity, vertices.Length);
@@ -921,15 +927,16 @@ namespace Pathfinding.Util {
 			}
 		}
 
-		/** Refine a mesh using delaunay refinement.
-		 * Loops through all pairs of neighbouring triangles and check if it would be better to flip the diagonal joining them
-		 * using the delaunay criteria.
-		 *
-		 * Does not require triangles to be clockwise, triangles will be checked for if they are clockwise and made clockwise if not.
-		 * The resulting mesh will have all triangles clockwise.
-		 *
-		 * \see https://en.wikipedia.org/wiki/Delaunay_triangulation
-		 */
+		/// <summary>
+		/// Refine a mesh using delaunay refinement.
+		/// Loops through all pairs of neighbouring triangles and check if it would be better to flip the diagonal joining them
+		/// using the delaunay criteria.
+		///
+		/// Does not require triangles to be clockwise, triangles will be checked for if they are clockwise and made clockwise if not.
+		/// The resulting mesh will have all triangles clockwise.
+		///
+		/// See: https://en.wikipedia.org/wiki/Delaunay_triangulation
+		/// </summary>
 		void DelaunayRefinement (Int3[] verts, int[] tris, ref int tCount, bool delaunay, bool colinear) {
 			if (tCount % 3 != 0) throw new System.ArgumentException("Triangle array length must be a multiple of 3");
 
@@ -1050,7 +1057,7 @@ namespace Pathfinding.Util {
 			}
 		}
 
-		/** Clear the tile at the specified tile coordinates */
+		/// <summary>Clear the tile at the specified tile coordinates</summary>
 		public void ClearTile (int x, int z) {
 			if (AstarPath.active == null) return;
 
@@ -1065,23 +1072,19 @@ namespace Pathfinding.Util {
 				if (!isBatching) {
 				    // Trigger post update event
 				    // This can trigger for example recalculation of navmesh links
-					GraphModifier.TriggerEvent(GraphModifier.EventType.PostUpdate);
+					context.SetGraphDirty(graph);
 				}
-
-				//Flood fill everything to make sure graph areas are still valid
-				//This tends to take more than 50% of the calculation time
-				context.QueueFloodFill();
 
 				return true;
 			}));
 		}
 
-		/** Reloads all tiles intersecting with the specified bounds */
+		/// <summary>Reloads all tiles intersecting with the specified bounds</summary>
 		public void ReloadInBounds (Bounds bounds) {
 			ReloadInBounds(graph.GetTouchingTiles(bounds));
 		}
 
-		/** Reloads all tiles specified by the rectangle */
+		/// <summary>Reloads all tiles specified by the rectangle</summary>
 		public void ReloadInBounds (IntRect tiles) {
 			// Make sure the rect is inside graph bounds
 			tiles = IntRect.Intersection(tiles, new IntRect(0, 0, tileXCount-1, tileZCount-1));
@@ -1095,9 +1098,10 @@ namespace Pathfinding.Util {
 			}
 		}
 
-		/** Reload tile at tile coordinate.
-		 * The last tile loaded at that position will be reloaded (e.g to account for moved NavmeshCut components)
-		 */
+		/// <summary>
+		/// Reload tile at tile coordinate.
+		/// The last tile loaded at that position will be reloaded (e.g to account for moved NavmeshCut components)
+		/// </summary>
 		public void ReloadTile (int x, int z) {
 			if (x < 0 || z < 0 || x >= tileXCount || z >= tileZCount) return;
 
@@ -1139,15 +1143,13 @@ namespace Pathfinding.Util {
 		}
 #endif
 
-		/** Load a tile at tile coordinate \a x, \a z.
-		 *
-		 * \param tile Tile type to load
-		 * \param x Tile x coordinate (first tile is at (0,0), second at (1,0) etc.. ).
-		 * \param z Tile z coordinate.
-		 * \param rotation Rotate tile by 90 degrees * value.
-		 * \param yoffset Offset Y coordinates by this amount. In Int3 space, so if you have a world space
-		 *      offset, multiply by Int3.Precision and round to the nearest integer before calling this function.
-		 */
+		/// <summary>Load a tile at tile coordinate x, z.</summary>
+		/// <param name="tile">Tile type to load</param>
+		/// <param name="x">Tile x coordinate (first tile is at (0,0), second at (1,0) etc.. ).</param>
+		/// <param name="z">Tile z coordinate.</param>
+		/// <param name="rotation">Rotate tile by 90 degrees * value.</param>
+		/// <param name="yoffset">Offset Y coordinates by this amount. In Int3 space, so if you have a world space
+		///      offset, multiply by Int3.Precision and round to the nearest integer before calling this function.</param>
 		public void LoadTile (TileType tile, int x, int z, int rotation, int yoffset) {
 			if (tile == null) throw new ArgumentNullException("tile");
 
@@ -1211,12 +1213,9 @@ namespace Pathfinding.Util {
 				if (!isBatching) {
 				    // Trigger post update event
 				    // This can trigger for example recalculation of navmesh links
-					GraphModifier.TriggerEvent(GraphModifier.EventType.PostUpdate);
+				    // TODO: Does this need to be inside an if statement?
+					context.SetGraphDirty(graph);
 				}
-
-				// Flood fill everything to make sure graph areas are still valid
-				// This tends to take more than 50% of the calculation time
-				context.QueueFloodFill();
 
 				return true;
 			}));

@@ -3,7 +3,7 @@ using Pathfinding.Serialization;
 using UnityEngine;
 
 namespace Pathfinding {
-	/** Node used for the GridGraph */
+	/// <summary>Node used for the GridGraph</summary>
 	public class GridNode : GridNodeBase {
 		public GridNode (AstarPath astar) : base(astar) {
 		}
@@ -22,7 +22,7 @@ namespace Pathfinding {
 			_gridGraphs[graphIndex] = graph;
 		}
 
-		/** Internal use only */
+		/// <summary>Internal use only</summary>
 		internal ushort InternalGridFlags {
 			get { return gridFlags; }
 			set { gridFlags = value; }
@@ -41,67 +41,76 @@ namespace Pathfinding {
 			}
 		}
 
-		/** True if the node has a connection in the specified direction.
-		 * The dir parameter corresponds to directions in the grid as:
-		 * \code
-		 *         Z
-		 *         |
-		 *         |
-		 *
-		 *      6  2  5
-		 *       \ | /
-		 * --  3 - X - 1  ----- X
-		 *       / | \
-		 *      7  0  4
-		 *
-		 *         |
-		 *         |
-		 * \endcode
-		 *
-		 * \see SetConnectionInternal
-		 */
+		/// <summary>
+		/// True if the node has a connection in the specified direction.
+		/// The dir parameter corresponds to directions in the grid as:
+		/// <code>
+		///         Z
+		///         |
+		///         |
+		///
+		///      6  2  5
+		///       \ | /
+		/// --  3 - X - 1  ----- X
+		///       / | \
+		///      7  0  4
+		///
+		///         |
+		///         |
+		/// </code>
+		///
+		/// See: SetConnectionInternal
+		/// </summary>
 		public bool HasConnectionInDirection (int dir) {
 			return (gridFlags >> dir & GridFlagsConnectionBit0) != 0;
 		}
 
-		/** True if the node has a connection in the specified direction.
-		 * \deprecated Use HasConnectionInDirection
-		 */
+		/// <summary>
+		/// True if the node has a connection in the specified direction.
+		/// Deprecated: Use HasConnectionInDirection
+		/// </summary>
 		[System.Obsolete("Use HasConnectionInDirection")]
 		public bool GetConnectionInternal (int dir) {
 			return HasConnectionInDirection(dir);
 		}
 
-		/** Enables or disables a connection in a specified direction on the graph.
-		 *	\see HasConnectionInDirection
-		 */
+		/// <summary>
+		/// Enables or disables a connection in a specified direction on the graph.
+		/// See: HasConnectionInDirection
+		/// </summary>
 		public void SetConnectionInternal (int dir, bool value) {
 			// Set bit number #dir to 1 or 0 depending on #value
 			unchecked { gridFlags = (ushort)(gridFlags & ~((ushort)1 << GridFlagsConnectionOffset << dir) | (value ? (ushort)1 : (ushort)0) << GridFlagsConnectionOffset << dir); }
+			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
 		}
 
-		/** Sets the state of all grid connections.
-		 * \param connections a bitmask of the connections (bit 0 is the first connection, bit 1 the second connection, etc.).
-		 *
-		 * \see SetConnectionInternal
-		 */
+		/// <summary>
+		/// Sets the state of all grid connections.
+		///
+		/// See: SetConnectionInternal
+		/// </summary>
+		/// <param name="connections">a bitmask of the connections (bit 0 is the first connection, bit 1 the second connection, etc.).</param>
 		public void SetAllConnectionInternal (int connections) {
 			unchecked { gridFlags = (ushort)((gridFlags & ~GridFlagsConnectionMask) | (connections << GridFlagsConnectionOffset)); }
+			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
 		}
 
-		/** Disables all grid connections from this node.
-		 * \note Other nodes might still be able to get to this node.
-		 * Therefore it is recommended to also disable the relevant connections on adjacent nodes.
-		 */
+		/// <summary>
+		/// Disables all grid connections from this node.
+		/// Note: Other nodes might still be able to get to this node.
+		/// Therefore it is recommended to also disable the relevant connections on adjacent nodes.
+		/// </summary>
 		public void ResetConnectionsInternal () {
 			unchecked {
 				gridFlags = (ushort)(gridFlags & ~GridFlagsConnectionMask);
 			}
+			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
 		}
 
-		/** Work in progress for a feature that required info about which nodes were at the border of the graph.
-		 * \note This property is not functional at the moment.
-		 */
+		/// <summary>
+		/// Work in progress for a feature that required info about which nodes were at the border of the graph.
+		/// Note: This property is not functional at the moment.
+		/// </summary>
 		public bool EdgeNode {
 			get {
 				return (gridFlags & GridFlagsEdgeNodeMask) != 0;
@@ -226,28 +235,6 @@ namespace Pathfinding {
 			return false;
 		}
 
-		public override void FloodFill (Stack<GraphNode> stack, uint region) {
-			GridGraph gg = GetGridGraph(GraphIndex);
-
-			int[] neighbourOffsets = gg.neighbourOffsets;
-			GridNode[] nodes = gg.nodes;
-			var index = NodeInGridIndex;
-
-			for (int i = 0; i < 8; i++) {
-				if (HasConnectionInDirection(i)) {
-					GridNode other = nodes[index + neighbourOffsets[i]];
-					if (other != null && other.Area != region) {
-						other.Area = region;
-						stack.Push(other);
-					}
-				}
-			}
-
-#if !ASTAR_GRID_NO_CUSTOM_CONNECTIONS
-			base.FloodFill(stack, region);
-#endif
-		}
-
 		public override void UpdateRecursiveG (Path path, PathNode pathNode, PathHandler handler) {
 			GridGraph gg = GetGridGraph(GraphIndex);
 
@@ -316,9 +303,10 @@ namespace Pathfinding {
 			(1<<6)
 		};
 
-		/** Permutation of the standard grid node neighbour order to put them on a clockwise cycle around the node.
-		 * Enables easier math in some cases
-		 */
+		/// <summary>
+		/// Permutation of the standard grid node neighbour order to put them on a clockwise cycle around the node.
+		/// Enables easier math in some cases
+		/// </summary>
 		static int[] JPSCyclic = {
 			6,
 			4,
@@ -330,7 +318,7 @@ namespace Pathfinding {
 			7
 		};
 
-		/** Inverse permutation of #JPSCyclic */
+		/// <summary>Inverse permutation of <see cref="JPSCyclic"/></summary>
 		static int[] JPSInverseCyclic = {
 			3, // 0
 			6, // 1
@@ -345,20 +333,21 @@ namespace Pathfinding {
 		const int JPSNaturalStraightNeighbours = 1 << 4;
 		const int JPSNaturalDiagonalNeighbours = (1 << 5) | (1 << 4) | (1 << 3);
 
-		/** Memoization of what results to return from the Jump method.
-		 */
+		/// <summary>Memoization of what results to return from the Jump method.</summary>
 		GridNode[] JPSCache;
 
-		/** Each byte is a bitfield where each bit indicates if direction number i should return null from the Jump method.
-		 * Used as a cache.
-		 * I would like to make this a ulong instead, but that could run into data races.
-		 */
+		/// <summary>
+		/// Each byte is a bitfield where each bit indicates if direction number i should return null from the Jump method.
+		/// Used as a cache.
+		/// I would like to make this a ulong instead, but that could run into data races.
+		/// </summary>
 		byte[] JPSDead;
 		ushort[] JPSLastCacheID;
 
-		/** Executes a straight jump search.
-		 * \see http://en.wikipedia.org/wiki/Jump_point_search
-		 */
+		/// <summary>
+		/// Executes a straight jump search.
+		/// See: http://en.wikipedia.org/wiki/Jump_point_search
+		/// </summary>
 		static GridNode JPSJumpStraight (GridNode node, Path path, PathHandler handler, int parentDir, int depth = 0) {
 			GridGraph gg = GetGridGraph(node.GraphIndex);
 
@@ -487,9 +476,10 @@ namespace Pathfinding {
 			return result;
 		}
 
-		/** Executes a diagonal jump search.
-		 * \see http://en.wikipedia.org/wiki/Jump_point_search
-		 */
+		/// <summary>
+		/// Executes a diagonal jump search.
+		/// See: http://en.wikipedia.org/wiki/Jump_point_search
+		/// </summary>
 		GridNode JPSJumpDiagonal (Path path, PathHandler handler, int parentDir, int depth = 0) {
 			// Indexing into the cache arrays from multiple threads like this should cause
 			// a lot of false sharing and cache trashing, but after profiling it seems
@@ -638,9 +628,10 @@ namespace Pathfinding {
 			return null;
 		}
 
-		/** Opens a node using Jump Point Search.
-		 * \see http://en.wikipedia.org/wiki/Jump_point_search
-		 */
+		/// <summary>
+		/// Opens a node using Jump Point Search.
+		/// See: http://en.wikipedia.org/wiki/Jump_point_search
+		/// </summary>
 		public void JPSOpen (Path path, PathNode pathNode, PathHandler handler) {
 			GridGraph gg = GetGridGraph(GraphIndex);
 

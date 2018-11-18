@@ -5,11 +5,10 @@ using System.Linq;
 using UnityEditor;
 
 namespace Pathfinding {
-	/**
-	 * Helper for enabling or disabling compiler directives.
-	 * Used only in the editor.
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Helper for enabling or disabling compiler directives.
+	/// Used only in the editor.
+	/// </summary>
 	public static class OptimizationHandler {
 		public class DefineDefinition {
 			public string name;
@@ -18,9 +17,10 @@ namespace Pathfinding {
 			public bool consistent;
 		}
 
-		/** Various build targets that Unity have deprecated.
-		 * There is apparently no way to figute out which these are without hard coding them.
-		 */
+		/// <summary>
+		/// Various build targets that Unity have deprecated.
+		/// There is apparently no way to figure out which these are without hard coding them.
+		/// </summary>
 		static readonly BuildTargetGroup[] deprecatedBuildTargets = new BuildTargetGroup[] {
 			BuildTargetGroup.Unknown,
 #if UNITY_5_4_OR_NEWER
@@ -30,6 +30,17 @@ namespace Pathfinding {
 			(BuildTargetGroup)5, /* PS3 */
 			(BuildTargetGroup)6, /* XBox360 */
 			(BuildTargetGroup)15, /* WP8 */
+#endif
+#if UNITY_2017_4_OR_NEWER
+			(BuildTargetGroup)2, /* WebPlayer */
+			(BuildTargetGroup)20, /* PSM */
+#endif
+#if UNITY_2018_1_OR_NEWER
+			(BuildTargetGroup)22, /* SamsungTV */
+			(BuildTargetGroup)24, /* WiiU */
+#endif
+#if UNITY_2018_2_OR_NEWER
+			(BuildTargetGroup)17, /// <summary>Tizen</summary>
 #endif
 		};
 

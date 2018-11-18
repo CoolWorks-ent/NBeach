@@ -3,32 +3,31 @@ using System;
 using System.Collections.Generic;
 
 namespace Pathfinding {
-	/** Radius path modifier for offsetting paths.
-	 * \ingroup modifiers
-	 *
-	 * The radius modifier will offset the path to create the effect
-	 * of adjusting it to the characters radius.
-	 * It gives good results on navmeshes which have not been offset with the
-	 * character radius during scan. Especially useful when characters with different
-	 * radiuses are used on the same navmesh. It is also useful when using
-	 * rvo local avoidance with the RVONavmesh since the RVONavmesh assumes the
-	 * navmesh has not been offset with the character radius.
-	 *
-	 * This modifier assumes all paths are in the XZ plane (i.e Y axis is up).
-	 *
-	 * It is recommended to use the Funnel Modifier on the path as well.
-	 *
-	 * \shadowimage{radius_modifier.png}
-	 *
-	 * \see RVONavmesh
-	 * \see modifiers
-	 *
-	 * Also check out the howto page "Using Modifiers".
-	 *
-	 * \astarpro
-	 *
-	 * \since Added in 3.2.6
-	 */
+	/// <summary>
+	/// Radius path modifier for offsetting paths.
+	/// \ingroup modifiers
+	///
+	/// The radius modifier will offset the path to create the effect
+	/// of adjusting it to the characters radius.
+	/// It gives good results on navmeshes which have not been offset with the
+	/// character radius during scan. Especially useful when characters with different
+	/// radiuses are used on the same navmesh. It is also useful when using
+	/// rvo local avoidance with the RVONavmesh since the RVONavmesh assumes the
+	/// navmesh has not been offset with the character radius.
+	///
+	/// This modifier assumes all paths are in the XZ plane (i.e Y axis is up).
+	///
+	/// It is recommended to use the Funnel Modifier on the path as well.
+	///
+	/// [Open online documentation to see images]
+	///
+	/// See: RVONavmesh
+	/// See: modifiers
+	///
+	/// Also check out the howto page "Using Modifiers".
+	///
+	/// \since Added in 3.2.6
+	/// </summary>
 	[AddComponentMenu("Pathfinding/Modifiers/Radius Offset")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_radius_modifier.php")]
 	public class RadiusModifier : MonoModifier {
@@ -41,31 +40,34 @@ namespace Pathfinding {
 
 		public override int Order { get { return 41; } }
 
-		/** Radius of the circle segments generated.
-		 * Usually similar to the character radius.
-		 */
+		/// <summary>
+		/// Radius of the circle segments generated.
+		/// Usually similar to the character radius.
+		/// </summary>
 		public float radius = 1f;
 
-		/** Detail of generated circle segments.
-		 * Measured as steps per full circle.
-		 *
-		 * It is more performant to use a low value.
-		 * For movement, using a high value will barely improve path quality.
-		 */
+		/// <summary>
+		/// Detail of generated circle segments.
+		/// Measured as steps per full circle.
+		///
+		/// It is more performant to use a low value.
+		/// For movement, using a high value will barely improve path quality.
+		/// </summary>
 		public float detail = 10;
 
-		/** Calculates inner tangents for a pair of circles.
-		 * \param p1 Position of first circle
-		 * \param p2 Position of the second circle
-		 * \param r1 Radius of the first circle
-		 * \param r2 Radius of the second circle
-		 * \param a Angle from the line joining the centers of the circles to the inner tangents.
-		 * \param sigma World angle from p1 to p2 (in XZ space)
-		 *
-		 * Add \a a to \a sigma to get the first tangent angle, subtract \a a from \a sigma to get the second tangent angle.
-		 *
-		 * \returns True on success. False when the circles are overlapping.
-		 */
+		/// <summary>
+		/// Calculates inner tangents for a pair of circles.
+		///
+		/// Add a to sigma to get the first tangent angle, subtract a from sigma to get the second tangent angle.
+		///
+		/// Returns: True on success. False when the circles are overlapping.
+		/// </summary>
+		/// <param name="p1">Position of first circle</param>
+		/// <param name="p2">Position of the second circle</param>
+		/// <param name="r1">Radius of the first circle</param>
+		/// <param name="r2">Radius of the second circle</param>
+		/// <param name="a">Angle from the line joining the centers of the circles to the inner tangents.</param>
+		/// <param name="sigma">World angle from p1 to p2 (in XZ space)</param>
 		bool CalculateCircleInner (Vector3 p1, Vector3 p2, float r1, float r2, out float a, out float sigma) {
 			float dist = (p1-p2).magnitude;
 
@@ -81,18 +83,19 @@ namespace Pathfinding {
 			return true;
 		}
 
-		/** Calculates outer tangents for a pair of circles.
-		 * \param p1 Position of first circle
-		 * \param p2 Position of the second circle
-		 * \param r1 Radius of the first circle
-		 * \param r2 Radius of the second circle
-		 * \param a Angle from the line joining the centers of the circles to the inner tangents.
-		 * \param sigma World angle from p1 to p2 (in XZ space)
-		 *
-		 * Add \a a to \a sigma to get the first tangent angle, subtract \a a from \a sigma to get the second tangent angle.
-		 *
-		 * \returns True on success. False on failure (more specifically when |r1-r2| > |p1-p2| )
-		 */
+		/// <summary>
+		/// Calculates outer tangents for a pair of circles.
+		///
+		/// Add a to sigma to get the first tangent angle, subtract a from sigma to get the second tangent angle.
+		///
+		/// Returns: True on success. False on failure (more specifically when |r1-r2| > |p1-p2| )
+		/// </summary>
+		/// <param name="p1">Position of first circle</param>
+		/// <param name="p2">Position of the second circle</param>
+		/// <param name="r1">Radius of the first circle</param>
+		/// <param name="r2">Radius of the second circle</param>
+		/// <param name="a">Angle from the line joining the centers of the circles to the inner tangents.</param>
+		/// <param name="sigma">World angle from p1 to p2 (in XZ space)</param>
 		bool CalculateCircleOuter (Vector3 p1, Vector3 p2, float r1, float r2, out float a, out float sigma) {
 			float dist = (p1-p2).magnitude;
 
@@ -146,11 +149,11 @@ namespace Pathfinding {
 		float[] a2 = new float[10];
 		bool[] dir = new bool[10];
 
-		/** Apply this modifier on a raw Vector3 list */
+		/// <summary>Apply this modifier on a raw Vector3 list</summary>
 		public List<Vector3> Apply (List<Vector3> vs) {
 			if (vs == null || vs.Count < 3) return vs;
 
-			/** \todo Do something about these allocations */
+			/// <summary>TODO: Do something about these allocations</summary>
 			if (radi.Length < vs.Count) {
 				radi = new float[vs.Count];
 				a1 = new float[vs.Count];

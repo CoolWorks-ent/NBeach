@@ -5,41 +5,42 @@ using System;
 using System.Collections.Generic;
 
 namespace Pathfinding {
-	/** Finds all nodes within a specified distance from the start.
-	 * This class will search outwards from the start point and find all nodes which it costs less than ConstantPath.maxGScore to reach, this is usually the same as the distance to them multiplied with 1000
-	 *
-	 * The path can be called like:
-	 * \code
-	 * // Here you create a new path and set how far it should search. Null is for the callback, but the seeker will handle that
-	 * ConstantPath cpath = ConstantPath.Construct(transform.position, 2000, null);
-	 * // Set the seeker to search for the path (where mySeeker is a variable referencing a Seeker component)
-	 * mySeeker.StartPath(cpath, myCallbackFunction);
-	 * \endcode
-	 *
-	 * Then when getting the callback, all nodes will be stored in the variable ConstantPath.allNodes (remember that you need to cast it from Path to ConstantPath first to get the variable).
-	 *
-	 * This list will be sorted by the cost to reach that node (more specifically the G score if you are familiar with the terminology for search algorithms).
-	 * \shadowimage{constantPath.png}
-	 *
-	 * \ingroup paths
-	 * \astarpro
-	 *
-	 **/
+	/// <summary>
+	/// Finds all nodes within a specified distance from the start.
+	/// This class will search outwards from the start point and find all nodes which it costs less than ConstantPath.maxGScore to reach, this is usually the same as the distance to them multiplied with 1000
+	///
+	/// The path can be called like:
+	/// <code>
+	/// // Here you create a new path and set how far it should search. Null is for the callback, but the seeker will handle that
+	/// ConstantPath cpath = ConstantPath.Construct(transform.position, 2000, null);
+	/// // Set the seeker to search for the path (where mySeeker is a variable referencing a Seeker component)
+	/// mySeeker.StartPath(cpath, myCallbackFunction);
+	/// </code>
+	///
+	/// Then when getting the callback, all nodes will be stored in the variable ConstantPath.allNodes (remember that you need to cast it from Path to ConstantPath first to get the variable).
+	///
+	/// This list will be sorted by the cost to reach that node (more specifically the G score if you are familiar with the terminology for search algorithms).
+	/// [Open online documentation to see images]
+	///
+	/// \ingroup paths
+	/// </summary>
 	public class ConstantPath : Path {
 		public GraphNode startNode;
 		public Vector3 startPoint;
 		public Vector3 originalStartPoint;
 
-		/** Contains all nodes the path found.
-		 * This list will be sorted by G score (cost/distance to reach the node).
-		 */
+		/// <summary>
+		/// Contains all nodes the path found.
+		/// This list will be sorted by G score (cost/distance to reach the node).
+		/// </summary>
 		public List<GraphNode> allNodes;
 
-		/** Controls when the path should terminate.
-		 * This is set up automatically in the constructor to an instance of the Pathfinding.EndingConditionDistance class with a \a maxGScore is specified in the constructor.
-		 * If you want to use another ending condition.
-		 * \see Pathfinding.PathEndingCondition for examples
-		 */
+		/// <summary>
+		/// Controls when the path should terminate.
+		/// This is set up automatically in the constructor to an instance of the Pathfinding.EndingConditionDistance class with a maxGScore is specified in the constructor.
+		/// If you want to use another ending condition.
+		/// See: Pathfinding.PathEndingCondition for examples
+		/// </summary>
 		public PathEndingCondition endingCondition;
 
 		internal override bool FloodingPath {
@@ -48,14 +49,15 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Constructs a ConstantPath starting from the specified point.
-		 * \param start             From where the path will be started from (the closest node to that point will be used)
-		 * \param maxGScore			Searching will be stopped when a node has a G score greater than this
-		 * \param callback			Will be called when the path has completed, leave this to null if you use a Seeker to handle calls
-		 *
-		 * Searching will be stopped when a node has a G score (cost to reach it) greater or equal to \a maxGScore
-		 * in order words it will search all nodes with a cost to get there less than \a maxGScore.
-		 */
+		/// <summary>
+		/// Constructs a ConstantPath starting from the specified point.
+		///
+		/// Searching will be stopped when a node has a G score (cost to reach it) greater or equal to maxGScore
+		/// in order words it will search all nodes with a cost to get there less than maxGScore.
+		/// </summary>
+		/// <param name="start">From where the path will be started from (the closest node to that point will be used)</param>
+		/// <param name="maxGScore">Searching will be stopped when a node has a G score greater than this</param>
+		/// <param name="callback">Will be called when the path has completed, leave this to null if you use a Seeker to handle calls</param>
 		public static ConstantPath Construct (Vector3 start, int maxGScore, OnPathDelegate callback = null) {
 			var p = PathPool.GetPath<ConstantPath>();
 
@@ -63,7 +65,7 @@ namespace Pathfinding {
 			return p;
 		}
 
-		/** Sets up a ConstantPath starting from the specified point */
+		/// <summary>Sets up a ConstantPath starting from the specified point</summary>
 		protected void Setup (Vector3 start, int maxGScore, OnPathDelegate callback) {
 			this.callback = callback;
 			startPoint = start;
@@ -77,12 +79,13 @@ namespace Pathfinding {
 			if (allNodes != null) Util.ListPool<GraphNode>.Release(ref allNodes);
 		}
 
-		/** Reset the path to default values.
-		 * Clears the #allNodes list.
-		 * \note This does not reset the #endingCondition.
-		 *
-		 * Also sets #heuristic to Heuristic.None as it is the default value for this path type
-		 */
+		/// <summary>
+		/// Reset the path to default values.
+		/// Clears the <see cref="allNodes"/> list.
+		/// Note: This does not reset the <see cref="endingCondition"/>.
+		///
+		/// Also sets <see cref="heuristic"/> to Heuristic.None as it is the default value for this path type
+		/// </summary>
 		protected override void Reset () {
 			base.Reset();
 			allNodes = Util.ListPool<GraphNode>.Claim();
@@ -104,8 +107,10 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Initializes the path.
-		 * Sets up the open list and adds the first node to it */
+		/// <summary>
+		/// Initializes the path.
+		/// Sets up the open list and adds the first node to it
+		/// </summary>
 		protected override void Initialize () {
 			PathNode startRNode = pathHandler.GetPathNode(startNode);
 
@@ -203,15 +208,16 @@ namespace Pathfinding {
 		}
 	}
 
-	/** Target is found when the path is longer than a specified value.
-	 * Actually this is defined as when the current node's G score is >= a specified amount (EndingConditionDistance.maxGScore).\n
-	 * The G score is the cost from the start node to the current node, so an area with a higher penalty (weight) will add more to the G score.
-	 * However the G score is usually just the shortest distance from the start to the current node.
-	 *
-	 * \see Pathfinding.ConstantPath which uses this ending condition
-	 */
+	/// <summary>
+	/// Target is found when the path is longer than a specified value.
+	/// Actually this is defined as when the current node's G score is >= a specified amount (EndingConditionDistance.maxGScore).\n
+	/// The G score is the cost from the start node to the current node, so an area with a higher penalty (weight) will add more to the G score.
+	/// However the G score is usually just the shortest distance from the start to the current node.
+	///
+	/// See: Pathfinding.ConstantPath which uses this ending condition
+	/// </summary>
 	public class EndingConditionDistance : PathEndingCondition {
-		/** Max G score a node may have */
+		/// <summary>Max G score a node may have</summary>
 		public int maxGScore = 100;
 
 		//public EndingConditionDistance () {}

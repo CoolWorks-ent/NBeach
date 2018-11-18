@@ -4,13 +4,14 @@ using UnityEngine;
 namespace Pathfinding.Examples {
 	using Pathfinding;
 
-	/** Example of how to handle off-mesh link traversal.
-	 * This is used in the "Example4_Recast_Navmesh2" example scene.
-	 *
-	 * \see #Pathfinding.RichAI
-	 * \see #Pathfinding.RichAI.onTraverseOffMeshLink
-	 * \see #Pathfinding.AnimationLink
-	 */
+	/// <summary>
+	/// Example of how to handle off-mesh link traversal.
+	/// This is used in the "Example4_Recast_Navmesh2" example scene.
+	///
+	/// See: <see cref="Pathfinding.RichAI"/>
+	/// See: <see cref="Pathfinding.RichAI.onTraverseOffMeshLink"/>
+	/// See: <see cref="Pathfinding.AnimationLink"/>
+	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_examples_1_1_animation_link_traverser.php")]
 	public class AnimationLinkTraverser : VersionedMonoBehaviour {
 		public Animation anim;

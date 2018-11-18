@@ -3,21 +3,18 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Pathfinding {
-	/** Axis Aligned Bounding Box Tree.
-	 * Holds a bounding box tree of RecastMeshObj components.\n
-	 * Note that it assumes that once an object has been added, it stays at the same
-	 * world position. If it is moved, then it might not be able to be found.
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Axis Aligned Bounding Box Tree.
+	/// Holds a bounding box tree of RecastMeshObj components.\n
+	/// Note that it assumes that once an object has been added, it stays at the same
+	/// world position. If it is moved, then it might not be able to be found.
+	/// </summary>
 	public class RecastBBTree {
 		RecastBBTreeBox root;
 
-		/** Queries the tree for all RecastMeshObjs inside the specified bounds.
-		 *
-		 * \param bounds World space bounds to search within
-		 * \param buffer The results will be added to the buffer
-		 */
+		/// <summary>Queries the tree for all RecastMeshObjs inside the specified bounds.</summary>
+		/// <param name="bounds">World space bounds to search within</param>
+		/// <param name="buffer">The results will be added to the buffer</param>
 		public void QueryInBounds (Rect bounds, List<RecastMeshObj> buffer) {
 			if (root == null) return;
 			QueryBoxInBounds(root, bounds, buffer);
@@ -42,11 +39,12 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Removes the specified mesh from the tree.
-		 * Assumes that it has the correct bounds information.
-		 *
-		 * \returns True if the mesh was removed from the tree, false otherwise.
-		 */
+		/// <summary>
+		/// Removes the specified mesh from the tree.
+		/// Assumes that it has the correct bounds information.
+		///
+		/// Returns: True if the mesh was removed from the tree, false otherwise.
+		/// </summary>
 		public bool Remove (RecastMeshObj mesh) {
 			if (mesh == null) throw new ArgumentNullException("mesh");
 
@@ -94,7 +92,7 @@ namespace Pathfinding {
 			return c;
 		}
 
-		/** Inserts a RecastMeshObj in the tree at its current position */
+		/// <summary>Inserts a RecastMeshObj in the tree at its current position</summary>
 		public void Insert (RecastMeshObj mesh) {
 			var box = new RecastBBTreeBox(mesh);
 
@@ -137,7 +135,7 @@ namespace Pathfinding {
 			return (r.xMax > r2.xMin && r.yMax > r2.yMin && r2.xMax > r.xMin && r2.yMax > r.yMin);
 		}
 
-		/** Returns the difference in area between \a r and \a r expanded to contain \a r2 */
+		/// <summary>Returns the difference in area between r and r expanded to contain r2</summary>
 		static float ExpansionRequired (Rect r, Rect r2) {
 			float xMin = Mathf.Min(r.xMin, r2.xMin);
 			float xMax = Mathf.Max(r.xMax, r2.xMax);
@@ -147,7 +145,7 @@ namespace Pathfinding {
 			return (xMax-xMin)*(yMax-yMin)-RectArea(r);
 		}
 
-		/** Returns a new rect which contains both \a r and \a r2 */
+		/// <summary>Returns a new rect which contains both r and r2</summary>
 		static Rect ExpandToContain (Rect r, Rect r2) {
 			float xMin = Mathf.Min(r.xMin, r2.xMin);
 			float xMax = Mathf.Max(r.xMax, r2.xMax);
@@ -157,7 +155,7 @@ namespace Pathfinding {
 			return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
 		}
 
-		/** Returns the area of a rect */
+		/// <summary>Returns the area of a rect</summary>
 		static float RectArea (Rect r) {
 			return r.width*r.height;
 		}

@@ -32,8 +32,7 @@ namespace Pathfinding {
 				}
 			}
 
-			PropertyField("height");
-			Clamp("height", 0);
+			FloatField("height", min: 0f);
 
 			PropertyField("center");
 
@@ -41,8 +40,7 @@ namespace Pathfinding {
 			PropertyField("updateDistance");
 			if (PropertyField("useRotationAndScale")) {
 				EditorGUI.indentLevel++;
-				PropertyField("updateRotationDistance");
-				Clamp("updateRotationDistance", 0, 180);
+				FloatField("updateRotationDistance", min: 0f, max: 180f);
 				EditorGUI.indentLevel--;
 			}
 
@@ -55,11 +53,6 @@ namespace Pathfinding {
 				foreach (NavmeshCut tg in targets) {
 					tg.ForceUpdate();
 				}
-			}
-
-			// Only the TileHandlerHelper uses the OnEnableCallback, so use that as a quick test to see if one exists
-			if (Application.isPlaying && !NavmeshClipper.AnyEnableListeners) {
-				EditorGUILayout.HelpBox("No active TileHandlerHelper component exists in the scene. NavmeshCut components will not affect any graphs", MessageType.Error);
 			}
 		}
 	}
