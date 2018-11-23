@@ -75,18 +75,10 @@ public class Darkness : MonoBehaviour {
         }
     }
 
-    /* public void SetMovementParameters(bool canMove, float repathRate, float maxSpeed)
-    {
-        aIRichPath.canMove = canMove;
-        aIRichPath.repathRate = repathRate;
-        aIRichPath.maxSpeed = maxSpeed;
-    }*/
-
     public bool TargetWithinDistance()
     {
         if(Vector3.Distance(transform.position, target.position) <= (float)attackInitiationRange && canAttack)
         {
-            canAttack = false;
             return true;
         }
         else return false;

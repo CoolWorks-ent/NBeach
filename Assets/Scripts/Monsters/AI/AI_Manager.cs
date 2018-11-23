@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,11 +7,13 @@ public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
 	public Dictionary<int, Darkness> ActiveDarkness;
-	private Queue<int> AttackQueue;
+
 	[SerializeField]
 	private int darknessQueueID, darknessConcurrentAttackLimit, attacksCurrentlyProcessed;
 	public int maxEnemyCount;
     public int minEnemyCount;
+
+	private List<int> enemyEngagement;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
 	{
@@ -30,10 +33,11 @@ public class AI_Manager : MonoBehaviour {
 		else instance = this;
 
 		ActiveDarkness = new Dictionary<int, Darkness>();
+		enemyEngagement = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
-		AttackRequest += UpdateAttackRequest;
-		AttackQueue = new Queue<int>();
+		AttackRequest += ProcessAttackRequest;
+		ChangeState += DarknessStateChange;
 		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
 
@@ -43,54 +47,46 @@ public class AI_Manager : MonoBehaviour {
 			ProcessAttackRequest();*/
 	}
 
+	private void DarknessStateChange(Dark_State toState, Darkness fromController, Action<bool, Dark_State, Darkness> callback)
+	{
+		switch(toState.stateType)
+		{
+			case Dark_State.StateType.CHASING:
+				if(fromController.canAttack)
+				{
+					callback(true, toState, fromController);
+				}
+				else callback(false, toState, fromController);
+				break;
+			case Dark_State.StateType.WANDER:
+				callback(true, toState, fromController);
+				break;
+
+		}
+	}
+
 	///<summary>Notify AI manager to add a Darkness unit to the queue to decide which units can attack next</summary>
-	private void UpdateAttackRequest(int iD, bool requested)
+	private void ProcessAttackRequest(int iD, bool requested)
 	{
 		if(!requested)
 		{
-			Darkness dark;
-			if(ActiveDarkness.TryGetValue(iD, out dark))
+			if(enemyEngagement.Count < 3)
 			{
-				dark.attackRequested = true;
-				AttackQueue.Enqueue(iD); 
+				Darkness dark;
+				if(ActiveDarkness.TryGetValue(iD, out dark))
+				{
+					dark.attackRequested = true;
+					enemyEngagement.Add(iD);
+					//AttackQueue.Enqueue(iD); 
+				}
+				Debug.Log("<b><color=green>AI Manager:</color></b> Darkness #" + iD + " request has been processed");
 			}
-			Debug.Log("<b><color=green>AI Manager:</color></b> Darkness #" + iD + " request has been processed");
 		}
 		else
 		{
 			Debug.LogWarning("<b><color=red>AI Manager:</color></b> Darkness #" + iD + " has already requested to attack");
-			ProcessAttackRequest();
+			//ProcessAttackRequest();
 		} 
-	}
-
-	///<summary>
-	///Checks the status of the AI on the top of the queue to see if the attack has finished or was interrupted. 
-	///Once a result has been sent the units will be dequeued.
-	///</summary>
-	private void ProcessAttackRequest()
-	{
-		//TODO check if current darkness 
-		if(attacksCurrentlyProcessed <= darknessConcurrentAttackLimit)
-		{
-			if(ActiveDarkness.ContainsKey(AttackQueue.Peek()))
-			{
-				ActiveDarkness[AttackQueue.Peek()].canAttack = true;
-				attacksCurrentlyProcessed++;
-				AttackQueue.Dequeue();
-				ProcessAttackRequest();
-			}
-			else 
-			{
-				AttackQueue.Dequeue();
-			}
-		}
-		// if(AttackQueue.Count >= 0 && attackConfirmations <= attackPriorityCount)
-		// {
-		// 	for(int i = 0; i <= darknessAttackCount || i <= AttackQueue.Count; i++)
-		// 	{
-		// 		attackConfirmations++;	
-		// 	}
-		// }
 	}
 
 	private void AddtoDarknessList(Darkness updatedDarkness)
@@ -105,6 +101,8 @@ public class AI_Manager : MonoBehaviour {
     private void RemoveFromDarknessList(int updatedDarkness)
     {
         ActiveDarkness.Remove(updatedDarkness);
+		if(ActiveDarkness[updatedDarkness].canAttack)
+			enemyEngagement.Remove(ActiveDarkness[updatedDarkness].queueID);
     }
 
 	public void KillAllDarkness()
@@ -122,23 +120,25 @@ public class AI_Manager : MonoBehaviour {
 		yield return new WaitForSeconds(timer);
 	}
 
+#region AIManagerEvents
 	public delegate void AIEvent<T>(T obj);
 	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
+	public delegate void AIEvent<T1,T2, T3>(T1 obj1, T2 obj2, T3 obj3);
 	public static event AIEvent<int, bool> AttackRequest;
-	public static event AIEvent<int> AttackEnded;
+	public static event AIEvent<Dark_State, Darkness, Action<bool, Dark_State, Darkness>> ChangeState;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<int> RemoveDarkness;
 
-	public static void OnAttackRequest(int iD, bool request)
+	public static void OnAttackRequest(int queueID, bool attackRequested)
 	{
 		if(AttackRequest != null)
-			AttackRequest(iD, request);			
+			AttackRequest(queueID, attackRequested);
 	}
 
-	public static void OnAttackEnded(int d)
+	public static void OnChangeState(Dark_State to, Darkness from, Action<bool, Dark_State, Darkness> approved)
 	{
-		if(AttackEnded != null)
-			AttackEnded(d);
+		if(ChangeState != null)
+			ChangeState(to, from, approved);
 	}
 
 	public static void OnDarknessAdded(Darkness d)
@@ -151,4 +151,5 @@ public class AI_Manager : MonoBehaviour {
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
 	}
+	#endregion
 }

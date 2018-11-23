@@ -5,21 +5,20 @@ public class ChaseDecision : AI_Decision
 {
     public override bool Decide(Darkness controller)
     {   
-        return ApproachTarget(controller);
+        return ApproachPlayer(controller);
     }
 
-    public bool ApproachTarget(Darkness controller)
+    public bool ApproachPlayer(Darkness controller)
     {
-        if(!controller.TargetWithinDistance())//Vector3.Distance(controller.target.position, controller.transform.position) >= controller.attackInitiationRange)
-        {
-            return true; //keep chasing if not in initiation range
-        }
-        else 
+        if(controller.TargetWithinDistance())
         {
             Debug.Log("<b><color=blue>Chase:</color></b> Darkness #" + controller.queueID + " request has been processed");
             AI_Manager.OnAttackRequest(controller.queueID, controller.attackRequested);
+            return true;
+        }
+        else 
+        {
             return false;
         }
-        
     }
 }

@@ -9,7 +9,7 @@ public class IdleState : Dark_State
     public float idleTime;
     public override void InitializeState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
         
         float idleTime = controller.actionIdle;

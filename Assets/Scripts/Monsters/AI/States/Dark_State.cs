@@ -20,18 +20,28 @@ public abstract class Dark_State : ScriptableObject
         {
             bool decisionSucceeded = transitions[i].decision.Decide(controller);
             if(decisionSucceeded)
-                StateTransfer(transitions[i].trueState, controller);
-            else StateTransfer(transitions[i].falseState, controller);
+                InitiateStateTransfer(transitions[i].trueState, controller);
+            else InitiateStateTransfer(transitions[i].falseState, controller);
         }   
     }
 
-    private void StateTransfer(Dark_State newState, Darkness controller)
+    private void InitiateStateTransfer(Dark_State newState, Darkness controller)
     {
         if(newState != controller.currentState)
         {
+            //ExitState(controller);
+            //controller.ChangeState(newState);
+            //Debug.LogWarning("<b><i>Changing states from</i></b> " + controller.currentState.name + " to new state ->" + newState.name);
+            AI_Manager.OnChangeState(newState, controller, ProcessStateChange);
+        }
+    }
+
+    private void ProcessStateChange(bool approved, Dark_State approvedState, Darkness controller)
+    {
+        if(approved)
+        {
             ExitState(controller);
-            controller.ChangeState(newState);
-            Debug.LogWarning("<b><i>Changing states from</i></b> " + controller.currentState.name + " to new state ->" + newState.name);
+            controller.ChangeState(approvedState);
         }
     }
 }

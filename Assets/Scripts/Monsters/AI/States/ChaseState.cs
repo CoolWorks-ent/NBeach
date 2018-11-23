@@ -32,6 +32,6 @@ public class ChaseState : Dark_State
 
     protected override void ExitState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
+        controller.aIRichPath.canMove = false;
     }
 }

@@ -9,43 +9,28 @@ public class WanderNearState : Dark_State
     [Range(1.0f,10.0f)]
     public float minSpeedRange, maxSpeedRange;
 
-    [Range(2.05f, 14.0f)]
-    public float wanderRange;
+    [Range(-14.0f, 14.0f)]
+    public float minWanderRange, maxWanderRange;
 
 
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);
-        
-        //controller.aIRichPath.canMove = true;
-        //controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
-        //controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
+        controller.aIRichPath.canMove = true;
+        controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
+        controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
+        float range = Random.RandomRange(minWanderRange, maxWanderRange);
+        controller.aIDestSet.target.position = new Vector3(controller.target.position.x + range, controller.transform.position.y, controller.transform.position.z + Mathf.Abs(range)/2);
     }
 
     public override void UpdateState(Darkness controller)
     {
-        /* if(controller.aIMovement != null) 
-            controller.aIMovement.aI.SearchPath();
-        else Debug.LogError("AI not set. Attach IAstar component to object");*/
-        /* if(controller.TargetWithinDistance(controller.attackInitiationRange*2))
-        {
-            AI_Manager.OnAttackRequest(controller.queueID);
-            if(controller.canAttack)
-            {
-                ExitState(controller);
-                controller.ChangeState(EnemyState.CHASING);
-            }
-            else 
-            {
-                ExitState(controller); 
-                controller.ChangeState(EnemyState.IDLE);
-            }
-        }*/
+       CheckTransitions(controller);
     }
 
     protected override void ExitState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
-        //controller.ChangeState(EnemyState.IDLE);
+        controller.aIDestSet.target = controller.target;
+        controller.aIRichPath.canMove = false;
     }
 }
