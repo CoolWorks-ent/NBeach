@@ -17,6 +17,7 @@ public class Darkness : MonoBehaviour {
     public AIDestinationSetter aIDestSet;
 
     public GameObject deathFX;
+    public Dark_State DeathState;
 
     //public Pathfinding.RichAI aIRichPath;
 
@@ -100,6 +101,7 @@ public class Darkness : MonoBehaviour {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
+                AI_Manager.RemoveDarkness(this);
                 //ChangeState(DeathState);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }

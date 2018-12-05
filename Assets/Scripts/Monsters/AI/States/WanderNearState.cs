@@ -12,6 +12,11 @@ public class WanderNearState : Dark_State
     [Range(-14.0f, 14.0f)]
     public float minWanderRange, maxWanderRange;
 
+    protected override void Awake()
+    {
+        stateType = StateType.WANDER;
+        base.Awake();
+    }
 
     public override void InitializeState(Darkness controller)
     {

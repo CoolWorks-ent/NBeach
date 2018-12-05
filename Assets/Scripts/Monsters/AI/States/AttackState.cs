@@ -7,6 +7,12 @@ public class AttackState : Dark_State
     [Range(1, 3)]
     public int attackSpeedModifier;
 
+    protected override void Awake()
+    {
+        stateType = StateType.ATTACK;
+        base.Awake();
+    }
+
     public override void InitializeState(Darkness controller)
     {
         //controller.aIRichPath.canMove = false;

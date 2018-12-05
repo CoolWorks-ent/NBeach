@@ -13,6 +13,11 @@ public abstract class Dark_State : ScriptableObject
     public abstract void UpdateState(Darkness controller);
 
     protected abstract void ExitState(Darkness controller);
+
+    protected virtual void Awake()
+    {
+        AI_Manager.RemoveDarkness += RemoveDarkness;
+    }
         
     protected void CheckTransitions(Darkness controller)
     {
@@ -25,7 +30,7 @@ public abstract class Dark_State : ScriptableObject
         }   
     }
 
-    private void InitiateStateTransfer(Dark_State newState, Darkness controller)
+    protected void InitiateStateTransfer(Dark_State newState, Darkness controller)
     {
         if(newState != controller.currentState)
         {
@@ -36,12 +41,21 @@ public abstract class Dark_State : ScriptableObject
         }
     }
 
-    private void ProcessStateChange(bool approved, Dark_State approvedState, Darkness controller)
+    protected void ProcessStateChange(bool approved, Dark_State approvedState, Darkness controller)
     {
         if(approved)
         {
             ExitState(controller);
             controller.ChangeState(approvedState);
+        }
+    }
+
+    protected void RemoveDarkness(Darkness controller)
+    {
+        if(stateType != Dark_State.StateType.DEATH)
+        {
+            this.ExitState(controller);
+            controller.ChangeState(controller.DeathState);
         }
     }
 }

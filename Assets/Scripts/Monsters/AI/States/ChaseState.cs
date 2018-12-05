@@ -9,6 +9,12 @@ public class ChaseState : Dark_State
     [Range(1.0f,10.0f)]
     public float minSpeedRange, maxSpeedRange;
 
+    protected override void Awake()
+    {
+        stateType = StateType.CHASING;
+        base.Awake();
+    }
+
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);

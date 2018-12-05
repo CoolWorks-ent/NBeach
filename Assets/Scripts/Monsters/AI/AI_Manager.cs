@@ -9,7 +9,7 @@ public class AI_Manager : MonoBehaviour {
 	public Dictionary<int, Darkness> ActiveDarkness;
 
 	[SerializeField]
-	private int darknessQueueID, darknessConcurrentAttackLimit, attacksCurrentlyProcessed;
+	private int darknessIDCounter, darknessConcurrentAttackLimit, attacksCurrentlyProcessed;
 	public int maxEnemyCount;
     public int minEnemyCount;
 
@@ -23,8 +23,8 @@ public class AI_Manager : MonoBehaviour {
 	void Awake()
 	{
 		darknessConcurrentAttackLimit = 2;
-		darknessQueueID = 0;
-		maxEnemyCount = 2;
+		darknessIDCounter = 0;
+		maxEnemyCount = 5;
         minEnemyCount = 3;
 		if(instance != null && instance != this)
 		{
@@ -52,15 +52,15 @@ public class AI_Manager : MonoBehaviour {
 		switch(toState.stateType)
 		{
 			case Dark_State.StateType.CHASING:
-				if(fromController.canAttack)
+				if(fromController.canAttack && enemyEngagement.Count <= darknessConcurrentAttackLimit)
 				{
 					callback(true, toState, fromController);
 				}
 				else callback(false, toState, fromController);
 				break;
-			case Dark_State.StateType.WANDER:
+			/*case Dark_State.StateType.WANDER:
 				callback(true, toState, fromController);
-				break;
+				break;*/
 
 		}
 	}
@@ -91,18 +91,18 @@ public class AI_Manager : MonoBehaviour {
 
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
-		darknessQueueID++;
-		ActiveDarkness.Add(darknessQueueID, updatedDarkness);
-		updatedDarkness.queueID = darknessQueueID;
+		darknessIDCounter++;
+		ActiveDarkness.Add(darknessIDCounter, updatedDarkness);
+		updatedDarkness.queueID = darknessIDCounter;
 		updatedDarkness.target = player;
 		//updatedDarkness.GetComponent<AI_Movement>().target = player;
 	}
 
-    private void RemoveFromDarknessList(int updatedDarkness)
+    private void RemoveFromDarknessList(Darkness updatedDarkness)
     {
-        ActiveDarkness.Remove(updatedDarkness);
-		if(ActiveDarkness[updatedDarkness].canAttack)
-			enemyEngagement.Remove(ActiveDarkness[updatedDarkness].queueID);
+		if(ActiveDarkness[updatedDarkness.queueID].canAttack)
+			enemyEngagement.Remove(updatedDarkness.queueID);
+        ActiveDarkness.Remove(updatedDarkness.queueID);
     }
 
 	public void KillAllDarkness()
@@ -110,7 +110,7 @@ public class AI_Manager : MonoBehaviour {
         Debug.Log("[AI] All Darkness AI kill call");
         foreach(KeyValuePair<int, Darkness>dark in ActiveDarkness)
         {
-            Destroy(dark.Value);
+			OnDarknessRemoved(dark.Value);
             ActiveDarkness.Remove(dark.Key);
         }
     }
@@ -127,7 +127,7 @@ public class AI_Manager : MonoBehaviour {
 	public static event AIEvent<int, bool> AttackRequest;
 	public static event AIEvent<Dark_State, Darkness, Action<bool, Dark_State, Darkness>> ChangeState;
 	public static event AIEvent<Darkness> AddDarkness;
-	public static event AIEvent<int> RemoveDarkness;
+	public static event AIEvent<Darkness> RemoveDarkness;
 
 	public static void OnAttackRequest(int queueID, bool attackRequested)
 	{
@@ -146,7 +146,7 @@ public class AI_Manager : MonoBehaviour {
 		if(AddDarkness != null)
 			AddDarkness(d);
 	}
-	public static void OnDarknessRemoved(int d)
+	public static void OnDarknessRemoved(Darkness d)
 	{
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
