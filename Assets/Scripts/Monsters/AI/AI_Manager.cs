@@ -39,7 +39,7 @@ public class AI_Manager : MonoBehaviour {
 		AddDarkness += AddtoDarknessList;
 		//RemoveDarkness += RemoveFromDarknessList;
 		AttackRequest += ProcessAttackRequest;
-		ChangeState += DarknessStateChange;
+		//ChangeState += DarknessStateChange;
 		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
 
@@ -49,7 +49,7 @@ public class AI_Manager : MonoBehaviour {
 			ProcessAttackRequest();*/
 	}
 
-	public bool DarknessStateChange(Dark_State.StateType toState, Dark_State fromState, Darkness fromController)//Dark_State toState, Darkness fromController, Action<bool, Dark_State, Darkness> callback)
+	public bool DarknessStateChange(Dark_State.StateType toState, Darkness fromController)//Dark_State toState, Darkness fromController, Action<bool, Dark_State, Darkness> callback)
 	{
 		//Debug.LogWarning(String.Format("Darkness {0} received request to change from {2} state to {1} state ",fromController.queueID,toState.stateType,fromController.currentState.stateType));
 		switch(toState)//.stateType)
@@ -79,6 +79,7 @@ public class AI_Manager : MonoBehaviour {
 				else return false;
 				break;
 		}
+		return false;
 	}
 
 	///<summary>Notify AI manager to add a Darkness unit to the queue to decide which units can attack next</summary>

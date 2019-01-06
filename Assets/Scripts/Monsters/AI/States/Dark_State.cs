@@ -31,14 +31,22 @@ public abstract class Dark_State : ScriptableObject
         {
             bool decisionResult = transitions[i].decision.Decide(controller);
             if(decisionResult) //&& transitions[i].trueState.stateType != controller.currentState.stateType)
-                InitiateStateTransfer(transitions[i].trueState, controller);
+            {
+                if(AI_Manager.Instance.DarknessStateChange(transitions[i].trueState.stateType, controller))
+                    ProcessStateChange(true,transitions[i].trueState, controller);
+                //InitiateStateTransfer(transitions[i].trueState, controller);
+            }
             else if(!decisionResult) //&& transitions[i].falseState.stateType != controller.currentState.stateType)
-                InitiateStateTransfer(transitions[i].falseState, controller);
+            {
+                if(AI_Manager.Instance.DarknessStateChange(transitions[i].falseState.stateType, controller))
+                    ProcessStateChange(true,transitions[i].falseState, controller);
+                //InitiateStateTransfer(transitions[i].falseState, controller);
+            }
             //else continue;
         }   
     }
 
-    protected void InitiateStateTransfer(Dark_State newState, Darkness controller)
+    protected void InitiateStateTransfer(Dark_State newState, Darkness controller) 
     {
         //if(newState != controller.currentState)
         //{
