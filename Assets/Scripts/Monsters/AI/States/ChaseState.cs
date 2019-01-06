@@ -28,12 +28,6 @@ public class ChaseState : Dark_State
         //controller.aIMovement.target = controller.target;
         //controller.aIMovement.UpdatePath();
         CheckTransitions(controller);
-        /*if(controller.TargetWithinDistance(controller.attackInitiationRange))
-        {
-            AI_Manager.OnAttackRequest(controller.queueID);
-            ExitState(controller);
-            controller.ChangeState(EnemyState.ATTACK);
-        }*/
     }
 
     protected override void ExitState(Darkness controller)

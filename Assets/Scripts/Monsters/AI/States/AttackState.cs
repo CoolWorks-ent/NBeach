@@ -17,7 +17,7 @@ public class AttackState : Dark_State
     {
         //controller.aIRichPath.canMove = false;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
-        //controller.animeController.SetTrigger(controller.attackHash);
+        controller.animeController.SetTrigger(controller.attackHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));
     }
 
@@ -25,12 +25,11 @@ public class AttackState : Dark_State
     {
         //controller.animeController.SetTrigger(controller.attackHash);
         //controller.aIRichPath.maxSpeed /= attackSpeedModifier;
-        
     }
 
     protected override void ExitState(Darkness controller)
     {
-        controller.animeController.SetBool(controller.attackAfterHash, true);   
+        controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 
     protected IEnumerator IdleTime(Darkness controller, float idleTime)
@@ -38,5 +37,4 @@ public class AttackState : Dark_State
         yield return AI_Manager.Instance.WaitTimer(idleTime);
         CheckTransitions(controller);
     }
-
 }

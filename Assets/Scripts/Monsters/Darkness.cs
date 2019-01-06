@@ -32,19 +32,25 @@ public class Darkness : MonoBehaviour {
     public Dark_State previousState, currentState;
     public RichAI aIRichPath;
 
-    public bool canAttack, idleFinished, attackRequested, updateStates;
+    public bool canAttack, attackRequested, updateStates, clearedToMove;
+
+    void Awake()
+    {
+        actionIdle = attackInitiationRange = 3;
+        canAttack = attackRequested = clearedToMove = false;
+        queueID = 0;
+        updateStates = true;
+        stateUpdateRate = 0.5f;
+    }
 
     void Start () {
-        actionIdle = attackInitiationRange = 3;
-        canAttack = idleFinished = attackRequested = false;
-        queueID = 0;
+        AI_Manager.OnDarknessAdded(this);
         animeController = GetComponentInChildren<Animator>();
         //aIMovement = GetComponent<AI_Movement>();
         aIRichPath = GetComponent<RichAI>();
+        sekr = GetComponent<Seeker>();
         aIDestSet = GetComponent<AIDestinationSetter>();
         currentState.InitializeState(this);
-        updateStates = true;
-        stateUpdateRate = 0.5f;
         StartCoroutine(ExecuteCurrentState());
         aIDestSet.target = target;
 	}
@@ -96,12 +102,12 @@ public class Darkness : MonoBehaviour {
         {
             Debug.Log("Darkness collided with Player");
         }
-        else if (collider.gameObject.tag == "Projectile")
+        else if (collider.gameObject.tag == "Player Attack")
         {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
-                AI_Manager.RemoveDarkness(this);
+                AI_Manager.OnDarknessRemoved(this);
                 //ChangeState(DeathState);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }

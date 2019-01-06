@@ -24,9 +24,8 @@ public class DeathState : Dark_State
 
     protected override void ExitState(Darkness controller)
     {
-        AI_Manager.OnDarknessRemoved(controller.queueID);
+        //AI_Manager.OnDarknessRemoved(controller);
     }
-
     
     IEnumerator deathRoutine(Darkness controller)
     {
@@ -45,6 +44,7 @@ public class DeathState : Dark_State
         }
        
         //yield return new WaitForSeconds(fxTime);
+        AI_Manager.Instance.RemoveFromDarknessList(controller);
         Destroy(controller.gameObject);
         yield return 0;
     }

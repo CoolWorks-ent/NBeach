@@ -13,7 +13,7 @@ public class AttackDecision : AI_Decision
     /// </summary>
     private bool CanAttack(Darkness controller)
     {
-        if(controller.TargetWithinDistance() && controller.canAttack)
+        if(controller.TargetWithinDistance() && AI_Manager.Instance.CanMove(controller.queueID))
         {
             return true;
         }

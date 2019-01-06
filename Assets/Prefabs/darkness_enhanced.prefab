@@ -682,7 +682,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 195.8648, y: 53.03, z: 103.5387}
+  m_LocalPosition: {x: 190.43283, y: 53.03, z: 94.57671}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4693482682022224}
@@ -872,6 +872,7 @@ MonoBehaviour:
   sekr: {fileID: 0}
   aIDestSet: {fileID: 0}
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
+  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   animeController: {fileID: 0}
   attackHash: 1080829965
   attackAfterHash: 530937694

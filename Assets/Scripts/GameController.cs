@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum GameState { IsPlaying, IsPaused, IsOver, InMenu}
+public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused}
 
 public class GameController : MonoBehaviour {
 
@@ -129,6 +129,7 @@ public class GameController : MonoBehaviour {
          * load different resources based upon the Scene loaded
          */
         EventManager.StartListening("Player_Stop", ResetPlayer);
+        EventManager.StartListening("PauseWorld", OnWorldPaused);
         //timeManager = GetComponent<TimeManager>();
         Time.fixedDeltaTime = Time.timeScale * .02f;
 
@@ -180,6 +181,21 @@ public class GameController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        //Press 'W' to pause the game's world state and update. Causes everything to stop moving except for the player.
+        if(Input.GetKeyDown(KeyCode.W))
+        {
+            if (gameState == GameState.IsPlaying)
+            {
+                gameState = GameState.IsWorldPaused;
+                EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+            }
+            else if (gameState == GameState.IsWorldPaused)
+            {
+                gameState = GameState.IsPlaying;
+                EventManager.TriggerEvent("ResumeWorld", "ResumeWorld");
+            }
         }
 
         //if "P" pressed, pause spline
@@ -243,6 +259,88 @@ public class GameController : MonoBehaviour {
         playerControl.Reset();
         //cancel FX
         //cancel powerUps
+    }
+
+    private void OnWorldPaused(string evt)
+    {
+        if (gameState == GameState.IsWorldPaused)
+        {
+            Debug.Log("World State UnPaused");
+            gameState = GameState.IsPlaying;
+            soundManager.ResumeBGAudio();
+        }
+        else
+        { 
+            Debug.Log("World State Paused");
+            gameState = GameState.IsWorldPaused;
+            //Also PAUSE BG AUDIO
+            soundManager.PauseBGAudio();
+        }
+    }
+    /// <summary>
+    ///  Scene Skip Implementation
+    ///  1. Determine the new time to skip the scene too
+    ///  2. Turn on player's camSpline until they are in the proper position for that stage or time in the level. (unless there is a way to skip the spline to the player's point...)
+    /// (possibly use the start percentage and change it to match the new time
+    ///  3. Change the BGM playback position to the new time 
+    ///  4. Call function that start this section of the level
+    /// </summary>
+    /// <param name="evt"></param>
+    /// <param name="newBgmPlaybackTime"></param>
+    public void SceneSkip(string evt, float newBgmPlaybackTime)
+    {
+        Debug.Log("[Scene Skip] Skip to " + evt);
+        switch (evt)
+        {
+            case "Song2_Opening":
+                break;
+            case "Song2_Stage1":
+                //change start percentage for camera path
+                pathControl.startPercent = .3f;
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(1));
+                break;
+            case "Song2_Stage2":
+                //change start percentage for camera path
+                pathControl.startPercent = .6f;
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(2));
+                break;
+            case "Song2_Stage3":
+                //change start percentage for camera path
+                //pathControl.Play();
+                //pathControl.startPercent = .6f;
+                pathControl.Seek(.8f);                
+                soundManager.ChangeBgmPlaybackPos(newBgmPlaybackTime);
+
+                pathControl.Play();
+                StartCoroutine(SceneSkipCoroutine(3));
+                break;
+        }
+    }
+
+    IEnumerator SceneSkipCoroutine(int section)
+    {
+        song2_lvl level = lvlManager.currentLvl.GetComponent<song2_lvl>();
+        //start stage 1
+        level.StopAllCoroutines(); //stop all current running coroutines in song2, which are stage coroutines
+        switch (section)
+        {
+            case 1:
+                level.Stage1();
+                break;
+            case 2:
+                level.Stage2();
+                break;
+            case 3:
+                level.Stage3();
+                break;
+        }
+        yield return 0;
     }
 
     //function that contains what each event in song 1 should do

@@ -10,15 +10,12 @@ public class ChaseDecision : AI_Decision
 
     public bool ApproachPlayer(Darkness controller)
     {
-        if(controller.TargetWithinDistance())
+        if(AI_Manager.Instance.CanMove(controller.queueID))
         {
-            Debug.Log("<b><color=blue>Chase:</color></b> Darkness #" + controller.queueID + " request has been processed");
-            AI_Manager.OnAttackRequest(controller.queueID, controller.attackRequested);
+            //Debug.Log("<b><color=blue>Chase:</color></b> Darkness #" + controller.queueID + " request has been processed");
+            //AI_Manager.OnAttackRequest(controller.queueID, controller.attackRequested);
             return true;
         }
-        else 
-        {
-            return false;
-        }
+        else return false;
     }
 }

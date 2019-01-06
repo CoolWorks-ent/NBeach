@@ -63,6 +63,7 @@ public class NFPSController : PlayerController {
 
         public GameController gController;
         int playerHealth;
+        int playerHealthMax = 100;
         int playerRechargeAmt = 0;
         int playerRechargeAmtMax = 10;
         public int playerAmmo;
@@ -148,8 +149,9 @@ public class NFPSController : PlayerController {
         healthText.text = playerHealth.ToString();
 
         //Monitor Player's Health and change HUD based upon health amt
-        //HUD intensity increases while player health decreases
-        Camera.main.GetComponent<BWEffect>().intensity = 1 - (playerHealth / 100.0f);
+        //HUD intensity increases while player health decreases, after player health is less than 30%
+        if(playerHealth < playerHealthMax*.3)
+            Camera.main.GetComponent<BWEffect>().intensity = 1 - (playerHealth / (playerHealthMax * .3f));
 
         if (playerStatus == PLAYER_STATUS.HURT)
         {
@@ -165,6 +167,13 @@ public class NFPSController : PlayerController {
                 playerHealth = 100;
                 playerRechargeAmt = 0;
                 StopCoroutine(HurtCoroutine);
+                EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+
+                //Disable BWEffect on Camera 
+                Camera.main.GetComponent<BWEffect>().intensity = 0;
+
+                //Turn Off TiltHint upon recovery
+                EventManager.TriggerEvent("Player_TiltHintOff", "Player_TiltHint");
             }
         }
         else //If player is NOT HURT
@@ -559,6 +568,9 @@ public class NFPSController : PlayerController {
         float normTargetZ = 0;
         //headRotation = (pitch, yaw, roll        
 
+        //Play Hint Gif
+        EventManager.TriggerEvent("Player_TiltHintOn", "Player_TiltHint");
+
         while (rechargeAmt < playerRechargeAmtMax)
         {
          // initials
@@ -603,6 +615,7 @@ public class NFPSController : PlayerController {
             yield return null;
         }
         Camera.main.transform.localRotation = new Quaternion(0, 0, 0, 0);
+
         yield return rechargeAmt;
     }
 
@@ -654,12 +667,12 @@ public class NFPSController : PlayerController {
         float t = 0;
 
         //player can't be damaged if in HURT state
-        if (invincibleState == false && playerStatus != PLAYER_STATUS.HURT)
+        if (playerStatus != PLAYER_STATUS.HURT)
         {
-
-            if (playerHealth > 0)
+            //if player not already invincible, then damage player
+            if (invincibleState == false)
             {
-                if (invincibleState != true)
+                if (playerHealth > 0)
                 {
                     //show damage overlay when hurt
                     StartCoroutine(OnPlayerDamaged_corout());
@@ -673,12 +686,11 @@ public class NFPSController : PlayerController {
 
                         //if player hit with RockSmashAttack, trigger event to fly back and hit island
                         DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum >= 3)
                         {
                             EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
                         }
                     }
-                }
                     curTime = 0;
                     invincibleState = true;
                     yield return new WaitForSeconds(invincibleTime);
@@ -692,25 +704,27 @@ public class NFPSController : PlayerController {
                     }*/
                     Debug.Log("Invincibility Off");
                     invincibleState = false;
-                
+
+                }
             }
 
-        }
-        else if(playerStatus != PLAYER_STATUS.HURT)
-        {
-            //if player hit with RockSmashAttack, trigger event to fly back and hit island
-            DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-            if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+            if (enemy != null && enemy.GetComponent<DarkBossAttack>() != null)
             {
-                EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                //if player hit with RockSmashAttack, trigger event to fly back and hit island
+                DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
+                if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
+                {
+                    EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
+                }
             }
         }
         //set player into "hurt" state if their health is too low
-        if (playerHealth <= 1 && playerStatus != PLAYER_STATUS.HURT)
+        else if (playerHealth <= 1)
         {
             playerStatus = PLAYER_STATUS.HURT;
             HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
-            
+            EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+
         }
         yield return 0;
     }

@@ -25,7 +25,7 @@ public class WanderNearState : Dark_State
         controller.aIRichPath.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIRichPath.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
         float range = Random.RandomRange(minWanderRange, maxWanderRange);
-        controller.aIDestSet.target.position = new Vector3(controller.target.position.x + range, controller.transform.position.y, controller.transform.position.z + Mathf.Abs(range)/2);
+        //controller.aIDestSet.target.position = new Vector3(controller.target.position.x + range, controller.transform.position.y, controller.transform.position.z + Mathf.Abs(range)/2);
     }
 
     public override void UpdateState(Darkness controller)

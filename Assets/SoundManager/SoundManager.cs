@@ -207,8 +207,26 @@ public class SoundManager : MonoBehaviour {
         AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
         curAudio.Stop();
     }
-	
-	public void CrossFadeMusicIntroScene()
+
+    public void PauseBGAudio()
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.Pause();
+    }
+
+    public void ResumeBGAudio()
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.UnPause();
+    }
+
+    public void ChangeBgmPlaybackPos(float newTime)
+    {
+        AudioSource curAudio = BGMusic.GetComponent<AudioSource>();
+        curAudio.time = newTime;
+    }
+
+    public void CrossFadeMusicIntroScene()
 	{
 		AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath,music[8]), typeof(AudioClip));
 		GameObject newMusic = (GameObject)Instantiate (newSound);

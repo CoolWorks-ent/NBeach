@@ -7,9 +7,12 @@ public class IdleDecision : AI_Decision {
 
 	public override bool Decide(Darkness controller)
 	{
-		bool withinDistance = controller.TargetWithinDistance();
+		if(AI_Manager.Instance.CanMove(controller.queueID))
+			return true;
+		else return false;
+		/* bool withinDistance = controller.TargetWithinDistance();
 		if(withinDistance && controller.canAttack)
 			return false;
-		else return true;
+		else return true;*/
 	}
 }
