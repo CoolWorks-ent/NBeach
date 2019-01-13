@@ -7,6 +7,15 @@ public class WaterSurface : MonoBehaviour {
     ParticleSystem rainDrop;
     [SerializeField]
     EnemySpawner enemySpawner;
+    [SerializeField]
+    public Material daytimeWaterMat;
+    [SerializeField]
+    public Material nighttimeWaterMat;
+
+    private void Awake()
+    {
+        Debug.Log(daytimeWaterMat);
+    }
 
 	// Use this for initialization
 	void Start () {

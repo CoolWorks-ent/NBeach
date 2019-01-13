@@ -706,6 +706,10 @@ public class NFPSController : PlayerController {
                     invincibleState = false;
 
                 }
+                else
+                {
+                    playerStatus = PLAYER_STATUS.HURT;
+                }
             }
 
             if (enemy != null && enemy.GetComponent<DarkBossAttack>() != null)
@@ -717,14 +721,14 @@ public class NFPSController : PlayerController {
                     EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
                 }
             }
-        }
-        //set player into "hurt" state if their health is too low
-        else if (playerHealth <= 1)
-        {
-            playerStatus = PLAYER_STATUS.HURT;
-            HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
-            EventManager.TriggerEvent("PauseWorld", "PauseWorld");
+            //set player into "hurt" state if their health is too low
+            if (playerHealth <= 1 && playerStatus != PLAYER_STATUS.HURT)
+            {
+                playerStatus = PLAYER_STATUS.HURT;
+                HurtCoroutine = StartCoroutine(PlayerHurtStateRoutine(playerRechargeAmt));
+                EventManager.TriggerEvent("PauseWorld", "PauseWorld");
 
+            }
         }
         yield return 0;
     }

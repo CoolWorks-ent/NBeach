@@ -78,7 +78,7 @@ Material:
     - _GradientYStartPos_L: 0
     - _GradientYStartPos_R: 0
     - _LM: 1
-    - _LMPower: 0
+    - _LMPower: 0.6
     - _LocalSpace: 0
     - _MainTexturePower: 0.1
     - _Metallic: 0

@@ -72,8 +72,6 @@ public class DarknessBoss : MonoBehaviour {
         sm.PlayDarkWizardVox(0);
 
         ballMoveSpeed = 20f;
-
-        //spellIcon = transform.Find("SpellIcon").GetComponent<SpriteRenderer>();
     }
 
     //Returns the rgba values to a float between 0 to 1
@@ -107,7 +105,8 @@ public class DarknessBoss : MonoBehaviour {
         /*
          * Check on Player's Status and Determine what status Boss should be in
          */
-         PlayerController pController;
+
+         /*PlayerController pController;
          if(pController = target.GetComponent<PlayerController>())
         {
             //If Player is in Hurt State, Pause the Boss' Attacks
@@ -115,7 +114,7 @@ public class DarknessBoss : MonoBehaviour {
             {
                 status = BossStatus.rest;
             }
-        }
+        }*/
 
         /************************
          **Switch to Manage Boss Stages
@@ -589,9 +588,11 @@ public class DarknessBoss : MonoBehaviour {
 
             //reset attack timer when attack's animation has finished
             attackTimer = 0;
-            if (DarkBallFX.IsAlive())
-                DarkBallFX.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
+            if (DarkBallFX != null)
+            { 
+                if (DarkBallFX.IsAlive())
+                    DarkBallFX.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
             //attackAnimFinished = true;
             Debug.Log("attackAnimFinished");
             //Attach my FinalBossController to the new FinalBossAttack script in newGb
@@ -705,10 +706,13 @@ public class DarknessBoss : MonoBehaviour {
          * 2 = right side
          */
         Transform transf = MagicPos.transform;
-        
+
         //null reference here...in mobile
         //GameObject newFX = Instantiate(DarkBallFX.gameObject, transf.position, Quaternion.identity) as GameObject;
-        DarkBallFX.Play();
+        if (DarkBallFX != null)
+        {
+            DarkBallFX.Play();
+        }
         //newFX.transform.parent = transf;
 
     }

@@ -52,6 +52,8 @@ public class song2_lvl : Level {
     Material rockMaterial_2;
     [SerializeField]
     Material cloudMaterial;
+    [SerializeField]
+    SpriteRenderer titleText;
 
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
@@ -81,13 +83,15 @@ public class song2_lvl : Level {
     int rainEmissionRateMax = 40;
     Material nightSkybox;
     Material daySkybox;
-   
+    GameObject oceanWater;
+
+
 
     bool stagePlaying = true;
 
     // Use this for initialization
     void Start() {
-
+        
     }
 
     public new void Initialize()
@@ -108,8 +112,9 @@ public class song2_lvl : Level {
 
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
         blackOverlay.gameObject.SetActive(false);
-        nightSkybox = (Material)Resources.Load("Skyboxes/Night 01A", typeof(Material));
-        daySkybox = (Material)Resources.Load("Skyboxes/Day 01A", typeof(Material));
+        nightSkybox = (Material)Resources.Load("Skyboxes/Night 01B", typeof(Material));
+        daySkybox = (Material)Resources.Load("Skyboxes/Sunny 01A", typeof(Material));
+        oceanWater = GameObject.FindGameObjectWithTag("Water");
 
         //start Intro First
         darkBoss.gameObject.SetActive(false);
@@ -122,6 +127,9 @@ public class song2_lvl : Level {
         shellArray = new List<ShellPickup>();
         gController.playerControl.playerStatus = PLAYER_STATUS.ALIVE;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
+        //Reset the stage to original form
+        StageReset();
+
         //Start Stage0 of battle
         Stage0();
         //StartCoroutine(StageTestRoutine());
@@ -427,8 +435,9 @@ public class song2_lvl : Level {
         ColorUtility.TryParseHtmlString("#B0B0B0", out lightingColor_Day);
 
         print("day sky");
-        RenderSettings.skybox = nightSkybox;
+        RenderSettings.skybox = daySkybox;
         RenderSettings.ambientLight = lightingColor_Day;
+        oceanWater.GetComponent<Renderer>().material = oceanWater.GetComponent<WaterSurface>().daytimeWaterMat;
 
         //change lighting on rocks and environment objects
         float dayColor_rocks = 0f;
@@ -517,6 +526,9 @@ public class song2_lvl : Level {
     IEnumerator Stage0Routine()
     {
         Debug.Log("Stage 0 Start");
+        //Dissolve title text after 3 seconds
+        StartCoroutine(SongTitleRoutine()); 
+
         //start rain
         RainFX.Play();
         RainFX_Wide.Play();
@@ -531,21 +543,24 @@ public class song2_lvl : Level {
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
         yield return new WaitForSeconds(0.1f);
 
-        //change skybox & lighting to night
+        //---------- Night Lighting & Materials!---------------
+        //change skybox & lighting & water to night
+        
         Color lightingColor_Night;
         Color lightingColor_Day;  //"B0B0B0"
+        float dayColor_rocks = 0f;
+        float nightColor_rocks = 0.6f;
+        float dayColor_clouds = 0f;
+        float nightColor_clouds = 2f;
         ColorUtility.TryParseHtmlString("#56577A", out lightingColor_Night);
         ColorUtility.TryParseHtmlString("#B0B0B0", out lightingColor_Day);
 
         print("night sky");
         RenderSettings.skybox = nightSkybox;
         RenderSettings.ambientLight = lightingColor_Night;
+        oceanWater.GetComponent<Renderer>().material = oceanWater.GetComponent<WaterSurface>().nighttimeWaterMat;
 
         //change lighting on rocks and environment objects
-        float dayColor_rocks = 0f;
-        float nightColor_rocks = 0.6f;
-        float dayColor_clouds = 0f;
-        float nightColor_clouds = 2f;
         rockMaterial.SetFloat("_LMPower", nightColor_rocks);
         rockMaterial_2.SetFloat("_LMPower", nightColor_rocks);
         cloudMaterial.SetFloat("_LMPower", nightColor_clouds);
@@ -683,6 +698,8 @@ public class song2_lvl : Level {
                 //savedSongTime += Time.deltaTime; //count by seconds passed
                 //curWaitTime = tempWaitTime - savedSongTime;                
             }
+            else
+                Debug.Log("song paused");
             //MUST INCLUDE WAITFORSECONDS FOR while loops. so wait for 1 millisecond
             yield return null;
         }
@@ -1017,6 +1034,22 @@ public class song2_lvl : Level {
         //FADE OUT Music
         gController.soundManager.StopBGAudio();
         Debug.Log("song finished");
+    }
+
+    IEnumerator SongTitleRoutine()
+    {
+        float time = 0;
+        float showTime = 3;
+        float fadeTime = 1.5f;
+        yield return new WaitForSeconds(showTime);
+        while (time < fadeTime)
+        {
+            //fade out title
+            titleText.color = new Color(titleText.color.r, titleText.color.g, titleText.color.b, 1 - time / fadeTime);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        yield return 0;
     }
 
     /*
