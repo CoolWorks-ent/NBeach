@@ -12,9 +12,10 @@ public class AI_Manager : MonoBehaviour {
 	private int darknessIDCounter, darknessMoveCounter, darknessConcurrentAttackLimit, attacksCurrentlyProcessed, darknessConcurrentMovingLimit;
 	public int maxEnemyCount;
     public int minEnemyCount;
+	private int indexNull;
 
-	private List<int> enemyEngagement;
-	//private Queue<Darkness> engagementQueue;
+	private int[] enemyEngagement;
+	private Queue<Darkness> engagementQueue;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
 	{
@@ -26,19 +27,20 @@ public class AI_Manager : MonoBehaviour {
 		darknessConcurrentAttackLimit = 2;
 		darknessConcurrentMovingLimit = darknessConcurrentAttackLimit*2;
 		darknessIDCounter = darknessMoveCounter = 0;
-		maxEnemyCount = 5;
-        minEnemyCount = 3;
+		indexNull = 0;
+		maxEnemyCount = 6;
+        minEnemyCount = 1;
 		if(instance != null && instance != this)
 		{
 			//Debug.LogError("Instance of AI Manager already exist in this scene");
 		}
 		else instance = this;
-
+		engagementQueue = new Queue<Darkness>();
 		ActiveDarkness = new Dictionary<int, Darkness>();
-		enemyEngagement = new List<int>();
+		enemyEngagement = new int[3];
 		AddDarkness += AddtoDarknessList;
 		//RemoveDarkness += RemoveFromDarknessList;
-		AttackRequest += ProcessAttackRequest;
+		//AttackRequest += ProcessAttackRequest;
 		//ChangeState += DarknessStateChange;
 		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
 	}
@@ -55,7 +57,7 @@ public class AI_Manager : MonoBehaviour {
 		switch(toState)//.stateType)
 		{
 			case Dark_State.StateType.CHASING:
-				if(CanMove(fromController.queueID) && fromController.currentState.stateType != Dark_State.StateType.CHASING)
+				if(fromController.currentState.stateType != Dark_State.StateType.CHASING)
 				{
 					//callback(true, toState, fromController);
 					darknessMoveCounter++;
@@ -82,60 +84,56 @@ public class AI_Manager : MonoBehaviour {
 		return false;
 	}
 
-	///<summary>Notify AI manager to add a Darkness unit to the queue to decide which units can attack next</summary>
-	private void ProcessAttackRequest(int iD, bool requested)
+	///<summary>Check the current engagement collection. If the darkness is not in the list and the list is not full add it to the list</summary>
+	public bool CheckAttackRequest(int iD) //Search for an empty spot in the array. After checking all spots if none of them are empty or contain the item I'm looking for return false. If their is an empty spot add the item to that spot.
 	{
-		if(!requested)
+		for(int i = 0; i < enemyEngagement.Length; i++)
 		{
-			if(enemyEngagement.Count < 3)
+			if(enemyEngagement[i] == iD)
 			{
-				Darkness dark;
-				if(ActiveDarkness.TryGetValue(iD, out dark))
-				{
-					dark.attackRequested = true;
-					enemyEngagement.Add(iD);
-				}
-				Debug.Log("<b><color=green>AI Manager:</color></b> Darkness #" + iD + " request has been processed");
+				Debug.Log("Darkness already in engagment list");
+				ActiveDarkness[iD].canAttack = true;
+				ActiveDarkness[iD].engIndex = i;
+				return true;
+			}
+			else if(enemyEngagement[i] == indexNull)
+			{
+				Debug.Log("Added darkness to engagment list");
+				enemyEngagement[i] = iD;
+				ActiveDarkness[iD].canAttack = true;
+				ActiveDarkness[iD].engIndex = i;
+				return true;
 			}
 		}
-		else
-		{
-			Debug.LogWarning("<b><color=red>AI Manager:</color></b> Darkness #" + iD + " has already requested to attack");
-			//ProcessAttackRequest();
-		} 
+		ActiveDarkness[iD].canAttack = false;
+		return false;
 	}
 
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
 		darknessIDCounter++;
-		updatedDarkness.queueID = darknessIDCounter;
-		Debug.Log("New Darkness added. ID#" + updatedDarkness.queueID);
-		ActiveDarkness.Add(updatedDarkness.queueID, updatedDarkness);
+		updatedDarkness.creationID = darknessIDCounter;
+		Debug.Log("New Darkness added. ID#" + updatedDarkness.creationID);
+		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		updatedDarkness.target = player;
+		if(!CheckAttackRequest(updatedDarkness.creationID))
+			engagementQueue.Enqueue(updatedDarkness);
 		//updatedDarkness.GetComponent<AI_Movement>().target = player;
 	}
 
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
-		if(ActiveDarkness[updatedDarkness.queueID].canAttack)
+		if(updatedDarkness.engIndex != indexNull)//ActiveDarkness[updatedDarkness.creationID].canAttack)
 		{
-			enemyEngagement.Remove(updatedDarkness.queueID);
+			enemyEngagement[updatedDarkness.engIndex] = indexNull;
 			darknessMoveCounter--;
+			if(CheckAttackRequest(engagementQueue.Peek().creationID))
+			{
+				engagementQueue.Dequeue();
+			}
 		}
-        ActiveDarkness.Remove(updatedDarkness.queueID);
+        ActiveDarkness.Remove(updatedDarkness.creationID);
     }
-
-	public bool CanMove(int ID)
-	{
-		if(enemyEngagement.Contains(ID))
-			return true;
-		else if(enemyEngagement.Count <= 3)
-		{
-			ProcessAttackRequest(ID, false);
-			return true;
-		}
-		else return false;
-	}
 
 	public void KillAllDarkness()
     {
@@ -156,16 +154,9 @@ public class AI_Manager : MonoBehaviour {
 	public delegate void AIEvent<T>(T obj);
 	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
 	public delegate void AIEvent<T1,T2, T3>(T1 obj1, T2 obj2, T3 obj3);
-	public static event AIEvent<int, bool> AttackRequest;
 	public static event AIEvent<Dark_State, Darkness, Action<bool, Dark_State, Darkness>> ChangeState;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-
-	public static void OnAttackRequest(int queueID, bool attackRequested)
-	{
-		if(AttackRequest != null)
-			AttackRequest(queueID, attackRequested);
-	}
 
 	public static void OnChangeState(Dark_State to, Darkness from, Action<bool, Dark_State, Darkness> approved)
 	{

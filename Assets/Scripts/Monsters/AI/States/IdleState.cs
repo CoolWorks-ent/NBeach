@@ -36,6 +36,7 @@ public class IdleState : Dark_State
     protected override void ExitState(Darkness controller)
     {
         AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
+        controller.animeController.ResetTrigger(controller.idleHash);
     }
 
     protected IEnumerator IdleTime(Darkness controller, float idleTime)

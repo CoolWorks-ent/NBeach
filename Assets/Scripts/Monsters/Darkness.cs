@@ -10,17 +10,13 @@ public class Darkness : MonoBehaviour {
 
     public Transform target;
     
-    ///<summary>Sets the initiation range for darkness units. Units will be qeued for attack in this range</summary>
-    public int attackInitiationRange, actionIdle, queueID;
-    private float stateUpdateRate;
+    public int actionIdle, creationID, engIndex;
+    public bool canAttack, attackRequested, updateStates;
+    private float stateUpdateRate, attackInitiationRange;
     public Seeker sekr;
     public AIDestinationSetter aIDestSet;
-
     public GameObject deathFX;
     public Dark_State DeathState;
-
-    //public Pathfinding.RichAI aIRichPath;
-
     public Animator animeController;
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
@@ -32,13 +28,12 @@ public class Darkness : MonoBehaviour {
     public Dark_State previousState, currentState;
     public RichAI aIRichPath;
 
-    public bool canAttack, attackRequested, updateStates, clearedToMove;
-
     void Awake()
     {
-        actionIdle = attackInitiationRange = 3;
-        canAttack = attackRequested = clearedToMove = false;
-        queueID = 0;
+        actionIdle = 3;
+        attackInitiationRange = 5;
+        canAttack = attackRequested = false;
+        creationID = 0;
         updateStates = true;
         stateUpdateRate = 0.5f;
     }
