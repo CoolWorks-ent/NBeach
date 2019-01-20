@@ -71,7 +71,8 @@ public abstract class Dark_State : ScriptableObject
         if(stateType != Dark_State.StateType.DEATH)
         {
             this.ExitState(controller);
-            controller.ChangeState(controller.DeathState);
+            controller.updateStates = false;
+            //controller.ChangeState(controller.DeathState);
         }
     }
 }

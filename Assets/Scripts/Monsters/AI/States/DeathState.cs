@@ -7,7 +7,8 @@ public class DeathState : Dark_State
 {
     public override void InitializeState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
+        Debug.LogWarning("Darkness entered death state");
+        controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.deathHash);
         
         GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
@@ -16,6 +17,7 @@ public class DeathState : Dark_State
         //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
         controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
         AI_Manager.Instance.StartCoroutine(deathRoutine(controller));
+        controller.sekr.CancelCurrentPathRequest();
     }
 
     public override void UpdateState(Darkness controller)
@@ -32,7 +34,7 @@ public class DeathState : Dark_State
         float fxTime = 1;
         //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
         int maxPower = 10;
-        MeshRenderer renderer = controller.gameObject.GetComponentInChildren<MeshRenderer>();
+        SkinnedMeshRenderer renderer = controller.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
         float curPower = renderer.material.GetFloat("_MainTexturePower");
         float curTime = 0;
         while(curTime < fxTime)
@@ -44,7 +46,7 @@ public class DeathState : Dark_State
         }
        
         //yield return new WaitForSeconds(fxTime);
-        AI_Manager.Instance.RemoveFromDarknessList(controller);
+        //AI_Manager.Instance.RemoveFromDarknessList(controller);
         Destroy(controller.gameObject);
         yield return 0;
     }

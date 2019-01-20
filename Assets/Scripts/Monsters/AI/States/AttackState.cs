@@ -29,7 +29,7 @@ public class AttackState : Dark_State
 
     protected override void ExitState(Darkness controller)
     {
-        controller.animeController.SetBool(controller.attackAfterHash, true);
+        //controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 
     protected IEnumerator IdleTime(Darkness controller, float idleTime)

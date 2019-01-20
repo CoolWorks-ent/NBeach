@@ -31,9 +31,10 @@ public class Darkness : MonoBehaviour {
     void Awake()
     {
         actionIdle = 3;
-        attackInitiationRange = 5;
+        attackInitiationRange = 3;
         canAttack = attackRequested = false;
         creationID = 0;
+        engIndex = 500;
         updateStates = true;
         stateUpdateRate = 0.5f;
     }
@@ -93,19 +94,20 @@ public class Darkness : MonoBehaviour {
 
     private void OnTriggerEnter(Collider collider)
     {
-        if(collider.gameObject.tag == "Player")
-        {
-            Debug.Log("Darkness collided with Player");
-        }
-        else if (collider.gameObject.tag == "Player Attack")
+        if (collider.gameObject.CompareTag("Projectile"))
         {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
-                Debug.Log("Darkness Destroyed");
+                Debug.LogWarning("Darkness Destroyed");
                 AI_Manager.OnDarknessRemoved(this);
+                ChangeState(DeathState);
                 //ChangeState(DeathState);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
+        }
+        else if(collider.gameObject.CompareTag("Player"))
+        {
+            Debug.LogWarning("Darkness collided with Player");
         }
     }
 }

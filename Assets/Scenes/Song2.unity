@@ -62403,7 +62403,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 957796667}
-  ActiveDarkness: []
+  darknessIDCounter: 0
+  darknessMoveCounter: 0
+  darknessConcurrentAttackLimit: 0
+  attacksCurrentlyProcessed: 0
+  darknessConcurrentMovingLimit: 0
   maxEnemyCount: 0
   minEnemyCount: 0
 --- !u!54 &957796669
@@ -63047,7 +63051,7 @@ SphereCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1103039663}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5

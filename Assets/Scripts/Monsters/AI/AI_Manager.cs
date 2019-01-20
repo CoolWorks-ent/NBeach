@@ -39,7 +39,7 @@ public class AI_Manager : MonoBehaviour {
 		ActiveDarkness = new Dictionary<int, Darkness>();
 		enemyEngagement = new int[3];
 		AddDarkness += AddtoDarknessList;
-		//RemoveDarkness += RemoveFromDarknessList;
+		RemoveDarkness += RemoveFromDarknessList;
 		//AttackRequest += ProcessAttackRequest;
 		//ChangeState += DarknessStateChange;
 		//player = GameObject.FindGameObjectWithTag("PlayerCube").transform;
@@ -66,7 +66,7 @@ public class AI_Manager : MonoBehaviour {
 				}
 				else return false; //callback(false, toState, fromController); Debug.LogWarning(String.Format("Darkness {0} staying in {1} state",fromController.queueID,fromController.currentState));
 				break;
-			/* case Dark_State.StateType.WANDER:
+			/*	case Dark_State.StateType.WANDER:
 				if((fromController.currentState.stateType != Dark_State.StateType.WANDER || fromController.currentState.stateType != Dark_State.StateType.CHASING) && darknessMoveCounter <= darknessConcurrentMovingLimit)
 				{
 					Debug.LogWarning(String.Format("Darkness {0} transitioning to {1} state",fromController.queueID,toState.stateType));
@@ -123,10 +123,11 @@ public class AI_Manager : MonoBehaviour {
 
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
-		if(updatedDarkness.engIndex != indexNull)//ActiveDarkness[updatedDarkness.creationID].canAttack)
-		{
+		darknessMoveCounter--;
+		if(updatedDarkness.engIndex < enemyEngagement.Length)
 			enemyEngagement[updatedDarkness.engIndex] = indexNull;
-			darknessMoveCounter--;
+		if (engagementQueue.Count >= 1 && engagementQueue.Peek() != null)
+		{
 			if(CheckAttackRequest(engagementQueue.Peek().creationID))
 			{
 				engagementQueue.Dequeue();
