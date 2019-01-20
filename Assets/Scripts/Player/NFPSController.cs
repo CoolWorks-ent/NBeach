@@ -100,6 +100,7 @@ public class NFPSController : PlayerController {
         bool canDodgeRight = true, canDodgeLeft = true;
 
         Coroutine HurtCoroutine;
+        DarknessBoss darkBoss;
 
         
 
@@ -116,7 +117,8 @@ public class NFPSController : PlayerController {
             maxAmmo = 10;
             bReloading = true;
 
-        }
+            EventManager.StartListening("DarkBossSmashAttackCheck", PlayerInvicibilityChange);
+    }
 
 
         private void OnEnable()
@@ -139,6 +141,16 @@ public class NFPSController : PlayerController {
             PlayerDodge();
         }
 
+    }
+
+    //Prevent Player Damage durin Dark Boss "Rock Smash Attack"
+    //Callback to manage player's invicibility via outside events
+    private void PlayerInvicibilityChange(string val)
+    {
+        if (val == "On")
+            invincibleState = true;
+        else if (val == "Off")
+            invincibleState = false;
     }
 
     private void Update()
@@ -722,6 +734,7 @@ public class NFPSController : PlayerController {
                 }
             }
             //set player into "hurt" state if their health is too low
+            //If Boss is using "Rock Smash" player takes 0 damage
             if (playerHealth <= 1 && playerStatus != PLAYER_STATUS.HURT)
             {
                 playerStatus = PLAYER_STATUS.HURT;

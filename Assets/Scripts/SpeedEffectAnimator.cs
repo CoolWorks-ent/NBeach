@@ -33,8 +33,6 @@ public class SpeedEffectAnimator : MonoBehaviour {
         //set to invisible
         speedFxOverlay.color = new Color(speedFxOverlay.color.r,speedFxOverlay.color.g,speedFxOverlay.color.b,0);
         baseColor = speedFxOverlay.color;
-
-        animationControl = GetComponent<Animator>();
     }
 
 

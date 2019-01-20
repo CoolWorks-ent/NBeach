@@ -82,8 +82,8 @@ public class CameraPathAnimator : MonoBehaviour
     private float _pathTime = 10;
     //the time the path animation should last for
     [SerializeField]
-    private float _pathSpeed = 10;
-    private float _basePathSpeed = 0;
+    public float _pathSpeed = 10;
+    public float _basePathSpeed = 0;
     private float _percentage;
     private float _lastPercentage;
     public float nearestOffset = 0;
@@ -254,6 +254,9 @@ public class CameraPathAnimator : MonoBehaviour
     /// </summary>
     public virtual void Play()
     {
+        //Set the base Path Speed to be the current set path speed, to be used later
+        _basePathSpeed = _pathSpeed;
+
         StartCoroutine(GradualStart());
         /*_playing = true;
         if(_basePathSpeed!=0)
@@ -307,13 +310,15 @@ public class CameraPathAnimator : MonoBehaviour
 
     private IEnumerator ImmediatePause()
     {
-        if (_basePathSpeed == 0)
-            _basePathSpeed = _pathSpeed;
+        _basePathSpeed = _pathSpeed;
 
         _pathSpeed = 0;
         _playing = false;
         EventManager.TriggerEvent("Player_Stop", "playerStop");
         if (AnimationPausedEvent != null) AnimationPausedEvent();
+
+        //reset path speed
+        ResetSpeed();
 
         yield return null;
     }
@@ -336,6 +341,9 @@ public class CameraPathAnimator : MonoBehaviour
         _playing = false;
         EventManager.TriggerEvent("Player_Stop", "playerStop");
         if (AnimationPausedEvent != null) AnimationPausedEvent();
+
+        //reset path speed
+        ResetSpeed();
 
         yield return null;
     }
@@ -389,6 +397,14 @@ public class CameraPathAnimator : MonoBehaviour
         EventManager.TriggerEvent("Player_Start", "playerStart");
         
         yield return null;
+    }
+
+    /// <summary>
+    /// Reset the path speed to be it's base value originally set in-editor
+    /// </summary>
+    private void ResetSpeed()
+    {
+        _pathSpeed = _basePathSpeed;
     }
 
     /// <summary>

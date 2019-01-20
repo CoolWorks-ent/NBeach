@@ -430,6 +430,9 @@ public class DarknessBoss : MonoBehaviour {
                 newGb = darkHand;
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "RockSmash";
+
+                //Call event to signal Boss's RockSmash attack
+                EventManager.TriggerEvent("DarkBossSmashAttackCheck", "On");
             }
             else if(attackState == BossAttackType.Smash)
             {
@@ -634,6 +637,9 @@ public class DarknessBoss : MonoBehaviour {
             else if (attack.GetComponent<DarkBossAttack>().attackType == "RockSmash")
             {
                 attacks.Remove(attack);
+
+                //Call event to signal Boss's RockSmash attack if finished
+                EventManager.TriggerEvent("DarkBossSmashAttackCheck", "Off");
             }
 
 

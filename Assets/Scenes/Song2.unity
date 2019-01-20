@@ -595,6 +595,7 @@ MonoBehaviour:
   editorPercentage: 0
   _pathTime: 10
   _pathSpeed: 10
+  _basePathSpeed: 0
   nearestOffset: 0
   startPercent: 0
   animateFOV: 1
@@ -7191,7 +7192,7 @@ RectTransform:
   m_GameObject: {fileID: 103103149}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4, y: 1.2, z: 1}
+  m_LocalScale: {x: 1.4, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 948108236}
   m_RootOrder: 0
@@ -8301,6 +8302,11 @@ Prefab:
       propertyPath: titleText
       value: 
       objectReference: {fileID: 2035926312}
+    - target: {fileID: 114795370930730580, guid: a79ac96491fac394db07f5a01b0827cc,
+        type: 2}
+      propertyPath: stage1StartTime
+      value: 45
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a79ac96491fac394db07f5a01b0827cc, type: 2}
   m_IsPrefabParent: 0
@@ -9353,6 +9359,7 @@ MonoBehaviour:
   editorPercentage: 0
   _pathTime: 10
   _pathSpeed: 8
+  _basePathSpeed: 0
   nearestOffset: 0
   startPercent: 0
   animateFOV: 1
@@ -33229,8 +33236,9 @@ MonoBehaviour:
   editorPercentage: 0
   _pathTime: 10
   _pathSpeed: 8.5
+  _basePathSpeed: 0
   nearestOffset: 0
-  startPercent: 0.8
+  startPercent: 0
   animateFOV: 1
   topSpeed: 0
   targetModeUp: {x: 0, y: 1, z: 0}
@@ -38948,7 +38956,7 @@ MonoBehaviour:
   hermiteBias: 0
   editorPreview: {fileID: 0}
   selectedPoint: 0
-  pointMode: 3
+  pointMode: 0
   addPointAtPercent: 0.424
   _aspect: 1.7778
   _previewResolution: 800
@@ -62872,75 +62880,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c8bd7dca9c0420c488e86cc495d1498d, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &1068768541
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1068768543}
-  - component: {fileID: 1068768542}
-  m_Layer: 0
-  m_Name: GameObject (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!212 &1068768542
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1068768541}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: caa05eee6e4cc4a84b610b1c3f2fda43, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 4.5, y: 0.62}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
---- !u!4 &1068768543
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1068768541}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 191.55, y: 47, z: 94.33}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 68
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1069532614
 Prefab:
   m_ObjectHideFlags: 0
@@ -64755,7 +64694,7 @@ MonoBehaviour:
   m_ScreenMesh: {fileID: 0}
   m_AnimTextures: []
   speedFxOverlay: {fileID: 103103152}
-  animationControl: {fileID: 0}
+  animationControl: {fileID: 103103151}
 --- !u!114 &1451287275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65836,6 +65775,7 @@ MonoBehaviour:
   editorPercentage: 0
   _pathTime: 10
   _pathSpeed: 10
+  _basePathSpeed: 0
   nearestOffset: 0
   startPercent: 0
   animateFOV: 1

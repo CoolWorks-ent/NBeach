@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 2e5630218d1309b4cb6902f54e1b4465
+timeCreated: 1547967847
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Yukarimobile
+  fontNames:
+  - Yukarimobile
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

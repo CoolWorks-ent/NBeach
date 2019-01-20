@@ -10,7 +10,7 @@ public class SpeedBoost : MonoBehaviour {
     public float speedTime = 1f; //length of time player keeps speedBoost
     public float initBoostTime = .5f, boostAmt =1f;
     float timeElapsed;
-    float origSpeed;
+    float baseSpeed;
     bool playSpeedAnim;
     bool playDeboost;
     GameObject speedBoostObj;
@@ -25,7 +25,7 @@ public class SpeedBoost : MonoBehaviour {
         EventManager.StartListening("Player_SpeedBoost", OnSpeedBoost);
         EventManager.StartListening("CancelPowerUps", OnCancel);
         speedAnimator = Camera.main.GetComponent<SpeedEffectAnimator>();
-        origSpeed = gameController.pathControl.pathSpeed;
+        baseSpeed = gameController.pathControl._basePathSpeed;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -83,7 +83,7 @@ public class SpeedBoost : MonoBehaviour {
             if (playSpeedAnim == true)
             {
                 StopCoroutine(GradualBoost());
-                gameController.pathControl.pathSpeed = origSpeed;
+                gameController.pathControl.pathSpeed = baseSpeed;
                 Debug.Log(gameController.pathControl.pathSpeed);
                 //destroy this game object, that was playing the animation
                 Destroy(speedBoostObj);
@@ -111,13 +111,13 @@ public class SpeedBoost : MonoBehaviour {
     IEnumerator GradualBoost()
     {
         float time = 0;
-        float baseSpeed = gameController.pathControl.pathSpeed;
+        float startSpeed = gameController.pathControl.pathSpeed;
         Debug.Log("boosting");
         //fade sign out every second
         while (time < initBoostTime)
         {
             //increase speed over time and hold that speed
-            gameController.pathControl.pathSpeed = Mathf.Lerp(baseSpeed, gameController.pathControl.pathSpeed + boostAmt, time/initBoostTime);
+            gameController.pathControl.pathSpeed = Mathf.Lerp(startSpeed, gameController.pathControl.pathSpeed + boostAmt, time/initBoostTime);
             time += Time.deltaTime;
             yield return null;
         }
@@ -133,7 +133,7 @@ public class SpeedBoost : MonoBehaviour {
         //if (speedBoostObj != null)
         //{ 
                 // decrease speed over time
-                float baseSpeed = gameController.pathControl.pathSpeed;
+            float startSpeed = gameController.pathControl.pathSpeed;
             float decreaseTime = initBoostTime;
             //reset time
             float time = 0;
@@ -141,12 +141,12 @@ public class SpeedBoost : MonoBehaviour {
             while (time < decreaseTime)
             {
                 //decrease speed back to normal speed
-                gameController.pathControl.pathSpeed = Mathf.Lerp(baseSpeed, origSpeed, time / decreaseTime);
+                gameController.pathControl.pathSpeed = Mathf.Lerp(startSpeed, baseSpeed, time / decreaseTime);
                 time += Time.deltaTime;
                 yield return null;
             }
             //set back to original speed
-            gameController.pathControl.pathSpeed = origSpeed;
+            gameController.pathControl.pathSpeed = baseSpeed;
         //destroy object
         if (speedBoostObj != null)
             Destroy(speedBoostObj);

@@ -70,6 +70,7 @@ public class EventManager : MonoBehaviour {
         }
     }
 
+    //TriggerEvent passes value from the Trigger Call to the event function (the function referenced in StartListening)
     public static void TriggerEvent(string eventName, string value)
     {
         ThisEvent thisEvent = null;

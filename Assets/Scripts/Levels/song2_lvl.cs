@@ -15,6 +15,28 @@ public class song2_lvl : Level {
     [SerializeField]
     Transform[] shellLocs;
     [SerializeField]
+    float stage1StartTime = 120; //240; //1min in seconds
+    [SerializeField]
+    float stage2StartTime = 180; //240; //3min in seconds
+    [SerializeField]
+    float stage3StartTime = 230; //240; //4min in seconds
+    [SerializeField]
+    float stage3EndTime = 250; //320 //5+min in seconds 
+    [SerializeField]
+    float finalStageEndTime = 320; //(current total song time = 5:15)
+
+    [SerializeField]
+    float darkSpawnRate_Stage0 = 6;
+    [SerializeField]
+    float darkSpawnRate_Stage0_1 = 5;
+    [SerializeField]
+    float darkSpawnRate_Stage1 = 4;
+    [SerializeField]
+    float darkSpawnRate_Stage2 = 2f;
+    [SerializeField]
+    float darkSpawnRate_Stage3 = 1f;
+
+    [SerializeField]
     SpeedBoost speedBoostPowerUp;
     [SerializeField]
     public GameObject[] coverRocks;
@@ -63,18 +85,8 @@ public class song2_lvl : Level {
     float curSongTime = 0;
     float songStartTime = 0;
     public int stageNum = 0;
-    float stage1StartTime = 120; //120; //in seconds
-    float stage2StartTime = 180; //180; //3min in seconds
-    float stage3StartTime = 230; //240; //4min in seconds
-    float stage3EndTime = 250; //320 //5+min in seconds 
-    float finalStageEndTime = 320; //(current total song time = 5:15)
-    float darkSpawnRate_Stage0 = 6;
-    float darkSpawnRate_Stage0_1 = 5;
-    float darkSpawnRate_Stage1 = 4;
-    float darkSpawnRate_Stage2 = 2f;
-    float darkSpawnRate_Stage3 = 1f;
-    int rainEmissionRate_stage1 = 0, rainEmissionRate_stage2 = 0, rainEmissionRate_stage3 = 0, rainEmissionRate_stage3End = 0;
 
+    int rainEmissionRate_stage1 = 0, rainEmissionRate_stage2 = 0, rainEmissionRate_stage3 = 0, rainEmissionRate_stage3End = 0;
     int numOfShells = 0;
     int maxShellCount = 5;
     float shellSpawnTime = 0;
@@ -84,8 +96,6 @@ public class song2_lvl : Level {
     Material nightSkybox;
     Material daySkybox;
     GameObject oceanWater;
-
-
 
     bool stagePlaying = true;
 
@@ -102,7 +112,7 @@ public class song2_lvl : Level {
         EventManager.StartListening("Stage2Start", delegate { DebugFunc("Stage2Start"); });
         EventManager.StartListening("Stage3Start", delegate { DebugFunc("Stage3Start"); });
         EventManager.StartListening("Stage4Start", delegate { DebugFunc("Stage4Start"); });
-        EventManager.StartListening("Song2_End_Cutscene_Start", delegate { StartCoroutine(Song2_EndCutscene()); });
+        EventManager.StartListening("Song2_End_Cutscene_Start", delegate { StartCoroutine(Song2_EndCutscene()); }); //this cutscene is called when player is hit by Dark Boss Smash in stage3
         EventManager.StartListening("OnPlayerHitIsland", OnPlayerHitIsland);
         EventManager.StartListening("PauseWorld", OnStagePaused);
 
@@ -313,8 +323,13 @@ public class song2_lvl : Level {
         for (int i = 0; i < shellArray.Count; i++)
         {
             //add a object == nil check?
-            if (shellArray[i].name == str)
-                shellArray.RemoveAt(i);
+            if (shellArray[i] == null)
+                Debug.Log("this shell is null");
+            else
+            {
+                if (shellArray[i].name == str)
+                    shellArray.RemoveAt(i);
+            }
         }
         //numOfShells -= 1;
     }
@@ -363,12 +378,12 @@ public class song2_lvl : Level {
         //slight delay after rock is destroyed  before player should run
         yield return new WaitForSeconds(.5f);
         if (stageNum < 2) //only run to new rock if not on last stage of battle
-            StartCoroutine(RunToNewRock(1));
+            StartCoroutine(RunToNewRock());
         yield return 0;
     }
 
     //function to make player run to next rock when old rock is destroyed Via Cam pathSpline
-    public IEnumerator RunToNewRock(int rockNum)
+    public IEnumerator RunToNewRock()
     {
         /*
         * Prevent Enemies from Attacking Player
