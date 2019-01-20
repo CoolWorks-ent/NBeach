@@ -6,21 +6,27 @@ namespace Pathfinding.RVO {
 	[CanEditMultipleObjects]
 	public class RVOControllerEditor : EditorBase {
 		protected override void Inspector () {
-			EditorGUILayout.Separator();
-			EditorGUILayout.LabelField("Shape", EditorStyles.boldLabel);
-			PropertyField("radius");
-			Clamp("radius", 0.01f);
+			Section("Shape");
+			var ai = (target as MonoBehaviour).GetComponent<IAstarAI>();
+			if (ai != null) {
+				var drivenStr = "Driven by " + ai.GetType().Name + " component";
+				EditorGUILayout.LabelField("Radius", drivenStr);
+				if ((target as RVOController).movementPlane == MovementPlane.XZ) {
+					EditorGUILayout.LabelField("Height", drivenStr);
+					EditorGUILayout.LabelField("Center", drivenStr);
+				}
+			} else {
+				FloatField("radiusBackingField", label: "Radius", min: 0.01f);
 
-			if ((target as RVOController).movementPlane == MovementPlane.XZ) {
-				PropertyField("height");
-				Clamp("height", 0.01f);
-				PropertyField("center");
+				if ((target as RVOController).movementPlane == MovementPlane.XZ) {
+					FloatField("heightBackingField", label: "Height", min: 0.01f);
+					PropertyField("centerBackingField", label: "Center");
+				}
 			}
 
-			EditorGUILayout.Separator();
-			EditorGUILayout.LabelField("Avoidance", EditorStyles.boldLabel);
-			PropertyField("agentTimeHorizon");
-			PropertyField("obstacleTimeHorizon");
+			Section("Avoidance");
+			FloatField("agentTimeHorizon", min: 0f);
+			FloatField("obstacleTimeHorizon", min: 0f);
 			PropertyField("maxNeighbours");
 			PropertyField("layer");
 			PropertyField("collidesWith");

@@ -1,14 +1,13 @@
 using UnityEngine;
 
 namespace Pathfinding {
-	/** Restrict suitable nodes by if they have been searched by a FloodPath.
-	 *
-	 * Suitable nodes are in addition to the basic contraints, only the nodes which return true on a FloodPath.HasPathTo (node) call.
-	 * \see Pathfinding.FloodPath
-	 * \see Pathfinding.FloodPathTracer
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Restrict suitable nodes by if they have been searched by a FloodPath.
+	///
+	/// Suitable nodes are in addition to the basic contraints, only the nodes which return true on a FloodPath.HasPathTo (node) call.
+	/// See: Pathfinding.FloodPath
+	/// See: Pathfinding.FloodPathTracer
+	/// </summary>
 	public class FloodPathConstraint : NNConstraint {
 		readonly FloodPath path;
 
@@ -22,15 +21,17 @@ namespace Pathfinding {
 		}
 	}
 
-	/** Traces a path created with the Pathfinding.FloodPath.
-	 *
-	 * See Pathfinding.FloodPath for examples on how to use this path type
-	 *
-	 * \shadowimage{floodPathExample.png}
-	 * \astarpro
-	 * \ingroup paths */
+	/// <summary>
+	/// Traces a path created with the Pathfinding.FloodPath.
+	///
+	/// See Pathfinding.FloodPath for examples on how to use this path type
+	///
+	/// [Open online documentation to see images]
+	///
+	/// \ingroup paths
+	/// </summary>
 	public class FloodPathTracer : ABPath {
-		/** Reference to the FloodPath which searched the path originally */
+		/// <summary>Reference to the FloodPath which searched the path originally</summary>
 		protected FloodPath flood;
 
 		protected override bool hasEndPoint {
@@ -39,9 +40,10 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Default constructor.
-		 * Do not use this. Instead use the static Construct method which can handle path pooling.
-		 */
+		/// <summary>
+		/// Default constructor.
+		/// Do not use this. Instead use the static Construct method which can handle path pooling.
+		/// </summary>
 		public FloodPathTracer () {}
 
 		public static FloodPathTracer Construct (Vector3 start, FloodPath flood, OnPathDelegate callback = null) {
@@ -67,9 +69,10 @@ namespace Pathfinding {
 			flood = null;
 		}
 
-		/** Initializes the path.
-		 * Traces the path from the start node.
-		 */
+		/// <summary>
+		/// Initializes the path.
+		/// Traces the path from the start node.
+		/// </summary>
 		protected override void Initialize () {
 			if (startNode != null && flood.HasPathTo(startNode)) {
 				Trace(startNode);
@@ -80,13 +83,14 @@ namespace Pathfinding {
 		}
 
 		protected override void CalculateStep (long targetTick) {
-			if (!IsDone()) throw new System.Exception("Something went wrong. At this point the path should be completed");
+			if (CompleteState != PathCompleteState.Complete) throw new System.Exception("Something went wrong. At this point the path should be completed");
 		}
 
-		/** Traces the calculated path from the start node to the end.
-		 * This will build an array (#path) of the nodes this path will pass through and also set the #vectorPath array to the #path arrays positions.
-		 * This implementation will use the #flood (FloodPath) to trace the path from precalculated data.
-		 */
+		/// <summary>
+		/// Traces the calculated path from the start node to the end.
+		/// This will build an array (<see cref="path)"/> of the nodes this path will pass through and also set the <see cref="vectorPath"/> array to the <see cref="path"/> arrays positions.
+		/// This implementation will use the <see cref="flood"/> (FloodPath) to trace the path from precalculated data.
+		/// </summary>
 		public void Trace (GraphNode from) {
 			GraphNode c = from;
 			int count = 0;

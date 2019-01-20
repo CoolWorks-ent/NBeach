@@ -1,41 +1,94 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
- [RequireComponent(typeof(DarkStateController))]
 public class Darkness : MonoBehaviour {
 
     public Transform target;
     
-    public DarkStateController dsController;
-
-    public int attackRange;
-
+    public int actionIdle, creationID, engIndex;
+    public bool canAttack, attackRequested, updateStates;
+    private float stateUpdateRate, attackInitiationRange;
+    public Seeker sekr;
+    public AIDestinationSetter aIDestSet;
     public GameObject deathFX;
+    public Dark_State DeathState;
+    public Animator animeController;
+    public int attackHash = Animator.StringToHash("Attack"),
+                attackAfterHash = Animator.StringToHash("AfterAttack"),
+                chaseHash = Animator.StringToHash("Chase"),
+                idleHash = Animator.StringToHash("Idle"),
+                deathHash = Animator.StringToHash("Death");
+    //public AI_Movement aIMovement;
 
+    public Dark_State previousState, currentState;
+    public RichAI aIRichPath;
 
+    void Awake()
+    {
+        actionIdle = 3;
+        attackInitiationRange = 5;
+        canAttack = attackRequested = false;
+        creationID = 0;
+        updateStates = true;
+        stateUpdateRate = 0.5f;
+    }
 
-    // Use this for initialization
     void Start () {
-        
-        dsController = GetComponent<DarkStateController>();
+        AI_Manager.OnDarknessAdded(this);
+        animeController = GetComponentInChildren<Animator>();
+        //aIMovement = GetComponent<AI_Movement>();
+        aIRichPath = GetComponent<RichAI>();
+        sekr = GetComponent<Seeker>();
+        aIDestSet = GetComponent<AIDestinationSetter>();
+        currentState.InitializeState(this);
+        StartCoroutine(ExecuteCurrentState());
+        aIDestSet.target = target;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        dsController.ExecuteCurrentState();
+        
+    }
+
+    public IEnumerator ExecuteCurrentState()
+    {
+        while(updateStates)
+        {
+            currentState.UpdateState(this);
+            yield return new WaitForSeconds(stateUpdateRate);
+        }
+        yield return null;
+    }
+
+    public void ChangeState(Dark_State nextState)
+    {
+        if(currentState != nextState)
+        {
+            /*string memes = "Switching from current <color = red><b>" + currentState.stateType + "</b></color> state to next <color = green><b>" + nextState.stateType +  "</b></color> state";
+            Debug.Log(memes);*/
+            currentState = nextState;
+            currentState.InitializeState(this);
+            previousState = currentState;
+        }
+    }
+
+    public bool TargetWithinDistance()
+    {
+        if(Vector3.Distance(transform.position, target.position) <= (float)attackInitiationRange && canAttack)
+        {
+            return true;
+        }
+        else return false;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        //EventManager.TriggerEvent("DarknessDeath", gameObject.);
-        if (collision.gameObject.tag == "Projectile")
-        {
-            Debug.Log("collision");
-        }
+      //EventManager.TriggerEvent("DarknessDeath", gameObject.);
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -44,67 +97,15 @@ public class Darkness : MonoBehaviour {
         {
             Debug.Log("Darkness collided with Player");
         }
-        else if (collider.tag == "Projectile")
+        else if (collider.gameObject.tag == "Player Attack")
         {
-            if (collider.GetComponent<Projectile_Shell>().projectileFired == true)
+            if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.Log("Darkness Destroyed");
-
-                //AI_Manager.Instance.AddtoDarknessList(this);
-                //Remove from list of darkness
-                AI_Manager.Instance.RemoveFromDarknessList(this);
-                //AI_Manager.Instance.AddtoDarknessList(this);
-
-                GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
-                //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
-                
-                //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-                dsController.ChangeState(EnemyState.DEATH);
-                gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
-                StartCoroutine(deathRoutine());
-
+                AI_Manager.OnDarknessRemoved(this);
+                //ChangeState(DeathState);
                 //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
         }
     }
-
-    public void DestroyDarkness()
-    {
-        Debug.Log("Darkness Destroyed");
-
-        //AI_Manager.Instance.AddtoDarknessList(this);
-        //Remove from list of darkness
-        AI_Manager.Instance.RemoveFromDarknessList(this);
-        //AI_Manager.Instance.AddtoDarknessList(this);
-
-        GameObject newFX = Instantiate(deathFX.gameObject, transform.position, Quaternion.identity) as GameObject;
-        //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
-
-        //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-        dsController.ChangeState(EnemyState.DEATH);
-        gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
-        StartCoroutine(deathRoutine());
-    }
-
-    IEnumerator deathRoutine()
-    {
-        float fxTime = 1;
-        //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
-        int maxPower = 10;
-        MeshRenderer renderer = gameObject.GetComponentInChildren<MeshRenderer>();
-        float curPower = renderer.material.GetFloat("_MainTexturePower");
-        float curTime = 0;
-        while(curTime < fxTime)
-        {
-            curPower = curTime * maxPower;
-            renderer.material.SetFloat("_MainTexturePower", curPower);
-            curTime += Time.deltaTime;
-            yield return 0;
-        }
-       
-        //yield return new WaitForSeconds(fxTime);
-        Destroy(this.gameObject);
-        yield return 0;
-    }
-
 }

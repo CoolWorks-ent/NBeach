@@ -10,20 +10,24 @@ namespace Pathfinding {
 		Custom
 	}
 
-	/** Implements heuristic optimizations.
-	 *
-	 * \see heuristic-opt
-	 * \see Game AI Pro - Pathfinding Architecture Optimizations by Steve Rabin and Nathan R. Sturtevant
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Implements heuristic optimizations.
+	///
+	/// See: heuristic-opt
+	/// See: Game AI Pro - Pathfinding Architecture Optimizations by Steve Rabin and Nathan R. Sturtevant
+	/// </summary>
 	[System.Serializable]
 	public class EuclideanEmbedding {
+		/// <summary>
+		/// If heuristic optimization should be used and how to place the pivot points.
+		/// See: heuristic-opt
+		/// See: Game AI Pro - Pathfinding Architecture Optimizations by Steve Rabin and Nathan R. Sturtevant
+		/// </summary>
 		public HeuristicOptimizationMode mode;
 
 		public int seed;
 
-		/** All children of this transform will be used as pivot points */
+		/// <summary>All children of this transform will be used as pivot points</summary>
 		public Transform pivotPointRoot;
 
 		public int spreadOutCount = 1;
@@ -31,13 +35,14 @@ namespace Pathfinding {
 		[System.NonSerialized]
 		public bool dirty;
 
-		/**
-		 * Costs laid out as n*[int],n*[int],n*[int] where n is the number of pivot points.
-		 * Each node has n integers which is the cost from that node to the pivot node.
-		 * They are at around the same place in the array for simplicity and for cache locality.
-		 *
-		 * cost(nodeIndex, pivotIndex) = costs[nodeIndex*pivotCount+pivotIndex]
-		 */
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
+		/// <summary>
+		/// Costs laid out as n*[int],n*[int],n*[int] where n is the number of pivot points.
+		/// Each node has n integers which is the cost from that node to the pivot node.
+		/// They are at around the same place in the array for simplicity and for cache locality.
+		///
+		/// cost(nodeIndex, pivotIndex) = costs[nodeIndex*pivotCount+pivotIndex]
+		/// </summary>
 		uint[] costs = new uint[8];
 		int maxNodeIndex;
 
@@ -64,15 +69,18 @@ namespace Pathfinding {
 
 		System.Object lockObj = new object ();
 
-		/** Simple linear congruential generator.
-		 * \see http://en.wikipedia.org/wiki/Linear_congruential_generator
-		 */
+		/// <summary>
+		/// Simple linear congruential generator.
+		/// See: http://en.wikipedia.org/wiki/Linear_congruential_generator
+		/// </summary>
 		uint GetRandom () {
 			rval = (ra*rval + rc);
 			return rval;
 		}
+#endif
 
 		void EnsureCapacity (int index) {
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 			if (index > maxNodeIndex) {
 				lock (lockObj) {
 					if (index > maxNodeIndex) {
@@ -85,9 +93,11 @@ namespace Pathfinding {
 					}
 				}
 			}
+#endif
 		}
 
 		public uint GetHeuristic (int nodeIndex1, int nodeIndex2) {
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 			nodeIndex1 *= pivotCount;
 			nodeIndex2 *= pivotCount;
 
@@ -102,8 +112,12 @@ namespace Pathfinding {
 			}
 
 			return mx;
+#else
+			return 0;
+#endif
 		}
 
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 		void GetClosestWalkableNodesToChildrenRecursively (Transform tr, List<GraphNode> nodes) {
 			foreach (Transform ch in tr) {
 				var info = AstarPath.active.GetNearest(ch.position, NNConstraint.Default);
@@ -115,16 +129,17 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Pick N random walkable nodes from all nodes in all graphs and add them to the buffer.
-		 *
-		 * Here we select N random nodes from a stream of nodes.
-		 * Probability of choosing the first N nodes is 1
-		 * Probability of choosing node i is min(N/i,1)
-		 * A selected node will replace a random node of the previously
-		 * selected ones.
-		 *
-		 * \see https://en.wikipedia.org/wiki/Reservoir_sampling
-		 */
+		/// <summary>
+		/// Pick N random walkable nodes from all nodes in all graphs and add them to the buffer.
+		///
+		/// Here we select N random nodes from a stream of nodes.
+		/// Probability of choosing the first N nodes is 1
+		/// Probability of choosing node i is min(N/i,1)
+		/// A selected node will replace a random node of the previously
+		/// selected ones.
+		///
+		/// See: https://en.wikipedia.org/wiki/Reservoir_sampling
+		/// </summary>
 		void PickNRandomNodes (int count, List<GraphNode> buffer) {
 			int n = 0;
 
@@ -163,8 +178,10 @@ namespace Pathfinding {
 
 			return first;
 		}
+#endif
 
 		public void RecalculatePivots () {
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 			if (mode == HeuristicOptimizationMode.None) {
 				pivotCount = 0;
 				pivots = null;
@@ -216,9 +233,11 @@ namespace Pathfinding {
 			pivots = pivotList.ToArray();
 
 			Pathfinding.Util.ListPool<GraphNode>.Release(ref pivotList);
+#endif
 		}
 
 		public void RecalculateCosts () {
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 			if (pivots == null) RecalculatePivots();
 			if (mode == HeuristicOptimizationMode.None) return;
 
@@ -342,18 +361,20 @@ namespace Pathfinding {
 				// Recursive and serial
 				startCostCalculation(0);
 			}
-
+#endif
 			dirty = false;
 		}
 
-		/** Special case necessary for paths to unwalkable nodes right next to walkable nodes to be able to use good heuristics.
-		 *
-		 * This will find all unwalkable nodes in all grid graphs with walkable nodes as neighbours
-		 * and set the cost to reach them from each of the pivots as the minimum of the cost to
-		 * reach the neighbours of each node.
-		 *
-		 * \see ABPath.EndPointGridGraphSpecialCase
-		 */
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
+		/// <summary>
+		/// Special case necessary for paths to unwalkable nodes right next to walkable nodes to be able to use good heuristics.
+		///
+		/// This will find all unwalkable nodes in all grid graphs with walkable nodes as neighbours
+		/// and set the cost to reach them from each of the pivots as the minimum of the cost to
+		/// reach the neighbours of each node.
+		///
+		/// See: ABPath.EndPointGridGraphSpecialCase
+		/// </summary>
 		void ApplyGridGraphEndpointSpecialCase () {
 #if !ASTAR_NO_GRID_GRAPH
 			var graphs = AstarPath.active.graphs;
@@ -417,8 +438,10 @@ namespace Pathfinding {
 			}
 #endif
 		}
+#endif
 
 		public void OnDrawGizmos () {
+#if !AstarFree && !ASTAR_NO_EUCLIDEAN_EMBEDDING
 			if (pivots != null) {
 				for (int i = 0; i < pivots.Length; i++) {
 					Gizmos.color = new Color(159/255.0f, 94/255.0f, 194/255.0f, 0.8f);
@@ -428,6 +451,7 @@ namespace Pathfinding {
 					}
 				}
 			}
+#endif
 		}
 	}
 }

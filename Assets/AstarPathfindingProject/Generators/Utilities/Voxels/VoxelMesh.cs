@@ -4,9 +4,10 @@ namespace Pathfinding.Voxels {
 	using Pathfinding.Util;
 
 	public partial class Voxelize {
-		/** Returns T iff (v_i, v_j) is a proper internal
-		 * diagonal of P.
-		 */
+		/// <summary>
+		/// Returns T iff (v_i, v_j) is a proper internal
+		/// diagonal of P.
+		/// </summary>
 		public static bool Diagonal (int i, int j, int n, int[] verts, int[] indices) {
 			return InCone(i, j, n, verts, indices) && Diagonalie(i, j, n, verts, indices);
 		}
@@ -25,9 +26,10 @@ namespace Pathfinding.Voxels {
 			return !(LeftOn(pi, pj, pi1, verts) && LeftOn(pj, pi, pin1, verts));
 		}
 
-		/** Returns true iff c is strictly to the left of the directed
-		 * line through a to b.
-		 */
+		/// <summary>
+		/// Returns true iff c is strictly to the left of the directed
+		/// line through a to b.
+		/// </summary>
 		public static bool Left (int a, int b, int c, int[] verts) {
 			return Area2(a, b, c, verts) < 0;
 		}
@@ -44,10 +46,10 @@ namespace Pathfinding.Voxels {
 			return (verts[b] - verts[a]) * (verts[c+2] - verts[a+2]) - (verts[c+0] - verts[a+0]) * (verts[b+2] - verts[a+2]);
 		}
 
-		/**
-		 * Returns T iff (v_i, v_j) is a proper internal *or* external
-		 * diagonal of P, *ignoring edges incident to v_i and v_j*.
-		 */
+		/// <summary>
+		/// Returns T iff (v_i, v_j) is a proper internal *or* external
+		/// diagonal of P, *ignoring edges incident to v_i and v_j*.
+		/// </summary>
 		static bool Diagonalie (int i, int j, int n, int[] verts, int[] indices) {
 			int d0 = (indices[i] & 0x0fffffff) * 4;
 			int d1 = (indices[j] & 0x0fffffff) * 4;
@@ -127,17 +129,19 @@ namespace Pathfinding.Voxels {
 			return verts[a+0] == verts[b+0] && verts[a+2] == verts[b+2];
 		}
 
-		/** (i-1+n) % n assuming 0 <= i < n */
+		/// <summary>(i-1+n) % n assuming 0 <= i < n</summary>
 		public static int Prev (int i, int n) { return i-1 >= 0 ? i-1 : n-1; }
-		/** (i+1) % n assuming 0 <= i < n */
+		/// <summary>(i+1) % n assuming 0 <= i < n</summary>
 		public static int Next (int i, int n) { return i+1 < n ? i+1 : 0; }
 
-		/** Builds a polygon mesh from a contour set.
-		 *
-		 * \param cset contour set to build a mesh from.
-		 * \param nvp Maximum allowed vertices per polygon. \warning Currently locked to 3.
-		 * \param mesh Results will be written to this mesh.
-		 */
+		/// <summary>
+		/// Builds a polygon mesh from a contour set.
+		///
+		/// Warning: Currently locked to 3.
+		/// </summary>
+		/// <param name="cset">contour set to build a mesh from.</param>
+		/// <param name="nvp">Maximum allowed vertices per polygon.</param>
+		/// <param name="mesh">Results will be written to this mesh.</param>
 		public void BuildPolyMesh (VoxelContourSet cset, int nvp, out VoxelMesh mesh) {
 			AstarProfiler.StartProfile("Build Poly Mesh");
 

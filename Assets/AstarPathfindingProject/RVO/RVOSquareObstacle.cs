@@ -1,21 +1,17 @@
 using UnityEngine;
 
 namespace Pathfinding.RVO {
-	/**
-	 * Square Obstacle for RVO Simulation.
-	 *
-	 * \astarpro
-	 */
+	/// <summary>Square Obstacle for RVO Simulation.</summary>
 	[AddComponentMenu("Pathfinding/Local Avoidance/Square Obstacle")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_r_v_o_1_1_r_v_o_square_obstacle.php")]
 	public class RVOSquareObstacle : RVOObstacle {
-		/** Height of the obstacle */
+		/// <summary>Height of the obstacle</summary>
 		public float height = 1;
 
-		/** Size of the square */
+		/// <summary>Size of the square</summary>
 		public Vector2 size = Vector3.one;
 
-		/** Center of the square */
+		/// <summary>Center of the square</summary>
 		public Vector2 center = Vector3.zero;
 
 		protected override bool StaticObstacle { get { return false; } }

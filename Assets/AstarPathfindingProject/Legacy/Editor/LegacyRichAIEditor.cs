@@ -1,12 +1,4 @@
-using UnityEditor;
 
-namespace Pathfinding.Legacy {
-	[CustomEditor(typeof(LegacyRichAI))]
-	[CanEditMultipleObjects]
-	public class LegacyRichAIEditor : BaseAIEditor {
-		protected override void Inspector () {
-			base.Inspector();
-			LegacyEditorHelper.UpgradeDialog(targets, typeof(RichAI));
-		}
-	}
-}
+// This file has been removed from the project. Since UnityPackages cannot
+// delete files, only replace them, this message is left here to prevent old
+// files from causing compiler errors

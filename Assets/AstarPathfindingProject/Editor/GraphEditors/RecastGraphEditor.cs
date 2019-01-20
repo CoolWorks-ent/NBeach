@@ -2,10 +2,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace Pathfinding {
-	/**
-	 * Editor for the RecastGraph.
-	 * \astarpro
-	 */
+	/// <summary>Editor for the RecastGraph.</summary>
 	[CustomGraphEditor(typeof(RecastGraph), "Recast Graph")]
 	public class RecastGraphEditor : GraphEditor {
 		public static bool tagMaskFoldout;
@@ -146,6 +143,8 @@ namespace Pathfinding {
 			graph.mask = EditorGUILayoutx.LayerMaskField("Layer Mask", graph.mask);
 			tagMaskFoldout = EditorGUILayoutx.UnityTagMaskList(new GUIContent("Tag Mask"), tagMaskFoldout, graph.tagMask);
 
+			graph.enableNavmeshCutting = EditorGUILayout.Toggle(new GUIContent("Affected by navmesh cuts", "Makes this graph affected by NavmeshCut and NavmeshAdd components. See the documentation for more info."), graph.enableNavmeshCutting);
+
 			Separator();
 
 			GUILayout.BeginHorizontal();
@@ -190,7 +189,7 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Exports the INavmesh graph to a .obj file */
+		/// <summary>Exports the INavmesh graph to a .obj file</summary>
 		public static void ExportToFile (RecastGraph target) {
 			//INavmesh graph = (INavmesh)target;
 			if (target == null) return;

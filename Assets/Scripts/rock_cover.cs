@@ -20,6 +20,7 @@ public class rock_cover : MonoBehaviour {
         {
             //play animation to destroy rock
             Debug.Log("cover smashed");
+            AstarPath.active.UpdateGraphs(GetComponent<Collider>().bounds);
             Destroy(this.gameObject);
         }
     }

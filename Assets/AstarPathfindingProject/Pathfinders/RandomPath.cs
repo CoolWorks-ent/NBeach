@@ -1,65 +1,72 @@
 using UnityEngine;
 
 namespace Pathfinding {
-	/** Finds a path in a random direction from the start node.
-	 * \ingroup paths
-	 * Terminates and returns when G \>= \a length (passed to the constructor) + RandomPath.spread or when there are no more nodes left to search.\n
-	 *
-	 * \code
-	 *
-	 * // Call a RandomPath call like this, assumes that a Seeker is attached to the GameObject
-	 *
-	 * // The path will be returned when the path is over a specified length (or more accurately when the traversal cost is greater than a specified value).
-	 * // A score of 1000 is approximately equal to the cost of moving one world unit.
-	 * int theGScoreToStopAt = 50000;
-	 *
-	 * // Create a path object
-	 * RandomPath path = RandomPath.Construct(transform.position, theGScoreToStopAt);
-	 * // Determines the variation in path length that is allowed
-	 * path.spread = 5000;
-	 *
-	 * // Get the Seeker component which must be attached to this GameObject
-	 * Seeker seeker = GetComponent<Seeker>();
-	 *
-	 * // Start the path and return the result to MyCompleteFunction (which is a function you have to define, the name can of course be changed)
-	 * seeker.StartPath(path, MyCompleteFunction);
-	 *
-	 * \endcode
-	 * \astarpro
-	 */
+	/// <summary>
+	/// Finds a path in a random direction from the start node.
+	/// \ingroup paths
+	/// Terminates and returns when G \>= length (passed to the constructor) + RandomPath.spread or when there are no more nodes left to search.\n
+	///
+	/// <code>
+	///
+	/// // Call a RandomPath call like this, assumes that a Seeker is attached to the GameObject
+	///
+	/// // The path will be returned when the path is over a specified length (or more accurately when the traversal cost is greater than a specified value).
+	/// // A score of 1000 is approximately equal to the cost of moving one world unit.
+	/// int theGScoreToStopAt = 50000;
+	///
+	/// // Create a path object
+	/// RandomPath path = RandomPath.Construct(transform.position, theGScoreToStopAt);
+	/// // Determines the variation in path length that is allowed
+	/// path.spread = 5000;
+	///
+	/// // Get the Seeker component which must be attached to this GameObject
+	/// Seeker seeker = GetComponent<Seeker>();
+	///
+	/// // Start the path and return the result to MyCompleteFunction (which is a function you have to define, the name can of course be changed)
+	/// seeker.StartPath(path, MyCompleteFunction);
+	///
+	/// </code>
+	/// </summary>
 	public class RandomPath : ABPath {
-		/** G score to stop searching at.
-		 * The G score is rougly the distance to get from the start node to a node multiplied by 1000 (per default, see Pathfinding.Int3.Precision), plus any penalties */
+		/// <summary>
+		/// G score to stop searching at.
+		/// The G score is rougly the distance to get from the start node to a node multiplied by 1000 (per default, see Pathfinding.Int3.Precision), plus any penalties
+		/// </summary>
 		public int searchLength;
 
-		/** All G scores between #searchLength and #searchLength+#spread are valid end points, a random one of them is chosen as the final point.
-		 * On grid graphs a low spread usually works (but keep it higher than nodeSize*1000 since that it the default cost of moving between two nodes), on NavMesh graphs
-		 * I would recommend a higher spread so it can evaluate more nodes
-		 */
+		/// <summary>
+		/// All G scores between <see cref="searchLength"/> and <see cref="searchLength"/>+<see cref="spread"/> are valid end points, a random one of them is chosen as the final point.
+		/// On grid graphs a low spread usually works (but keep it higher than nodeSize*1000 since that it the default cost of moving between two nodes), on NavMesh graphs
+		/// I would recommend a higher spread so it can evaluate more nodes
+		/// </summary>
 		public int spread = 5000;
 
-		/** If an #aim is set, the higher this value is, the more it will try to reach #aim */
+		/// <summary>If an <see cref="aim"/> is set, the higher this value is, the more it will try to reach <see cref="aim"/></summary>
 		public float aimStrength;
 
-		/** Currently chosen end node */
+		/// <summary>Currently chosen end node</summary>
 		PathNode chosenNodeR;
 
-		/** The node with the highest G score which is still lower than #searchLength.
-		 * Used as a backup if a node with a G score higher than #searchLength could not be found */
+		/// <summary>
+		/// The node with the highest G score which is still lower than <see cref="searchLength"/>.
+		/// Used as a backup if a node with a G score higher than <see cref="searchLength"/> could not be found
+		/// </summary>
 		PathNode maxGScoreNodeR;
 
-		/** The G score of #maxGScoreNodeR */
+		/// <summary>The G score of <see cref="maxGScoreNodeR"/></summary>
 		int maxGScore;
 
-		/** An aim can be used to guide the pathfinder to not take totally random paths.
-		 * For example you might want your AI to continue in generally the same direction as before, then you can specify
-		 * aim to be transform.postion + transform.forward*10 which will make it more often take paths nearer that point
-		 * \see #aimStrength */
+		/// <summary>
+		/// An aim can be used to guide the pathfinder to not take totally random paths.
+		/// For example you might want your AI to continue in generally the same direction as before, then you can specify
+		/// aim to be transform.postion + transform.forward*10 which will make it more often take paths nearer that point
+		/// See: <see cref="aimStrength"/>
+		/// </summary>
 		public Vector3 aim;
 
 		int nodesEvaluatedRep;
 
-		/** Random number generator */
+		/// <summary>Random number generator</summary>
 		readonly System.Random rnd = new System.Random();
 
 		internal override bool FloodingPath {
@@ -91,11 +98,6 @@ namespace Pathfinding {
 
 		public RandomPath () {}
 
-		[System.Obsolete("This constructor is obsolete. Please use the pooling API and the Construct methods")]
-		public RandomPath (Vector3 start, int length, OnPathDelegate callback = null) {
-			throw new System.Exception("This constructor is obsolete. Please use the pooling API and the Setup methods");
-		}
-
 		public static RandomPath Construct (Vector3 start, int length, OnPathDelegate callback = null) {
 			var p = PathPool.GetPath<RandomPath>();
 
@@ -119,8 +121,10 @@ namespace Pathfinding {
 			return this;
 		}
 
-		/** Calls callback to return the calculated path.
-		 * \see #callback */
+		/// <summary>
+		/// Calls callback to return the calculated path.
+		/// See: <see cref="callback"/>
+		/// </summary>
 		protected override void ReturnPath () {
 			if (path != null && path.Count > 0) {
 				endNode = path[path.Count-1];

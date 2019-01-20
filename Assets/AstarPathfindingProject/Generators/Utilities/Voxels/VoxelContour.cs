@@ -181,7 +181,7 @@ namespace Pathfinding.Voxels {
 						Debug.LogError("rcBuildContours: Could not find merge target for bad contour "+i+".");
 					} else {
 						// Debugging
-						//Debug.LogWarning ("Fixing contour");
+						// Debug.LogWarning ("Fixing contour");
 
 						VoxelContour mcont = contours[mergeIdx];
 						// Merge by closest points.
@@ -298,7 +298,7 @@ namespace Pathfinding.Voxels {
 			}
 		}
 
-		/** Releases contents of a contour set to caches */
+		/// <summary>Releases contents of a contour set to caches</summary>
 		static void ReleaseContours (VoxelContourSet cset) {
 			for (int i = 0; i < cset.conts.Count; i++) {
 				VoxelContour cont = cset.conts[i];
@@ -425,6 +425,7 @@ namespace Pathfinding.Voxels {
 
 			// Add points until all raw points are within
 			// error tolerance to the simplified shape.
+			// This uses the Douglas-Peucker algorithm.
 			int pn = verts.Count/4;
 
 			//Use the max squared error instead

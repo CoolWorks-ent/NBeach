@@ -55,7 +55,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   data:
-    dataString: UEsDBBQAAAgIAACAn+t105t24AEAAK8DAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtUk1P4zAQ/StRzgvKR1PoHrdUcKB0lXBAoD1M7Eli4dhdx6GlVf/7evLRBrEn22/mvfG8maPPKjDALJoUuGgb/6cX/vB8ppXVrVnDfmWMNg6NCEUpM3FA9wyuEwfsQL5DLvEBRVnZIWsEl1LU+Tm1hn0m9Za4cdC/V7zER1SlrYjZgUKlWAqthiqxw5ALq82zkDiAYUKpdgBeviGvZ6RtkHjUlDUtOsSgxA9Q9t7AtspaUwDDteYk69/pJ21T/NsKgz7lQuNscYJLLaXgaEinANngNLjGpvpSYQw8ozEg1P8iBqcMNsinY/wOLQhJXfRGNe/ufvT8D5At/fQqiuPZzcw7UdNQrvuEtz/07ItmUG/PfpGJRluwztdeaE9TcejncB7o7OQKbRjyX7pVvFmicnIXRnibDJwouY4G2txN9xtzKDzygrHWbCzmoI7UVHpHBm5aK4XCiycUeHJzWWqlkNHPp+aPtGGAF5pCMNjYzB2s2ij5+fI6oZWt4F+d9FmQ3wZRuJjHN/N5HCRX4SxOiiRfLPIYEh7kfvdPoYQVIH+jAmlH19wyT6aroO4UU2Rujl63YLRF3MDuXhxqPZm4UIXOmNsCtek1zo25+YN07vFVt/UZWitUSVT/ePJP/wBQSwMEFAAACAgAAICf6xUUHY5vAAAAegAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPUMzTTUVBKL0osyCgGihiCOKWZKSB2tFKyQZKFgZGhpZmxuZmZsYGprqGJsWmaaZKlZZJxommKQZJSLFB9SWVBql9ibipET0BiSUZaZl5KZl66XlBqcmJxiTvIcKXYWgBQSwECLQAUAAAICAAAgJ/rddObduABAACvAwAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rFRQdjm8AAAB6AAAACQAkAAAAAAAAAAAAAAAtAgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAOcCAAAAAA==
+    dataString: UEsDBBQAAAgIAACAn+sYELVP6AEAAMsDAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtU01v2zAM/SuBz+sQ52vOjkuD7rAkQ9xD0WIHRqJtobKUyVKSJuh/H+mPxEV3kvXI9yg+0pdIFOBAeHRbkCpU0fdB/HX6ZRAJa7wNbgWnpXPWET5iFLVO1RnpOqzTjqBfYafxJ6q88G1WBy60KnfX1BJOqbZ75o6HzX0pc/yFJvcFM2tQmS3mypq2ypgwlMpb96g0tmA8Sgj2LfD0CXm+IqFC5nFb3gUkxKHGAxj/4GBfpMFlIHBlJctG93Zt/Rb/BuUw4lyoyBgSXFitlUTHOhnoCvvBFVbFhwpd4BGdA2X+F3HYZ4hWftvF79GD0txFY1T1St+XQXQAHfild/FsPk9mg3duGvJVk/Dyh69N0RTK/dUvNtFZD558bYROPBVC39rzzGctl1knUP6wwchqgYbkbow46TiTjvRt+onVFu04w44TT1sOQTWpKuyRzdsEr5XBmx8cWNNMFtYYFPzqvvEdrR3ejWYQHFY+pUMUG6Pfnp57NDS8kms4lMRdBO+VyW/cPCj50eNoNhNZkmE8mYtsPsXkbhLvpIiTcTJCELMMoroLZZRXoH+Tvvadn7TmvbkbKGvFLQqa8KBePd4v6eD4oM6l7e2CMplNBe2H2TQa17ZpM0CTt3JZ/w8p1i0wNbq8R+//AFBLAwQUAAAICAAAgJ/rNIaCF24AAAB5AAAACQAkAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAatWKkstKs7Mz1OyUjDRM9Iz0lFQSi9KLMgoBgoYgjilmSkgdrSSmVlymkVaqqGJZXKapWmqha6JYVJKsqGFsYVRamKyWVqiUixQfUllQapfYm4qRE9AYklGWmZeSmZeul5QanJicYk7yHCl2FoAUEsBAi0AFAAACAgAAICf6xgQtU/oAQAAywMAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf6zSGghduAAAAeQAAAAkAJAAAAAAAAAAAAAAANQIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAADuAgAAAAA=
     upgradeData: 
     file_cachedStartup: {fileID: 4900000, guid: 21f303a13747b394aac2cb72b2113fdd,
       type: 3}
@@ -76,7 +76,7 @@ MonoBehaviour:
   prioritizeGraphs: 0
   prioritizeGraphsLimit: 1
   colorSettings:
-    _NodeConnection: {r: 1, g: 1, b: 1, a: 0.9}
+    _SolidColor: {r: 0.11764706, g: 0.4, b: 0.7882353, a: 0.9}
     _UnwalkableNode: {r: 1, g: 0, b: 0, a: 0.5}
     _BoundsHandles: {r: 0.29, g: 0.454, b: 0.741, a: 0.9}
     _ConnectionLowLerp: {r: 0, g: 1, b: 0, a: 0.5}
@@ -96,7 +96,7 @@ MonoBehaviour:
   - 9
   - 10
   - 11
-  - 12
+  - Darkness
   - 13
   - 14
   - 15
@@ -118,11 +118,10 @@ MonoBehaviour:
   - 31
   heuristic: 2
   heuristicScale: 1
-  threadCount: 1
+  threadCount: 2
   maxFrameTime: 10
-  minAreaSize: 0
-  batchGraphUpdates: 0
-  graphUpdateBatchingInterval: 0.2
+  batchGraphUpdates: 1
+  graphUpdateBatchingInterval: 0.75
   euclideanEmbedding:
     mode: 0
     seed: 0
@@ -141,8 +140,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  ActiveDarkness: []
+  darknessIDCounter: 0
+  darknessConcurrentAttackLimit: 0
+  attacksCurrentlyProcessed: 0
   maxEnemyCount: 0
+  minEnemyCount: 0
 --- !u!114 &114950399579548982
 MonoBehaviour:
   m_ObjectHideFlags: 1

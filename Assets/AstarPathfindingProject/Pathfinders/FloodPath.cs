@@ -3,56 +3,55 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Pathfinding {
-	/** Floods the area completely for easy computation of any path to a single point.
-	 * This path is a bit special, because it does not do anything useful by itself. What it does is that it calculates paths to all nodes it can reach, it floods the graph.
-	 * This data will remain stored in the path. Then you can call a FloodPathTracer path, that path will trace the path from it's starting point all the way to where this path started flooding and thus generating a path extremely quickly.\n
-	 * It is very useful in for example TD (Tower Defence) games where all your AIs will walk to the same point, but from different places, and you do not update the graph or change the target point very often,
-	 * what changes is their positions and new AIs spawn all the time (which makes it hard to use the MultiTargetPath).\n
-	 *
-	 * With this path type, it can all be handled easily.
-	 * - At start, you simply start ONE FloodPath and save the reference (it will be needed later).
-	 * - Then when a unit is spawned or needs its path recalculated, start a FloodPathTracer path from it's position.
-	 * It will then find the shortest path to the point specified when you called the FloodPath extremely quickly.
-	 * - If you update the graph (for example place a tower in a TD game) or need to change the target point, you simply call a new FloodPath (and store it's reference).
-	 *
-	 * \version From 3.2 and up, path traversal data is now stored in the path class.
-	 * So you can now use other path types in parallel with this one.
-	 *
-	 * Here follows some example code of the above list of steps:
-	 * \code
-	 * public static FloodPath fpath;
-	 *
-	 * public void Start () {
-	 * fpath = FloodPath.Construct (someTargetPosition, null);
-	 * AstarPath.StartPath (fpath);
-	 * }
-	 * \endcode
-	 *
-	 * When searching for a new path to \a someTargetPosition from let's say \a transform.position, you do
-	 * \code
-	 * FloodPathTracer fpathTrace = FloodPathTracer.Construct (transform.position,fpath,null);
-	 * seeker.StartPath (fpathTrace,OnPathComplete);
-	 * \endcode
-	 * Where OnPathComplete is your callback function.
-	 * \n
-	 * Another thing to note is that if you are using NNConstraints on the FloodPathTracer, they must always inherit from Pathfinding.PathIDConstraint.\n
-	 * The easiest is to just modify the instance of PathIDConstraint which is created as the default one.
-	 *
-	 * \astarpro
-	 *
-	 * \shadowimage{floodPathExample.png}
-	 *
-	 * \ingroup paths
-	 *
-	 */
+	/// <summary>
+	/// Floods the area completely for easy computation of any path to a single point.
+	/// This path is a bit special, because it does not do anything useful by itself. What it does is that it calculates paths to all nodes it can reach, it floods the graph.
+	/// This data will remain stored in the path. Then you can call a FloodPathTracer path, that path will trace the path from it's starting point all the way to where this path started flooding and thus generating a path extremely quickly.\n
+	/// It is very useful in for example TD (Tower Defence) games where all your AIs will walk to the same point, but from different places, and you do not update the graph or change the target point very often,
+	/// what changes is their positions and new AIs spawn all the time (which makes it hard to use the MultiTargetPath).\n
+	///
+	/// With this path type, it can all be handled easily.
+	/// - At start, you simply start ONE FloodPath and save the reference (it will be needed later).
+	/// - Then when a unit is spawned or needs its path recalculated, start a FloodPathTracer path from it's position.
+	/// It will then find the shortest path to the point specified when you called the FloodPath extremely quickly.
+	/// - If you update the graph (for example place a tower in a TD game) or need to change the target point, you simply call a new FloodPath (and store it's reference).
+	///
+	/// Version: From 3.2 and up, path traversal data is now stored in the path class.
+	/// So you can now use other path types in parallel with this one.
+	///
+	/// Here follows some example code of the above list of steps:
+	/// <code>
+	/// public static FloodPath fpath;
+	///
+	/// public void Start () {
+	/// fpath = FloodPath.Construct (someTargetPosition, null);
+	/// AstarPath.StartPath (fpath);
+	/// }
+	/// </code>
+	///
+	/// When searching for a new path to someTargetPosition from let's say transform.position, you do
+	/// <code>
+	/// FloodPathTracer fpathTrace = FloodPathTracer.Construct (transform.position,fpath,null);
+	/// seeker.StartPath (fpathTrace,OnPathComplete);
+	/// </code>
+	/// Where OnPathComplete is your callback function.
+	/// \n
+	/// Another thing to note is that if you are using NNConstraints on the FloodPathTracer, they must always inherit from Pathfinding.PathIDConstraint.\n
+	/// The easiest is to just modify the instance of PathIDConstraint which is created as the default one.
+	///
+	/// [Open online documentation to see images]
+	///
+	/// \ingroup paths
+	/// </summary>
 	public class FloodPath : Path {
 		public Vector3 originalStartPoint;
 		public Vector3 startPoint;
 		public GraphNode startNode;
 
-		/** If false, will not save any information.
-		 * Used by some internal parts of the system which doesn't need it.
-		 */
+		/// <summary>
+		/// If false, will not save any information.
+		/// Used by some internal parts of the system which doesn't need it.
+		/// </summary>
 		public bool saveParents = true;
 
 		protected Dictionary<GraphNode, GraphNode> parents;
@@ -71,9 +70,10 @@ namespace Pathfinding {
 			return parents[node];
 		}
 
-		/** Default constructor.
-		 * Do not use this. Instead use the static Construct method which can handle path pooling.
-		 */
+		/// <summary>
+		/// Default constructor.
+		/// Do not use this. Instead use the static Construct method which can handle path pooling.
+		/// </summary>
 		public FloodPath () {}
 
 		public static FloodPath Construct (Vector3 start, OnPathDelegate callback = null) {
@@ -111,7 +111,7 @@ namespace Pathfinding {
 			originalStartPoint = Vector3.zero;
 			startPoint = Vector3.zero;
 			startNode = null;
-			/** \todo Avoid this allocation */
+			/// <summary>TODO: Avoid this allocation</summary>
 			parents = new Dictionary<GraphNode, GraphNode>();
 			saveParents = true;
 		}
@@ -165,12 +165,13 @@ namespace Pathfinding {
 			// Any nodes left to search?
 			if (pathHandler.heap.isEmpty) {
 				CompleteState = PathCompleteState.Complete;
+				return;
 			}
 
 			currentR = pathHandler.heap.Remove();
 		}
 
-		/** Opens nodes until there are none left to search (or until the max time limit has been exceeded) */
+		/// <summary>Opens nodes until there are none left to search (or until the max time limit has been exceeded)</summary>
 		protected override void CalculateStep (long targetTick) {
 			int counter = 0;
 

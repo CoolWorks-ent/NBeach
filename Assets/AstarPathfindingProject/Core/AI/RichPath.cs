@@ -9,15 +9,16 @@ namespace Pathfinding {
 
 		public Seeker seeker;
 
-		/** Transforms points from path space to world space.
-		 * If null the identity transform will be used.
-		 *
-		 * This is used when the world position of the agent does not match the
-		 * corresponding position on the graph. This is the case in the example
-		 * scene called 'Moving'.
-		 *
-		 * \see #Pathfinding.Examples.LocalSpaceRichAI
-		 */
+		/// <summary>
+		/// Transforms points from path space to world space.
+		/// If null the identity transform will be used.
+		///
+		/// This is used when the world position of the agent does not match the
+		/// corresponding position on the graph. This is the case in the example
+		/// scene called 'Moving'.
+		///
+		/// See: <see cref="Pathfinding.Examples.LocalSpaceRichAI"/>
+		/// </summary>
 		public ITransform transform;
 
 		public RichPath () {
@@ -30,17 +31,15 @@ namespace Pathfinding {
 			Endpoint = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
 		}
 
-		/** Use this for initialization.
-		 *
-		 * \param seeker Optionally provide in order to take tag penalties into account. May be null if you do not use a Seeker\
-		 * \param path Path to follow
-		 * \param mergePartEndpoints If true, then adjacent parts that the path is split up in will
-		 * try to use the same start/end points. For example when using a link on a navmesh graph
-		 * Instead of first following the path to the center of the node where the link is and then
-		 * follow the link, the path will be adjusted to go to the exact point where the link starts
-		 * which usually makes more sense.
-		 * \param simplificationMode The path can optionally be simplified. This can be a bit expensive for long paths.
-		 */
+		/// <summary>Use this for initialization.</summary>
+		/// <param name="seeker">Optionally provide in order to take tag penalties into account. May be null if you do not use a Seeker\</param>
+		/// <param name="path">Path to follow</param>
+		/// <param name="mergePartEndpoints">If true, then adjacent parts that the path is split up in will
+		/// try to use the same start/end points. For example when using a link on a navmesh graph
+		/// Instead of first following the path to the center of the node where the link is and then
+		/// follow the link, the path will be adjusted to go to the exact point where the link starts
+		/// which usually makes more sense.</param>
+		/// <param name="simplificationMode">The path can optionally be simplified. This can be a bit expensive for long paths.</param>
 		public void Initialize (Seeker seeker, Path path, bool mergePartEndpoints, bool simplificationMode) {
 			if (path.error) throw new System.ArgumentException("Path has an error");
 
@@ -126,14 +125,14 @@ namespace Pathfinding {
 
 		public Vector3 Endpoint { get; private set; }
 
-		/** True if we have completed (called NextPart for) the last part in the path */
+		/// <summary>True if we have completed (called NextPart for) the last part in the path</summary>
 		public bool CompletedAllParts {
 			get {
 				return currentPart >= parts.Count;
 			}
 		}
 
-		/** True if we are traversing the last part of the path */
+		/// <summary>True if we are traversing the last part of the path</summary>
 		public bool IsLastPart {
 			get {
 				return currentPart >= parts.Count - 1;
@@ -167,7 +166,7 @@ namespace Pathfinding {
 		RichPath path;
 		int[] triBuffer = new int[3];
 
-		/** Post process the funnel corridor or not */
+		/// <summary>Post process the funnel corridor or not</summary>
 		public bool funnelSimplification = true;
 
 		public RichFunnel () {
@@ -177,7 +176,7 @@ namespace Pathfinding {
 			this.graph = null;
 		}
 
-		/** Works like a constructor, but can be used even for pooled objects. Returns \a this for easy chaining */
+		/// <summary>Works like a constructor, but can be used even for pooled objects. Returns this for easy chaining</summary>
 		public RichFunnel Initialize (RichPath path, NavmeshBase graph) {
 			if (graph == null) throw new System.ArgumentNullException("graph");
 			if (this.graph != null) throw new System.InvalidOperationException("Trying to initialize an already initialized object. " + graph);
@@ -206,13 +205,13 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Build a funnel corridor from a node list slice.
-		 * The nodes are assumed to be of type TriangleMeshNode.
-		 *
-		 * \param nodes Nodes to build the funnel corridor from
-		 * \param start Start index in the nodes list
-		 * \param end End index in the nodes list, this index is inclusive
-		 */
+		/// <summary>
+		/// Build a funnel corridor from a node list slice.
+		/// The nodes are assumed to be of type TriangleMeshNode.
+		/// </summary>
+		/// <param name="nodes">Nodes to build the funnel corridor from</param>
+		/// <param name="start">Start index in the nodes list</param>
+		/// <param name="end">End index in the nodes list, this index is inclusive</param>
 		public void BuildFunnelCorridor (List<GraphNode> nodes, int start, int end) {
 			//Make sure start and end points are on the correct nodes
 			exactStart = (nodes[start] as MeshNode).ClosestPointOnNode(exactStart);
@@ -249,7 +248,7 @@ namespace Pathfinding {
 			}
 
 			for (int i = 0; i < this.nodes.Count-1; i++) {
-				/** \todo should use return value in future versions */
+				/// <summary>TODO: should use return value in future versions</summary>
 				this.nodes[i].GetPortal(this.nodes[i+1], left, right, false);
 			}
 
@@ -257,13 +256,14 @@ namespace Pathfinding {
 			right.Add(exactEnd);
 		}
 
-		/** Simplifies a funnel path using linecasting.
-		 * Running time is roughly O(n^2 log n) in the worst case (where n = end-start)
-		 * Actually it depends on how the graph looks, so in theory the actual upper limit on the worst case running time is O(n*m log n) (where n = end-start and m = nodes in the graph)
-		 * but O(n^2 log n) is a much more realistic worst case limit.
-		 *
-		 * Requires #graph to implement IRaycastableGraph
-		 */
+		/// <summary>
+		/// Simplifies a funnel path using linecasting.
+		/// Running time is roughly O(n^2 log n) in the worst case (where n = end-start)
+		/// Actually it depends on how the graph looks, so in theory the actual upper limit on the worst case running time is O(n*m log n) (where n = end-start and m = nodes in the graph)
+		/// but O(n^2 log n) is a much more realistic worst case limit.
+		///
+		/// Requires <see cref="graph"/> to implement IRaycastableGraph
+		/// </summary>
 		void SimplifyPath (IRaycastableGraph graph, List<GraphNode> nodes, int start, int end, List<GraphNode> result, Vector3 startPoint, Vector3 endPoint) {
 			if (graph == null) throw new System.ArgumentNullException("graph");
 
@@ -349,9 +349,10 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Split funnel at node index \a splitIndex and throw the nodes up to that point away and replace with \a prefix.
-		 * Used when the AI has happened to get sidetracked and entered a node outside the funnel.
-		 */
+		/// <summary>
+		/// Split funnel at node index splitIndex and throw the nodes up to that point away and replace with prefix.
+		/// Used when the AI has happened to get sidetracked and entered a node outside the funnel.
+		/// </summary>
 		void UpdateFunnelCorridor (int splitIndex, List<TriangleMeshNode> prefix) {
 			nodes.RemoveRange(0, splitIndex);
 			nodes.InsertRange(0, prefix);
@@ -370,7 +371,7 @@ namespace Pathfinding {
 			right.Add(exactEnd);
 		}
 
-		/** True if any node in the path is destroyed */
+		/// <summary>True if any node in the path is destroyed</summary>
 		bool CheckForDestroyedNodes () {
 			// Loop through all nodes and check if they are destroyed
 			// If so, we really need a recalculation of our path quickly
@@ -384,9 +385,10 @@ namespace Pathfinding {
 			return false;
 		}
 
-		/** Approximate distance (as the crow flies) to the endpoint of this path part.
-		 * \see #exactEnd
-		 */
+		/// <summary>
+		/// Approximate distance (as the crow flies) to the endpoint of this path part.
+		/// See: <see cref="exactEnd"/>
+		/// </summary>
 		public float DistanceToEndOfPath {
 			get {
 				var currentNode = CurrentNode;
@@ -395,9 +397,10 @@ namespace Pathfinding {
 			}
 		}
 
-		/** Clamps the position to the navmesh and repairs the path if the agent has moved slightly outside it.
-		 * You should not call this method with anything other than the agent's position.
-		 */
+		/// <summary>
+		/// Clamps the position to the navmesh and repairs the path if the agent has moved slightly outside it.
+		/// You should not call this method with anything other than the agent's position.
+		/// </summary>
 		public Vector3 ClampToNavmesh (Vector3 position) {
 			if (path.transform != null) position = path.transform.InverseTransform(position);
 			ClampToNavmeshInternal(ref position);
@@ -405,16 +408,16 @@ namespace Pathfinding {
 			return position;
 		}
 
-		/** Find the next points to move towards and clamp the position to the navmesh.
-		 *
-		 * \param position The position of the agent.
-		 * \param buffer Will be filled with up to \a numCorners points which are the next points in the path towards the target.
-		 * \param numCorners See buffer.
-		 * \param lastCorner True if the buffer contains the end point of the path.
-		 * \param requiresRepath True if nodes along the path have been destroyed and a path recalculation is necessary.
-		 *
-		 * \returns The position of the agent clamped to make sure it is inside the navmesh.
-		 */
+		/// <summary>
+		/// Find the next points to move towards and clamp the position to the navmesh.
+		///
+		/// Returns: The position of the agent clamped to make sure it is inside the navmesh.
+		/// </summary>
+		/// <param name="position">The position of the agent.</param>
+		/// <param name="buffer">Will be filled with up to numCorners points which are the next points in the path towards the target.</param>
+		/// <param name="numCorners">See buffer.</param>
+		/// <param name="lastCorner">True if the buffer contains the end point of the path.</param>
+		/// <param name="requiresRepath">True if nodes along the path have been destroyed and a path recalculation is necessary.</param>
 		public Vector3 Update (Vector3 position, List<Vector3> buffer, int numCorners, out bool lastCorner, out bool requiresRepath) {
 			if (path.transform != null) position = path.transform.InverseTransform(position);
 
@@ -455,19 +458,20 @@ namespace Pathfinding {
 			return position;
 		}
 
-		/** Cached object to avoid unnecessary allocations */
+		/// <summary>Cached object to avoid unnecessary allocations</summary>
 		static Queue<TriangleMeshNode> navmeshClampQueue = new Queue<TriangleMeshNode>();
-		/** Cached object to avoid unnecessary allocations */
+		/// <summary>Cached object to avoid unnecessary allocations</summary>
 		static List<TriangleMeshNode> navmeshClampList = new List<TriangleMeshNode>();
-		/** Cached object to avoid unnecessary allocations */
+		/// <summary>Cached object to avoid unnecessary allocations</summary>
 		static Dictionary<TriangleMeshNode, TriangleMeshNode> navmeshClampDict = new Dictionary<TriangleMeshNode, TriangleMeshNode>();
 
-		/** Searches for the node the agent is inside.
-		 * This will also clamp the position to the navmesh
-		 * and repair the funnel cooridor if the agent moves slightly outside it.
-		 *
-		 * \returns True if nodes along the path have been destroyed so that a path recalculation is required
-		 */
+		/// <summary>
+		/// Searches for the node the agent is inside.
+		/// This will also clamp the position to the navmesh
+		/// and repair the funnel cooridor if the agent moves slightly outside it.
+		///
+		/// Returns: True if nodes along the path have been destroyed so that a path recalculation is required
+		/// </summary>
 		bool ClampToNavmeshInternal (ref Vector3 position) {
 			var previousNode = nodes[currentNode];
 
@@ -567,9 +571,10 @@ namespace Pathfinding {
 			return currentNode + 1 < nodes.Count && nodes[currentNode+1].Destroyed;
 		}
 
-		/** Fill wallBuffer with all navmesh wall segments close to the current position.
-		 * A wall segment is a node edge which is not shared by any other neighbour node, i.e an outer edge on the navmesh.
-		 */
+		/// <summary>
+		/// Fill wallBuffer with all navmesh wall segments close to the current position.
+		/// A wall segment is a node edge which is not shared by any other neighbour node, i.e an outer edge on the navmesh.
+		/// </summary>
 		public void FindWalls (List<Vector3> wallBuffer, float range) {
 			FindWalls(currentNode, wallBuffer, currentPosition, range);
 		}
@@ -817,7 +822,7 @@ namespace Pathfinding {
 			nodeLink = null;
 		}
 
-		/** Works like a constructor, but can be used even for pooled objects. Returns \a this for easy chaining */
+		/// <summary>Works like a constructor, but can be used even for pooled objects. Returns this for easy chaining</summary>
 		public RichSpecial Initialize (NodeLink2 nodeLink, GraphNode first) {
 			this.nodeLink = nodeLink;
 			if (first == nodeLink.startNode) {

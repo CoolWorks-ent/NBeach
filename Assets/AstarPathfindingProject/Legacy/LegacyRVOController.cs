@@ -5,29 +5,29 @@ using System.Collections.Generic;
 namespace Pathfinding.Legacy {
 	using Pathfinding.RVO;
 
-	/** RVO Character Controller.
-	 * Designed to be used as a drop-in replacement for the Unity Character Controller,
-	 * it supports almost all of the same functions and fields with the exception
-	 * that due to the nature of the RVO implementation, desired velocity is set in the Move function
-	 * and is assumed to stay the same until something else is requested (as opposed to reset every frame).
-	 *
-	 * For documentation of many of the variables of this class: refer to the Pathfinding.RVO.IAgent interface.
-	 *
-	 * \note Requires an RVOSimulator in the scene
-	 *
-	 * \see Pathfinding.RVO.IAgent
-	 * \see RVOSimulator
-	 *
-	 * \deprecated Use the RVOController class instead. This class only exists for compatibility reasons.
-	 *
-	 * \astarpro
-	 */
+	/// <summary>
+	/// RVO Character Controller.
+	/// Designed to be used as a drop-in replacement for the Unity Character Controller,
+	/// it supports almost all of the same functions and fields with the exception
+	/// that due to the nature of the RVO implementation, desired velocity is set in the Move function
+	/// and is assumed to stay the same until something else is requested (as opposed to reset every frame).
+	///
+	/// For documentation of many of the variables of this class: refer to the Pathfinding.RVO.IAgent interface.
+	///
+	/// Note: Requires an RVOSimulator in the scene
+	///
+	/// See: Pathfinding.RVO.IAgent
+	/// See: RVOSimulator
+	///
+	/// Deprecated: Use the RVOController class instead. This class only exists for compatibility reasons.
+	/// </summary>
 	[AddComponentMenu("Pathfinding/Legacy/Local Avoidance/Legacy RVO Controller")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_legacy_1_1_legacy_r_v_o_controller.php")]
 	public class LegacyRVOController : RVOController {
-		/** Layer mask for the ground.
-		 * The RVOController will raycast down to check for the ground to figure out where to place the agent.
-		 */
+		/// <summary>
+		/// Layer mask for the ground.
+		/// The RVOController will raycast down to check for the ground to figure out where to place the agent.
+		/// </summary>
 		[Tooltip("Layer mask for the ground. The RVOController will raycast down to check for the ground to figure out where to place the agent")]
 		public new LayerMask mask = -1;
 
