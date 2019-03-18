@@ -33,6 +33,7 @@ public class DarknessBoss : MonoBehaviour {
     public Sprite WoodIcon;
     public Sprite FireIcon;
     public bool doRockSmash = false;
+    public int ProjectileAttack_Finish = 0;
     public ParticleSystem DarkBallFX;
 
     private SoundManager sm;
@@ -53,6 +54,12 @@ public class DarknessBoss : MonoBehaviour {
     private SpriteRenderer spellIcon;
 
     // Use this for initialization
+    private void Awake()
+    {
+        animationControl = GetComponent<Animator>();
+
+    }
+
     void Start()
     {
         EventManager.StartListening("BossAttackAnimFinished", OnAttackAnimFinished);
@@ -88,8 +95,6 @@ public class DarknessBoss : MonoBehaviour {
                 animationControl.SetBool ("NoAttackAlive", true);
             else
                 animationControl.SetBool ("NoAttackAlive", false);*/
-
-
         if (Input.GetKeyDown(KeyCode.Alpha1))
             makeTestAttack(67);
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -238,6 +243,7 @@ public class DarknessBoss : MonoBehaviour {
             }
 
             //transform.LookAt(tempTarget);
+            animationControl.ResetTrigger("SmashEnd");
             animationControl.SetBool("DoRockSmashAttack", true);
             StartCoroutine(DoAttackCoroutine(ArmPivot.transform, target, false));
         }
@@ -640,6 +646,7 @@ public class DarknessBoss : MonoBehaviour {
 
                 //Call event to signal Boss's RockSmash attack if finished
                 EventManager.TriggerEvent("DarkBossSmashAttackCheck", "Off");
+                animationControl.SetTrigger("SmashEnd");                
             }
 
 
@@ -650,6 +657,8 @@ public class DarknessBoss : MonoBehaviour {
                 animationControl.SetBool("DoSmashAttack", false);
                 animationControl.SetBool("IsRest", false);
                 animationControl.SetBool("AttackWait", true);
+                animationControl.SetTrigger("SmashEnd");
+                //animationControl.ResetTrigger("SmashEnd");
                 rockSmashInterruptAttack = false;
                 changeAttackType = false;
                 attackState = BossAttackType.RockSmash;
@@ -663,8 +672,14 @@ public class DarknessBoss : MonoBehaviour {
                 animationControl.SetBool("DoSmashAttack", false);
                 animationControl.SetBool("IsRest", true);
                 animationControl.SetBool("AttackWait", false);
+                animationControl.ResetTrigger("SmashEnd");
             }
         }
+    }
+
+    public void OnSmashAttackEnd()
+    {
+        animationControl.SetTrigger("SmashEnd");
     }
 
     IEnumerator FlashSpellIcon()

@@ -3,28 +3,28 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.EventSystems;
 
-public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused}
+public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused }
+public enum GameLevelSelectionState {LevelSelected, Continue, NewGame}
 
 public class GameController : MonoBehaviour {
 
     [SerializeField]
     public PlayerController playerControl;
     [SerializeField]
-    public GameObject playerStage;
-    [SerializeField]
     public SoundManager soundManager;
     [SerializeField]
     public LevelManager lvlManager;
     [SerializeField]
-    Camera UICamera;
+    public Camera UICamera;
     [SerializeField]
     UIManager uiManager;
     [SerializeField]
-    public CameraPathAnimator pathControl;
-    [SerializeField]
     GameObject debugMenuPrefab;
 
+    public CameraPathAnimator pathControl; //reads value from level script
     public TimeManager timeManager;
     GameObject player;
     GameObject wave;
@@ -35,12 +35,16 @@ public class GameController : MonoBehaviour {
     ParticleSystem HolyLight;
 
     public GameState gameState { get; set; }
+    public GameLevelSelectionState gameLevelSelectionState { get; set; }
     public Image blackOverlay, dmgOverlay;
 
 
     MagicFish specialFish;
     bool showDebug=false;
     private GameObject debugMenuObj;
+    List<string> s1Events;
+    
+
 
     private static GameController gameController;
 
@@ -63,13 +67,10 @@ public class GameController : MonoBehaviour {
     }
 
 
-    List<string> s1Events;
+    
 
     // Use this for initialization
     void Start () {
-
-        //set gamestate
-        gameState = GameState.IsPlaying;
 
         //set unity player to run even when video is not in focus
         Application.runInBackground = true;
@@ -78,12 +79,84 @@ public class GameController : MonoBehaviour {
 
         //set default state to "paused"
         //splineControl.sSplineState = SplineState.Paused;
-        
-        /********************************
-         * Song 1
-         * ********************************/
+
+    }
+
+    void Awake()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        /*
+         * LOAD RESOURCES on AWAKE
+         * load different resources based upon the Scene loaded
+         */
+        EventManager.StartListening("Player_Stop", ResetPlayer);
+        EventManager.StartListening("PauseWorld", OnWorldPaused);
+        EventManager.StartListening("PauseGame", OnGamePaused);
+        EventManager.StartListening("MenuSelect_ResumeGame", OnGameResume);
+        EventManager.StartListening("MenuSelect_StartGame", OnStartGame);
+        EventManager.StartListening("MenuSelect_LevelSelectGame", OnStartGameFromLevelSelect);
+
+
+        //timeManager = GetComponent<TimeManager>();
+        Time.fixedDeltaTime = Time.timeScale * .02f;
+        EventManager.StartListening("StopAllTempAudio", delegate { DebugFunc("StopAudio"); });
+
+      
+
+    }
+
+    //SCRIPT runs right after a level is loaded.
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (SceneManager.GetActiveScene().name == "Main Menu")
+        {
+            Debug.Log("MainMenu");
+            //set gamestate
+            gameState = GameState.InMenu;
+        }
+        else
+        {
+            gameState = GameState.IsPlaying;
+            lvlManager.OnSceneLoaded(scene, mode);
+
+            //Assign Variables from new Scene
+            playerControl = GameObject.FindGameObjectWithTag("PlayerCube").GetComponent<PlayerController>();
+            UICamera = playerControl.UICamera;
+            uiManager = playerControl.UICamera.GetComponent<UIManager>();
+            //get Camera Path Controller from current level
+            pathControl = lvlManager.currentLvl.pathControl;
+
+            pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
+            pathControl.AnimationFinishedEvent += delegate { DebugFunc("Finished"); };
+
+            LoadSceneObjects();
+            Debug.Log("Level Loaded: " + lvlManager.currentLvl.levelNum);
+            EventManager.TriggerEvent("LevelLoaded", "level loaded");
+
+            
+        }
+    }
+
+    /// <summary>
+    /// LoadSceneObjects -Function determines what objects to load based upon the scene
+    /// </summary>
+    private void LoadSceneObjects()
+    {
         if (SceneManager.GetActiveScene().name == "Song1_V2")
         {
+            waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
+            //there are 3 particles now, need to make this dynamic later
+            //order particles are currently added to array: greastest to least = 1st item is the last item in the array
+            waterParticles[0].SetActive(false);
+            waterParticles[1].SetActive(true);
+            waterParticles[2].SetActive(true);
+
+            darkRoom = GameObject.Find("DarkRoom");
+
+            //subscribe to Scene1Event event call
+            EventManager.StartListening("Scene1Event", Scene1Events);
+            s1Events = new List<string> { "waterBubbles", "" };
+
             blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
             blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
             blackOverlay.gameObject.SetActive(false);
@@ -102,56 +175,20 @@ public class GameController : MonoBehaviour {
             specialFish.gameObject.SetActive(false);
             */
 
+
+            //START LEVEL LOGIC
             pathControl.playOnStart = false;
             StartCoroutine(Level1Start());
         }
-        if (SceneManager.GetActiveScene().name == "Song1_V2")
+        else if (SceneManager.GetActiveScene().name == "Song2")
         {
+
             dmgOverlay = GameObject.Find("DmgOverlay").GetComponent<Image>();
-            dmgOverlay.color = new Color(dmgOverlay.color.r, dmgOverlay.color.g, dmgOverlay.color.b, 0);
-            dmgOverlay.gameObject.SetActive(false);
-        }
+            blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
 
-        /********************************
-         * Song 2
-         * ********************************/
-        if (SceneManager.GetActiveScene().name == "Song2")
-        {
-            song2_lvl lvl2 = (song2_lvl)lvlManager.levelList[0];
+            song2_lvl lvl2 = GameObject.Find("Song2_LevelObj").GetComponent<song2_lvl>();
+            //song2_lvl lvl2 = (song2_lvl)lvlManager.levelList[0];
             lvl2.Initialize();
-        }
-    }
-
-    void Awake()
-    {
-        /*
-         * LOAD RESOURCES on AWAKE
-         * load different resources based upon the Scene loaded
-         */
-        EventManager.StartListening("Player_Stop", ResetPlayer);
-        EventManager.StartListening("PauseWorld", OnWorldPaused);
-        //timeManager = GetComponent<TimeManager>();
-        Time.fixedDeltaTime = Time.timeScale * .02f;
-
-        if (SceneManager.GetActiveScene().name == "Song1_V2")
-        {
-            waterParticles = GameObject.FindGameObjectsWithTag("WaterParticle");
-            //there are 3 particles now, need to make this dynamic later
-            //order particles are currently added to array: greastest to least = 1st item is the last item in the array
-            waterParticles[0].SetActive(false);
-            waterParticles[1].SetActive(true);
-            waterParticles[2].SetActive(true);
-
-			darkRoom = GameObject.Find ("DarkRoom");
-
-            //subscribe to Scene1Event event call
-            EventManager.StartListening("Scene1Event", Scene1Events);
-            s1Events = new List<string> { "waterBubbles", "" };
-        }
-        else if(SceneManager.GetActiveScene().name == "Song2")
-        {
-            EventManager.StartListening("Scene2Event", Scene2Events);
-            EventManager.StartListening("Player_Cover_Destroyed", Scene2Events);
         }
 
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
@@ -159,7 +196,59 @@ public class GameController : MonoBehaviour {
         EventManager.StartListening("StopAllTempAudio", delegate { DebugFunc("StopAudio"); });
     }
 
-    
+
+    /// <summary>
+    /// OnGameStart -> Handles loading of game assets, choosing of level to load, and starting game logic
+    /// </summary>
+    private void OnStartGame(string evt)
+    {
+        //load last level from save state
+        lvlManager.LoadLevel(1); //temp, load 1st level
+        gameLevelSelectionState = GameLevelSelectionState.Continue;
+    }
+
+    /// <summary>
+    /// OnStartGame From LevelSelect Menu
+    /// </summary>
+    /// <param name="evt"></param>
+    private void OnStartGameFromLevelSelect(string evt)
+    {
+        gameLevelSelectionState = GameLevelSelectionState.LevelSelected;
+    }
+
+    /// <summary>
+    /// OnLevelFinished Function called when Level script declares level as finished.  Event Call
+    /// </summary>
+    /// <param name="evt"></param>
+    private void OnLevelFinished(string evt)
+    {
+        if(gameLevelSelectionState == GameLevelSelectionState.Continue || gameLevelSelectionState == GameLevelSelectionState.NewGame)
+        {
+            lvlManager.LoadNextLevel(evt);
+        }
+    }
+
+    public void OnLoadNextLevel(string evt)
+    {
+
+    }
+
+    public void OnGameResume(string evt)
+    {
+        Time.timeScale = 1;
+        Debug.Log("Game UnPaused");
+        gameState = GameState.IsPlaying;
+        soundManager.ResumeBGAudio();
+    }
+
+    public void OnGamePaused(string evt)
+    {
+        Time.timeScale = 0;
+        Debug.Log("Game Paused");
+        gameState = GameState.IsPaused;
+        soundManager.PauseBGAudio();
+    }
+
 
     private void DebugFunc(string evt)
     {
@@ -177,10 +266,35 @@ public class GameController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        //testing mouse input code for Pause Button
+        if (Input.GetMouseButtonDown(0))
+        {
+            /*
+            const float maxDistance = 100f;
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(GetRayForDistance(distance));
+            Ray finalRay = Camera.main.ScreenPointToRay(screenPoint);
+
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance).OrderBy(h => h.distance).ToArray();
+            Debug.Log(hits.Length);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                RaycastHit hit = hits[i];
+                Debug.Log(hit.transform.name);
+                if (hit.collider.gameObject.CompareTag("Pause Button"))
+                {
+                    Debug.Log("pause button hit");
+                    // do something with this object
+                }
+            }
+            */
+        }
+
         // Exit when (X) is tapped.
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Application.Quit();
+
+            EventManager.TriggerEvent("PauseGame", "PauseGame");
         }
 
         //Press 'W' to pause the game's world state and update. Causes everything to stop moving except for the player.
@@ -366,30 +480,6 @@ public class GameController : MonoBehaviour {
         Debug.Log("[EVENT] " + evt);
     }
 
-    void Scene2Events(string evt)
-    {
-        song2_lvl level = lvlManager.currentLvl.GetComponent<song2_lvl>();
-        switch (evt)
-        {
-            case "Song2_Opening":
-                break;
-            case "PAUSE_SPLINE_EndStage":
-                level.PauseSplineEndStage();
-                break;
-            case "PAUSE_IMMEDIATE":
-                pathControl.pPathState = CamPathState.PausedImmediate;
-                break;
-            case "Player_Cover_Destroyed":
-                level.StartCoroutine(level.OnPlayerCoverDestroyed());
-                break;
-            case "CancelSpeedBoost":
-                EventManager.TriggerEvent("CancelPowerUps", "CancelPowerUps");
-                break;
-            default:
-                break;
-        }
-        Debug.Log("[EVENT] " + evt);
-    }
 
 	IEnumerator Scene1()
 	{
@@ -611,9 +701,9 @@ public class GameController : MonoBehaviour {
         yield return new WaitForSeconds(1);
 
         //begin spline
-        pathControl.Play();
-        playerControl.CanMove = true;
-        playerControl.playerState = PlayerState.MOVING;
+        //pathControl.Play();
+        //playerControl.CanMove = true;
+        //playerControl.playerState = PlayerState.MOVING;
 
         StartCoroutine(Scene1());
 

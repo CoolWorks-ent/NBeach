@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Level : MonoBehaviour {
 
+    public int levelNum;
+    [SerializeField]
+    public CameraPathAnimator pathControl;
+    
 	// Use this for initialization
 	void Start () {
 		
@@ -11,6 +15,13 @@ public class Level : MonoBehaviour {
 
     public Level()
     {
+    
+    }
+
+    //Trigger event that level is finished
+    public void OnLevelFinished(string levelNum)
+    {
+        EventManager.TriggerEvent("LevelFinished",levelNum);
 
     }
 

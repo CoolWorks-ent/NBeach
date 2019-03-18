@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class song2_lvl : Level {
 
     public EnemySpawner enemySpawners;
-    [SerializeField]
     GameController gController;
+
     [SerializeField]
     ShellPickup[] pickupShells;
     [SerializeField]
@@ -15,15 +15,15 @@ public class song2_lvl : Level {
     [SerializeField]
     Transform[] shellLocs;
     [SerializeField]
-    float stage1StartTime = 120; //240; //1min in seconds
+    float stage1StartTime = 30; //60; //1min in seconds
     [SerializeField]
-    float stage2StartTime = 180; //240; //3min in seconds
+    float stage2StartTime = 60; //180; //3min in seconds
     [SerializeField]
-    float stage3StartTime = 230; //240; //4min in seconds
+    float stage3StartTime = 90; //240; //4min in seconds
     [SerializeField]
-    float stage3EndTime = 250; //320 //5+min in seconds 
+    float stage3EndTime = 110; //320 //5+min in seconds 
     [SerializeField]
-    float finalStageEndTime = 320; //(current total song time = 5:15)
+    float finalStageEndTime = 130; //(current total song time = 5:15)
 
     [SerializeField]
     float darkSpawnRate_Stage0 = 6;
@@ -79,7 +79,7 @@ public class song2_lvl : Level {
 
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
-    CameraPathAnimator pathControl;
+    //CameraPathAnimator pathControl;
     public Image blackOverlay;
     int enemiesDestroyed = 0;
     float curSongTime = 0;
@@ -112,12 +112,13 @@ public class song2_lvl : Level {
         EventManager.StartListening("Stage2Start", delegate { DebugFunc("Stage2Start"); });
         EventManager.StartListening("Stage3Start", delegate { DebugFunc("Stage3Start"); });
         EventManager.StartListening("Stage4Start", delegate { DebugFunc("Stage4Start"); });
+        EventManager.StartListening("Scene2Event", Scene2Events);
+        EventManager.StartListening("Player_Cover_Destroyed", Scene2Events);
         EventManager.StartListening("Song2_End_Cutscene_Start", delegate { StartCoroutine(Song2_EndCutscene()); }); //this cutscene is called when player is hit by Dark Boss Smash in stage3
         EventManager.StartListening("OnPlayerHitIsland", OnPlayerHitIsland);
         EventManager.StartListening("PauseWorld", OnStagePaused);
 
         gController = GameController.instance;
-        pathControl = gController.pathControl;
         pathControl.topSpeed = 4;
 
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
@@ -464,6 +465,30 @@ public class song2_lvl : Level {
         cloudMaterial.SetFloat("_LMPower", dayColor_clouds);
     }
 
+    void Scene2Events(string evt)
+    {
+        switch (evt)
+        {
+            case "Song2_Opening":
+                break;
+            case "PAUSE_SPLINE_EndStage":
+                PauseSplineEndStage();
+                break;
+            case "PAUSE_IMMEDIATE":
+                pathControl.pPathState = CamPathState.PausedImmediate;
+                break;
+            case "Player_Cover_Destroyed":
+                StartCoroutine(OnPlayerCoverDestroyed());
+                break;
+            case "CancelSpeedBoost":
+                EventManager.TriggerEvent("CancelPowerUps", "CancelPowerUps");
+                break;
+            default:
+                break;
+        }
+        Debug.Log("[EVENT] " + evt);
+    }
+
     /*
      * Stage Test Routine
      * Function for ONLY testing specific Stages of the battler
@@ -793,7 +818,7 @@ public class song2_lvl : Level {
         darkBossObj.transform.rotation = new Quaternion(0, 0, 0, 0);
 
         //snap player transform to face dark boss after reaching the new stage position
-        gController.playerStage.transform.LookAt(darkBoss.transform);
+        playerStageObj.transform.LookAt(darkBoss.transform);
 
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         
@@ -852,7 +877,7 @@ public class song2_lvl : Level {
         }
 
         //snap player transform to face dark boss after reaching the new stage position
-        gController.playerStage.transform.LookAt(darkBoss.transform);
+        playerStageObj.transform.LookAt(darkBoss.transform);
 
         //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
@@ -872,7 +897,7 @@ public class song2_lvl : Level {
         float moveTime = 2;
         float t = 0;
         Vector3 startPos = darkBossObj.transform.position;
-        Vector3 endPos = gController.playerStage.transform.position;
+        Vector3 endPos = playerStageObj.transform.position;
 
         while (t <= moveTime)
         {
@@ -929,7 +954,7 @@ public class song2_lvl : Level {
         }
 
         //snap player transform to face dark boss after reaching the new stage position
-        gController.playerStage.transform.LookAt(darkBoss.transform);
+        //playerStageObj.transform.LookAt(darkBoss.transform);
         enemyStageObj.transform.LookAt(gController.playerControl.gameObject.transform);
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
@@ -1011,11 +1036,12 @@ public class song2_lvl : Level {
          */ 
         float tempSpeed = 3;
         //Teleport Boss close to player's position
-        darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x-5, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-5);
-        //set boss to look in player's direction on the island
-        darkBossObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().playerContainer.transform);
+        darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x-10, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-10);
+ 
         //rotate boss to face downwards and in player's view
-        darkBossObj.transform.localRotation = new Quaternion(23.365f, darkBossObj.transform.rotation.y, darkBossObj.transform.rotation.z, darkBossObj.transform.rotation.w);
+        Quaternion darkBossEndRot = Quaternion.Euler(23.365f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z);
+        darkBossObj.transform.rotation = darkBossEndRot;
+        //darkBossObj.transform.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX;
 
         //slowly move boss towards player's position within their view
         yield return new WaitForSeconds(1);
@@ -1024,6 +1050,9 @@ public class song2_lvl : Level {
         while (t < moveTime)
         {
             darkBossObj.transform.position = Vector3.MoveTowards(darkBossObj.transform.position, darkBossEndPos.transform.position, Time.deltaTime * tempSpeed);
+            //set boss to look in player's direction on the island
+            darkBossObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().transform);
+            darkBossObj.transform.rotation = Quaternion.Euler(40f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z); ;
             yield return null;
         }
 
@@ -1049,6 +1078,9 @@ public class song2_lvl : Level {
         //FADE OUT Music
         gController.soundManager.StopBGAudio();
         Debug.Log("song finished");
+
+        //CALL LEVEL FINISHED FUNCTION
+        OnLevelFinished(levelNum.ToString());
     }
 
     IEnumerator SongTitleRoutine()

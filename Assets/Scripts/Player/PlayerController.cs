@@ -19,8 +19,11 @@ public class PlayerController : MonoBehaviour {
     float fakeFriction = 0.86f;
     [SerializeField]
     float waterDrag = 1f;
+    [SerializeField]
+    public GameObject playerContainer;
 
-    Camera mainCamera;
+    public Camera mainCamera;
+    public Camera UICamera;
     GameObject player;
     GameController gameController;
     UnderwaterScript underwaterScript;
