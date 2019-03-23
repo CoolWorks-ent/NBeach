@@ -56,8 +56,9 @@ public class NFPSController : PlayerController {
         private Text ammoText;
         [SerializeField]
         private Text healthText;
+        
         [SerializeField]
-        public GameObject playerContainer;
+        public GameObject playerStage;
         [SerializeField]
         bool invincibleState = false;
 
@@ -107,6 +108,8 @@ public class NFPSController : PlayerController {
     private void Awake()
         {
             gController = GameObject.Find("GameController").GetComponent<GameController>();
+            mainCamera = Camera.main;
+            UICamera = GameObject.Find("UICamera").GetComponent<Camera>();
             EventManager.StartListening("FireProjectile", ProjectileFired);
             nRigidbody = playerContainer.GetComponent<Rigidbody>();
             playerRigidbody = GetComponent<Rigidbody>();
