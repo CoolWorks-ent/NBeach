@@ -9,6 +9,7 @@ public class DeathState : Dark_State
     {
         Debug.LogWarning("Darkness entered death state");
         controller.aIRichPath.canMove = false;
+        controller.sekr.CancelCurrentPathRequest();
         controller.animeController.SetTrigger(controller.deathHash);
         
         GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
@@ -47,6 +48,9 @@ public class DeathState : Dark_State
        
         //yield return new WaitForSeconds(fxTime);
         //AI_Manager.Instance.RemoveFromDarknessList(controller);
+        controller.gameObject.SetActive(false);
+        AI_Manager.OnDarknessRemoved(controller);
+        Destroy(controller.animeController);
         Destroy(controller.gameObject);
         yield return 0;
     }

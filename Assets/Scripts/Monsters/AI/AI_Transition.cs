@@ -6,8 +6,10 @@ using UnityEngine;
 public class AI_Transition
 {
     public enum Transition_Priority {LOW = 1, MEDIUM = 3, HIGH = 5}
-    public Transition_Priority priority;
-    public AI_Decision decision;
+    //public Transition_Priority priority;
+    public AI_DecisionMaker decision = new AI_DecisionMaker();
+
+    public AI_DecisionMaker.DecisionName decisionChoice;
     public Dark_State trueState;
     public Dark_State falseState;
 }

@@ -844,7 +844,7 @@ MonoBehaviour:
   heightBackingField: 2
   centerBackingField: 1
   locked: 0
-  lockWhenNotMoving: 0
+  lockWhenNotMoving: 1
   agentTimeHorizon: 2
   obstacleTimeHorizon: 2
   maxNeighbours: 10
@@ -866,26 +866,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  attackInitiationRange: 10
   actionIdle: 0
-  queueID: 0
-  sekr: {fileID: 0}
-  aIDestSet: {fileID: 0}
-  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
-  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
-  animeController: {fileID: 0}
+  creationID: 0
+  engIndex: 0
   attackHash: 1080829965
   attackAfterHash: 530937694
   chaseHash: 1463555229
   idleHash: 2081823275
   deathHash: 646380074
+  canAttack: 0
+  updateStates: 0
+  standBy: 0
+  waitRange: 0
+  sekr: {fileID: 0}
+  aIDestSet: {fileID: 0}
+  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
+  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
+  animeController: {fileID: 0}
   previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   aIRichPath: {fileID: 0}
-  canAttack: 0
-  idleFinished: 0
-  attackRequested: 0
-  updateStates: 0
 --- !u!114 &114662073128543118
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -915,7 +915,7 @@ MonoBehaviour:
   acceleration: 5
   rotationSpeed: 180
   slowdownTime: 0.5
-  endReachedDistance: 0.01
+  endReachedDistance: 1.5
   wallForce: 3
   wallDist: 1
   funnelSimplification: 1

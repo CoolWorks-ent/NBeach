@@ -30,19 +30,22 @@ public class IdleState : Dark_State
 
     public override void UpdateState(Darkness controller)
     {
-        
+        // Vector3 dir = Vector3.RotateTowards(controller.transform.position, controller.target.position,0f,0f);
+        // controller.transform.rotation = Quaternion.LookRotation(dir);
     }
 
     protected override void ExitState(Darkness controller)
     {
         AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
-        controller.animeController.ResetTrigger(controller.idleHash);
+        if(controller.animeController != null)
+            controller.animeController.ResetTrigger(controller.idleHash);
     }
 
     protected IEnumerator IdleTime(Darkness controller, float idleTime)
     {
         yield return AI_Manager.Instance.WaitTimer(idleTime);
         CheckTransitions(controller);
+        //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
     }
 }
