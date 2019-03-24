@@ -680,9 +680,12 @@ public class CameraPathAnimator : MonoBehaviour
             _percentage = 1-startPercent;
         }
 
-//        Vector3 initalRotation = cameraPath.GetPathRotation(_percentage, false).eulerAngles;
-//        rotationX = initalRotation.y;
-//        rotationY = initalRotation.x;
+        //        Vector3 initalRotation = cameraPath.GetPathRotation(_percentage, false).eulerAngles;
+        //        rotationX = initalRotation.y;
+        //        rotationY = initalRotation.x;
+
+        //Set base path speed for references in other scripts
+        _basePathSpeed = _pathSpeed;
     }
 
     protected virtual void OnEnable()

@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour {
     float waterDrag = 1f;
     [SerializeField]
     public GameObject playerContainer;
+    [SerializeField]
+    public SimpleAnimator2D animator_EyeBlink;
 
     public Camera mainCamera;
     public Camera UICamera;
@@ -137,11 +139,13 @@ public class PlayerController : MonoBehaviour {
         //begin player movement again if no longer colliding with PlayerContainer
         if (startMove == true && CanMove==true)
         {
+            Debug.Log("player can move");
             playerState = PlayerState.MOVING;
             startMove = false;
         }
         else if(CanMove == false)
         {
+            Debug.Log("player can't move");
             playerState = PlayerState.NOTMOVING;
         }
 

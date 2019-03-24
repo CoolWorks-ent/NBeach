@@ -191,6 +191,7 @@ public class GameController : MonoBehaviour {
             lvl2.Initialize();
         }
 
+        uiManager.Initialize();
         pathControl.AnimationPausedEvent += delegate { DebugFunc("Paused"); };
         pathControl.AnimationFinishedEvent += delegate { DebugFunc("Finished"); };
         EventManager.StartListening("StopAllTempAudio", delegate { DebugFunc("StopAudio"); });
@@ -472,6 +473,9 @@ public class GameController : MonoBehaviour {
                 case "Song1_pt2":
                     StartCoroutine(Scene1_5());
                     break;
+                /*case "Song1_pt3":
+                    StartCoroutine(Scene1_6());
+                    break;*/
                 case "SceneEnd":
                     break;
                 default:
@@ -642,13 +646,14 @@ public class GameController : MonoBehaviour {
         //resume the spline, player should be beginning to move once they open their eyes
         playerControl.CanMove = true;
         //pathControl.pathSpeed = 7;
-        pathControl.topSpeed = 5;
+        //pathControl.topSpeed = 5;
         pathControl.pPathState = CamPathState.Play;
 
         //pause to allow camera to look towards wave and then open eyes
         yield return new WaitForSeconds(1.2f);
 
         //open eyes, and fade out black overlay
+        playerControl.animator_EyeBlink.Play("eyeOpen");
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0f);
         blackOverlay.gameObject.SetActive(false);
 

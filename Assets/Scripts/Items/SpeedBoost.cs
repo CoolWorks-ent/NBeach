@@ -42,7 +42,7 @@ public class SpeedBoost : MonoBehaviour {
         }
     else
         {
-            if(collider.tag == "PlayerContainer")
+            if(collider.tag == "PlayerContainer" || collider.tag == "Player")
             {
                 EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
                 //OnSpeedBoost("evt");

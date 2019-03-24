@@ -9,9 +9,16 @@ public class UIManager : MonoBehaviour {
     GUIArrows_NB guiArrows;
 	// Use this for initialization
 	void Start () {
-        guiArrows.Load();
+        if(guiArrows != null)
+            guiArrows.Load();
 	}
 	
+    public void Initialize()
+    {
+        if (guiArrows != null)
+            guiArrows.Load();
+    }
+
 	// Update is called once per frame
 	void Update () {
 		
