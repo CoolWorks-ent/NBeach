@@ -60766,7 +60766,6 @@ GameObject:
   - component: {fileID: 957796670}
   - component: {fileID: 957796669}
   - component: {fileID: 587343805}
-  - component: {fileID: 957796668}
   m_Layer: 12
   m_Name: PlayerCube
   m_TagString: PlayerCube
@@ -60790,26 +60789,6 @@ Transform:
   m_Father: {fileID: 1275722337}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &957796668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114383806228240598, guid: 62c03333288333c43a987da631e8551b,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 957796666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c43cb211e74e7ba47b3e08b42409f3f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 957796667}
-  darknessIDCounter: 0
-  darknessMoveCounter: 0
-  darknessConcurrentAttackLimit: 0
-  attacksCurrentlyProcessed: 0
-  darknessConcurrentMovingLimit: 0
-  maxEnemyCount: 0
-  minEnemyCount: 0
 --- !u!54 &957796669
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -84977,20 +84956,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+    - target: {fileID: 114729928814456672, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
-      propertyPath: data.dataString
-      value: UEsDBBQAAAgIAACAn+uP066XjAIAAGUFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtVF1v2jAU/SvIz2uVAIWyty1Qtklt0di0h6UPJr4hFo4d+aNAK/77rh3TpHQSksO5536ce6/9Srg0DRRW6aXm7F4xIJ8HxH+TTwNCg+0ntVwhnCLCjarBal58kVvhuQmCTvJS6XrBtpApYw3CJRUG0KSV9d4SodcBOUSHYzxf/Dk44VcB0oLuWOlseH0zjNR0fD2K7Mk00J0sBK0bYGv+Ap3X7Bz8to0qUU9k+OILJQQ3sRpij00Qm9HGONSCBMYpqgt1eH4FfFtZ/DPsOz+WpQEbFWh6nHONTWqjkq/KVj5STc2ureuZCufz3KKkUFQb9f4D4WqcTifpZBRIpVb1t3P6NPGpbMWL3U96LKixvQ734fn7+p3cU7GjGwF/KpAPaqmVkwyNVjvv6gwM571QbxKzCopdx2srvgBd83GmaTfTU2jCIRO83njketwCa6FC28OoQOOAvmPBYUdMjISoL+K3gV9021+maLjj2lg0xYTSV7dRTnsqWYSeeTHOZkpLCHCsuQFJhT2uMIy9nOSFrZf2wnJH/XWJyaPtfBsuXALc8ZPkwrRS+25YBn64ulkpLu0aqC6qXjxTqf09mOrRWcEldIq84QGbmCkp2y00/3FbO13Soudm4WCdhjm1NNwFrAm3hPVdsaHBQzoh/EIGFT74X1Thf0++yRXFvCLA5EHJcIvenU9+EbaOs/fLThjbzCY3t9Mx3UCaTtOrTUJHowkkSTouZ2U5IuEecIk9p2LVNi2OCjdIdlok7vz50RosNW3CBWSa7pf8pVb9fnBZqnWhAeRjG+JNLWjMgi8FWzCOOtdgLZdh+chrToQqdsDyt5x56OziYDXNuyg5afizsh7JSRYetJycyOkfUEsDBBQAAAgIAACAn+vvADTmbAAAAHcAAAAJACQAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0Bq1YqSy0qzszPU7JSMNEz0jPSUVBKL0osyCgGChiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf64/TrpeMAgAAZQUAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf6+8ANOZsAAAAdwAAAAkAJAAAAAAAAAAAAAAA2QIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAACQAwAAAAA=
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1087406834434032, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 957796667}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0

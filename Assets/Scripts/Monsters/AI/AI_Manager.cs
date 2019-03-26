@@ -30,9 +30,10 @@ public class AI_Manager : MonoBehaviour {
 		indexNull = 0;
 		maxEnemyCount = 6;
         minEnemyCount = 1;
-		if(instance != null && instance != this)
+		if(instance != null && !instance.gameObject.CompareTag("AI Manager"))
 		{
 			Debug.LogError("Instance of AI Manager already exist in this scene");
+			//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 		}
 		else instance = this;
 		engagementQueue = new Queue<Darkness>();
