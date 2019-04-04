@@ -104,6 +104,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4135267396860538}
+  - component: {fileID: 114152114226715530}
   m_Layer: 0
   m_Name: svrCoralTubeGroupL_B_pink
   m_TagString: plant
@@ -459,3 +460,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1557953954200612}
   m_Mesh: {fileID: 4300008, guid: e99bb17de5720c64da880ba199bb0a90, type: 3}
+--- !u!114 &114152114226715530
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1693543158408044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 0}

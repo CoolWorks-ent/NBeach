@@ -22,6 +22,9 @@ GameObject:
   - component: {fileID: 33913535563662814}
   - component: {fileID: 23087504197415710}
   - component: {fileID: 95134447332841208}
+  - component: {fileID: 114098692395448860}
+  - component: {fileID: 114633753800560428}
+  - component: {fileID: 65483671139463484}
   m_Layer: 0
   m_Name: CoralStalkBlue_01
   m_TagString: Untagged
@@ -35,13 +38,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1362310899252068}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 190.5655, y: -3.44, z: -592.37354}
-  m_LocalScale: {x: 200, y: 200, z: 200}
+  m_LocalRotation: {x: -0, y: -0.8913318, z: -0, w: -0.4533516}
+  m_LocalPosition: {x: 11.970001, y: -38.437008, z: 21.25}
+  m_LocalScale: {x: 432.70856, y: 432.70856, z: 432.70856}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -233.918, z: 0}
 --- !u!23 &23087504197415710
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -81,6 +84,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1362310899252068}
   m_Mesh: {fileID: 4300000, guid: d7ea4b1b9edf4a641b3874b97a90edd7, type: 3}
+--- !u!65 &65483671139463484
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1362310899252068}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.011337222, y: 0.01937704, z: 0.012484731}
+  m_Center: {x: -0.0026686299, y: -0.002188519, z: -0.0012423594}
 --- !u!95 &95134447332841208
 Animator:
   serializedVersion: 3
@@ -98,3 +113,26 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114098692395448860
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1362310899252068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 1124178475197322, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
+--- !u!114 &114633753800560428
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1362310899252068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

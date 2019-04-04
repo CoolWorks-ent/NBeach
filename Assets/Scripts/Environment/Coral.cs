@@ -7,11 +7,12 @@ public class Coral : MonoBehaviour {
 
     private GVRInteractiveItem m_InteractiveItem;
     public GameObject bubbles;
+    GameObject bubbleCopy;
 
     // Use this for initialization
     void Start () {
         m_InteractiveItem = GetComponent<GVRInteractiveItem>();
-        m_InteractiveItem.OnDown += TouchCoral;
+        m_InteractiveItem.OnClick += TouchCoral;
 	}
 	
 	// Update is called once per frame
@@ -25,7 +26,8 @@ public class Coral : MonoBehaviour {
         //make object bounce slightly
         StartCoroutine(BounceEffect());
         //play bubble particle
-        GameObject bubbleCopy = Instantiate(bubbles, transform.position,Quaternion.identity, transform) as GameObject;
+        //may need to adjust the position the bubbles should appear
+        bubbleCopy = Instantiate(bubbles, transform.position, bubbles.transform.rotation) as GameObject;
         bubbleCopy.GetComponentInChildren<ParticleSystem>().Play();
     }
 
@@ -33,7 +35,7 @@ public class Coral : MonoBehaviour {
     {
         Vector3 baseScale = transform.localScale;
         Vector3 newScale = new Vector3(baseScale.x+.2f,baseScale.y+.2f, baseScale.z+.2f);
-        float baseAmt = 1f, newAmt = 1.15f;
+        float baseAmt = 1f, newAmt = 2f; //1.15f
         float t = 0f;
         float bounceTime = 1f;
         float time = 0f;
@@ -47,6 +49,9 @@ public class Coral : MonoBehaviour {
             transform.localScale = baseScale * value;
             yield return null;
         }
+
+        yield return new WaitForSeconds(3); //play bubble effect for [x] seconds only
+        bubbleCopy.GetComponentInChildren<ParticleSystem>().Stop();
 
         yield return null;
     }

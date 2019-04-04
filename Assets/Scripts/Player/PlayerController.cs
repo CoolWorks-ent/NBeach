@@ -145,7 +145,6 @@ public class PlayerController : MonoBehaviour {
         }
         else if(CanMove == false)
         {
-            Debug.Log("player can't move");
             playerState = PlayerState.NOTMOVING;
         }
 

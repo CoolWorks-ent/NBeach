@@ -23,13 +23,15 @@ GameObject:
   - component: {fileID: 114133421419948792}
   - component: {fileID: 114045792573522404}
   - component: {fileID: 114223188232798436}
+  - component: {fileID: 114739550497427106}
+  - component: {fileID: 114963904690349220}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4384050671721832
 Transform:
   m_ObjectHideFlags: 1
@@ -77,6 +79,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slowMoOn: 0
+--- !u!114 &114739550497427106
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1795319202145726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33d946560d48bb1428a2c779237975d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guiArrows: {fileID: 0}
 --- !u!114 &114751116388189884
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -90,12 +104,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControl: {fileID: 0}
   soundManager: {fileID: 0}
-  lvlManager: {fileID: 0}
+  lvlManager: {fileID: 114963904690349220}
   UICamera: {fileID: 0}
-  uiManager: {fileID: 0}
-  debugMenuPrefab: {fileID: 1626867569804002, guid: b702811e37b56fe4da60dd8d0884dc8b,
-    type: 2}
+  uiManager: {fileID: 114739550497427106}
+  debugMenuPrefab: {fileID: 0}
   pathControl: {fileID: 0}
-  timeManager: {fileID: 114223188232798436}
+  timeManager: {fileID: 0}
   blackOverlay: {fileID: 0}
   dmgOverlay: {fileID: 0}
+--- !u!114 &114963904690349220
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1795319202145726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4dd0706df8edab45b0b14a8d6ec267e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelList:
+  - {fileID: 0}
+  currentLvl: {fileID: 0}
