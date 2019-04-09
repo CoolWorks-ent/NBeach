@@ -138,7 +138,7 @@ public class GameController : MonoBehaviour {
             //Assign Variables from new Scene
             playerControl = GameObject.FindGameObjectWithTag("PlayerCube").GetComponent<PlayerController>();
             UICamera = playerControl.UICamera;
-            uiManager = playerControl.UICamera.GetComponent<UIManager>();
+            //uiManager = playerControl.UICamera.GetComponent<UIManager>();
             //get Camera Path Controller from current level
             pathControl = lvlManager.currentLvl.pathControl;
 
