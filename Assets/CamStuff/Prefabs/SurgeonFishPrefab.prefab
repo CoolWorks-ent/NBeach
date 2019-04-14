@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4459964450933886}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35,7 +35,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4723982267433812}
   - component: {fileID: 137503624845645944}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane17
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -50,7 +50,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4263918106420348}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Tail_Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -66,7 +66,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4010815004263704}
   - component: {fileID: 137345252475388604}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4428360444827224}
   - component: {fileID: 137082032182172954}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4105411296285400}
   - component: {fileID: 137887826126028238}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane18
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,8 @@ GameObject:
   - component: {fileID: 136106126828198164}
   - component: {fileID: 114983046430441964}
   - component: {fileID: 114852942493910438}
-  m_Layer: 0
+  - component: {fileID: 65888066168015692}
+  m_Layer: 9
   m_Name: SurgeonFishPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +133,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4467482410623328}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Tail_Tip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +148,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4335491409948788}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Fin_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +164,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4460786092421402}
   - component: {fileID: 137327776411227182}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4943387582391998}
   - component: {fileID: 137713809249460354}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane19
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +195,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4611340072283592}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Fin_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -209,7 +210,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4486017553855638}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +225,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4143662023020968}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Spine_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -240,7 +241,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4468518551889360}
   - component: {fileID: 137439268629685388}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -255,7 +256,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4302551276084822}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Surgeon_Spine_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,8 +272,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4795868916430920}
   - component: {fileID: 137671056181969728}
-  - component: {fileID: 136578367899889680}
-  m_Layer: 0
+  - component: {fileID: 136712430865689974}
+  - component: {fileID: 65116193211969702}
+  m_Layer: 9
   m_Name: pCube1_pCube2_pCube2_pCube6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,7 +290,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4631906870257430}
   - component: {fileID: 137958784551739230}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: pPlane16
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -327,9 +329,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1548488539253482}
-  m_LocalRotation: {x: -0, y: 0.8088682, z: -0, w: 0.58799}
-  m_LocalPosition: {x: 146.09, y: -25.62, z: -59.6}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 72.06, y: -33.98015, z: -387.13998}
+  m_LocalScale: {x: 50, y: 50, z: 50}
   m_Children:
   - {fileID: 4795868916430920}
   - {fileID: 4459964450933886}
@@ -546,6 +548,30 @@ Transform:
   m_Father: {fileID: 4795868916430920}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &65116193211969702
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1960567510078536}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.023990914, y: 0.034603033, z: 0.044289183}
+  m_Center: {x: 0.0018798918, y: 0.0029739023, z: 0.0043049953}
+--- !u!65 &65888066168015692
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1548488539253482}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.023990914, y: 0.034603033, z: 0.044289183}
+  m_Center: {x: 0.0018798918, y: 0.0029739023, z: 0.0043049953}
 --- !u!95 &95598318450768888
 Animator:
   serializedVersion: 3
@@ -555,7 +581,7 @@ Animator:
   m_GameObject: {fileID: 1548488539253482}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a8b1e84ca5098894085b660262005f80, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 827a038711e3eec44818d2bb4e466a91, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -592,20 +618,20 @@ CapsuleCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1548488539253482}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.012717874
   m_Height: 0.046874996
   m_Direction: 2
   m_Center: {x: 0, y: 0.003647542, z: 0.002372233}
---- !u!136 &136578367899889680
+--- !u!136 &136712430865689974
 CapsuleCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1960567510078536}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.012717874
   m_Height: 0.046874996

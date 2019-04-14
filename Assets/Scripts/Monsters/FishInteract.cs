@@ -17,8 +17,8 @@ public class FishInteract : MonoBehaviour {
     GVRInteractiveItem m_InteractiveItem;
     private Vector3 velocity = Vector3.zero;
 
-    int[] offsetRange = new int[] { 1, 2, 3, };
-    int[] ZoffsetRange = new int[] { -3,-2,3 };
+    int[] offsetRange = new int[] { -3, -2, -2, 1, 2, 3, };
+    int[] ZoffsetRange = new int[] { -2, 0, 3 };
 
     // Use this for initialization
     void Start () {
@@ -55,7 +55,13 @@ public class FishInteract : MonoBehaviour {
 
     }
 
-    
+    //This function will force fish to follow the player when it is called.  
+    public void ForceFollow()
+    {
+        StartCoroutine(fishCaptureAnim());
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         //make fish begin swimming with player if player interacts with it & is fish is in camera viewport
@@ -63,68 +69,36 @@ public class FishInteract : MonoBehaviour {
         
         //viewport space is within 0-1 you are in the cameras frustum
         bool onScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1.5 && screenPoint.y > 0 && screenPoint.y < 1.5;
-        if (other.tag == "Player") //check if fish is also "onScreen"
+        if (other.tag == "PlayerCube") //check if fish is also "onScreen"
         {
             //if fish not already moving with player, start moving with player
             if (move_wPlayer == false)
             {
                 StartCoroutine(fishCaptureAnim());
-                /*
-                fishLocalPos = other.transform.position;
-                playerDiff = fishLocalPos - player.transform.position;
-                float sign = (player.transform.position.y < fishLocalPos.y ? -1.0f : 1.0f);
-                float angleDiff = Vector2.Angle(Vector3.right, playerDiff) * sign;
-
-                float currentAngle = Vector3.Angle(fishLocalPos, player.transform.position);
-
-                //LATER: based upon angle, place fish in particular quadrant around player
-                //for now, just place in random position
-                playerOffset = new Vector3(GetRandom("x"), GetRandom("y"), GetRandom("z"));
-                
-                Debug.Log(this.gameObject.name + "follow player");
-
-                //for 1st second of collision, play animation, reduce the followSpeed, and make the transition smooth before going to Update
-                float t = 0;
-                float animTime_a = 2f;
-                float animTime = 2f;
-                bool anim1Finished = false;
-                float tempZ = 0;
-                //smooth follow?
-                float followVal = 0.1f;
-                float followVal_a = 1f;
-                while (t < animTime_a)
-                {
-                    //float pos = animTime_a * GameController.instance.pathControl.pathSpeed;
-
-                    tempZ = transform.position.z + 100;
-                    Vector3 targetPos = new Vector3(transform.position.x, transform.position.y, tempZ);
-
-                    //transform.position += (targetPos - transform.position) * followVal;
-                    transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, followVal_a);
-                    t += Time.deltaTime;
-                }
-
-                t = 0;
-                tempZ = 0;
-                while (t < animTime && anim1Finished == true)
-                {
-                    //this will make the z-transform positive before adding to the offset, and then revert the z-transform back to the original value.
-                    //ensures that the z-transform and playerOffset are being added together with the same "sign" value, + or -
-                    if (player.transform.position.z < 0) tempZ = -1 * ((player.transform.position.z) * -1 - playerOffset.z);
-
-                    Vector3 targetPos = new Vector3(player.transform.position.x + playerOffset.x,
-                        player.transform.position.y + playerOffset.y, tempZ);
-                    
-                    transform.position += (targetPos - transform.position) * followVal;
-                    t += Time.deltaTime;
-                }
-                //lerp fish position to position close to player
-                move_wPlayer = true;
-                */
             }
             
         }
     }
+
+    /*not using collider for this anymore*/
+    /*
+    private void OnCollisionEnter(Collision collision)
+    {
+        //make fish begin swimming with player if player interacts with it & is fish is in camera viewport
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(transform.position);
+
+        //viewport space is within 0-1 you are in the cameras frustum
+        bool onScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1.5 && screenPoint.y > 0 && screenPoint.y < 1.5;
+        if (collision.collider.tag == "PlayerCube") //check if fish is also "onScreen"
+        {
+            //if fish not already moving with player, start moving with player
+            if (move_wPlayer == false)
+            {
+                StartCoroutine(fishCaptureAnim());
+                //if fish collides with another fish, pause fish 1 movement, move to outside of fish 2 collider
+            }
+        }
+    }*/
 
     IEnumerator fishCaptureAnim()
     {
@@ -161,7 +135,8 @@ public class FishInteract : MonoBehaviour {
         {
             //this will make the z-transform positive before adding to the offset, and then revert the z-transform back to the original value.
             //ensures that the z-transform and playerOffset are being added together with the same "sign" value, + or -
-            if (player.transform.position.z < 0) tempZ = -1 * ((player.transform.position.z) * -1 - playerOffset.z);
+            if (player.transform.position.z < 0)
+                tempZ = -1 * ((player.transform.position.z) * -1 - playerOffset.z);
 
             Vector3 targetPos = new Vector3(player.transform.position.x + playerOffset.x,
                 player.transform.position.y + playerOffset.y, tempZ);
@@ -188,33 +163,6 @@ public class FishInteract : MonoBehaviour {
         else return offsetRange[UnityEngine.Random.Range(0, offsetRange.Length)];
     }
 
-/*not using collider for this anymore*/
-private void OnCollisionEnter(Collision collision)
-    {
-        //make fish begin swimming with player if player interacts with it & is fish is in camera viewport
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(transform.position);
-        //viewport space is within 0-1 you are in the cameras frustum
-        bool onScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1.5 && screenPoint.y > 0 && screenPoint.y < 1.5;
-        if (collision.collider.tag == "PlayerCube" && onScreen == true)
-        { 
-            //if fish not already moving with player, start moving with player
-            if (move_wPlayer == false)
-            {
-                fishLocalPos = collision.transform.position;
-                playerDiff = fishLocalPos - player.transform.position;
-                float currentAngle = Vector3.Angle(fishLocalPos, player.transform.position);
-                float zAngle = Mathf.Sin(currentAngle);
-                float xAngle = Mathf.Cos(currentAngle);
-                float yAngle = Mathf.Tan(currentAngle);
-                //based upon angle, add or subtract a number offset amt
-                playerOffset = new Vector3(xAngle+1f, yAngle, zAngle+10f);
-                //lerp fish position to position close to player
-                move_wPlayer = true;
-                Debug.Log(this.gameObject.name + "follow player");
-            }
-        }
-        //if fish collides with another fish, pause fish 1 movement, move to outside of fish 2 collider
-    }
 
     public IEnumerator moveToPlayer(Vector3 curPos, Vector3 newPos)
     {
