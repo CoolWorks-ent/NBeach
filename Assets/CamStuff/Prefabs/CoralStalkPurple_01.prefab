@@ -22,6 +22,9 @@ GameObject:
   - component: {fileID: 33931793303754296}
   - component: {fileID: 23111293896727200}
   - component: {fileID: 95488113882276722}
+  - component: {fileID: 114329543672466874}
+  - component: {fileID: 114871100315062500}
+  - component: {fileID: 65768855562900760}
   m_Layer: 0
   m_Name: CoralStalkPurple_01
   m_TagString: Untagged
@@ -81,6 +84,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1900556265391520}
   m_Mesh: {fileID: 4300000, guid: d7ea4b1b9edf4a641b3874b97a90edd7, type: 3}
+--- !u!65 &65768855562900760
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1900556265391520}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.01, y: 0.01937704, z: 0.01}
+  m_Center: {x: -0.0020000003, y: -0.002188519, z: 0}
 --- !u!95 &95488113882276722
 Animator:
   serializedVersion: 3
@@ -98,3 +113,26 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114329543672466874
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1900556265391520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 1124178475197322, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
+--- !u!114 &114871100315062500
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1900556265391520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

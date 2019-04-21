@@ -87,6 +87,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4560567657154098}
+  - component: {fileID: 114202751860527926}
+  - component: {fileID: 114799566031801290}
+  - component: {fileID: 65878696203300094}
   m_Layer: 0
   m_Name: svrCoralTubeAssyK_mixPink
   m_TagString: plant
@@ -370,8 +373,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1337466568065180}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 193.67464, y: -5.77, z: -691.13}
+  m_LocalScale: {x: 4.675176, y: 4.6751804, z: 4.6751804}
   m_Children:
   - {fileID: 4096707940862280}
   - {fileID: 4391439099400492}
@@ -879,3 +882,38 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1237595773011970}
   m_Mesh: {fileID: 4300004, guid: e99bb17de5720c64da880ba199bb0a90, type: 3}
+--- !u!65 &65878696203300094
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1337466568065180}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.3080057, y: 2.3706207, z: 1.4097465}
+  m_Center: {x: 0.24110416, y: 0.6903125, z: 0.1030311}
+--- !u!114 &114202751860527926
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1337466568065180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 1124178475197322, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
+--- !u!114 &114799566031801290
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1337466568065180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

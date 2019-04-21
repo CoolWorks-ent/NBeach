@@ -409,6 +409,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4967371626669568}
+  - component: {fileID: 114298828514996178}
+  - component: {fileID: 114529808791339074}
+  - component: {fileID: 65832203638677146}
   m_Layer: 0
   m_Name: svrCoralTubeMixGroupA
   m_TagString: plant
@@ -1263,9 +1266,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1493762587499340}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 212.16, y: -5.4169955, z: 58.96}
-  m_LocalScale: {x: 1, y: 2, z: 1}
+  m_LocalRotation: {x: -0, y: 0.0117544755, z: -0, w: 0.999931}
+  m_LocalPosition: {x: -60.276722, y: -5.582081, z: -228.14952}
+  m_LocalScale: {x: 10, y: 20, z: 10}
   m_Children:
   - {fileID: 4848714010400632}
   - {fileID: 4222048778440546}
@@ -2200,3 +2203,38 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1465670056326844}
   m_Mesh: {fileID: 4300010, guid: e99bb17de5720c64da880ba199bb0a90, type: 3}
+--- !u!65 &65832203638677146
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1493762587499340}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.402271, y: 2.3706207, z: 2.3061147}
+  m_Center: {x: -0.30602857, y: 0.69031256, z: 0.55121523}
+--- !u!114 &114298828514996178
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1493762587499340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 1124178475197322, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
+--- !u!114 &114529808791339074
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1493762587499340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

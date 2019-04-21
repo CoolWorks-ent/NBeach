@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 400004}
   - component: {fileID: 11400000}
-  - component: {fileID: 114566906891712162}
   m_Layer: 0
   m_Name: SoundManager
   m_TagString: SoundManager
@@ -580,7 +579,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 1000
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -823,14 +822,3 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100004}
   m_IsPrefabParent: 1
---- !u!114 &114566906891712162
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 374e4f40063560d448ccbdced7d26424, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

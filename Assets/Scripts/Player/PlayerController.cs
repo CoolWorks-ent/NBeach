@@ -145,7 +145,6 @@ public class PlayerController : MonoBehaviour {
         }
         else if(CanMove == false)
         {
-            Debug.Log("player can't move");
             playerState = PlayerState.NOTMOVING;
         }
 
@@ -221,6 +220,11 @@ public class PlayerController : MonoBehaviour {
             //get speedBoost object to use for variables
             speedBoost = collision.gameObject.GetComponent<SpeedBoost>();
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        
     }
 
 

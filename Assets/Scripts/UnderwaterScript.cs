@@ -59,13 +59,11 @@ public class UnderwaterScript : MonoBehaviour {
          {
              isUnderwater = true;
              SetUnderwater();
-            Debug.Log("underwater");
          }
         else
         {
             isUnderwater = false;
             SetNormal();
-            Debug.Log("above water");
         }
                 
         /*if(transform.position.y < groundLevel)

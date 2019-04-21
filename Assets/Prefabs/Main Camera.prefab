@@ -1876,8 +1876,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7dcc90c2e60c4011896c7f21fc1f557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastMode: 1
-  overridePointerCamera: {fileID: 0}
+  raycastMode: 0
+  overridePointerCamera: {fileID: 20499729540591830}
   reticleSegments: 20
   reticleGrowthSpeed: 8
   reticleSortingOrder: 32767
@@ -2737,7 +2737,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 2560, y: 2440}
+  m_SizeDelta: {x: 2399, y: 1702}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224479213637494282
 RectTransform:
@@ -2848,8 +2848,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.22500001, y: 0.16018869}
-  m_AnchoredPosition: {x: 50.742737, y: 35.404602}
-  m_SizeDelta: {x: -110.514496, y: -78.809166}
+  m_AnchoredPosition: {x: 50.742737, y: 63.080013}
+  m_SizeDelta: {x: -110.514496, y: -134.15999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224811554735099404
 RectTransform:

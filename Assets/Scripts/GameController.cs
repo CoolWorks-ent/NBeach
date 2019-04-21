@@ -85,10 +85,26 @@ public class GameController : MonoBehaviour {
     void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        if (instance != gameController)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        /*
+         * 
+         * Load other managers
+         *
+         */
+        uiManager = this.GetComponent<UIManager>(); //FindObjectOfType(typeof(UIManager)) as UIManager;
+        soundManager = FindObjectOfType(typeof(SoundManager)) as SoundManager;            
+        lvlManager = this.GetComponent<LevelManager>(); //FindObjectOfType(typeof(LevelManager)) as LevelManager;
+
         /*
          * LOAD RESOURCES on AWAKE
          * load different resources based upon the Scene loaded
          */
+         
         EventManager.StartListening("Player_Stop", ResetPlayer);
         EventManager.StartListening("PauseWorld", OnWorldPaused);
         EventManager.StartListening("PauseGame", OnGamePaused);
@@ -122,7 +138,7 @@ public class GameController : MonoBehaviour {
             //Assign Variables from new Scene
             playerControl = GameObject.FindGameObjectWithTag("PlayerCube").GetComponent<PlayerController>();
             UICamera = playerControl.UICamera;
-            uiManager = playerControl.UICamera.GetComponent<UIManager>();
+            //uiManager = playerControl.UICamera.GetComponent<UIManager>();
             //get Camera Path Controller from current level
             pathControl = lvlManager.currentLvl.pathControl;
 
@@ -487,7 +503,7 @@ public class GameController : MonoBehaviour {
 
 	IEnumerator Scene1()
 	{
-		float pt1Time = 35f;
+		float pt1Time = 10f; //35f
 		float pt2Time = 10f;
 		float fadeTime = .5f;
         float scene1Time = 60f;
