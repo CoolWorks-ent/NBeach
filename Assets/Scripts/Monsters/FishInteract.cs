@@ -18,7 +18,7 @@ public class FishInteract : MonoBehaviour {
     private Vector3 velocity = Vector3.zero;
 
     int[] offsetRange = new int[] { -3, -2, -2, 1, 2, 3, };
-    int[] ZoffsetRange = new int[] { -2, 0, 3 };
+    int[] ZoffsetRange = new int[] { 3, 4, 5, 6 };
 
     // Use this for initialization
     void Start () {
@@ -27,6 +27,8 @@ public class FishInteract : MonoBehaviour {
         pController = GameController.instance.playerControl;
         m_InteractiveItem = GetComponent<GVRInteractiveItem>();
         m_InteractiveItem.OnClick += OnTouch;
+
+        EventManager.StartListening("FishFollowStop", StopFollow);
     }
 
     //used for smoother movement while following player. should help to reduce jitter due to the player's update needing to happen first
@@ -41,6 +43,9 @@ public class FishInteract : MonoBehaviour {
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, followSharpness);
             //set to face same direction as player container (because the player can look anywhere)
             transform.rotation = pController.transform.rotation;
+
+            //disable box collider on the fish while it is following player
+            GetComponent<BoxCollider>().enabled = false;
         }
         
     }
@@ -59,6 +64,11 @@ public class FishInteract : MonoBehaviour {
     public void ForceFollow()
     {
         StartCoroutine(fishCaptureAnim());
+    }
+
+    public void StopFollow(string str)
+    {
+        move_wPlayer = false;
     }
 
 

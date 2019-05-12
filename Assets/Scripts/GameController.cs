@@ -570,6 +570,8 @@ public class GameController : MonoBehaviour {
     //player hits bursts from water and hits wave @3:00min
     IEnumerator Scene1_5()
     {
+        //tell FishInteract scripts to stop following the player, fish will stop immediately
+        EventManager.TriggerEvent("FishFollowStop", "FishFollowStop");
         //pause the spline
         playerControl.CanMove = false;
         pathControl.pPathState = CamPathState.Paused;
