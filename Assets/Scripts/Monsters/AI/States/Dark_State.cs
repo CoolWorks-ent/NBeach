@@ -8,6 +8,7 @@ public abstract class Dark_State : ScriptableObject
     public enum StateType { CHASING, WANDER, IDLE, ATTACK, DEATH, PAUSE, REMAIN }
     public StateType stateType;
     public AI_Transition[] transitions;
+    public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
     public abstract void InitializeState(Darkness controller);
     public abstract void UpdateState(Darkness controller);
@@ -15,53 +16,49 @@ public abstract class Dark_State : ScriptableObject
 
     protected virtual void Awake()
     {
-        AI_Manager.RemoveDarkness += RemoveDarkness;
-        //SortTransitions();
+        //AI_Manager.RemoveDarkness += RemoveDarkness;
     }
 
-    // private void SortTransitions()
-    // {
-    //     transitions.OrderBy(pr => pr.priority);
-    // }
-        
+    public void Startup()
+    {
+        AI_Manager.RemoveDarkness += RemoveDarkness;
+        if(ReferencedBy == null || ReferencedBy.Count < 1)
+            ReferencedBy = new List<Dark_State>();
+        foreach(AI_Transition ai in transitions)
+        {
+            if(!ai.trueState.ReferencedBy.Contains(this))
+                ai.trueState.ReferencedBy.Add(this);
+            if(!ai.falseState.ReferencedBy.Contains(this))
+                ai.falseState.ReferencedBy.Add(this);
+        }
+    }
+
     protected void CheckTransitions(Darkness controller)
     {
         for(int i = 0; i < transitions.Length; i++)
         {
             bool decisionResult = transitions[i].decision.MakeDecision(transitions[i].decisionChoice,controller);
-            if(decisionResult) //&& transitions[i].trueState.stateType != controller.currentState.stateType)
+            if(decisionResult) 
             {
+                if(transitions[i].trueState.stateType == StateType.REMAIN)
+                    continue;
                 if(AI_Manager.Instance.DarknessStateChange(transitions[i].trueState, controller))
-                    ProcessStateChange(true,transitions[i].trueState, controller);
-                //InitiateStateTransfer(transitions[i].trueState, controller);
+                    ProcessStateChange(transitions[i].trueState, controller);
             }
-            else if(!decisionResult) //&& transitions[i].falseState.stateType != controller.currentState.stateType)
+            else if(!decisionResult) 
             {
+                if(transitions[i].falseState.stateType == StateType.REMAIN)
+                    continue;
                 if(AI_Manager.Instance.DarknessStateChange(transitions[i].falseState, controller))
-                    ProcessStateChange(true,transitions[i].falseState, controller);
-                //InitiateStateTransfer(transitions[i].falseState, controller);
+                    ProcessStateChange(transitions[i].falseState, controller);
             }
         }   
     }
 
-    /* protected void InitiateStateTransfer(Dark_State newState, Darkness controller) 
+    protected void ProcessStateChange(Dark_State approvedState, Darkness controller)
     {
-        //if(newState != controller.currentState)
-        //{
-            //ExitState(controller);
-            //controller.ChangeState(newState);
-            //Debug.LogWarning("<b><i>Changing states from</i></b> " + controller.currentState.name + " to new state ->" + newState.name);
-            AI_Manager.OnChangeState(newState, controller, ProcessStateChange);
-        //}
-    }*/
-
-    protected void ProcessStateChange(bool approved, Dark_State approvedState, Darkness controller)
-    {
-        if(approved)
-        {
-            ExitState(controller);
-            controller.ChangeState(approvedState);
-        }
+        ExitState(controller);
+        controller.ChangeState(approvedState);
     }
 
     protected void RemoveDarkness(Darkness controller)

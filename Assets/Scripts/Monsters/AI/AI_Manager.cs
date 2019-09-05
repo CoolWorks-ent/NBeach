@@ -9,13 +9,16 @@ public class AI_Manager : MonoBehaviour {
 	public Dictionary<int, Darkness> ActiveDarkness;
 
 	[SerializeField]
-	private int darknessIDCounter, darknessMoveCounter, darknessConcurrentAttackLimit, attacksCurrentlyProcessed, darknessConcurrentMovingLimit;
+	private int darknessIDCounter, darknessMoveCounter, darknessConcurrentAttackLimit;
 	public int maxEnemyCount;
     public int minEnemyCount;
 	private int indexNull;
+	private bool paused;
 
-	private int[] enemyEngagement; 
-	private Queue<Darkness> engagementQueue, approachQueue;
+	public Dark_State[] dark_States;
+
+	public List<int> attackApprovalPriority; 
+	//private Queue<Darkness> engagementQueue, approachQueue;
 	private static AI_Manager instance;
 	public static AI_Manager Instance
 	{
@@ -24,8 +27,8 @@ public class AI_Manager : MonoBehaviour {
 
 	void Awake()
 	{
+		dark_States = Resources.LoadAll<Dark_State>("States");
 		darknessConcurrentAttackLimit = 2;
-		darknessConcurrentMovingLimit = 3;
 		darknessIDCounter = darknessMoveCounter = 0;
 		indexNull = 0;
 		maxEnemyCount = 6;
@@ -36,12 +39,18 @@ public class AI_Manager : MonoBehaviour {
 			//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 		}
 		else instance = this;
-		engagementQueue = new Queue<Darkness>();
-		approachQueue = new Queue<Darkness>();
+		// engagementQueue = new Queue<Darkness>();
+		// approachQueue = new Queue<Darkness>();
 		ActiveDarkness = new Dictionary<int, Darkness>();
-		enemyEngagement = new int[3];
+		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
+		paused = false;
+		StartCoroutine(CompareNeighbors());
+		foreach(Dark_State d in dark_States)
+        {
+            d.Startup();
+        }
 	}
 
 	void Update()
@@ -88,52 +97,108 @@ public class AI_Manager : MonoBehaviour {
 		return result;
 	}
 
-	///<summary>Check the current engagement collection. If the darkness is not in the list and the list is not full add it to the list</summary>
-	public bool CheckAttackRequest(int iD) //Search for an empty spot in the array. After checking all spots if none of them are empty or contain the item I'm looking for return false. If there is an empty spot add the item to that spot.
+	private void AttackerSwap(int usurper, int deposed)
 	{
-		if(Array.Exists(enemyEngagement, i => i.Equals(indexNull)))
-		{
-			if(Array.Exists(enemyEngagement, i => i.Equals(iD)))
-			{
-				Debug.LogWarning(String.Format("<color=purple>Darkness <color=red>({0})</color> already in engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
-				return false;	
-			}
-			for(int i = 0; i < enemyEngagement.Length; i++)
-			{
-				if(enemyEngagement[i] == indexNull && enemyEngagement[i] != iD)
-				{
-					Debug.LogWarning(String.Format("<color=white>Added darkness <color=green>({0})</color> to engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
-					enemyEngagement[i] = iD;
-					ActiveDarkness[iD].canAttack = true;
-					ActiveDarkness[iD].standBy = false;
-					ActiveDarkness[iD].engIndex = i;
-					return true;
-				}
-			}
-		}
-		ActiveDarkness[iD].canAttack = false;
-		return false;
+		int temp = usurper;
+		Debug.LogError("Starting swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
+		attackApprovalPriority[usurper] = attackApprovalPriority[deposed];
+		attackApprovalPriority[deposed] = attackApprovalPriority[temp];
+		Debug.LogError("Ending swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
 	}
 
-	///<summary>Called when adding a new Darkness to the queue. Checks the first few in the queue and sets them to the standby status.</summary>
-	private void UpdateStandbyDarkness()
+	private IEnumerator CompareNeighbors() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
 	{
-		int i = 0;
-		if(engagementQueue.Count > 0)
+		while(!paused)
 		{
-			Darkness[] darkContainer = engagementQueue.ToArray();
-			while(i < darknessConcurrentMovingLimit && i < darkContainer.Length)
+			if(attackApprovalPriority.Count > 1)
 			{
-				if(ActiveDarkness[darkContainer[i].creationID].standBy)
-					i++;
-				else
+				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
+				foreach(KeyValuePair<int,Darkness> baba in ActiveDarkness)
 				{
-					ActiveDarkness[darkContainer[i].creationID].standBy = true;
-					i++;
+					baba.Value.DistanceEvaluation();
 				}
+				SortTheGoons();
+				yield return new WaitForSeconds(0.5f);
+				ApproveGoonAttack();
+				yield return new WaitForSeconds(1.5f);
+			}
+			else yield return new WaitForSeconds(1.0f);
+		}
+		yield return null;
+	}
+
+	private void ApproveGoonAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
+	{
+		for(int i = 0; i < attackApprovalPriority.Count; i++)
+		{
+			if(i < darknessConcurrentAttackLimit)
+			{
+				ActiveDarkness[attackApprovalPriority[i]].canAttack = true;
+			}
+			else 
+			{
+				if(ActiveDarkness[attackApprovalPriority[i]].canAttack)
+					ActiveDarkness[attackApprovalPriority[i]].canAttack = false;
 			}
 		}
+		//Debug.LogWarning("First two entries set to attack " + )
 	}
+
+	private void SortTheGoons() //check if the darkness should get on the attack list 
+	{
+		attackApprovalPriority.Sort(delegate(int a, int b)
+		{
+			return ActiveDarkness[a].targetDist.CompareTo(ActiveDarkness[b].targetDist);
+		});
+	}	
+
+	///<summary>Check the current engagement collection. If the darkness is not in the list and the list is not full add it to the list</summary> //TODO add way for Darkness to be set to trade places if closer to player
+	// public bool CheckAttackRequest(int iD) //Search for an empty spot in the array. After checking all spots if none of them are empty or contain the item I'm looking for return false. If there is an empty spot add the item to that spot.
+	// {
+
+	// 	if(Array.Exists(attackApproved, i => i.Equals(indexNull)))
+	// 	{
+	// 		if(Array.Exists(attackApproved, i => i.Equals(iD)))
+	// 		{
+	// 			Debug.LogWarning(String.Format("<color=purple>Darkness <color=red>({0})</color> already in engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
+	// 			return false;	
+	// 		}
+	// 		for(int i = 0; i < attackApproved.Length; i++)
+	// 		{
+	// 			if(attackApproved[i] == indexNull && attackApproved[i] != iD)
+	// 			{
+	// 				Debug.LogWarning(String.Format("<color=white>Added darkness <color=green>({0})</color> to engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
+	// 				attackApproved[i] = iD;
+	// 				ActiveDarkness[iD].canAttack = true;
+	// 				ActiveDarkness[iD].standBy = false;
+	// 				ActiveDarkness[iD].engIndex = i;
+	// 				return true;
+	// 			}
+	// 		}
+	// 	}
+	// 	ActiveDarkness[iD].canAttack = false;
+	// 	return false;
+	// }
+
+	///<summary>Called when adding a new Darkness to the queue. Checks the first few in the queue and sets them to the standby status.</summary>
+	// private void UpdateStandbyDarkness() //TODO set 1-2 standby Darkness to wander between patrol nodes. Nodes should be selected in the Wander state
+	// {
+	// 	int i = 0;
+	// 	if(engagementQueue.Count > 0)
+	// 	{
+	// 		Darkness[] darkContainer = engagementQueue.ToArray();
+	// 		while(i < darknessConcurrentMovingLimit && i < darkContainer.Length)
+	// 		{
+	// 			if(ActiveDarkness[darkContainer[i].creationID].standBy)
+	// 				i++;
+	// 			else
+	// 			{
+	// 				ActiveDarkness[darkContainer[i].creationID].standBy = true;
+	// 				i++;
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	///<summary> Notified by the AddDarkness event. If the engagement count is not at cap add the Darkness. Otherwise assign to wait queue.</summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
@@ -141,16 +206,18 @@ public class AI_Manager : MonoBehaviour {
 		updatedDarkness.transform.SetParent(Instance.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
-		Debug.Log("New Darkness added. ID#" + updatedDarkness.creationID);
+		//Debug.Log("New Darkness added. ID#" + updatedDarkness.creationID);
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
+		attackApprovalPriority.Add(updatedDarkness.creationID);
 		updatedDarkness.target = player;
 		/* if(!CheckAttackRequest(updatedDarkness.creationID)) //check to see if the queue has grunts in it first
 		{
 		}*/
-		engagementQueue.Enqueue(updatedDarkness);
-		if(!CheckAttackRequest(engagementQueue.Peek().creationID))
-			UpdateStandbyDarkness();
-		else engagementQueue.Dequeue();
+		
+		// engagementQueue.Enqueue(updatedDarkness);
+		// if(!CheckAttackRequest(engagementQueue.Peek().creationID))
+		// 	UpdateStandbyDarkness();
+		// else engagementQueue.Dequeue();
 		//updatedDarkness.GetComponent<AI_Movement>().target = player;
 	}
 
@@ -158,21 +225,22 @@ public class AI_Manager : MonoBehaviour {
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
 		darknessMoveCounter--;
-		if(enemyEngagement[updatedDarkness.engIndex] != indexNull && updatedDarkness.engIndex < enemyEngagement.Length)
-			enemyEngagement[updatedDarkness.engIndex] = indexNull;
-		if (engagementQueue.Count >= 1)
-		{
-			if(engagementQueue.Peek() != null)
-			{
-				if(CheckAttackRequest(engagementQueue.Peek().creationID)) //Log ID number is being added number 
-				{
-					//Debug.LogWarning(String.Format("<color=gray>AI Darkness Removed:</color> Adding this darkness {0}", engagementQueue.Peek()), engagementQueue.Peek());
-					engagementQueue.Dequeue();
-					UpdateStandbyDarkness();
-				}
-			}
-			else engagementQueue.Dequeue();
-		}
+		//if(attackApprovalPriority[updatedDarkness.engIndex] != indexNull && updatedDarkness.engIndex < attackApprovalPriority.Count)
+		//	attackApprovalPriority[updatedDarkness.engIndex] = indexNull;
+		// if (engagementQueue.Count >= 1)
+		// {
+		// 	if(engagementQueue.Peek() != null)
+		// 	{
+		// 		if(CheckAttackRequest(engagementQueue.Peek().creationID)) //Log ID number is being added number 
+		// 		{
+		// 			//Debug.LogWarning(String.Format("<color=gray>AI Darkness Removed:</color> Adding this darkness {0}", engagementQueue.Peek()), engagementQueue.Peek());
+		// 			engagementQueue.Dequeue();
+		// 			UpdateStandbyDarkness();
+		// 		}
+		// 	}
+		// 	else engagementQueue.Dequeue();
+		// }
+		attackApprovalPriority.Remove(updatedDarkness.creationID);
         ActiveDarkness.Remove(updatedDarkness.creationID);
     }
 

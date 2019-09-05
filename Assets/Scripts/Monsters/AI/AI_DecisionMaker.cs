@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AI_DecisionMaker
 {
-    public enum DecisionName {CHASE_PLAYER, ATTACK_PLAYER, PAUSE_FOR_COMMAND, WANDER_NEAR}
+    public enum DecisionName {CHASE_PLAYER, ATTACK_PLAYER, PAUSE_FOR_COMMAND, SHOULD_STAND_BACK, WANDER_NEAR}
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
     public AI_DecisionMaker()
@@ -14,6 +14,7 @@ public class AI_DecisionMaker
         Decisions.Add(DecisionName.ATTACK_PLAYER,ShouldAttack);
         Decisions.Add(DecisionName.PAUSE_FOR_COMMAND, ShouldPauseForCommand);
         Decisions.Add(DecisionName.WANDER_NEAR,ShouldWanderNear);
+        Decisions.Add(DecisionName.SHOULD_STAND_BACK, ShouldStandBack);
     }
 
     public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -46,9 +47,16 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    private bool ShouldWanderNear(Darkness controller)
+    private bool ShouldStandBack(Darkness controller)
     {
-        if(controller.standBy && Vector3.Distance(controller.target.position,controller.transform.position) > controller.waitRange) 
+        if(!controller.canAttack)
+            return true;
+        else return false;
+    }
+
+    private bool ShouldWanderNear(Darkness controller) 
+    {
+        if(!controller.canAttack && controller.standBy && Vector3.Distance(controller.target.position,controller.transform.position) > controller.waitRange) 
         {
             return true;
         }

@@ -11,7 +11,8 @@ public class Darkness : MonoBehaviour {
     public Dark_State previousState, currentState;
     public Transform target;
     
-    public int actionIdle, creationID, engIndex;
+    public int actionIdle, creationID;
+    
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
@@ -19,7 +20,9 @@ public class Darkness : MonoBehaviour {
                 deathHash = Animator.StringToHash("Death"),
                 wanderHash = Animator.StringToHash("Wander");
     public bool canAttack, updateStates, standBy;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist;
+    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist;
+    public enum AggresionDistanceRating {FarDistance = 1, StandbyDistance, ApproachDistance, AttackingDistance}
+    public AggresionDistanceRating adRating;
     public Seeker sekr;
     public AIDestinationSetter aIDestSet;
     public GameObject deathFX;
@@ -37,7 +40,6 @@ public class Darkness : MonoBehaviour {
         stopDist = 1;
         canAttack = standBy = false;
         creationID = 0;
-        engIndex = 0;
         updateStates = true;
         stateUpdateRate = 0.5f;
     }
@@ -87,6 +89,20 @@ public class Darkness : MonoBehaviour {
             currentState.InitializeState(this);
             previousState = currentState;
         }
+    }
+
+    public void DistanceEvaluation()
+    {
+        targetDist = Vector3.Distance(transform.position, target.position);
+        if(targetDist > waitRange * 1.5f)
+            adRating = AggresionDistanceRating.FarDistance;
+        else if (targetDist < waitRange && targetDist > attackInitiationRange)
+            adRating = AggresionDistanceRating.StandbyDistance;
+        else if (targetDist > attackInitiationRange && targetDist < waitRange/1.5f)
+            adRating = AggresionDistanceRating.ApproachDistance;
+        else if(targetDist <= attackInitiationRange)
+            adRating = AggresionDistanceRating.AttackingDistance;
+        
     }
 
     public bool TargetWithinDistance(float range)
