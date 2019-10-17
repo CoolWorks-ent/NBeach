@@ -7,10 +7,9 @@ public class AttackState : Dark_State
     [Range(1, 3)]
     public int attackSpeedModifier;
 
-    protected override void Awake()
+    protected override void FirstTimeSetup()
     {
         stateType = StateType.ATTACK;
-        base.Awake();
     }
 
     public override void InitializeState(Darkness controller)
@@ -25,6 +24,7 @@ public class AttackState : Dark_State
     {
         //controller.animeController.SetTrigger(controller.attackHash);
         //controller.aIRichPath.maxSpeed /= attackSpeedModifier;
+        controller.aIMovement.UpdatePath();
     }
 
     protected override void ExitState(Darkness controller)

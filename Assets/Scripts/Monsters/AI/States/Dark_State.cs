@@ -5,7 +5,7 @@ using System.Linq;
 
 public abstract class Dark_State : ScriptableObject
 {
-    public enum StateType { CHASING, WANDER, IDLE, ATTACK, DEATH, PAUSE, REMAIN }
+    public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
     public StateType stateType;
     public AI_Transition[] transitions;
     public List<Dark_State> ReferencedBy;
@@ -13,11 +13,6 @@ public abstract class Dark_State : ScriptableObject
     public abstract void InitializeState(Darkness controller);
     public abstract void UpdateState(Darkness controller);
     protected abstract void ExitState(Darkness controller);
-
-    protected virtual void Awake()
-    {
-        //AI_Manager.RemoveDarkness += RemoveDarkness;
-    }
 
     public void Startup()
     {
@@ -33,6 +28,11 @@ public abstract class Dark_State : ScriptableObject
         }
     }
 
+    protected virtual void FirstTimeSetup()
+    {
+        stateType = StateType.REMAIN;
+    }
+
     protected void CheckTransitions(Darkness controller)
     {
         for(int i = 0; i < transitions.Length; i++)
@@ -42,15 +42,13 @@ public abstract class Dark_State : ScriptableObject
             {
                 if(transitions[i].trueState.stateType == StateType.REMAIN)
                     continue;
-                if(AI_Manager.Instance.DarknessStateChange(transitions[i].trueState, controller))
-                    ProcessStateChange(transitions[i].trueState, controller);
+                else ProcessStateChange(transitions[i].trueState, controller); 
             }
             else if(!decisionResult) 
             {
                 if(transitions[i].falseState.stateType == StateType.REMAIN)
                     continue;
-                if(AI_Manager.Instance.DarknessStateChange(transitions[i].falseState, controller))
-                    ProcessStateChange(transitions[i].falseState, controller);
+                else ProcessStateChange(transitions[i].falseState, controller);
             }
         }   
     }

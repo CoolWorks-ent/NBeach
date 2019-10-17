@@ -6,10 +6,13 @@ using Pathfinding;
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
+ [RequireComponent(typeof(AI_Movement))]
 public class Darkness : MonoBehaviour {
 
+    public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
+    public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
-    public Transform target;
+    public Transform Target;
     
     public int actionIdle, creationID;
     
@@ -19,57 +22,36 @@ public class Darkness : MonoBehaviour {
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death"),
                 wanderHash = Animator.StringToHash("Wander");
-    public bool canAttack, updateStates, standBy;
+    public bool updateStates;
     public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist;
-    public enum AggresionDistanceRating {FarDistance = 1, StandbyDistance, ApproachDistance, AttackingDistance}
-    public AggresionDistanceRating adRating;
-    public Seeker sekr;
-    public AIDestinationSetter aIDestSet;
+    //public AIDestinationSetter aIDestSet;
+    public AI_Movement aIMovement;
     public GameObject deathFX;
     public Dark_State DeathState;
     public Animator animeController;
     
     //public AI_Movement aIMovement;
-    public RichAI aIRichPath;
 
     void Awake()
     {
         actionIdle = 3;
         attackInitiationRange = 3.5f;
-        waitRange = attackInitiationRange*2.5f;
+        waitRange = 10f;
         stopDist = 1;
-        canAttack = standBy = false;
         creationID = 0;
         updateStates = true;
         stateUpdateRate = 0.5f;
+        agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
     }
 
     void Start () {
-        AI_Manager.OnDarknessAdded(this);
         animeController = GetComponentInChildren<Animator>();
-        //aIMovement = GetComponent<AI_Movement>();
-        aIRichPath = GetComponent<RichAI>();
-        sekr = GetComponent<Seeker>();
-        aIDestSet = GetComponent<AIDestinationSetter>();
+        AI_Manager.OnDarknessAdded(this);
+        aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
         StartCoroutine(ExecuteCurrentState());
-        aIDestSet.target = target;
-        aIRichPath.endReachedDistance = stopDist;
+        aIMovement.target = Target;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-        
-    }
-
-    // void FixedUpdate()
-    // {
-    //     if(!aIRichPath.canMove)
-    //     {
-    //         Vector3 dir = Vector3.RotateTowards(this.transform.position, target.position,0f,0f);
-    //         transform.rotation = Quaternion.LookRotation(dir);
-    //     }    
-    // }
 
     public IEnumerator ExecuteCurrentState()
     {
@@ -85,29 +67,27 @@ public class Darkness : MonoBehaviour {
     {
         if(currentState != nextState)
         {
+            previousState = currentState;
             currentState = nextState;
             currentState.InitializeState(this);
-            previousState = currentState;
         }
     }
 
     public void DistanceEvaluation()
     {
-        targetDist = Vector3.Distance(transform.position, target.position);
-        if(targetDist > waitRange * 1.5f)
-            adRating = AggresionDistanceRating.FarDistance;
-        else if (targetDist < waitRange && targetDist > attackInitiationRange)
-            adRating = AggresionDistanceRating.StandbyDistance;
-        else if (targetDist > attackInitiationRange && targetDist < waitRange/1.5f)
-            adRating = AggresionDistanceRating.ApproachDistance;
-        else if(targetDist <= attackInitiationRange)
-            adRating = AggresionDistanceRating.AttackingDistance;
-        
+        targetDist = Vector3.Distance(transform.position, Target.position);
+    }
+
+    public void AggressionChanged(AggresionRating agR)
+    {
+        if(agR != agRatingCurrent)
+            agRatingPrevious = agRatingCurrent;
+		agRatingCurrent = agR;
     }
 
     public bool TargetWithinDistance(float range)
     {
-        if(Vector3.Distance(transform.position, target.position) <= range)
+        if(Vector3.Distance(transform.position, Target.position) <= range)
         {
             return true;
         }
@@ -122,8 +102,6 @@ public class Darkness : MonoBehaviour {
             {
                 Debug.LogWarning("Darkness Destroyed");
                 ChangeState(DeathState);
-                //ChangeState(DeathState);
-                //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
         }
         else if(collider.gameObject.CompareTag("Player"))

@@ -7,16 +7,15 @@ public class IdleState : Dark_State
 {
     [Range(1, 5)]
     public float idleTime;
-
-    protected override void Awake()
+    
+    protected override void FirstTimeSetup()
     {
         stateType = StateType.IDLE;
-        base.Awake();
     }
 
     public override void InitializeState(Darkness controller)
     {
-        controller.aIRichPath.canMove = false;
+        controller.aIMovement.EndMovement();
         controller.animeController.SetTrigger(controller.idleHash);
         
         float idleTime = controller.actionIdle;
