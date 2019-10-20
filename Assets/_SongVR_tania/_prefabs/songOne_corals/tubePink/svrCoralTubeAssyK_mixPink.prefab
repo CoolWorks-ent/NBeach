@@ -26,7 +26,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1086950530002794
 GameObject:
@@ -43,7 +43,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1237595773011970
 GameObject:
@@ -60,7 +60,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1332120224697082
 GameObject:
@@ -77,7 +77,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1337466568065180
 GameObject:
@@ -90,12 +90,13 @@ GameObject:
   - component: {fileID: 114202751860527926}
   - component: {fileID: 114799566031801290}
   - component: {fileID: 65878696203300094}
+  - component: {fileID: 95772138830709004}
   m_Layer: 0
   m_Name: svrCoralTubeAssyK_mixPink
   m_TagString: plant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1340061020612318
 GameObject:
@@ -107,12 +108,13 @@ GameObject:
   - component: {fileID: 4096707940862280}
   - component: {fileID: 33243064444791746}
   - component: {fileID: 23237514464806610}
+  - component: {fileID: 114457722652168188}
   m_Layer: 0
-  m_Name: svrCoralTubeB_pink
+  m_Name: svrCoralTubeB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1370056034727394
 GameObject:
@@ -129,7 +131,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1469354914965444
 GameObject:
@@ -146,7 +148,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1564507754687888
 GameObject:
@@ -163,7 +165,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1684078188333064
 GameObject:
@@ -180,7 +182,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1746830755308258
 GameObject:
@@ -193,11 +195,11 @@ GameObject:
   - component: {fileID: 33314633159695676}
   - component: {fileID: 23556170062161950}
   m_Layer: 0
-  m_Name: svrCoralTubeC_pink
+  m_Name: svrCoralTubeC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1764000089191622
 GameObject:
@@ -210,11 +212,11 @@ GameObject:
   - component: {fileID: 33311430898729008}
   - component: {fileID: 23938403694086502}
   m_Layer: 0
-  m_Name: svrCoralTubeD_pink
+  m_Name: svrCoralTubeD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1958715716970782
 GameObject:
@@ -227,11 +229,11 @@ GameObject:
   - component: {fileID: 33044098175014002}
   - component: {fileID: 23571477539088854}
   m_Layer: 0
-  m_Name: svrCoralTubeA_pink
+  m_Name: svrCoralTubeA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &4064020227680638
 Transform:
@@ -280,7 +282,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1340061020612318}
   m_LocalRotation: {x: -0.06555001, y: -0.002930283, z: 0.07752009, w: 0.9948293}
-  m_LocalPosition: {x: -0.042, y: 0, z: -0.376}
+  m_LocalPosition: {x: -0.29, y: 0, z: -0.376}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4560567657154098}
@@ -372,9 +374,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1337466568065180}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 193.67464, y: -5.77, z: -691.13}
-  m_LocalScale: {x: 4.675176, y: 4.6751804, z: 4.6751804}
+  m_LocalRotation: {x: 0.1049389, y: -0.17400609, z: -0.15798335, w: 0.96630794}
+  m_LocalPosition: {x: 116.04139, y: -4.4428725, z: 147.77376}
+  m_LocalScale: {x: 5, y: 3, z: 5}
   m_Children:
   - {fileID: 4096707940862280}
   - {fileID: 4391439099400492}
@@ -386,7 +388,7 @@ Transform:
   - {fileID: 4519942408863828}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 8.501, y: -21.935001, z: -20.221}
 --- !u!4 &4694160007968772
 Transform:
   m_ObjectHideFlags: 1
@@ -894,6 +896,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.3080057, y: 2.3706207, z: 1.4097465}
   m_Center: {x: 0.24110416, y: 0.6903125, z: 0.1030311}
+--- !u!95 &95772138830709004
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1337466568065180}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5da8e2b39b2301b4fb238130756e063e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114202751860527926
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -906,6 +925,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bubbles: {fileID: 1124178475197322, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
+  bubbleSpawnPoint: {fileID: 0}
+--- !u!114 &114457722652168188
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1340061020612318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22f9ddc624282d74d8d4e2a0edcbfdf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fxObj: {fileID: 198403190158317752, guid: 5be2434f3b4196048a1041c37a668302, type: 2}
 --- !u!114 &114799566031801290
 MonoBehaviour:
   m_ObjectHideFlags: 1

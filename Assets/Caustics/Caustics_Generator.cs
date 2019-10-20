@@ -78,9 +78,9 @@ public class Caustics_Generator : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		if ( !causticTexture || !renderTexture ){
-			//Debug.LogError("A texture or a render texture are missing, assign them.");
+			Debug.LogError("A texture or a render texture are missing, assign them.");
 		}else{
-			//Debug.Log ( "Setup Caustics Caustics_Generator" );
+			Debug.Log ( "Setup Caustics Caustics_Generator" );
 			Caustics_Renderer.Setup( causticTexture, renderTexture, causticsMaterial );
 			this.GetComponent<Light>().cookie = renderTexture;
 		}

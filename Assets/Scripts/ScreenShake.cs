@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Script ScreenShake uses Pernel Noise to shake the camera.
+/// </summary>
+/// 
 public class ScreenShake : MonoBehaviour {
 
     float shakeDuration;
@@ -31,6 +35,7 @@ public class ScreenShake : MonoBehaviour {
         StartCoroutine(Shake(mag, duration));
     }
 
+    //Uses Pernel Noise
     public IEnumerator Shake(float magnitude, float duration)
     {
         originalCamPos = camObj.transform.localPosition;

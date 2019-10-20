@@ -24,6 +24,8 @@ GameObject:
   - component: {fileID: 23397594261682456}
   - component: {fileID: 54116476572652930}
   - component: {fileID: 114689428767728086}
+  - component: {fileID: 114964542484293868}
+  - component: {fileID: 95725247930852050}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -38,7 +40,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1132894309862976}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 182.55104, y: 48.25126, z: 95.759705}
+  m_LocalPosition: {x: 202.285, y: 48.290638, z: 96.55731}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -57,7 +59,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 12cb141551f0d0d40a2b56e3db543ec6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,6 +100,23 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!95 &95725247930852050
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1132894309862976}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 13e10f8391d350a4d8afc86794c7ea44, type: 3}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114689428767728086
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -109,6 +128,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9006d257e4c1b7447825dd6e5a1fb5f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectileFired: 0
+  shootPoint: {fileID: 0}
+--- !u!114 &114964542484293868
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1132894309862976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e9e8ed23028ac14e87326c7ca98234b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScrollX: 0.5
+  ScrollY: 0.5
 --- !u!135 &135630521900414924
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -41,7 +41,10 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
   [SerializeField]
   protected LayerMask raycasterEventMask = NO_EVENT_MASK_SET;
 
-  [SerializeField]
+    //only allow interaction with interact layer for level 1
+    int myEventMask;
+
+    [SerializeField]
   [Range(1, MAX_RAYCAST_HITS_MAX)]
   /// The max number of hits that the raycaster can detect at once.
   /// They are NOT guaranteed to be ordered by distance. This value should be set to a higher number
@@ -85,8 +88,9 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
   /// Event mask used to determine which objects will receive events.
   public int finalEventMask {
     get {
-      return (eventCamera != null) ? eventCamera.cullingMask & eventMask : NO_EVENT_MASK_SET;
-    }
+            //return (eventCamera != null) ? eventCamera.cullingMask & eventMask : NO_EVENT_MASK_SET;
+            return (eventCamera != null) ? eventCamera.cullingMask & eventMask : myEventMask;
+        }
   }
 
   /// Layer mask used to filter events. Always combined with the camera's culling mask if a camera is used.
@@ -105,7 +109,8 @@ public class GvrPointerPhysicsRaycaster : GvrBasePointerRaycaster {
   protected override void Awake() {
     base.Awake();
     hits = new RaycastHit[maxRaycastHits];
-  }
+    myEventMask = 1 << LayerMask.NameToLayer("PInteract");
+    }
 
   protected override bool PerformRaycast(GvrBasePointer.PointerRay pointerRay, float radius,
     PointerEventData eventData, List<RaycastResult> resultAppendList) {

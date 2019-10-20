@@ -30,7 +30,7 @@ public class GvrReticlePointer : GvrBasePointer {
   // Minimum distance of the reticle (in meters).
   public const float RETICLE_DISTANCE_MIN = 0.45f;
   // Maximum distance of the reticle (in meters).
-  public const float RETICLE_DISTANCE_MAX = 15.0f;
+  public const float RETICLE_DISTANCE_MAX = 100.0f;
 
   /// Number of segments making the reticle circle.
   public int reticleSegments = 20;
@@ -138,6 +138,8 @@ public class GvrReticlePointer : GvrBasePointer {
 
   void Update() {
     UpdateDiameters();
+        Vector3 forward = transform.TransformDirection(Vector3.forward) * ReticleDistanceInMeters;
+        Debug.DrawRay(transform.position, forward, Color.blue);
   }
 
   private bool SetPointerTarget(Vector3 target, bool interactive) {

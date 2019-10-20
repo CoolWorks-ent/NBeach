@@ -70,6 +70,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4357783520789394}
+  - component: {fileID: 95316525313521630}
+  - component: {fileID: 65399627476256858}
+  - component: {fileID: 114108934162519618}
+  - component: {fileID: 114635939449927444}
   m_Layer: 0
   m_Name: svrCoralTubeAssyC_purple
   m_TagString: plant
@@ -126,8 +130,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1731518969049542}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.22316955, y: 0.09062514, z: 0.0208431, w: 0.970334}
+  m_LocalPosition: {x: -97.9039, y: -35.97874, z: -583.5728}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4923041036886042}
@@ -136,7 +140,7 @@ Transform:
   - {fileID: 4209499232056962}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 7.0400004, y: -6.932, z: -44.296}
 --- !u!4 &4540288860173350
 Transform:
   m_ObjectHideFlags: 1
@@ -319,3 +323,56 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1040502643047314}
   m_Mesh: {fileID: 4300010, guid: e99bb17de5720c64da880ba199bb0a90, type: 3}
+--- !u!65 &65399627476256858
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731518969049542}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.3035822, y: 2.562075, z: 2.539084}
+  m_Center: {x: -0.094704404, y: 0.7810385, z: 0.15790413}
+--- !u!95 &95316525313521630
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731518969049542}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f12dee48640ca2e4eaea92b833783b67, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114108934162519618
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731518969049542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b751622d9d6eda488b0ec434d6fd5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubbles: {fileID: 0}
+  bubbleSpawnPoint: {fileID: 0}
+--- !u!114 &114635939449927444
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731518969049542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

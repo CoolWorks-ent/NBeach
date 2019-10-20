@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 4079295397876548}
   - component: {fileID: 33675214744837906}
   - component: {fileID: 23007988393188892}
+  - component: {fileID: 114307643172066210}
+  - component: {fileID: 65655389731177356}
   m_Layer: 0
   m_Name: svrCoralTubeA_pink
   m_TagString: plant
@@ -80,3 +82,27 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1686572240832448}
   m_Mesh: {fileID: 4300010, guid: e99bb17de5720c64da880ba199bb0a90, type: 3}
+--- !u!65 &65655389731177356
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1686572240832448}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.6, y: 1.9969102, z: 0.6}
+  m_Center: {x: 0, y: 0.9984551, z: 0}
+--- !u!114 &114307643172066210
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1686572240832448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22f9ddc624282d74d8d4e2a0edcbfdf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fxObj: {fileID: 198403190158317752, guid: 5be2434f3b4196048a1041c37a668302, type: 2}

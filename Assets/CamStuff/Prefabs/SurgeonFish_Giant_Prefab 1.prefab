@@ -270,8 +270,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4042350885214508}
   - component: {fileID: 95227017094831402}
-  - component: {fileID: 114620152128744226}
-  - component: {fileID: 114743056278814500}
   - component: {fileID: 136582374270223618}
   - component: {fileID: 65210775658191742}
   m_Layer: 9
@@ -576,28 +574,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114620152128744226
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1876398976750804}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f6c6ff763af9e34a81c0487e9dbf442, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114743056278814500
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1876398976750804}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbecdf8c937e0ee4bbde608fb5f0fd22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!136 &136582374270223618
 CapsuleCollider:
   m_ObjectHideFlags: 1
