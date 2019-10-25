@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4400177786202110}
   - component: {fileID: 114595640382436030}
   - component: {fileID: 114729928814456672}
-  - component: {fileID: 114950399579548982}
   m_Layer: 0
   m_Name: AI Manager
   m_TagString: AI Manager
@@ -55,7 +54,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   data:
-    dataString: UEsDBBQAAAgIAACAn+uP066XjAIAAGUFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFtVF1v2jAU/SvIz2uVAIWyty1Qtklt0di0h6UPJr4hFo4d+aNAK/77rh3TpHQSksO5536ce6/9Srg0DRRW6aXm7F4xIJ8HxH+TTwNCg+0ntVwhnCLCjarBal58kVvhuQmCTvJS6XrBtpApYw3CJRUG0KSV9d4SodcBOUSHYzxf/Dk44VcB0oLuWOlseH0zjNR0fD2K7Mk00J0sBK0bYGv+Ap3X7Bz8to0qUU9k+OILJQQ3sRpij00Qm9HGONSCBMYpqgt1eH4FfFtZ/DPsOz+WpQEbFWh6nHONTWqjkq/KVj5STc2ureuZCufz3KKkUFQb9f4D4WqcTifpZBRIpVb1t3P6NPGpbMWL3U96LKixvQ734fn7+p3cU7GjGwF/KpAPaqmVkwyNVjvv6gwM571QbxKzCopdx2srvgBd83GmaTfTU2jCIRO83njketwCa6FC28OoQOOAvmPBYUdMjISoL+K3gV9021+maLjj2lg0xYTSV7dRTnsqWYSeeTHOZkpLCHCsuQFJhT2uMIy9nOSFrZf2wnJH/XWJyaPtfBsuXALc8ZPkwrRS+25YBn64ulkpLu0aqC6qXjxTqf09mOrRWcEldIq84QGbmCkp2y00/3FbO13Soudm4WCdhjm1NNwFrAm3hPVdsaHBQzoh/EIGFT74X1Thf0++yRXFvCLA5EHJcIvenU9+EbaOs/fLThjbzCY3t9Mx3UCaTtOrTUJHowkkSTouZ2U5IuEecIk9p2LVNi2OCjdIdlok7vz50RosNW3CBWSa7pf8pVb9fnBZqnWhAeRjG+JNLWjMgi8FWzCOOtdgLZdh+chrToQqdsDyt5x56OziYDXNuyg5afizsh7JSRYetJycyOkfUEsDBBQAAAgIAACAn+vvADTmbAAAAHcAAAAJACQAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0Bq1YqSy0qzszPU7JSMNEz0jPSUVBKL0osyCgGChiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf64/TrpeMAgAAZQUAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf6+8ANOZsAAAAdwAAAAkAJAAAAAAAAAAAAAAA2QIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAACQAwAAAAA=
+    dataString: UEsDBBQAAAgIAACAn+s6dDEHVgIAAP4EAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVMty4jAQ/BVK503KBsJjb7sOIXvIo8Ju5eKLsMZYhSy59AgQin/fkSywQ06Ynp6Z7pmxj4RL00BhlV5qzp4UA/JzQPwz+THogo+wpxslV/wTzpx3zmzlSTRw3qjlCvHUpxlVg9W8+CU3wpMTBJ3kpdL1gm0gU8YahEsqDGBIK+uzJULHAdnHhEP8/fS/gxM+FSAt6I6Vzoe3d8NITce3o8ieTAPdyULQugHmZXdZ83PxWVtVoqHI8OILJQQ3UQ2xhya4zWhjHHpBAuMU3QUdnl8B31QW/wz7yS9lacBGB5oe7rnGIbVVyW/VTq6mZtvq+qDC+T4ztBREtVWfvhFuxul0kk5GgVRqVT+e26eJb2UrXmzf6KGgxvYm3Ifvv+p3ckfFlq4FvFcgn9VSKycZBq12PtUZGN73Sl0sZhUU247XKr4CXfN9p2m301MYwj4TvF575HbcAiuhwtjDqkDjgv6g4HAjJlZC1Iv4Z+Av3fSPKQYeuDYWQ7Gh9OrWymlPJYswM2/G2UxpCQGOmhuQVNjDK5ax15u8ivXaXkUeqH9tYvMYO78NVykB7vhJchV6VbvLskyldk9gqhdnBZf9Yj7yjIPKlJTtpfUsndNWTpe06KdtHGdfL4wwtp5P7mbTMV1Dmk7Tm3VCR6MJJEk6LudlOSLh+LhEo1S8tkrjfHBtsmsr8dDOn5PBUtMmXD3TdLfkn7XqCeSyVKtCA8iXtsLFFmhsgm8nWzCOE1qBtVyGhZNjToQqtsDyS6E8WF3sraZ5VyUnDf9Q1iM5ycJHJCcncvoPUEsDBBQAAAgIAACAn+shBV2xbAAAAHcAAAAJACQAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0Bq1YqSy0qzszPU7JSMNEz0rPQUVBKL0osyCgGChiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf6zp0MQdWAgAA/gQAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf6yEFXbFsAAAAdwAAAAkAJAAAAAAAAAAAAAAAowIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAABaAwAAAAA=
     upgradeData: 
     file_cachedStartup: {fileID: 4900000, guid: 21f303a13747b394aac2cb72b2113fdd,
       type: 3}
@@ -141,27 +140,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   darknessIDCounter: 0
-  darknessMoveCounter: 0
   darknessConcurrentAttackLimit: 0
-  attacksCurrentlyProcessed: 0
-  darknessConcurrentMovingLimit: 0
   maxEnemyCount: 0
   minEnemyCount: 0
---- !u!114 &114950399579548982
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1087406834434032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1764de1de43cc4d19af52679d3eaae06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  desiredSimulationFPS: 20
-  workerThreads: 2
-  doubleBuffering: 0
-  symmetryBreakingBias: 0.1
-  movementPlane: 0
-  drawObstacles: 0
+  darkTotalCount: 0
+  darkAttackCount: 0
+  darkStandbyCount: 0
+  calculationTime: 0
+  dark_States: []
+  attackApprovalPriority: 

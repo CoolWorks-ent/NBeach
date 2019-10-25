@@ -203,10 +203,10 @@ GameObject:
   - component: {fileID: 65387374068129854}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
-  - component: {fileID: 114372473262131794}
   - component: {fileID: 54991120590850454}
   - component: {fileID: 114811071986779280}
   - component: {fileID: 114857173380954124}
+  - component: {fileID: 114446345711301086}
   m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -813,7 +813,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 1
-  drawGizmos: 0
+  drawGizmos: 1
   detailedGizmos: 1
   startEndModifier:
     addPoints: 0
@@ -828,7 +828,7 @@ MonoBehaviour:
   tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
---- !u!114 &114372473262131794
+--- !u!114 &114446345711301086
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -836,24 +836,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558497094199476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 560112f876f5746c780eca0d404e7139, type: 3}
+  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 2
-  radiusBackingField: 0.8
-  heightBackingField: 2
-  centerBackingField: 1
-  locked: 0
-  lockWhenNotMoving: 1
-  agentTimeHorizon: 3
-  obstacleTimeHorizon: 2
-  maxNeighbours: 5
-  layer: 1
-  collidesWith: -1
-  wallAvoidForce: 1
-  wallAvoidFalloff: 1
-  priority: 0.75
-  debug: 0
+  version: 1
+  penalty: 1000
+  randomStep: 5
 --- !u!114 &114511842479999518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -907,6 +895,8 @@ MonoBehaviour:
   pathPoint: {x: 0, y: 0, z: 0}
   reachedEndOfPath: 0
   wandering: 0
+  pathCalculating: 0
+  targetMoved: 0
   PatrolPoints: []
 --- !u!114 &114857173380954124
 MonoBehaviour:
@@ -920,7 +910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 1
-  smoothType: 0
+  smoothType: 1
   subdivisions: 2
   iterations: 2
   strength: 0.5

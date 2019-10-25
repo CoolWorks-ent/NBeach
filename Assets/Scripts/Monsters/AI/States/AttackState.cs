@@ -24,7 +24,7 @@ public class AttackState : Dark_State
     {
         //controller.animeController.SetTrigger(controller.attackHash);
         //controller.aIRichPath.maxSpeed /= attackSpeedModifier;
-        controller.aIMovement.UpdatePath();
+        //controller.aIMovement.UpdatePath();
     }
 
     protected override void ExitState(Darkness controller)

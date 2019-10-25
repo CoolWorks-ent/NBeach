@@ -1,25 +1,25 @@
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using Pathfinding;
 
 [RequireComponent(typeof(Darkness))]
 public class AI_Movement : MonoBehaviour
 {
-    public IAstarAI aI;
     public Transform target;
     public float speed, maxSpeed, repathRate;
-    public Path path;
     public Vector3 wayPoint, pathPoint;
     private Seeker sekr;
-    public bool reachedEndOfPath, wandering;
+    private Path navPath;
+    public bool reachedEndOfPath, wandering, pathCalculating, targetMoved;
     public Vector3[] PatrolPoints;
     private Rigidbody rigidbod;
-    private Pathfinding.RVO.RVOController rVOController;
+    private Blocker bProvider;
 
     void Awake()
     { 
         speed = 2;
-        wandering = false;
+        wandering = targetMoved = reachedEndOfPath = false;
+        PathUpdate += PathTargetUpdated;
     }
 
     void Start()
@@ -27,45 +27,90 @@ public class AI_Movement : MonoBehaviour
         PatrolPoints = new Vector3[3];
         sekr = GetComponent<Seeker>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-        rVOController = gameObject.GetComponent<Pathfinding.RVO.RVOController>();
-        aI = GetComponent<IAstarAI>();
-        if(aI != null) aI.onSearchPath += UpdatePath;
+        sekr.pathCallback += PathComplete;
+        bProvider = new Blocker();
     }
 
-    public void UpdatePath()
+    public void UpdatePath(Vector3 target)
     {
-        if(aI != null)
+        if(!pathCalculating)
+            CreatePath(target);
+    }
+
+    private void PathComplete(Path p)
+    {
+        Debug.LogWarning("path callback complete");
+        pathCalculating = false;
+        p.Claim(this);
+        BlockPathNodes(p);
+        if(!p.error)
         {
-            if(wandering)
-            {
-                aI.destination = wayPoint;
-            }
-            else aI.destination = target.position;
+            if(navPath != null) 
+                navPath.Release(this);
+        }
+        else 
+        {
+            p.Release(this);
+            Debug.LogError("Path failed calculation for " + this + " because " + p.errorLog);
         }
     }
 
-    public void BeginMovement(Vector3 endPoint)
+    private void PathTargetUpdated(bool b)
     {
-        sekr.StartPath(transform.position, endPoint);
+        targetMoved = b;
+    }
+
+    private void BlockPathNodes(Path p)
+    {
+        foreach(GraphNode n in p.path)
+        {
+            bProvider.blockedNodes.Add(n);
+        }
+        //Debug.Break();
+    }
+
+    public void CreatePath(Vector3 endPoint)
+    {
+        bProvider.blockedNodes.Clear();
+        pathCalculating = true;
+        Path p = ABPath.Construct(transform.position, endPoint);
+        p.traversalProvider = bProvider;
+        sekr.StartPath(p, null);
+        p.BlockUntilCalculated();
     }
 
     public void EndMovement()
     {
-        sekr.CancelCurrentPathRequest();
+        if(pathCalculating)
+            sekr.CancelCurrentPathRequest();
     }
 
     void OnDisable()
     {
-        if (aI != null) aI.onSearchPath -= UpdatePath;
-        sekr.CancelCurrentPathRequest();
+        EndMovement();
     }
 
-    public void OnPathComplete(Path p)
+    class Blocker : ITraversalProvider
     {
-        if(!p.error)
+        public HashSet<GraphNode> blockedNodes = new HashSet<GraphNode>();
+        public bool CanTraverse(Path path, GraphNode node)
         {
-            path = p;
+            return DefaultITraversalProvider.CanTraverse(path, node) && !blockedNodes.Contains(node);
         }
-        else Debug.Log("Path return with an error " + path.error);
+
+        public uint GetTraversalCost(Path path, GraphNode node)
+        {
+            return DefaultITraversalProvider.GetTraversalCost(path, node);
+        }
+    }
+
+    public delegate void AI_MovementEvent<T>(T obj);
+
+    public static event AI_MovementEvent<bool> PathUpdate;
+
+    public static void OnPathUpdate(bool b)
+    {
+        if(PathUpdate != null)
+            PathUpdate(b);
     }
 }

@@ -14,7 +14,7 @@ public abstract class Dark_State : ScriptableObject
     public abstract void UpdateState(Darkness controller);
     protected abstract void ExitState(Darkness controller);
 
-    public void Startup()
+    public virtual void Startup()
     {
         AI_Manager.RemoveDarkness += RemoveDarkness;
         if(ReferencedBy == null || ReferencedBy.Count < 1)
@@ -26,6 +26,7 @@ public abstract class Dark_State : ScriptableObject
             if(!ai.falseState.ReferencedBy.Contains(this))
                 ai.falseState.ReferencedBy.Add(this);
         }
+        Debug.Log("Base startup complete");
     }
 
     protected virtual void FirstTimeSetup()

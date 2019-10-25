@@ -45,48 +45,12 @@ public class AI_Manager : MonoBehaviour {
 		RemoveDarkness += RemoveFromDarknessList;
 		paused = false;
 		calculationTime = 1.5f;
-		StartCoroutine(CompareNeighbors());
+		StartCoroutine(ManagedDarknessUpdate());
 		foreach(Dark_State d in dark_States)
         {
             d.Startup();
         }
 	}
-
-	/*public bool DarknessStateChange(Dark_State toState, Darkness fromController)
-	{
-		bool result = false;
-		switch(toState.stateType)
-		{
-			case Dark_State.StateType.REMAIN:
-				result = false;
-				break;
-			case Dark_State.StateType.IDLE:
-				Debug.LogWarning(String.Format("<color=blue>AI Manager IDLE:</color> Requesting {0} -> {1}",fromController.currentState,toState), fromController);
-				result = true;
-				break;
-			case Dark_State.StateType.CHASING:
-				if(fromController.currentState.stateType != Dark_State.StateType.CHASING)
-				{
-					 //lets check for player movement here
-					result = true;
-				}
-				else result = false; 
-				break;
-			case Dark_State.StateType.ATTACK:
-				if(fromController.agRating == Darkness.AggresionRating.Attacking)
-					result = true; 
-				else result = false;
-				break;
-			case Dark_State.StateType.STANDBY: 
-				if(fromController.agRating == Darkness.AggresionRating.StandingBy)
-				{
-					result = true;
-				}
-				else result = false;
-				break;
-		}
-		return result;
-	}*/
 
 	private void AttackerSwap(int usurper, int deposed)
 	{
@@ -97,7 +61,7 @@ public class AI_Manager : MonoBehaviour {
 		Debug.LogError("Ending swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
 	}
 
-	private IEnumerator CompareNeighbors() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
+	private IEnumerator ManagedDarknessUpdate() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
 	{
 		while(!paused)
 		{
@@ -114,8 +78,17 @@ public class AI_Manager : MonoBehaviour {
 				yield return new WaitForSeconds(calculationTime);
 			}
 			else yield return new WaitForSeconds(0.5f);
+			OnMovementUpdate();
+			//AI_Movement.OnPathUpdate(PlayerMoveUpdate());
 		}
 		yield return null;
+	}
+
+	private bool PlayerMoveUpdate()
+	{
+		if(player.GetComponent<Rigidbody>().velocity.magnitude > 0)
+			return true;
+		else return false;
 	}
 
 	private void ApproveGoonAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
@@ -129,9 +102,6 @@ public class AI_Manager : MonoBehaviour {
 			{
 				darkAttackCount++;
 				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
-				//ActiveDarkness[attackApprovalPriority[i]].agRatingPrevious = ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent;
-				//ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent = Darkness.AggresionRating.Attacking;
-				//ActiveDarkness[attackApprovalPriority[i]].target = player;
 			}
 			else if(i < darknessConcurrentAttackLimit+2)
 			{
@@ -158,6 +128,11 @@ public class AI_Manager : MonoBehaviour {
 			return ActiveDarkness[a].targetDist.CompareTo(ActiveDarkness[b].targetDist);
 		});
 	}	
+
+	private void AttackRequestProcessor(Darkness d, Action<Darkness,Vector3> callback)
+	{
+
+	}
 
 	///<summary> Notified by the AddDarkness event. If the engagement count is not at cap add the Darkness. Otherwise assign to wait queue.</summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
@@ -194,12 +169,12 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 #region AIManagerEvents
+	public delegate void AIEvent();
 	public delegate void AIEvent<T>(T obj);
-	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
-	//public delegate void AIEvent<T1,T2, T3>(T1 obj1, T2 obj2, T3 obj3);
-	//public static event AIEvent<Dark_State, Darkness, Action<bool, Dark_State, Darkness>> ChangeState;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
+
+	public static event AIEvent UpdateMovement;
 
 	///<summary>
 	///Adds Darkness to list. Darkness will be assigned their spot in the queue and set to attack if queue is not full.
@@ -217,5 +192,12 @@ public class AI_Manager : MonoBehaviour {
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
 	}
+
+	public static void OnMovementUpdate()
+	{
+		if(UpdateMovement != null)
+			UpdateMovement();
+	}
+
 	#endregion
 }

@@ -21,7 +21,7 @@ public class ChaseState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.aIMovement.BeginMovement(controller.Target.position);
+        controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
         //controller.aIRichPath.endReachedDistance = stopDist;
@@ -29,8 +29,8 @@ public class ChaseState : Dark_State
 
     public override void UpdateState(Darkness controller)
     {
-        //controller.aIMovement.target = controller.target;
-        controller.aIMovement.UpdatePath();
+        controller.aIMovement.UpdatePath(controller.Target.position);
+
         CheckTransitions(controller);
     }
 

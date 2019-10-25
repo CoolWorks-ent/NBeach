@@ -207,6 +207,72 @@ namespace Pathfinding {
 			}
 		}
 
+		/// <summary>Closest node to the point which satisfies the constraint</summary>
+		public GraphNode GetNearestConnection (Int3 point, NNConstraint constraint, long maximumSqrConnectionLength) {
+			GraphNode best = null;
+			long bestSqrDist = long.MaxValue;
+
+			// Given a found point at a distance of r world units
+			// then any node that has a connection on which a closer point lies must have a squared distance lower than
+			// d^2 < (maximumConnectionLength/2)^2 + r^2
+			// Note: (x/2)^2 = (x^2)/4
+			// Note: (x+3)/4 to round up
+			long offset = (maximumSqrConnectionLength+3)/4;
+
+			GetNearestConnectionInternal(1, point, constraint, ref best, ref bestSqrDist, offset);
+			return best;
+		}
+
+		void GetNearestConnectionInternal (int index, Int3 point, NNConstraint constraint, ref GraphNode best, ref long bestSqrDist, long distanceThresholdOffset) {
+			var data = tree[index].data;
+
+			if (data != null) {
+				var pointv3 = (UnityEngine.Vector3)point;
+				for (int i = tree[index].count - 1; i >= 0; i--) {
+					var dist = (data[i].position - point).sqrMagnitudeLong;
+					// Note: the subtraction is important. If we used an addition on the RHS instead the result might overflow as bestSqrDist starts as long.MaxValue
+					if (dist - distanceThresholdOffset < bestSqrDist && (constraint == null || constraint.Suitable(data[i]))) {
+						// This node may contains the closest connection
+						// Check all connections
+						var conns = (data[i] as PointNode).connections;
+						if (conns != null) {
+							var nodePos = (UnityEngine.Vector3)data[i].position;
+							for (int j = 0; j < conns.Length; j++) {
+								// Find the closest point on the connection, but only on this node's side of the connection
+								// This ensures that we will find the closest node with the closest connection.
+								var connectionMidpoint = ((UnityEngine.Vector3)conns[j].node.position + nodePos) * 0.5f;
+								float sqrConnectionDistance = VectorMath.SqrDistancePointSegment(nodePos, connectionMidpoint, pointv3);
+								// Convert to Int3 space
+								long sqrConnectionDistanceInt = (long)(sqrConnectionDistance*Int3.FloatPrecision*Int3.FloatPrecision);
+								if (sqrConnectionDistanceInt < bestSqrDist) {
+									bestSqrDist = sqrConnectionDistanceInt;
+									best = data[i];
+								}
+							}
+						}
+
+						// Also check if the node itself is close enough.
+						// This is important if the node has no connections at all.
+						if (dist < bestSqrDist) {
+							bestSqrDist = dist;
+							best = data[i];
+						}
+					}
+				}
+			} else {
+				var dist = (long)(point[tree[index].splitAxis] - tree[index].split);
+				var childIndex = 2 * index + (dist < 0 ? 0 : 1);
+				GetNearestConnectionInternal(childIndex, point, constraint, ref best, ref bestSqrDist, distanceThresholdOffset);
+
+				// Try the other one if it is possible to find a valid node on the other side
+				// Note: the subtraction is important. If we used an addition on the RHS instead the result might overflow as bestSqrDist starts as long.MaxValue
+				if (dist*dist - distanceThresholdOffset < bestSqrDist) {
+					// childIndex ^ 1 will flip the last bit, so if childIndex is odd, then childIndex ^ 1 will be even
+					GetNearestConnectionInternal(childIndex ^ 0x1, point, constraint, ref best, ref bestSqrDist, distanceThresholdOffset);
+				}
+			}
+		}
+
 		/// <summary>Add all nodes within a squared distance of the point to the buffer.</summary>
 		/// <param name="point">Nodes around this point will be added to the buffer.</param>
 		/// <param name="sqrRadius">squared maximum distance in Int3 space. If you are converting from world space you will need to multiply by Int3.Precision:

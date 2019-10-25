@@ -13,14 +13,21 @@ public class WanderState : ChaseState
         stateType = StateType.WANDER;
     }
 
+    public override void Startup()
+    {
+        AI_Manager.UpdateMovement += UpdatePatrolPoints;
+        base.Startup();
+        Debug.Log("Wander startup complete");
+    }
+
     public override void InitializeState(Darkness controller)
     {
-        
         base.InitializeState(controller);
         controller.aIMovement.wandering = true;
         ChooseNewPatrolPoints(controller);
         controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         AI_Manager.Instance.StartCoroutine(NewPointBuffer(controller,5));
+        controller.aIMovement.CreatePath(controller.Target.position);
     }
 
     public override void UpdateState(Darkness controller)
@@ -31,8 +38,14 @@ public class WanderState : ChaseState
         //     ChooseNewPatrolPoints(controller);
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
-        controller.aIMovement.UpdatePath();
+        if(!controller.aIMovement.pathCalculating) //&& controller.aIMovement.targetMoved)
+            controller.aIMovement.CreatePath(controller.Target.position);
         CheckTransitions(controller);
+    }
+
+    private void UpdatePatrolPoints()
+    {
+
     }
 
     private void ChooseNewPatrolPoints(Darkness controller)
