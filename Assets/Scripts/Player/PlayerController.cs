@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject playerContainer;
     [SerializeField]
     public SimpleAnimator2D animator_EyeBlink;
+    [SerializeField]
 
     public Camera mainCamera;
     public Camera UICamera;

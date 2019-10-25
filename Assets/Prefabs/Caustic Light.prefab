@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 108000010205688140}
   - component: {fileID: 119000012533355532}
   - component: {fileID: 114000011426487188}
+  - component: {fileID: 114607419268874628}
   m_Layer: 11
   m_Name: Caustic Light
   m_TagString: Untagged
@@ -35,13 +36,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010661959820}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 11.256592, y: 5.6, z: -37.1}
+  m_LocalRotation: {x: 0.0000005960464, y: 0.0000009238719, z: -0.7114713, w: 0.70271516}
+  m_LocalPosition: {x: 138.92966, y: -2.4021587, z: -12.550049}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 89.981, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90.00001, y: 0, z: 3.1190002}
 --- !u!108 &108000010205688140
 Light:
   m_ObjectHideFlags: 1
@@ -84,9 +85,23 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010661959820}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 578fae2f1aadef1408dcfcdb4ad71253, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  causticTexture: {fileID: 2800000, guid: ae72c9c084a8f824f826756a64545109, type: 3}
+  renderTexture: {fileID: 8400000, guid: 87e0fb950710ddb4fb2ec9db84a1515d, type: 2}
+  causticsMaterial: {fileID: 2100000, guid: 5e1d117563aed8b468c8149b8cece7e7, type: 2}
+--- !u!114 &114607419268874628
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010661959820}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c68ab50d174dba64ebcc06635a13af86, type: 3}
+  m_Script: {fileID: 11500000, guid: e650b2bd059774f40a91de5622ec2688, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   fps: 30
@@ -159,12 +174,12 @@ Projector:
   m_Enabled: 1
   serializedVersion: 2
   m_NearClipPlane: 0.1
-  m_FarClipPlane: 24.2
-  m_FieldOfView: 60
-  m_AspectRatio: 3.73
+  m_FarClipPlane: 40
+  m_FieldOfView: 82.3
+  m_AspectRatio: 1
   m_Orthographic: 1
-  m_OrthographicSize: 67.4
+  m_OrthographicSize: 28
   m_Material: {fileID: 2100000, guid: 7fa8bcaf2e0bb734eb1a1a0116fb2268, type: 2}
   m_IgnoreLayers:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1025

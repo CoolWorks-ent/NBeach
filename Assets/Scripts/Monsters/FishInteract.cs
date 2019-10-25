@@ -18,7 +18,7 @@ public class FishInteract : MonoBehaviour {
     private Vector3 velocity = Vector3.zero;
 
     int[] offsetRange = new int[] { -3, -2, -2, 1, 2, 3, };
-    int[] ZoffsetRange = new int[] { 3, 4, 5, 6 };
+    int[] ZoffsetRange = new int[] { -2, 1, 2, 3, 4, 5, 6 };
 
     // Use this for initialization
     void Start () {
@@ -29,6 +29,10 @@ public class FishInteract : MonoBehaviour {
         m_InteractiveItem.OnClick += OnTouch;
 
         EventManager.StartListening("FishFollowStop", StopFollow);
+        EventManager.StartListening("FishFollowStart", ForceFollow);
+
+        //testing
+        //ForceFollow();
     }
 
     //used for smoother movement while following player. should help to reduce jitter due to the player's update needing to happen first
@@ -44,8 +48,7 @@ public class FishInteract : MonoBehaviour {
             //set to face same direction as player container (because the player can look anywhere)
             transform.rotation = pController.transform.rotation;
 
-            //disable box collider on the fish while it is following player
-            GetComponent<BoxCollider>().enabled = false;
+           
         }
         
     }
@@ -57,13 +60,21 @@ public class FishInteract : MonoBehaviour {
     //function for clicking on fish
     public void OnTouch()
     {
-
+        //if fish not already moving with player, start moving with player
+        if (move_wPlayer == false)
+        {
+            StartCoroutine(fishCaptureAnim());
+            m_InteractiveItem.enabled = false;
+        }
     }
 
     //This function will force fish to follow the player when it is called.  
-    public void ForceFollow()
+    public void ForceFollow(string str)
     {
         StartCoroutine(fishCaptureAnim());
+        //disable box collider on the fish while it is following player
+        GetComponent<BoxCollider>().enabled = false;
+        m_InteractiveItem.enabled = false;
     }
 
     public void StopFollow(string str)
@@ -85,6 +96,7 @@ public class FishInteract : MonoBehaviour {
             if (move_wPlayer == false)
             {
                 StartCoroutine(fishCaptureAnim());
+                m_InteractiveItem.enabled = false;
             }
             
         }
@@ -124,7 +136,7 @@ public class FishInteract : MonoBehaviour {
         float animTime = 2f;
         float tempZ = 0;
         //smooth follow?
-        float followVal = 0.1f;
+        float followVal = 1f;
         float followVal_a = 1f;
         //1st, move the fish in front of the player
         //2nd, move the fish beside the player
@@ -151,7 +163,8 @@ public class FishInteract : MonoBehaviour {
             Vector3 targetPos = new Vector3(player.transform.position.x + playerOffset.x,
                 player.transform.position.y + playerOffset.y, tempZ);
 
-            transform.position += (targetPos - transform.position) * followVal;
+            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, followVal);
+            //transform.position += (targetPos - transform.position) * followVal;
             t += Time.deltaTime;
             yield return null;
         }
@@ -162,14 +175,37 @@ public class FishInteract : MonoBehaviour {
         yield return 0;
     }
 
-    int GetRandom(string val)
+    float GetRandom(string val)
     {
-        if(val == "x")
-            return offsetRange[UnityEngine.Random.Range(0, offsetRange.Length)];
+        float num;
+        if (val == "x")
+        {
+            num = UnityEngine.Random.Range(-4f, 4f);
+            if (num > -1 && num < 1)
+                if (num < 0) num += -1;
+                else if (num > 0) num += 1;
+            return num;
+            //return offsetRange[UnityEngine.Random.Range(0, offsetRange.Length)];
+        }
         else if (val == "y")
-            return offsetRange[UnityEngine.Random.Range(0, offsetRange.Length)];
-        else if(val =="z")
-            return ZoffsetRange[UnityEngine.Random.Range(0, ZoffsetRange.Length)];
+        {
+            num = UnityEngine.Random.Range(-3f, 4f);
+            if (num > -1 && num < 1)
+                if (num < 0) num += -1;
+                else if (num > 0) num += 1;
+            return num;
+        }
+        else if (val == "z")
+        //return ZoffsetRange[UnityEngine.Random.Range(0, ZoffsetRange.Length)];
+        //return UnityEngine.Random.Range(-2f, 6f);
+        {
+            num = UnityEngine.Random.Range(-3f, 6f);
+            if (num > -1 && num < 1)
+                if (num < 0) num += -1;
+                else if (num > 0) num += 1;
+            return num;
+           
+        }
         else return offsetRange[UnityEngine.Random.Range(0, offsetRange.Length)];
     }
 

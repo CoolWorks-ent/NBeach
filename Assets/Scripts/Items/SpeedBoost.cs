@@ -23,6 +23,8 @@ public class SpeedBoost : MonoBehaviour {
         gameController = GameObject.Find("GameController").GetComponent<GameController>();
         EventManager.StartListening("Player_SpeedBoostOff", OnDeboost);
         EventManager.StartListening("Player_SpeedBoost", OnSpeedBoost);
+        EventManager.StartListening("Player_SpeedFXOn", OnSpeedFx);
+        EventManager.StartListening("Player_SpeedFXOff", OffSpeedFx);
         EventManager.StartListening("CancelPowerUps", OnCancel);
         speedAnimator = Camera.main.GetComponent<SpeedEffectAnimator>();
         baseSpeed = gameController.pathControl._basePathSpeed;
@@ -62,6 +64,20 @@ public class SpeedBoost : MonoBehaviour {
         //increase player speed over time
         StartCoroutine(GradualBoost());
         //*optional: set the time of the speed boost here
+    }
+
+    public void OnSpeedFx(string str)
+    {
+        //start FX animation
+        speedAnimator.StartAnim("anim");
+        timeElapsed = Time.deltaTime;
+        playSpeedAnim = true;
+    }
+
+    public void OffSpeedFx(string str)
+    {
+        //reset camera path speed and stop speed animation
+        speedAnimator.StopAnim("anim");
     }
 
     private void OnDeboost(string str)

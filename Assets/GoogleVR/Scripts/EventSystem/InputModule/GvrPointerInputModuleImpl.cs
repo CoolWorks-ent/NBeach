@@ -151,10 +151,40 @@ public class GvrPointerInputModuleImpl {
     RaycastResult raycastResult;
     CurrentEventData.position = GvrMathHelpers.GetViewportCenter();
     bool isPointerActiveAndAvailable = IsPointerActiveAndAvailable();
+    bool objectHit = false;
     if (isPointerActiveAndAvailable) {
-      RaycastAll();
-      raycastResult = ModuleController.FindFirstRaycast(ModuleController.RaycastResultCache);
-    } else {
+      RaycastAll(); 
+            while(objectHit == false)
+            {
+                if (ModuleController.RaycastResultCache.Count == 0)
+                    break;
+
+                //probably just need to loop throught he RaycastResultCache
+                raycastResult = ModuleController.FindFirstRaycast(ModuleController.RaycastResultCache);
+                if(raycastResult.gameObject.layer != LayerMask.NameToLayer("PInteract"))
+                {
+                    ModuleController.RaycastResultCache.RemoveAt(0);
+                    raycastResult = new RaycastResult();
+                    raycastResult.Clear();
+                }
+                else
+                {
+                    objectHit = true;
+                }
+                               
+            }
+            if (ModuleController.RaycastResultCache.Count == 0)
+            {
+                raycastResult = new RaycastResult();
+                raycastResult.Clear();
+            }
+            else
+            {
+                raycastResult = ModuleController.FindFirstRaycast(ModuleController.RaycastResultCache);
+            }
+            //raycastResult = ModuleController.FindFirstRaycast(ModuleController.RaycastResultCache);
+            //raycastResult = ModuleController.RaycastResultCache[1];
+        } else {
       raycastResult = new RaycastResult();
       raycastResult.Clear();
     }

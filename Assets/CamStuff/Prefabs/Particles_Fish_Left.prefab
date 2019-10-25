@@ -51,7 +51,7 @@ ParticleSystem:
   lengthInSec: 15
   simulationSpeed: 1
   looping: 1
-  prewarm: 1
+  prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 1
   startDelay:

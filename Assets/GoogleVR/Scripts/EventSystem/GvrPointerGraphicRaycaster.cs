@@ -37,8 +37,10 @@ public class GvrPointerGraphicRaycaster : GvrBasePointerRaycaster {
   public bool ignoreReversedGraphics = true;
   public BlockingObjects blockingObjects = BlockingObjects.None;
   public LayerMask blockingMask = NO_EVENT_MASK_SET;
+  //only allow interaction with interact layer for level 1
+  public int myEventMask;
 
-  private Canvas targetCanvas;
+    private Canvas targetCanvas;
   private List<Graphic> raycastResults = new List<Graphic>();
   private Camera cachedPointerEventCamera;
 
@@ -88,13 +90,15 @@ public class GvrPointerGraphicRaycaster : GvrBasePointerRaycaster {
     }
 
     float hitDistance = float.MaxValue;
+    //calculate eventMask
+    myEventMask = 1 << LayerMask.NameToLayer("PInteract");
 
-    if (blockingObjects != BlockingObjects.None) {
+        if (blockingObjects != BlockingObjects.None) {
       float dist = eventCamera.farClipPlane - eventCamera.nearClipPlane;
 
       if (blockingObjects == BlockingObjects.ThreeD || blockingObjects == BlockingObjects.All) {
         RaycastHit hit;
-        if (Physics.Raycast(pointerRay.ray, out hit, dist, blockingMask)) {
+        if (Physics.Raycast(pointerRay.ray, out hit, dist, myEventMask)) { //blockingMask
           hitDistance = hit.distance;
         }
       }

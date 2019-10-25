@@ -149,6 +149,8 @@ public class GameController : MonoBehaviour {
             Debug.Log("Level Loaded: " + lvlManager.currentLvl.levelNum);
             EventManager.TriggerEvent("LevelLoaded", "level loaded");
 
+
+
             
         }
     }
@@ -486,6 +488,14 @@ public class GameController : MonoBehaviour {
                     Debug.Log("water particle activated");
                     waterParticles[1].SetActive(true);
                     break;
+                case "Song1_SpeedOn":
+                    waterParticles[1].SetActive(true);
+                    //SpeedBoost boost = new SpeedBoost();
+                    //boost.OnSpeedFx("");
+                Camera.main.GetComponent<SpeedEffectAnimator>().StartAnim("anim");
+                //EventManager.TriggerEvent("Player_SpeedFXOn", "Player_SpeedFXOn");
+                EventManager.TriggerEvent("FishFollowStop", "FishFollowStop");
+                break;
                 case "Song1_pt2":
                     StartCoroutine(Scene1_5());
                     break;
@@ -503,7 +513,10 @@ public class GameController : MonoBehaviour {
 
 	IEnumerator Scene1()
 	{
-		float pt1Time = 10f; //35f
+        //TESTING
+        //EventManager.TriggerEvent("FishFollowStart", "FishFollowStart");
+        //
+        float pt1Time = 10f; //35f
 		float pt2Time = 10f;
 		float fadeTime = .5f;
         float scene1Time = 60f;
@@ -571,7 +584,9 @@ public class GameController : MonoBehaviour {
     IEnumerator Scene1_5()
     {
         //tell FishInteract scripts to stop following the player, fish will stop immediately
-        EventManager.TriggerEvent("FishFollowStop", "FishFollowStop");
+        Camera.main.GetComponent<SpeedEffectAnimator>().StopAnim("anim");
+        EventManager.TriggerEvent("Player_SpeedFXOff", "Player_SpeedFXOff");
+
         //pause the spline
         playerControl.CanMove = false;
         pathControl.pPathState = CamPathState.Paused;
@@ -600,7 +615,7 @@ public class GameController : MonoBehaviour {
         uiManager.showArrow(0, wave);
         //set the impact position to be slightly further from the camera
         Vector3 crashPos = player.transform.position;
-
+        yield return new WaitUntil(() => wave.GetComponent<Renderer>().isVisible == true);
         while (time < waveCrashTime)
         {
             wave.transform.position = Vector3.Lerp(w_basePosition, crashPos, time / waveCrashTime);
@@ -665,6 +680,7 @@ public class GameController : MonoBehaviour {
         playerControl.CanMove = true;
         //pathControl.pathSpeed = 7;
         //pathControl.topSpeed = 5;
+        pathControl.pathSpeed = gameController.pathControl.pathSpeed; //reset path speed
         pathControl.pPathState = CamPathState.Play;
 
         //pause to allow camera to look towards wave and then open eyes

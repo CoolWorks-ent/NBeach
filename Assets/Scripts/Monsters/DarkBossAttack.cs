@@ -12,6 +12,7 @@ public class DarkBossAttack : MonoBehaviour {
     public float attackSpeed = 20f;
     float curTime = 0;
     bool move;
+    ParticleSystem attackFX;
     
     //Constructor
     /*public DarkBossAttack(string atkType, GameObject target)
@@ -24,7 +25,8 @@ public class DarkBossAttack : MonoBehaviour {
 	void Start () {
         move = false;
         targetPos = Target.transform.position;
-	}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {

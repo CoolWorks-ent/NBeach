@@ -8,11 +8,15 @@ public class Coral : MonoBehaviour {
     private GVRInteractiveItem m_InteractiveItem;
     public GameObject bubbles;
     GameObject bubbleCopy;
+    [SerializeField]
+    Transform bubbleSpawnPoint;
+    Animator anim;
 
     // Use this for initialization
     void Start () {
         m_InteractiveItem = GetComponent<GVRInteractiveItem>();
         m_InteractiveItem.OnClick += TouchCoral;
+        anim = GetComponent<Animator>();
 	}
 	
 	// Update is called once per frame
@@ -24,13 +28,33 @@ public class Coral : MonoBehaviour {
     {
         Debug.Log("coral touched");
         //make object bounce slightly
-        StartCoroutine(BounceEffect());
+        //StartCoroutine(BounceEffect());
+        if (anim != null)
+            anim.SetTrigger("IsTouched");
+            //anim.Play(1);
+        //StartCoroutine(BubbleEffect()); 
+
         //play bubble particle
         //may need to adjust the position the bubbles should appear
-        bubbleCopy = Instantiate(bubbles, transform.position, bubbles.transform.rotation) as GameObject;
-        bubbleCopy.GetComponentInChildren<ParticleSystem>().Play();
+        //bubbleCopy.SetActive(true);
+        /*
+        if(bubbleSpawnPoint != null)
+            bubbleCopy = Instantiate(bubbles, bubbleSpawnPoint.position, bubbles.transform.rotation) as GameObject;
+        else
+            bubbleCopy = Instantiate(bubbles, transform.position, bubbles.transform.rotation) as GameObject;
+        */
+        //bubbleCopy.GetComponentInChildren<ParticleSystem>().Play();
+        //bubbles.GetComponentInChildren<ParticleSystem>().Play();
+        foreach (Transform child in transform)
+        {
+            //EventManager.TriggerEvent("CoralTubeSingle_PlayInteract", "CoralTubeSingle_PlayInteract");
+            if(child.GetComponent<CoralTubeSingle>() != null)
+                child.GetComponent<CoralTubeSingle>().PlayInteract();            
+        }
+
     }
 
+    //is called via Coral Animation in Unity Engine
     IEnumerator BounceEffect()
     {
         Vector3 baseScale = transform.localScale;
@@ -50,10 +74,22 @@ public class Coral : MonoBehaviour {
             yield return null;
         }
 
-        yield return new WaitForSeconds(3); //play bubble effect for [x] seconds only
-        bubbleCopy.GetComponentInChildren<ParticleSystem>().Stop();
-
         yield return null;
+    }
+
+    IEnumerator BubbleEffect()
+    {
+        ParticleSystem []tempArr = GetComponentsInChildren<ParticleSystem>();
+        foreach (ParticleSystem particle in tempArr)
+        {
+            particle.Play();
+        }
+        yield return new WaitForSeconds(3); //play bubble effect for [x] seconds only
+        foreach (ParticleSystem particle in tempArr)
+        {
+            particle.Stop();
+        }
+        //GetComponentsInChildren<ParticleSystem>().Stop();
     }
 
     //ease functions from Copyright (c)2001 Robert Penner
