@@ -7,7 +7,8 @@ public class AI_Movement : MonoBehaviour
 {
     public Transform target;
     public float speed, maxSpeed, repathRate;
-    public Vector3 wayPoint, pathPoint;
+    public Vector3 wayPoint, pathPoint, direction;
+    public bool moving;
     private Seeker sekr;
     private Path navPath;
     public bool reachedEndOfPath, wandering, pathCalculating, targetMoved;
@@ -18,8 +19,8 @@ public class AI_Movement : MonoBehaviour
     void Awake()
     { 
         speed = 2;
+        moving = false;
         wandering = targetMoved = reachedEndOfPath = false;
-        PathUpdate += PathTargetUpdated;
     }
 
     void Start()
@@ -29,6 +30,17 @@ public class AI_Movement : MonoBehaviour
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
         sekr.pathCallback += PathComplete;
         bProvider = new Blocker();
+        direction = new Vector3();
+    }
+
+    void FixedUpdate()
+    {
+        if(moving && navPath != null)
+        {
+            direction = Vector3.Normalize(navPath.vectorPath[0] - this.transform.position);
+            rigidbod.AddForce(direction * speed * Time.deltaTime, ForceMode.VelocityChange);
+            //rigidbod.MovePosition(direction * speed * Time.deltaTime);
+        }
     }
 
     public void UpdatePath(Vector3 target)
@@ -47,6 +59,7 @@ public class AI_Movement : MonoBehaviour
         {
             if(navPath != null) 
                 navPath.Release(this);
+            navPath = p;
         }
         else 
         {
@@ -83,6 +96,7 @@ public class AI_Movement : MonoBehaviour
     {
         if(pathCalculating)
             sekr.CancelCurrentPathRequest();
+        moving = false;
     }
 
     void OnDisable()
@@ -102,15 +116,5 @@ public class AI_Movement : MonoBehaviour
         {
             return DefaultITraversalProvider.GetTraversalCost(path, node);
         }
-    }
-
-    public delegate void AI_MovementEvent<T>(T obj);
-
-    public static event AI_MovementEvent<bool> PathUpdate;
-
-    public static void OnPathUpdate(bool b)
-    {
-        if(PathUpdate != null)
-            PathUpdate(b);
     }
 }

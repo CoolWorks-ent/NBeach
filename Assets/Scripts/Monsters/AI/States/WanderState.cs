@@ -17,7 +17,6 @@ public class WanderState : ChaseState
     {
         AI_Manager.UpdateMovement += UpdatePatrolPoints;
         base.Startup();
-        Debug.Log("Wander startup complete");
     }
 
     public override void InitializeState(Darkness controller)
@@ -28,6 +27,7 @@ public class WanderState : ChaseState
         controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         AI_Manager.Instance.StartCoroutine(NewPointBuffer(controller,5));
         controller.aIMovement.CreatePath(controller.Target.position);
+        controller.aIMovement.moving = true;
     }
 
     public override void UpdateState(Darkness controller)

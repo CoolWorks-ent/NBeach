@@ -24,6 +24,7 @@ public class ChaseState : Dark_State
         controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
+        controller.aIMovement.moving = true;
         //controller.aIRichPath.endReachedDistance = stopDist;
     }
 

@@ -26,7 +26,6 @@ public abstract class Dark_State : ScriptableObject
             if(!ai.falseState.ReferencedBy.Contains(this))
                 ai.falseState.ReferencedBy.Add(this);
         }
-        Debug.Log("Base startup complete");
     }
 
     protected virtual void FirstTimeSetup()
