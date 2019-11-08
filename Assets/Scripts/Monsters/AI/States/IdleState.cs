@@ -15,7 +15,7 @@ public class IdleState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
-        controller.aIMovement.EndMovement();
+        //controller.aIMovement.EndMovement();
         controller.animeController.SetTrigger(controller.idleHash);
         
         float idleTime = controller.actionIdle;

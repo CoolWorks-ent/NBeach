@@ -6,13 +6,14 @@ using Pathfinding;
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
  */
- [RequireComponent(typeof(AI_Movement))]
 public class Darkness : MonoBehaviour {
 
     public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
     public Transform Target;
+    public AIPath pather;
+    public Seeker sekr;
     
     public int actionIdle, creationID;
     
@@ -25,12 +26,9 @@ public class Darkness : MonoBehaviour {
     public bool updateStates;
     public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist;
     //public AIDestinationSetter aIDestSet;
-    public AI_Movement aIMovement;
     public GameObject deathFX;
     public Dark_State DeathState;
     public Animator animeController;
-    
-    //public AI_Movement aIMovement;
 
     void Awake()
     {
@@ -46,11 +44,13 @@ public class Darkness : MonoBehaviour {
 
     void Start () {
         animeController = GetComponentInChildren<Animator>();
+        pather = GetComponent<AIPath>();
+        sekr = GetComponent<Seeker>();
         AI_Manager.OnDarknessAdded(this);
-        aIMovement = GetComponent<AI_Movement>();
+        //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
         StartCoroutine(ExecuteCurrentState());
-        aIMovement.target = Target;
+        //aIMovement.target = Target;
 	}
 
     public IEnumerator ExecuteCurrentState()

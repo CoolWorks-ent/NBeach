@@ -61,12 +61,12 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    private bool EndOfPathing(Darkness controller)
+    /*private bool EndOfPathing(Darkness controller)
     {
         if(controller.aIMovement.reachedEndOfPath && controller.agRatingCurrent != Darkness.AggresionRating.Idling)
             return true;
         else return false;
-    }
+    }*/
 
     private bool TargetCheck(Darkness controller)
     {

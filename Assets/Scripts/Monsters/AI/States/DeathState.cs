@@ -22,7 +22,7 @@ public class DeathState : Dark_State
         //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
         controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
         AI_Manager.Instance.StartCoroutine(deathRoutine(controller));
-        controller.aIMovement.EndMovement();
+        //controller.aIMovement.EndMovement();
     }
 
     public override void UpdateState(Darkness controller)

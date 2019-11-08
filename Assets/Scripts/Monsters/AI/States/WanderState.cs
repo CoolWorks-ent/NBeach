@@ -22,12 +22,19 @@ public class WanderState : ChaseState
     public override void InitializeState(Darkness controller)
     {
         base.InitializeState(controller);
-        controller.aIMovement.wandering = true;
-        ChooseNewPatrolPoints(controller);
-        controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
+        controller.pather.destination = controller.Target.position;
+        controller.pather.canMove = true;
+        controller.pather.canSearch = true;
+        controller.pather.repathRate = 3.0f;
+        controller.pather.pickNextWaypointDist = 0.95f;
+        controller.pather.rotationSpeed = 180;
+        //controller.aIMovement.wandering = true;
+        //ChooseNewPatrolPoints(controller);
+        /*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         AI_Manager.Instance.StartCoroutine(NewPointBuffer(controller,5));
         controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.moving = true;
+        controller.aIMovement.speed = 10;*/
     }
 
     public override void UpdateState(Darkness controller)
@@ -38,8 +45,10 @@ public class WanderState : ChaseState
         //     ChooseNewPatrolPoints(controller);
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
-        if(!controller.aIMovement.pathCalculating) //&& controller.aIMovement.targetMoved)
-            controller.aIMovement.CreatePath(controller.Target.position);
+        //controller.aIMovement.UpdatePath(controller.Target.position);
+        controller.pather.destination = controller.Target.position;
+        if(controller.targetDist < 3 && controller.pather.rotationSpeed < 360)
+            controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);
     }
 
@@ -48,7 +57,7 @@ public class WanderState : ChaseState
 
     }
 
-    private void ChooseNewPatrolPoints(Darkness controller)
+    /*private void ChooseNewPatrolPoints(Darkness controller)
     {
         Vector3 direction =  (controller.Target.transform.position - controller.transform.position).normalized;
         Vector3 wTemp = controller.aIMovement.wayPoint + direction*relativeRangeToPlayer;
@@ -75,10 +84,14 @@ public class WanderState : ChaseState
             yield return new WaitForSeconds(idleTime);
         }
         yield return null;
-    }
+    }*/
+
     protected override void ExitState(Darkness controller)
     {
-        controller.aIMovement.EndMovement();
-        controller.aIMovement.wandering = false;
+        //controller.aIMovement.EndMovement();
+        //controller.aIMovement.wandering = false;
+        controller.pather.canMove = false;
+        controller.pather.canSearch = false;
+        controller.sekr.CancelCurrentPathRequest();
     }
 }

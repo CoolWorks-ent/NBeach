@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AI_Movement_Supervisor))]
 public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
@@ -65,7 +66,7 @@ public class AI_Manager : MonoBehaviour {
 	{
 		while(!paused)
 		{
-			if(attackApprovalPriority.Count > 1)
+			if(attackApprovalPriority.Count > 0)
 			{
 				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
 				foreach(KeyValuePair<int,Darkness> baba in ActiveDarkness)
@@ -82,13 +83,6 @@ public class AI_Manager : MonoBehaviour {
 			//AI_Movement.OnPathUpdate(PlayerMoveUpdate());
 		}
 		yield return null;
-	}
-
-	private bool PlayerMoveUpdate()
-	{
-		if(player.GetComponent<Rigidbody>().velocity.magnitude > 0)
-			return true;
-		else return false;
 	}
 
 	private void ApproveGoonAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.

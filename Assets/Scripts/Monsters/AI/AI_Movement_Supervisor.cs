@@ -2,57 +2,55 @@ using UnityEngine;
 using System.Collections.Generic;
 using Pathfinding;
 
-[RequireComponent(typeof(Darkness))]
-public class AI_Movement : MonoBehaviour
+[RequireComponent(typeof(AI_Manager))]
+public class AI_Movement_Supervisor : MonoBehaviour
 {
     public Transform target;
-    public float speed, maxSpeed, repathRate;
-    public Vector3 wayPoint, pathPoint, direction;
-    public bool moving;
-    private Seeker sekr;
-    private Path navPath;
-    public bool reachedEndOfPath, wandering, pathCalculating, targetMoved;
+    //public Vector3 wayPoint, pathPoint, direction;
+    //public bool moving;
+    //private Seeker sekr;
+    //private Path navPath;
+    //public bool reachedEndOfPath, wandering, targetMoved;
     public Vector3[] PatrolPoints;
-    private Rigidbody rigidbod;
-    private Blocker bProvider;
+    //private Rigidbody rigidbod;
+    //private Blocker bProvider;
 
     void Awake()
     { 
-        speed = 2;
-        moving = false;
-        wandering = targetMoved = reachedEndOfPath = false;
+        //speed = 2;
+        //moving = false;
+        //wandering = targetMoved = reachedEndOfPath = false;
+        //sekr = GetComponent<Seeker>();
+        //rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
     }
 
     void Start()
     {
         PatrolPoints = new Vector3[3];
-        sekr = GetComponent<Seeker>();
-        rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-        sekr.pathCallback += PathComplete;
-        bProvider = new Blocker();
-        direction = new Vector3();
+        //sekr.pathCallback += PathComplete;
+        //bProvider = new Blocker();
+        //direction = new Vector3();
     }
 
-    void FixedUpdate()
+    /*void FixedUpdate()
     {
         if(moving && navPath != null)
         {
-            direction = Vector3.Normalize(navPath.vectorPath[0] - this.transform.position);
-            rigidbod.AddForce(direction * speed * Time.deltaTime, ForceMode.VelocityChange);
+            direction = Vector3.Normalize(navPath.vectorPath[1] - this.transform.position);
+            rigidbod.AddForce(direction * speed);
             //rigidbod.MovePosition(direction * speed * Time.deltaTime);
         }
     }
 
     public void UpdatePath(Vector3 target)
     {
-        if(!pathCalculating)
+        if(sekr.IsDone())
             CreatePath(target);
     }
 
     private void PathComplete(Path p)
     {
         Debug.LogWarning("path callback complete");
-        pathCalculating = false;
         p.Claim(this);
         BlockPathNodes(p);
         if(!p.error)
@@ -85,7 +83,6 @@ public class AI_Movement : MonoBehaviour
     public void CreatePath(Vector3 endPoint)
     {
         bProvider.blockedNodes.Clear();
-        pathCalculating = true;
         Path p = ABPath.Construct(transform.position, endPoint);
         p.traversalProvider = bProvider;
         sekr.StartPath(p, null);
@@ -94,15 +91,10 @@ public class AI_Movement : MonoBehaviour
 
     public void EndMovement()
     {
-        if(pathCalculating)
+        if(!sekr.IsDone())
             sekr.CancelCurrentPathRequest();
         moving = false;
-    }
-
-    void OnDisable()
-    {
-        EndMovement();
-    }
+    }*/
 
     class Blocker : ITraversalProvider
     {
