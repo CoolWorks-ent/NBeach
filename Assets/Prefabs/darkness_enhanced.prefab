@@ -204,8 +204,8 @@ GameObject:
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
   - component: {fileID: 54991120590850454}
-  - component: {fileID: 114857173380954124}
   - component: {fileID: 114446345711301086}
+  - component: {fileID: 114857173380954124}
   - component: {fileID: 114648332704818778}
   m_Layer: 17
   m_Name: darkness_enhanced
@@ -841,7 +841,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   penalty: 1000
-  randomStep: 5
+  randomStep: 10
 --- !u!114 &114511842479999518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -858,6 +858,8 @@ MonoBehaviour:
   previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   Target: {fileID: 0}
+  pather: {fileID: 0}
+  sekr: {fileID: 0}
   actionIdle: 0
   creationID: 0
   attackHash: 1080829965
@@ -902,7 +904,7 @@ MonoBehaviour:
   enableRotation: 1
   targetCompatibility: {fileID: 0}
   maxAcceleration: -2.5
-  rotationSpeed: 360
+  rotationSpeed: 180
   slowdownDistance: 0.6
   pickNextWaypointDist: 0.5
   endReachedDistance: 0.2
@@ -923,13 +925,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   smoothType: 1
-  subdivisions: 2
+  subdivisions: 3
   iterations: 2
   strength: 0.5
   uniformLength: 1
   maxSegmentLength: 2
   bezierTangentLength: 0.4
-  offset: 0.2
+  offset: 0.12
   factor: 0.1
 --- !u!137 &137808060623480506
 SkinnedMeshRenderer:

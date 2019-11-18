@@ -2,42 +2,41 @@ using UnityEngine;
 using System.Collections.Generic;
 using Pathfinding;
 
-[RequireComponent(typeof(AI_Manager))]
-public class AI_Movement_Supervisor : MonoBehaviour
+public class Darkness_Movement : MonoBehaviour
 {
     public Transform target;
-    //public Vector3 wayPoint, pathPoint, direction;
-    //public bool moving;
-    //private Seeker sekr;
-    //private Path navPath;
-    //public bool reachedEndOfPath, wandering, targetMoved;
-    public Vector3[] PatrolPoints;
-    //private Rigidbody rigidbod;
-    //private Blocker bProvider;
+    public Vector3 wayPoint, pathPoint, direction;
+    public bool moving;
+    public bool reachedEndOfPath, wandering, targetMoved;
+    
+    private Seeker sekr;
+    private Path navPath;
+    private Rigidbody rigidbod;
+    private Blocker bProvider;
 
     void Awake()
     { 
         //speed = 2;
-        //moving = false;
-        //wandering = targetMoved = reachedEndOfPath = false;
-        //sekr = GetComponent<Seeker>();
-        //rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
+        moving = false;
+        wandering = targetMoved = reachedEndOfPath = false;
+        sekr = GetComponent<Seeker>();
+        rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
     }
 
     void Start()
     {
-        PatrolPoints = new Vector3[3];
-        //sekr.pathCallback += PathComplete;
-        //bProvider = new Blocker();
-        //direction = new Vector3();
+        
+        sekr.pathCallback += PathComplete;
+        bProvider = new Blocker();
+        direction = new Vector3();
     }
 
-    /*void FixedUpdate()
+    void FixedUpdate()
     {
         if(moving && navPath != null)
         {
             direction = Vector3.Normalize(navPath.vectorPath[1] - this.transform.position);
-            rigidbod.AddForce(direction * speed);
+            rigidbod.AddForce(direction); //* speed);
             //rigidbod.MovePosition(direction * speed * Time.deltaTime);
         }
     }
@@ -94,7 +93,7 @@ public class AI_Movement_Supervisor : MonoBehaviour
         if(!sekr.IsDone())
             sekr.CancelCurrentPathRequest();
         moving = false;
-    }*/
+    }
 
     class Blocker : ITraversalProvider
     {

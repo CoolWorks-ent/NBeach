@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(AI_Movement_Supervisor))]
 public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
@@ -12,10 +11,12 @@ public class AI_Manager : MonoBehaviour {
 	[SerializeField]
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
 	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
-	public float calculationTime;
+	public float calculationTime, attackOffset;
 	private bool paused;
 
 	public Dark_State[] dark_States;
+	private NavigationTarget[] PatrolPoints;
+	private NavigationTarget[] AttackPoints;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
@@ -23,6 +24,19 @@ public class AI_Manager : MonoBehaviour {
 	public static AI_Manager Instance
 	{
 		get {return instance; }
+	}
+	public struct NavigationTarget
+	{
+		public bool occupied;
+		public int assignedDarknessID;
+		public Transform location;
+
+		public NavigationTarget(Transform loc, bool occ, int asID)
+		{
+			occupied = occ;
+			location = loc;
+			assignedDarknessID = asID;
+		}
 	}
 
 	void Awake()
@@ -38,19 +52,50 @@ public class AI_Manager : MonoBehaviour {
 			//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 		}
 		else instance = this;
-		// engagementQueue = new Queue<Darkness>();
-		// approachQueue = new Queue<Darkness>();
 		ActiveDarkness = new Dictionary<int, Darkness>();
 		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
 		paused = false;
 		calculationTime = 1.5f;
+		attackOffset = 3.5f;
+		PatrolPoints = new NavigationTarget[4]; //Declare Patrol points in start
+		AttackPoints = new NavigationTarget[3]; //Declare Attack points in start
 		StartCoroutine(ManagedDarknessUpdate());
 		foreach(Dark_State d in dark_States)
         {
             d.Startup();
         }
+	}
+
+	void Start()
+	{
+		for(int i = 0; i < AttackPoints.Length; i++)
+		{
+			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, false, 0);
+			AttackPoints[i].location.parent = player;
+		}
+
+		for(int i = 0; i < PatrolPoints.Length; i++)
+		{
+			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, false, 0);
+			PatrolPoints[i].location.parent = this.transform;
+		}
+
+		/*PatrolPoints[0].location.position = ; //TODO Choose random points within a radial range to path to
+		PatrolPoints[1].location.position = ;
+		PatrolPoints[2].location.position = ;
+		PatrolPoints[3].location.position = ;*/
+
+		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y, player.position.z);//right of player
+		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y, player.position.z);//left of player
+		AttackPoints[2].location.position = new Vector3(player.position.x, player.position.y, player.position.z + attackOffset);//front of player
+	}
+
+	private Vector3 GeneratePatrolPoint()
+	{
+
+		return new Vector3();
 	}
 
 	private void AttackerSwap(int usurper, int deposed)
@@ -75,17 +120,16 @@ public class AI_Manager : MonoBehaviour {
 				}
 				SortTheGoons();
 				yield return new WaitForSeconds(calculationTime/3);
-				ApproveGoonAttack();
+				ApproveDarknessAttack();
 				yield return new WaitForSeconds(calculationTime);
 			}
 			else yield return new WaitForSeconds(0.5f);
-			OnMovementUpdate();
-			//AI_Movement.OnPathUpdate(PlayerMoveUpdate());
+			//OnMovementUpdate();
 		}
 		yield return null;
 	}
 
-	private void ApproveGoonAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
+	private void ApproveDarknessAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
 	{
 		darkStandbyCount = 0;
 		darkAttackCount = 0;
@@ -115,6 +159,8 @@ public class AI_Manager : MonoBehaviour {
 		}
 	}
 
+	//TODO Add function to assign Darkness to the approved attack locations. Otherwise the target locations are null
+
 	private void SortTheGoons() 
 	{
 		attackApprovalPriority.Sort(delegate(int a, int b)
@@ -122,11 +168,6 @@ public class AI_Manager : MonoBehaviour {
 			return ActiveDarkness[a].targetDist.CompareTo(ActiveDarkness[b].targetDist);
 		});
 	}	
-
-	private void AttackRequestProcessor(Darkness d, Action<Darkness,Vector3> callback)
-	{
-
-	}
 
 	///<summary> Notified by the AddDarkness event. If the engagement count is not at cap add the Darkness. Otherwise assign to wait queue.</summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
@@ -167,7 +208,6 @@ public class AI_Manager : MonoBehaviour {
 	public delegate void AIEvent<T>(T obj);
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-
 	public static event AIEvent UpdateMovement;
 
 	///<summary>
@@ -187,11 +227,12 @@ public class AI_Manager : MonoBehaviour {
 			RemoveDarkness(d);
 	}
 
-	public static void OnMovementUpdate()
+	/*public static void OnMovementUpdate()
 	{
 		if(UpdateMovement != null)
 			UpdateMovement();
-	}
+	}*/
 
 	#endregion
+	
 }
