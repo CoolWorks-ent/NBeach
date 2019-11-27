@@ -20,7 +20,7 @@ public class ChaseState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.pather.destination = controller.Target.position;
+        controller.pather.destination = controller.Target.location.position;
         controller.pather.pickNextWaypointDist = 0.2f;
         controller.pather.repathRate = 1.75f;
         controller.pather.canMove = true;
@@ -36,7 +36,7 @@ public class ChaseState : Dark_State
     public override void UpdateState(Darkness controller)
     {
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        controller.pather.destination = controller.Target.position;
+        controller.pather.destination = controller.Target.location.position;
         if(controller.targetDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);

@@ -11,7 +11,7 @@ public class Darkness : MonoBehaviour {
     public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
-    public Transform Target;
+    public AI_Manager.NavigationTarget Target;
     public AIPath pather;
     public Seeker sekr;
     
@@ -75,7 +75,7 @@ public class Darkness : MonoBehaviour {
 
     public void DistanceEvaluation()
     {
-        targetDist = Vector3.Distance(transform.position, Target.position);
+        targetDist = Vector3.Distance(transform.position, Target.location.position);
     }
 
     public void AggressionChanged(AggresionRating agR)
@@ -87,7 +87,7 @@ public class Darkness : MonoBehaviour {
 
     public bool TargetWithinDistance(float range)
     {
-        if(Vector3.Distance(transform.position, Target.position) <= range)
+        if(Vector3.Distance(transform.position, Target.location.position) <= range)
         {
             return true;
         }

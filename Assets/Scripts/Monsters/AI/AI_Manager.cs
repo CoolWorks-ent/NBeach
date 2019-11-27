@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +13,8 @@ public class AI_Manager : MonoBehaviour {
 	public float calculationTime, attackOffset;
 	private bool paused;
 
-	public Dark_State[] dark_States;
+	[SerializeField]
+	private Dark_State[] dark_States;
 	private NavigationTarget[] PatrolPoints;
 	private NavigationTarget[] AttackPoints;
 
@@ -25,17 +25,17 @@ public class AI_Manager : MonoBehaviour {
 	{
 		get {return instance; }
 	}
-	public struct NavigationTarget
+	public class NavigationTarget
 	{
-		public bool occupied;
-		public int assignedDarknessID;
+		public List<int> assignedDarknessIDs;
+		public int targetID;
 		public Transform location;
 
-		public NavigationTarget(Transform loc, bool occ, int asID)
+		public NavigationTarget(Transform loc, int iD)
 		{
-			occupied = occ;
 			location = loc;
-			assignedDarknessID = asID;
+			targetID = iD;
+			assignedDarknessIDs = new List<int>();
 		}
 	}
 
@@ -59,8 +59,8 @@ public class AI_Manager : MonoBehaviour {
 		paused = false;
 		calculationTime = 1.5f;
 		attackOffset = 3.5f;
-		PatrolPoints = new NavigationTarget[4]; //Declare Patrol points in start
-		AttackPoints = new NavigationTarget[3]; //Declare Attack points in start
+		PatrolPoints = new NavigationTarget[4]; 
+		AttackPoints = new NavigationTarget[3]; 
 		StartCoroutine(ManagedDarknessUpdate());
 		foreach(Dark_State d in dark_States)
         {
@@ -72,39 +72,26 @@ public class AI_Manager : MonoBehaviour {
 	{
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, false, 0);
+			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i);
 			AttackPoints[i].location.parent = player;
+			AttackPoints[i].targetID = i;
 		}
 
 		for(int i = 0; i < PatrolPoints.Length; i++)
 		{
-			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, false, 0);
-			PatrolPoints[i].location.parent = this.transform;
+			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i);
+			float xOffset = 0;
+			PatrolPoints[i].location.parent = this.transform; //TODO make this locations unique and not trash
+			if(i % 2 == 0 || i == 0)
+				xOffset = this.transform.position.x - Random.Range(5+i, 15);
+			else xOffset = this.transform.position.x + Random.Range(5+i, 15);
+			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, this.transform.position.z + Random.Range(-9, 9+i));
+			PatrolPoints[i].targetID = i;
 		}
 
-		/*PatrolPoints[0].location.position = ; //TODO Choose random points within a radial range to path to
-		PatrolPoints[1].location.position = ;
-		PatrolPoints[2].location.position = ;
-		PatrolPoints[3].location.position = ;*/
-
-		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y, player.position.z);//right of player
-		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y, player.position.z);//left of player
-		AttackPoints[2].location.position = new Vector3(player.position.x, player.position.y, player.position.z + attackOffset);//front of player
-	}
-
-	private Vector3 GeneratePatrolPoint()
-	{
-
-		return new Vector3();
-	}
-
-	private void AttackerSwap(int usurper, int deposed)
-	{
-		int temp = usurper;
-		Debug.LogError("Starting swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
-		attackApprovalPriority[usurper] = attackApprovalPriority[deposed];
-		attackApprovalPriority[deposed] = attackApprovalPriority[temp];
-		Debug.LogError("Ending swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
+		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, 0f, player.position.z);//right of player
+		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, 0f, player.position.z);//left of player
+		AttackPoints[2].location.position = new Vector3(player.position.x, 0f, player.position.z - attackOffset);//front of player
 	}
 
 	private IEnumerator ManagedDarknessUpdate() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
@@ -114,9 +101,9 @@ public class AI_Manager : MonoBehaviour {
 			if(attackApprovalPriority.Count > 0)
 			{
 				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
-				foreach(KeyValuePair<int,Darkness> baba in ActiveDarkness)
+				foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
-					baba.Value.DistanceEvaluation();
+					dark.Value.DistanceEvaluation();
 				}
 				SortTheGoons();
 				yield return new WaitForSeconds(calculationTime/3);
@@ -140,6 +127,7 @@ public class AI_Manager : MonoBehaviour {
 			{
 				darkAttackCount++;
 				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
+				//ActiveDarkness[attackApprovalPriority[i]]
 			}
 			else if(i < darknessConcurrentAttackLimit+2)
 			{
@@ -160,6 +148,52 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 	//TODO Add function to assign Darkness to the approved attack locations. Otherwise the target locations are null
+	private NavigationTarget AssignAttackNavTargets(int darkID) 
+	{
+		//Find if Darkness is in the collection
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(darkID, out darkness))
+		{
+			if(AttackPoints[darkness.Target.targetID].assignedDarknessIDs.Contains(darkID))
+			{
+				return AttackPoints[darkness.Target.targetID];
+			}
+			else
+			{
+				//if(AttackPoints[darkness.Target.targetID].assignedDarknessIDs.Contains(darkID) )
+			}
+			//check to see if there is a list that the darkness can be added to
+		}
+		else 
+		{
+			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
+			return null;
+		}
+		return new NavigationTarget(this.transform, 0);
+	}
+
+	private NavigationTarget AssignWanderNavTargets(int darkID)
+	{
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(darkID, out darkness))
+		{
+			if(ActiveDarkness[darkID].Target.targetID == PatrolPoints[0].targetID)
+			{
+
+			}
+		}
+		else 
+		{
+			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
+			return null;
+		}
+		return new NavigationTarget(this.transform, 0);
+	}
+
+	private void RemoveFromNavTargets(int darkID)
+	{
+
+	}
 
 	private void SortTheGoons() 
 	{
@@ -178,7 +212,7 @@ public class AI_Manager : MonoBehaviour {
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
-		updatedDarkness.Target = player;
+		updatedDarkness.Target.location = player;
 	}
 
 	///<summary></summary>
