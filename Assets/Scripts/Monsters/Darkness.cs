@@ -17,6 +17,7 @@ public class Darkness : MonoBehaviour {
     
     public int actionIdle, creationID;
     
+    [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),

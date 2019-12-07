@@ -27,15 +27,16 @@ public class AI_Manager : MonoBehaviour {
 	}
 	public class NavigationTarget
 	{
-		public List<int> assignedDarknessIDs;
-		public int targetID;
+		public int targetID, 
+					weight, 
+					weightCap;
 		public Transform location;
 
-		public NavigationTarget(Transform loc, int iD)
+		public NavigationTarget(Transform loc, int iD)//, int assignmentLimit)
 		{
 			location = loc;
 			targetID = iD;
-			assignedDarknessIDs = new List<int>();
+			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 	}
 
@@ -94,7 +95,7 @@ public class AI_Manager : MonoBehaviour {
 		AttackPoints[2].location.position = new Vector3(player.position.x, 0f, player.position.z - attackOffset);//front of player
 	}
 
-	private IEnumerator ManagedDarknessUpdate() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
+	private IEnumerator ManagedDarknessUpdate() 
 	{
 		while(!paused)
 		{
@@ -111,12 +112,11 @@ public class AI_Manager : MonoBehaviour {
 				yield return new WaitForSeconds(calculationTime);
 			}
 			else yield return new WaitForSeconds(0.5f);
-			//OnMovementUpdate();
 		}
 		yield return null;
 	}
 
-	private void ApproveDarknessAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
+	private void ApproveDarknessAttack() 
 	{
 		darkStandbyCount = 0;
 		darkAttackCount = 0;
@@ -124,17 +124,26 @@ public class AI_Manager : MonoBehaviour {
 		for(int i = 0; i < attackApprovalPriority.Count; i++)
 		{
 			if(i < darknessConcurrentAttackLimit)
-			{
+			{ //TODO check for current NavTarget. Decrement weight of current if changing to new 
 				darkAttackCount++;
 				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
-				//ActiveDarkness[attackApprovalPriority[i]]
+				NavigationTarget nT = AssignNavigationTarget(ActiveDarkness[attackApprovalPriority[i]].creationID, true);
+				if(nT != null)
+				{
+					ActiveDarkness[attackApprovalPriority[i]].Target = nT;
+				}
 			}
 			else if(i < darknessConcurrentAttackLimit+2)
 			{
 				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
 				{
-					darkStandbyCount++;
+					darkStandbyCount++;//remove previous navTarget
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
+					NavigationTarget nT = AssignNavigationTarget(ActiveDarkness[attackApprovalPriority[i]].creationID, false);
+					if(nT != null)
+					{
+						ActiveDarkness[attackApprovalPriority[i]].Target = nT;
+					}
 				}
 			}
 			else 
@@ -147,48 +156,49 @@ public class AI_Manager : MonoBehaviour {
 		}
 	}
 
-	//TODO Add function to assign Darkness to the approved attack locations. Otherwise the target locations are null
-	private NavigationTarget AssignAttackNavTargets(int darkID) 
+	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
+	{
+		int lowest = 0;
+		List<int> evenCount = new List<int>();
+		for(int i = 0; i < navTargets.Length; i++)
+		{
+			if(navTargets[i].weight < navTargets[lowest].weight)
+				lowest = i;
+			else if(navTargets[i].weight == navTargets[lowest].weight)
+				evenCount.Add(i);
+		}
+
+		if(evenCount.Count >= 2)
+			lowest = evenCount[Random.Range(0, evenCount.Count-1)];
+		return lowest;
+	}
+
+	private NavigationTarget AssignNavigationTarget(int darkID, bool attack) 
 	{
 		//Find if Darkness is in the collection
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(AttackPoints[darkness.Target.targetID].assignedDarknessIDs.Contains(darkID))
+			if(attack)
 			{
-				return AttackPoints[darkness.Target.targetID];
+				int index = LeastRequestedNavigationTarget(AttackPoints);
+				AttackPoints[index].weight++;
+				return AttackPoints[index];
 			}
-			else
+			else 
 			{
-				//if(AttackPoints[darkness.Target.targetID].assignedDarknessIDs.Contains(darkID) )
-			}
-			//check to see if there is a list that the darkness can be added to
-		}
-		else 
-		{
-			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
-			return null;
-		}
-		return new NavigationTarget(this.transform, 0);
-	}
-
-	private NavigationTarget AssignWanderNavTargets(int darkID)
-	{
-		Darkness darkness;
-		if(ActiveDarkness.TryGetValue(darkID, out darkness))
-		{
-			if(ActiveDarkness[darkID].Target.targetID == PatrolPoints[0].targetID)
-			{
-
+				int index = LeastRequestedNavigationTarget(PatrolPoints);
+				PatrolPoints[index].weight++;
+				return PatrolPoints[index];
 			}
 		}
 		else 
 		{
 			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
-			return null;
+			return null;	
 		}
-		return new NavigationTarget(this.transform, 0);
 	}
+
 
 	private void RemoveFromNavTargets(int darkID)
 	{
