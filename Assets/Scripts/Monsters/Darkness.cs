@@ -50,7 +50,7 @@ public class Darkness : MonoBehaviour {
         AI_Manager.OnDarknessAdded(this);
         //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
-        StartCoroutine(ExecuteCurrentState());
+        //StartCoroutine(ExecuteCurrentState());
         //aIMovement.target = Target;
 	}
 

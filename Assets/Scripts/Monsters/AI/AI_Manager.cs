@@ -17,6 +17,7 @@ public class AI_Manager : MonoBehaviour {
 	private Dark_State[] dark_States;
 	private NavigationTarget[] PatrolPoints;
 	private NavigationTarget[] AttackPoints;
+	private NavigationTarget PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
@@ -71,6 +72,7 @@ public class AI_Manager : MonoBehaviour {
 
 	void Start()
 	{
+		PlayerPoint = new NavigationTarget(player, 0);
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
 			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i);
@@ -159,7 +161,7 @@ public class AI_Manager : MonoBehaviour {
 	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
 		int lowest = 0;
-		List<int> evenCount = new List<int>();
+		List<int> evenCount = new List<int>(); //In case there are entries at the same levels
 		for(int i = 0; i < navTargets.Length; i++)
 		{
 			if(navTargets[i].weight < navTargets[lowest].weight)
@@ -185,12 +187,7 @@ public class AI_Manager : MonoBehaviour {
 				AttackPoints[index].weight++;
 				return AttackPoints[index];
 			}
-			else 
-			{
-				int index = LeastRequestedNavigationTarget(PatrolPoints);
-				PatrolPoints[index].weight++;
-				return PatrolPoints[index];
-			}
+			else return PatrolPoints[Random.Range(0, PatrolPoints.Length)];
 		}
 		else 
 		{
@@ -222,12 +219,13 @@ public class AI_Manager : MonoBehaviour {
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
-		updatedDarkness.Target.location = player;
+		updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 	}
 
 	///<summary></summary>
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
+		updatedDarkness.StopCoroutine(updatedDarkness.ExecuteCurrentState());
 		attackApprovalPriority.Remove(updatedDarkness.creationID);
         ActiveDarkness.Remove(updatedDarkness.creationID);
     }
