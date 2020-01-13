@@ -28,6 +28,7 @@ public class WanderState : ChaseState
         controller.pather.repathRate = 3.0f;
         controller.pather.pickNextWaypointDist = 0.95f;
         controller.pather.rotationSpeed = 180;
+        controller.ChangeTarget(AI_Manager.NavTargetTag.Patrol);
         //controller.aIMovement.wandering = true;
         //ChooseNewPatrolPoints(controller);
         /*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);

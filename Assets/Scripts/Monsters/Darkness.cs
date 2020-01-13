@@ -9,6 +9,7 @@ using Pathfinding;
 public class Darkness : MonoBehaviour {
 
     public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
+    [HideInInspector]
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
     public AI_Manager.NavigationTarget Target;
@@ -54,16 +55,6 @@ public class Darkness : MonoBehaviour {
         //aIMovement.target = Target;
 	}
 
-    public IEnumerator ExecuteCurrentState()
-    {
-        while(updateStates)
-        {
-            currentState.UpdateState(this);
-            yield return new WaitForSeconds(stateUpdateRate);
-        }
-        yield return null;
-    }
-
     public void ChangeState(Dark_State nextState)
     {
         if(currentState != nextState)
@@ -74,9 +65,9 @@ public class Darkness : MonoBehaviour {
         }
     }
 
-    public void DistanceEvaluation()
+    public void DistanceEvaluation(Vector3 location)
     {
-        targetDist = Vector3.Distance(transform.position, Target.location.position);
+        targetDist = Vector3.Distance(transform.position, location);
     }
 
     public void AggressionChanged(AggresionRating agR)
@@ -86,13 +77,9 @@ public class Darkness : MonoBehaviour {
 		agRatingCurrent = agR;
     }
 
-    public bool TargetWithinDistance(float range)
+    public void ChangeTarget(AI_Manager.NavTargetTag targetType)
     {
-        if(Vector3.Distance(transform.position, Target.location.position) <= range)
-        {
-            return true;
-        }
-        else return false;
+        
     }
 
     private void OnTriggerEnter(Collider collider)

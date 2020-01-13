@@ -16,14 +16,13 @@ public class AttackState : Dark_State
     {
         //controller.aIRichPath.canMove = false;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
+        controller.ChangeTarget(AI_Manager.NavTargetTag.Attack);
         controller.animeController.SetTrigger(controller.attackHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));
     }
 
     public override void UpdateState(Darkness controller)
-    {
-        //controller.animeController.SetTrigger(controller.attackHash);
-        //controller.aIRichPath.maxSpeed /= attackSpeedModifier;
+    { //check for to see if the animation finished playing 
         //controller.aIMovement.UpdatePath();
     }
 

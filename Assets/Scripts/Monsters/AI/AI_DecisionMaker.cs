@@ -36,7 +36,7 @@ public class AI_DecisionMaker
 
     private bool CommitToAttack(Darkness controller)
     {
-        if(controller.TargetWithinDistance(controller.attackInitiationRange))
+        if(controller.targetDist < controller.attackInitiationRange)
         {
             return true;
         }

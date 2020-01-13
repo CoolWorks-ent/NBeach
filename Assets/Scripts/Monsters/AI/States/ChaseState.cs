@@ -26,6 +26,7 @@ public class ChaseState : Dark_State
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
         controller.pather.rotationSpeed = 180;
+        controller.ChangeTarget(AI_Manager.NavTargetTag.Attack);
         /*controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
