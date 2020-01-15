@@ -8,16 +8,23 @@ using Pathfinding;
  */
 public class Darkness : MonoBehaviour {
 
+
     public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
     [HideInInspector]
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
     public AI_Manager.NavigationTarget Target;
+
+    [HideInInspector]
     public AIPath pather;
+
+    [HideInInspector]
     public Seeker sekr;
     
-    public int actionIdle, creationID;
-    
+    public GameObject deathFX;
+    public Dark_State DeathState;
+    public Animator animeController;
+
     [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
@@ -26,11 +33,8 @@ public class Darkness : MonoBehaviour {
                 deathHash = Animator.StringToHash("Death"),
                 wanderHash = Animator.StringToHash("Wander");
     public bool updateStates;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist;
-    //public AIDestinationSetter aIDestSet;
-    public GameObject deathFX;
-    public Dark_State DeathState;
-    public Animator animeController;
+    public int actionIdle, creationID;
+    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist, swtichDist;
 
     void Awake()
     {
@@ -38,6 +42,7 @@ public class Darkness : MonoBehaviour {
         attackInitiationRange = 3.5f;
         waitRange = 10f;
         stopDist = 1;
+        swtichDist = 4.25f;
         creationID = 0;
         updateStates = true;
         stateUpdateRate = 0.5f;

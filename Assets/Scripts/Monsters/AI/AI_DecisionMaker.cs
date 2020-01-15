@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AI_DecisionMaker
 {
-    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, TARGET_MOVED_FAR}
+    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, TARGET_OUT_OF_RANGE}
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
     public AI_DecisionMaker()
@@ -12,9 +12,8 @@ public class AI_DecisionMaker
         Decisions = new Dictionary<DecisionName,Func<Darkness,bool>>();
         Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
         Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
-        Decisions.Add(DecisionName.WANDER_NEAR,ShouldWanderNear);
-        //Decisions.Add(DecisionName.NEED_NEW_TARGET, EndOfPathing);
-        //Decisions.Add(DecisionName.TARGET_OUT_OF_RANGE, TargetCheck);
+        Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
+        Decisions.Add(DecisionName.TARGET_OUT_OF_RANGE, TargetCheck);
         Decisions.Add(DecisionName.IN_ATTACK_RANGE, CommitToAttack);
     }
 
@@ -61,16 +60,9 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    /*private bool EndOfPathing(Darkness controller)
-    {
-        if(controller.aIMovement.reachedEndOfPath && controller.agRatingCurrent != Darkness.AggresionRating.Idling)
-            return true;
-        else return false;
-    }*/
-
     private bool TargetCheck(Darkness controller)
     {
-        if(controller.targetDist > controller.attackInitiationRange) //&& controller.agRatingPrevious == Darkness.AggresionRating.Attacking)
+        if(controller.targetDist > controller.attackInitiationRange) 
             return true;
         else return false;
     }

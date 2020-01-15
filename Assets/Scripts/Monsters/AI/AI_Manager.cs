@@ -17,7 +17,7 @@ public class AI_Manager : MonoBehaviour {
 	private Dark_State[] dark_States;
 	private NavigationTarget[] PatrolPoints;
 	private NavigationTarget[] AttackPoints;
-	private NavigationTarget StartPoint;
+	private NavigationTarget StartPoint, PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
@@ -64,6 +64,7 @@ public class AI_Manager : MonoBehaviour {
 		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
+		RequestNewTarget += ApproveDarknessTarget;
 		paused = false;
 		calculationTime = 1.5f;
 		attackOffset = 3.5f;
@@ -91,7 +92,7 @@ public class AI_Manager : MonoBehaviour {
 		{
 			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
 			float xOffset = 0;
-			PatrolPoints[i].location.parent = player; //TODO make this locations unique and not trash
+			PatrolPoints[i].location.parent = player; 
 			if(i % 2 == 0 || i == 0)
 				xOffset = player.position.x - Random.Range(5+i, 15);
 			else xOffset = player.position.x + Random.Range(5+i, 15);
@@ -171,32 +172,6 @@ public class AI_Manager : MonoBehaviour {
 		}
 	}
 
-	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
-	public void ApproveDarknessTarget(int ID, NavTargetTag type) //TODO Darkness will make request for new Navigation Targets based on their status
-	{
-		Darkness darkness;
-		if(ActiveDarkness.TryGetValue(ID, out darkness))
-		{
-			if(type == NavTargetTag.Attack && darkness.Target.navTargetTag != NavTargetTag.Attack && darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
-			{
-				NavigationTarget nT = AssignNavigationTarget(darkness.creationID, true); 
-				if(nT != null)
-				{
-					RemoveFromNavTargets(ID);
-					darkness.Target = nT;
-				}
-			}
-			if(darkness.Target.navTargetTag != NavTargetTag.Patrol && darkness.agRatingCurrent != Darkness.AggresionRating.Attacking)
-			{
-				NavigationTarget nT = AssignNavigationTarget(darkness.creationID, false);
-				if(nT != null)
-				{
-					darkness.Target = nT;
-				}
-			}
-		}
-	}
-
 	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
 	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
@@ -216,19 +191,28 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 	///<summary>Returns an attack or patrol Navigation Target. Returns a null object if Darkness is not found in active list. </summary>
-	private NavigationTarget AssignNavigationTarget(int darkID, bool attack) 
+	private NavigationTarget AssignNavigationTarget(int darkID) 
 	{
 		//Find if Darkness is in the collection
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness)) 
 		{
-			if(attack)
+			switch(darkness.agRatingCurrent)
 			{
-				int index = LeastRequestedNavigationTarget(AttackPoints);
-				AttackPoints[index].weight++;
-				return AttackPoints[index];
+				case Darkness.AggresionRating.Attacking:
+					int index = LeastRequestedNavigationTarget(AttackPoints);
+					AttackPoints[index].weight++;
+					return AttackPoints[index];
+				case Darkness.AggresionRating.Wandering:
+					/*if(darkness.Target.navTargetTag == NavTargetTag.Patrol)
+					{
+						List<NavigationTarget> temp = PatrolPoints.To
+					}
+					else*/ 
+					return PatrolPoints[Random.Range(0, PatrolPoints.Length)];
+				default:
+					return StartPoint;
 			}
-			else return PatrolPoints[Random.Range(0, PatrolPoints.Length)];
 		}
 		else 
 		{
@@ -287,6 +271,33 @@ public class AI_Manager : MonoBehaviour {
         ActiveDarkness.Remove(updatedDarkness.creationID);
     }
 
+	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
+	public void ApproveDarknessTarget(int ID) //TODO Darkness will make request for new Navigation Targets based on their status
+	{
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(ID, out darkness))
+		{
+			if(darkness.Target.navTargetTag != NavTargetTag.Attack && darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
+			{ //possibly redudent checks here TODO try without these checks
+				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+				if(nT != null)
+				{
+					RemoveFromNavTargets(ID);
+					darkness.Target = nT;
+				}
+			}
+			else if(darkness.agRatingCurrent != Darkness.AggresionRating.Attacking)
+			{
+				NavigationTarget nT = AssignNavigationTarget(darkness.creationID);
+				if(nT != null)
+				{
+					darkness.Target = nT;
+				}
+			}
+			else darkness.Target = StartPoint;
+		}
+	}
+
 	public void KillAllDarkness()
     {
         Debug.Log("[AI] All Darkness AI kill call");
@@ -303,8 +314,9 @@ public class AI_Manager : MonoBehaviour {
 	public delegate void AIEvent<T>(T obj);
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-	public static event AIEvent UpdateMovement;
 
+	public static event AIEvent<int> RequestNewTarget;
+	public static event AIEvent UpdateMovement;
 
 	public static void OnDarknessAdded(Darkness d)
 	{
@@ -316,6 +328,12 @@ public class AI_Manager : MonoBehaviour {
 	{
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
+	}
+
+	public static void OnRequestNewTarget(int ID)
+	{
+		if(RequestNewTarget != null)
+			RequestNewTarget(ID);
 	}
 
 	/*public static void OnMovementUpdate()

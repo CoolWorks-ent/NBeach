@@ -19,6 +19,7 @@ public class ChaseState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
+        RequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.pickNextWaypointDist = 0.2f;
