@@ -35,7 +35,7 @@ public class AI_DecisionMaker
 
     private bool CommitToAttack(Darkness controller)
     {
-        if(controller.targetDist < controller.attackInitiationRange)
+        if(controller.playerDist < controller.attackInitiationRange)
         {
             return true;
         }
@@ -62,7 +62,7 @@ public class AI_DecisionMaker
 
     private bool TargetCheck(Darkness controller)
     {
-        if(controller.targetDist > controller.attackInitiationRange) 
+        if(controller.playerDist > controller.attackInitiationRange) 
             return true;
         else return false;
     }

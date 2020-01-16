@@ -34,7 +34,7 @@ public class Darkness : MonoBehaviour {
                 wanderHash = Animator.StringToHash("Wander");
     public bool updateStates;
     public int actionIdle, creationID;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist, swtichDist;
+    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, playerDist, swtichDist;
 
     void Awake()
     {
@@ -72,7 +72,7 @@ public class Darkness : MonoBehaviour {
 
     public void DistanceEvaluation(Vector3 location)
     {
-        targetDist = Vector3.Distance(transform.position, location);
+        playerDist = Vector3.Distance(transform.position, location);
     }
 
     public void AggressionChanged(AggresionRating agR)
@@ -80,11 +80,6 @@ public class Darkness : MonoBehaviour {
         if(agR != agRatingCurrent)
             agRatingPrevious = agRatingCurrent;
 		agRatingCurrent = agR;
-    }
-
-    public void ChangeTarget(AI_Manager.NavTargetTag targetType)
-    {
-        
     }
 
     private void OnTriggerEnter(Collider collider)

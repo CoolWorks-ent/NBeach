@@ -16,7 +16,7 @@ public class AttackState : Dark_State
     {
         //controller.aIRichPath.canMove = false;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
-        controller.ChangeTarget(AI_Manager.NavTargetTag.Attack);
+        RequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.attackHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));
     }

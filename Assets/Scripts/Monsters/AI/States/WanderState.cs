@@ -29,7 +29,6 @@ public class WanderState : ChaseState
         controller.pather.repathRate = 3.0f;
         controller.pather.pickNextWaypointDist = 0.95f;
         controller.pather.rotationSpeed = 180;
-        controller.ChangeTarget(AI_Manager.NavTargetTag.Patrol);
         //controller.aIMovement.wandering = true;
         //ChooseNewPatrolPoints(controller);
         /*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
@@ -48,11 +47,11 @@ public class WanderState : ChaseState
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        if(controller.pather.reachedEndOfPath || controller.targetDist <= controller.swtichDist)
+        if(controller.pather.reachedEndOfPath || Vector3.Distance(controller.transform.position, controller.Target.location.position) <= controller.swtichDist)
         {
             RequestNewTarget(controller.creationID);
         }
-        if(controller.targetDist < 3 && controller.pather.rotationSpeed < 360)
+        if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);
     }

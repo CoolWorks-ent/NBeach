@@ -23,11 +23,10 @@ public class ChaseState : Dark_State
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.pickNextWaypointDist = 0.2f;
-        controller.pather.repathRate = 1.75f;
+        controller.pather.repathRate = 2.25f;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
         controller.pather.rotationSpeed = 180;
-        controller.ChangeTarget(AI_Manager.NavTargetTag.Attack);
         /*controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -39,7 +38,7 @@ public class ChaseState : Dark_State
     {
         //controller.aIMovement.UpdatePath(controller.Target.position);
         controller.pather.destination = controller.Target.location.position;
-        if(controller.targetDist < 3 && controller.pather.rotationSpeed < 360)
+        if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);
     }
