@@ -8,5 +8,5 @@ public class RemainState: Dark_State
         stateType = StateType.REMAIN;
     }
     public override void UpdateState(Darkness controller) {}
-    protected override void ExitState(Darkness controller) {}
+    public override void ExitState(Darkness controller) {}
 }

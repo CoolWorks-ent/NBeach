@@ -29,7 +29,7 @@ public class DeathState : Dark_State
     {
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         //AI_Manager.OnDarknessRemoved(controller);
     }

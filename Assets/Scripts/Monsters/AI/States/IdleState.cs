@@ -33,7 +33,7 @@ public class IdleState : Dark_State
         // controller.transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
         if(controller.animeController != null)

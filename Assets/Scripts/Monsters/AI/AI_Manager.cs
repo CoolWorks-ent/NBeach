@@ -106,6 +106,7 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 #region DarknessUpdateLoop
+
 	///<summary>Contols the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
@@ -184,6 +185,7 @@ public class AI_Manager : MonoBehaviour {
 	#endregion
 
 #region NavTargetHandling
+
 	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
 	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
@@ -198,7 +200,17 @@ public class AI_Manager : MonoBehaviour {
 		}
 
 		if(evenCount.Count >= 2)
-			lowest = evenCount[Random.Range(0, evenCount.Count-1)];
+		{
+			int t = 0;
+			for(int x = 0; x <= 5; x++)
+			{	
+				t = evenCount[Random.Range(0, evenCount.Count-1)];
+				if(t == lowest)
+					continue;
+				else lowest = t;
+			}
+		}
+			
 		return lowest;
 	}
 

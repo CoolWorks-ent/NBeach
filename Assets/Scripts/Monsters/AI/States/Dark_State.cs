@@ -12,7 +12,8 @@ public abstract class Dark_State : ScriptableObject
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
     public abstract void InitializeState(Darkness controller);
     public abstract void UpdateState(Darkness controller);
-    protected abstract void ExitState(Darkness controller);
+    public abstract void ExitState(Darkness controller);
+    public float transitionTime = 0.75f;
 
     public virtual void Startup()
     {
@@ -58,10 +59,9 @@ public abstract class Dark_State : ScriptableObject
         }   
     }
 
-    protected void ProcessStateChange(Dark_State approvedState, Darkness controller)
+    protected void ProcessStateChange(Dark_State approvedState, Darkness controller) //TODO Have Darkness start a coroutine to begin transitioning. 
     {
-        ExitState(controller);
-        controller.ChangeState(approvedState);
+        controller.ChangeState(approvedState, transitionTime);
     }
 
     protected void RemoveDarkness(Darkness controller)

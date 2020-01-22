@@ -26,7 +26,7 @@ public class AttackState : Dark_State
         //controller.aIMovement.UpdatePath();
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         //controller.animeController.SetBool(controller.attackAfterHash, true);
     }

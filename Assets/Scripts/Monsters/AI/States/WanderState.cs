@@ -90,7 +90,7 @@ public class WanderState : ChaseState
         yield return null;
     }*/
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         //controller.aIMovement.EndMovement();
         //controller.aIMovement.wandering = false;

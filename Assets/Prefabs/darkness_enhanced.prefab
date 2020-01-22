@@ -857,11 +857,11 @@ MonoBehaviour:
   agRatingPrevious: 0
   previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
-  Target: {fileID: 0}
   pather: {fileID: 0}
   sekr: {fileID: 0}
-  actionIdle: 0
-  creationID: 0
+  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
+  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
+  animeController: {fileID: 0}
   attackHash: 1080829965
   attackAfterHash: 530937694
   chaseHash: 1463555229
@@ -869,14 +869,14 @@ MonoBehaviour:
   deathHash: 646380074
   wanderHash: 918399791
   updateStates: 0
+  actionIdle: 0
+  creationID: 0
   stateUpdateRate: 0
   attackInitiationRange: 0
   waitRange: 0
   stopDist: 0
-  targetDist: 0
-  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
-  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
-  animeController: {fileID: 0}
+  playerDist: 0
+  swtichDist: 0
 --- !u!114 &114648332704818778
 MonoBehaviour:
   m_ObjectHideFlags: 1

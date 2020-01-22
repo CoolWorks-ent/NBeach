@@ -56,18 +56,34 @@ public class Darkness : MonoBehaviour {
         AI_Manager.OnDarknessAdded(this);
         //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
-        //StartCoroutine(ExecuteCurrentState());
         //aIMovement.target = Target;
 	}
 
-    public void ChangeState(Dark_State nextState)
+    public IEnumerator ValidateStateChange(Dark_State nextState, float transitionTime)
     {
-        if(currentState != nextState)
+        //if(nextState.stateType != currentState.stateType)
+            
+        yield return new WaitForSeconds(1.25f);
+        if(nextState != currentState)
         {
             previousState = currentState;
+            currentState.ExitState(this);
             currentState = nextState;
             currentState.InitializeState(this);
         }
+    }
+
+    public void ChangeState(Dark_State nextState, float time)
+    {
+        if(nextState.stateType != Dark_State.StateType.DEATH)
+            StartCoroutine(ValidateStateChange(nextState, time));
+        /*if(nextState.stateType != currentState.stateType)
+        {
+            previousState = currentState;
+            currentState.ExitState(this);
+            currentState = nextState;
+            currentState.InitializeState(this);
+        }*/
     }
 
     public void DistanceEvaluation(Vector3 location)
@@ -89,7 +105,7 @@ public class Darkness : MonoBehaviour {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.LogWarning("Darkness Destroyed");
-                ChangeState(DeathState);
+                ChangeState(DeathState, 0.1f);
             }
         }
         else if(collider.gameObject.CompareTag("Player"))

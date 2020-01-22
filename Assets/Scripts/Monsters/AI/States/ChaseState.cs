@@ -43,7 +43,7 @@ public class ChaseState : Dark_State
         CheckTransitions(controller);
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         //controller.aIMovement.EndMovement();
         controller.pather.canMove = false;
