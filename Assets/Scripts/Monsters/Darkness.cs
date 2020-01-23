@@ -75,15 +75,16 @@ public class Darkness : MonoBehaviour {
 
     public void ChangeState(Dark_State nextState, float time)
     {
-        if(nextState.stateType != Dark_State.StateType.DEATH)
-            StartCoroutine(ValidateStateChange(nextState, time));
-        /*if(nextState.stateType != currentState.stateType)
+        if(nextState.stateType == Dark_State.StateType.DEATH)
         {
             previousState = currentState;
             currentState.ExitState(this);
             currentState = nextState;
             currentState.InitializeState(this);
-        }*/
+        } 
+        //else if (nextState.stateType == Dark_State.StateType.ATTACK && currentState.stateType == Dark_State.StateType.CHASING)
+        else StartCoroutine(ValidateStateChange(nextState, time));
+        
     }
 
     public void DistanceEvaluation(Vector3 location)
