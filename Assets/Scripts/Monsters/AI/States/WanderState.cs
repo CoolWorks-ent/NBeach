@@ -15,7 +15,6 @@ public class WanderState : ChaseState
 
     public override void Startup()
     {
-        AI_Manager.UpdateMovement += UpdatePatrolPoints;
         base.Startup();
     }
 
@@ -50,15 +49,11 @@ public class WanderState : ChaseState
         if(controller.pather.reachedEndOfPath || Vector3.Distance(controller.transform.position, controller.Target.location.position) <= controller.swtichDist)
         {
             RequestNewTarget(controller.creationID);
+            controller.pather.destination = controller.Target.location.position;
         }
         if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);
-    }
-
-    private void UpdatePatrolPoints()
-    {
-
     }
 
     /*private void ChooseNewPatrolPoints(Darkness controller)

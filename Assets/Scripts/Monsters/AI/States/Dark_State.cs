@@ -13,6 +13,7 @@ public abstract class Dark_State : ScriptableObject
     public abstract void InitializeState(Darkness controller);
     public abstract void UpdateState(Darkness controller);
     public abstract void ExitState(Darkness controller);
+    [Range(0, 2.0f)]
     public float transitionTime = 0.75f;
 
     public virtual void Startup()
@@ -61,7 +62,7 @@ public abstract class Dark_State : ScriptableObject
 
     protected void ProcessStateChange(Dark_State approvedState, Darkness controller) //TODO Have Darkness start a coroutine to begin transitioning. 
     {
-        controller.ChangeState(approvedState, transitionTime);
+        controller.ChangeState(approvedState);
     }
 
     protected void RemoveDarkness(Darkness controller)

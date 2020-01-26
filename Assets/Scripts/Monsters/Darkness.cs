@@ -34,7 +34,7 @@ public class Darkness : MonoBehaviour {
                 wanderHash = Animator.StringToHash("Wander");
     public bool updateStates;
     public int actionIdle, creationID;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, playerDist, swtichDist;
+    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, playerDist, swtichDist, navTargetDist;
 
     void Awake()
     {
@@ -44,6 +44,7 @@ public class Darkness : MonoBehaviour {
         stopDist = 1;
         swtichDist = 4.25f;
         creationID = 0;
+        navTargetDist = -1;
         updateStates = true;
         stateUpdateRate = 0.5f;
         agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
@@ -59,23 +60,27 @@ public class Darkness : MonoBehaviour {
         //aIMovement.target = Target;
 	}
 
-    public IEnumerator ValidateStateChange(Dark_State nextState, float transitionTime)
+    public IEnumerator StateTransition(Dark_State nextState)
     {
         //if(nextState.stateType != currentState.stateType)
-            
-        yield return new WaitForSeconds(1.25f);
         if(nextState != currentState)
         {
             previousState = currentState;
-            currentState.ExitState(this);
             currentState = nextState;
+            yield return new WaitForSeconds(previousState.transitionTime);
+            previousState.ExitState(this);            
             currentState.InitializeState(this);
         }
+        yield return null;
     }
 
-    public void ChangeState(Dark_State nextState, float time)
+    public void ChangeState(Dark_State nextState)
     {
-        if(nextState.stateType == Dark_State.StateType.DEATH)
+        previousState = currentState;
+        currentState = nextState;
+        previousState.ExitState(this);            
+        currentState.InitializeState(this);
+        /*if(nextState.stateType == Dark_State.StateType.DEATH)
         {
             previousState = currentState;
             currentState.ExitState(this);
@@ -83,13 +88,23 @@ public class Darkness : MonoBehaviour {
             currentState.InitializeState(this);
         } 
         //else if (nextState.stateType == Dark_State.StateType.ATTACK && currentState.stateType == Dark_State.StateType.CHASING)
-        else StartCoroutine(ValidateStateChange(nextState, time));
+        else StartCoroutine(StateTransition(nextState));*/
         
     }
 
-    public void DistanceEvaluation(Vector3 location)
+    public void PlayerDistanceEvaluation(Vector3 location)
     {
         playerDist = Vector3.Distance(transform.position, location);
+        if(Target != null)
+        {
+            TargetDistanceEvaluation();
+        }
+        else navTargetDist = -1;
+    }
+
+    private void TargetDistanceEvaluation()
+    {
+        navTargetDist = Vector3.Distance(transform.position, Target.location.position);
     }
 
     public void AggressionChanged(AggresionRating agR)
@@ -106,7 +121,7 @@ public class Darkness : MonoBehaviour {
             if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
             {
                 Debug.LogWarning("Darkness Destroyed");
-                ChangeState(DeathState, 0.1f);
+                ChangeState(DeathState);
             }
         }
         else if(collider.gameObject.CompareTag("Player"))
