@@ -267,14 +267,28 @@ public class AI_Manager : MonoBehaviour {
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking || darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
+			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
-				if(nT != null)
+				if(darkness.navTargetDist <= darkness.swtichDist+0.25f)
+					darkness.Target = PlayerPoint;
+				else
 				{
-					RemoveFromNavTargets(darkID);
-					darkness.Target = nT;
+					NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+					if(nT != null)
+					{
+						RemoveFromNavTargets(darkID);
+						darkness.Target = nT;
+					}
 				}
+			}
+			else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
+			{
+				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+					if(nT != null)
+					{
+						RemoveFromNavTargets(darkID);
+						darkness.Target = nT;
+					}
 			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{

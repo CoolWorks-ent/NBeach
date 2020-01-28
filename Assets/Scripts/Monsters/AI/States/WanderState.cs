@@ -20,7 +20,7 @@ public class WanderState : ChaseState
 
     public override void InitializeState(Darkness controller)
     {
-        RequestNewTarget(controller.creationID);
+        AI_Manager.OnRequestNewTarget(controller.creationID);
         base.InitializeState(controller);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.canMove = true;
@@ -46,9 +46,9 @@ public class WanderState : ChaseState
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        if(controller.pather.reachedEndOfPath || Vector3.Distance(controller.transform.position, controller.Target.location.position) <= controller.swtichDist)
+        if(controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.swtichDist)
         {
-            RequestNewTarget(controller.creationID);
+            AI_Manager.OnRequestNewTarget(controller.creationID);
             controller.pather.destination = controller.Target.location.position;
         }
         if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)

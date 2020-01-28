@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AI_DecisionMaker
 {
-    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, TARGET_OUT_OF_RANGE}
+    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL}
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
     public AI_DecisionMaker()
@@ -13,8 +13,9 @@ public class AI_DecisionMaker
         Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
         Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
         Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
-        Decisions.Add(DecisionName.TARGET_OUT_OF_RANGE, TargetCheck);
+        Decisions.Add(DecisionName.PLAYER_OUT_OF_RANGE, TargetCheck);
         Decisions.Add(DecisionName.IN_ATTACK_RANGE, CommitToAttack);
+        Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
     }
 
     public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -35,7 +36,16 @@ public class AI_DecisionMaker
 
     private bool CommitToAttack(Darkness controller)
     {
-        if(controller.playerDist < controller.attackInitiationRange)
+        if(AggresiveCheck(controller) && controller.navTargetDist <= controller.swtichDist || controller.playerDist < controller.swtichDist) 
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    private bool AttackSuccessfull(Darkness controller)
+    {
+        if(controller.attacked)
         {
             return true;
         }
@@ -62,7 +72,7 @@ public class AI_DecisionMaker
 
     private bool TargetCheck(Darkness controller)
     {
-        if(controller.playerDist > controller.attackInitiationRange) 
+        if(controller.playerDist > controller.swtichDist) 
             return true;
         else return false;
     }

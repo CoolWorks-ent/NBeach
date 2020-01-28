@@ -35,11 +35,6 @@ public abstract class Dark_State : ScriptableObject
         stateType = StateType.REMAIN;
     }
 
-    protected void RequestNewTarget(int darkID)
-    {
-        AI_Manager.OnRequestNewTarget(darkID);
-    }
-
     protected void CheckTransitions(Darkness controller)
     {
         for(int i = 0; i < transitions.Length; i++)

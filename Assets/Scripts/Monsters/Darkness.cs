@@ -32,22 +32,19 @@ public class Darkness : MonoBehaviour {
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death"),
                 wanderHash = Animator.StringToHash("Wander");
-    public bool updateStates;
-    public int actionIdle, creationID;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, playerDist, swtichDist, navTargetDist;
+    public bool updateStates, attacked;
+    public int creationID;
+    public float attackInitiationRange, playerDist, swtichDist, navTargetDist;
 
     void Awake()
     {
-        actionIdle = 3;
-        attackInitiationRange = 3.5f;
-        waitRange = 10f;
-        stopDist = 1;
-        swtichDist = 4.25f;
+        attackInitiationRange = 2.5f;
+        swtichDist = attackInitiationRange*1.75f;
         creationID = 0;
         navTargetDist = -1;
         updateStates = true;
-        stateUpdateRate = 0.5f;
         agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
+        attacked = false;
     }
 
     void Start () {
@@ -92,19 +89,22 @@ public class Darkness : MonoBehaviour {
         
     }
 
+    public IEnumerator IdleTime(float idleTime)
+    {
+        if(!attacked)
+            attacked = true;
+        yield return new WaitForSeconds(idleTime);
+        attacked = false;
+    }
+
     public void PlayerDistanceEvaluation(Vector3 location)
     {
         playerDist = Vector3.Distance(transform.position, location);
         if(Target != null)
         {
-            TargetDistanceEvaluation();
+            navTargetDist = Vector3.Distance(transform.position, Target.location.position);
         }
         else navTargetDist = -1;
-    }
-
-    private void TargetDistanceEvaluation()
-    {
-        navTargetDist = Vector3.Distance(transform.position, Target.location.position);
     }
 
     public void AggressionChanged(AggresionRating agR)

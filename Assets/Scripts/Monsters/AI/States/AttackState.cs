@@ -14,26 +14,33 @@ public class AttackState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
+        AI_Manager.OnRequestNewTarget(controller.creationID);
+        controller.pather.destination = controller.Target.location.position;
+        controller.pather.repathRate = 1.75f;
+        controller.pather.canMove = true;
+        controller.pather.canSearch = true;
+        controller.pather.rotationSpeed = 270;
+        controller.pather.endReachedDistance = 1;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
-        RequestNewTarget(controller.creationID);
-        controller.animeController.SetTrigger(controller.attackHash);
-        AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));
+        controller.pather.canMove = true;
+        controller.pather.canSearch = true;
     }
 
     public override void UpdateState(Darkness controller)
-    { //check for to see if the animation finished playing 
-        //controller.aIMovement.UpdatePath();
+    { 
+        //TODO check if the darkness is facing the player. if not start rotating towards the player
+        controller.pather.destination = controller.Target.location.position;
+        if(controller.playerDist < controller.attackInitiationRange && !controller.attacked) 
+        {
+            controller.animeController.SetTrigger(controller.attackHash);
+            controller.attacked = true;
+        }   
+        CheckTransitions(controller);
     }
 
     public override void ExitState(Darkness controller)
     {
+        controller.pather.endReachedDistance = 0.2f;
         //controller.animeController.SetBool(controller.attackAfterHash, true);
-    }
-
-    protected IEnumerator IdleTime(Darkness controller, float idleTime)
-    {
-        yield return AI_Manager.Instance.WaitTimer(idleTime);
-        CheckTransitions(controller);
     }
 }

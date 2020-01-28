@@ -17,13 +17,6 @@ public class IdleState : Dark_State
     {
         //controller.aIMovement.EndMovement();
         controller.animeController.SetTrigger(controller.idleHash);
-        
-        float idleTime = controller.actionIdle;
-        /*if(controller.animeController.GetBool(controller.attackAfterHash))
-        {
-            idleTime = idleTime/2;
-            controller.animeController.SetBool(controller.attackAfterHash, true);
-        }*/
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
     }
 
