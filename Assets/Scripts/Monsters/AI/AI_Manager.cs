@@ -101,9 +101,9 @@ public class AI_Manager : MonoBehaviour {
 			PatrolPoints[i].targetID = i;
 		}
 
-		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y, player.position.z);//right of player
-		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y, player.position.z);//left of player
-		AttackPoints[2].location.position = new Vector3(player.position.x, player.position.y, player.position.z - attackOffset);//front of player
+		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
+		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
+		AttackPoints[2].location.position = new Vector3(player.position.x, player.position.y-0.5f, player.position.z - attackOffset);//front of player
 	}
 
 #region DarknessUpdateLoop

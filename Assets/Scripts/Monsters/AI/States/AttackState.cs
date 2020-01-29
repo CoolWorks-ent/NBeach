@@ -32,9 +32,15 @@ public class AttackState : Dark_State
         controller.pather.destination = controller.Target.location.position;
         if(controller.playerDist < controller.attackInitiationRange && !controller.attacked) 
         {
+            controller.pather.canMove = false;
             controller.animeController.SetTrigger(controller.attackHash);
             controller.attacked = true;
+            controller.StartCoroutine(controller.AttackCooldown(1));
         }   
+        else 
+        {
+            controller.pather.canMove = true;
+        }
         CheckTransitions(controller);
     }
 

@@ -34,11 +34,12 @@ public class Darkness : MonoBehaviour {
                 wanderHash = Animator.StringToHash("Wander");
     public bool updateStates, attacked;
     public int creationID;
-    public float attackInitiationRange, playerDist, swtichDist, navTargetDist;
+    public float attackInitiationRange, playerDist, swtichDist, navTargetDist, stopDistance;
 
     void Awake()
     {
         attackInitiationRange = 2.5f;
+        stopDistance = 3;
         swtichDist = attackInitiationRange*1.75f;
         creationID = 0;
         navTargetDist = -1;
@@ -89,7 +90,7 @@ public class Darkness : MonoBehaviour {
         
     }
 
-    public IEnumerator IdleTime(float idleTime)
+    public IEnumerator AttackCooldown(float idleTime)
     {
         if(!attacked)
             attacked = true;
