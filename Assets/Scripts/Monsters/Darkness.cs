@@ -20,6 +20,7 @@ public class Darkness : MonoBehaviour {
 
     [HideInInspector]
     public Seeker sekr;
+    public Collider darkHitBox;
     
     public GameObject deathFX;
     public Dark_State DeathState;
@@ -55,6 +56,7 @@ public class Darkness : MonoBehaviour {
         AI_Manager.OnDarknessAdded(this);
         //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
+        darkHitBox.enabled = false;
         //aIMovement.target = Target;
 	}
 
@@ -90,12 +92,15 @@ public class Darkness : MonoBehaviour {
         
     }
 
-    public IEnumerator AttackCooldown(float idleTime)
+    public IEnumerator AttackCooldown(float idleTime, int animationID)
     {
+        darkHitBox.enabled = true;
         if(!attacked)
             attacked = true;
+        animeController.SetTrigger(animationID);
         yield return new WaitForSeconds(idleTime);
         attacked = false;
+        darkHitBox.enabled = false;
     }
 
     public void PlayerDistanceEvaluation(Vector3 location)

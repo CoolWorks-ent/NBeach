@@ -6,6 +6,8 @@ public class AttackState : Dark_State
 {
     [Range(1, 3)]
     public int attackSpeedModifier;
+    [Range(0,5)]
+    public float attackCooldown;
 
     protected override void FirstTimeSetup()
     {
@@ -20,7 +22,7 @@ public class AttackState : Dark_State
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
         controller.pather.rotationSpeed = 270;
-        controller.pather.endReachedDistance = 1;
+        controller.pather.endReachedDistance = 1.85f;
         //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
@@ -35,7 +37,7 @@ public class AttackState : Dark_State
             controller.pather.canMove = false;
             controller.animeController.SetTrigger(controller.attackHash);
             controller.attacked = true;
-            controller.StartCoroutine(controller.AttackCooldown(1));
+            controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
         }   
         else 
         {

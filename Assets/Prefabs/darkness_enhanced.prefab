@@ -41,6 +41,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1133853046182626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4533775661440322}
+  - component: {fileID: 65207881856799222}
+  m_Layer: 17
+  m_Name: DarkAttack
+  m_TagString: Darkness
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1201729718813018
 GameObject:
   m_ObjectHideFlags: 1
@@ -199,7 +215,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4849616495344730}
-  - component: {fileID: 65578689530358540}
   - component: {fileID: 65387374068129854}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
@@ -359,6 +374,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4693482682022224}
   - component: {fileID: 95245961137181078}
+  - component: {fileID: 65008898640602808}
   m_Layer: 0
   m_Name: shadowGrunt_Anim_RotFix2
   m_TagString: Untagged
@@ -561,6 +577,19 @@ Transform:
   m_Father: {fileID: 4547306560135658}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90.00001}
+--- !u!4 &4533775661440322
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1133853046182626}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4849616495344730}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4547306560135658
 Transform:
   m_ObjectHideFlags: 1
@@ -682,10 +711,11 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 184.15079, y: 44.859962, z: 83.25046}
+  m_LocalPosition: {x: 183.23361, y: 50.59599, z: 107.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4693482682022224}
+  - {fileID: 4533775661440322}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -760,6 +790,30 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &65008898640602808
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1812272195741048}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 5, y: 6, z: 4}
+  m_Center: {x: 0, y: 3.2, z: -0.1}
+--- !u!65 &65207881856799222
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1133853046182626}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 1.25, z: 0.4}
 --- !u!65 &65387374068129854
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -772,18 +826,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1.82, z: 1.4}
   m_Center: {x: 0, y: 0.92, z: -0.1}
---- !u!65 &65578689530358540
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.72, y: 2, z: 1.74}
-  m_Center: {x: 0, y: 1, z: -0.1}
 --- !u!95 &95245961137181078
 Animator:
   serializedVersion: 3
@@ -859,6 +901,7 @@ MonoBehaviour:
   currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   pather: {fileID: 0}
   sekr: {fileID: 0}
+  darkHitBox: {fileID: 1133853046182626}
   deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
   DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   animeController: {fileID: 0}
@@ -869,14 +912,13 @@ MonoBehaviour:
   deathHash: 646380074
   wanderHash: 918399791
   updateStates: 0
-  actionIdle: 0
+  attacked: 0
   creationID: 0
-  stateUpdateRate: 0
   attackInitiationRange: 0
-  waitRange: 0
-  stopDist: 0
   playerDist: 0
   swtichDist: 0
+  navTargetDist: 0
+  stopDistance: 0
 --- !u!114 &114648332704818778
 MonoBehaviour:
   m_ObjectHideFlags: 1

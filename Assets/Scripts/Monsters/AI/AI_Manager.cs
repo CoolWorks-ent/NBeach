@@ -207,8 +207,18 @@ public class AI_Manager : MonoBehaviour {
 				t = evenCount[Random.Range(0, evenCount.Count-1)];
 				if(t == lowest)
 					continue;
-				else lowest = t;
+				else 
+				{
+					lowest = t;
+					break;
+				}
+
 			}
+			/*if(+1 < AttackPoints.Length)
+			{
+				patrol = PatrolPoints[darkness.Target.targetID+1];
+			}
+			else patrol = PatrolPoints[0];*/
 		}
 		return lowest;
 	}
