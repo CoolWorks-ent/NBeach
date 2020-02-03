@@ -37,18 +37,20 @@ public class AttackState : Dark_State
             controller.pather.canMove = false;
             controller.animeController.SetTrigger(controller.attackHash);
             controller.attacked = true;
-            controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
+            //if(controller.animeController.animation.)
+            //controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
         }   
-        else 
+        /*else 
         {
             controller.pather.canMove = true;
         }
-        CheckTransitions(controller);
+        CheckTransitions(controller);*/
     }
 
     public override void ExitState(Darkness controller)
     {
         controller.pather.endReachedDistance = 0.2f;
+        controller.attacked = false;
         //controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 }
