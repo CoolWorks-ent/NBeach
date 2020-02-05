@@ -66,7 +66,7 @@ public class AI_Manager : MonoBehaviour {
 		RemoveDarkness += RemoveFromDarknessList;
 		RequestNewTarget += ApproveDarknessTarget;
 		paused = false;
-		calculationTime = 1.5f;
+		calculationTime = 0.5f;
 		attackOffset = 3.5f;
 		PatrolPoints = new NavigationTarget[4]; 
 		AttackPoints = new NavigationTarget[3]; 

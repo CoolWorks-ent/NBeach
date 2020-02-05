@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 114446345711301086}
   - component: {fileID: 114857173380954124}
   - component: {fileID: 114648332704818778}
+  - component: {fileID: 136796206659899728}
   m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -682,7 +683,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 191.1601, y: 44.859966, z: 103.6727}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4693482682022224}
@@ -770,8 +771,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 1.82, z: 1.4}
-  m_Center: {x: 0, y: 0.92, z: -0.1}
+  m_Size: {x: 0.75, y: 1.54, z: 1.13}
+  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!65 &65625734434817152
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -924,7 +925,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 1
-  smoothType: 1
+  smoothType: 3
   subdivisions: 3
   iterations: 2
   strength: 0.5
@@ -932,7 +933,20 @@ MonoBehaviour:
   maxSegmentLength: 2
   bezierTangentLength: 0.4
   offset: 0.12
-  factor: 0.1
+  factor: 0.4
+--- !u!136 &136796206659899728
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  m_Radius: 0.5
+  m_Height: 1.6
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.15, z: 0.54}
 --- !u!137 &137808060623480506
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

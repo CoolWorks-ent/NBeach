@@ -53,6 +53,7 @@ public class Darkness : MonoBehaviour {
         animeController = GetComponentInChildren<Animator>();
         pather = GetComponent<AIPath>();
         sekr = GetComponent<Seeker>();
+        darkHitBox = GetComponent<CapsuleCollider>();
         AI_Manager.OnDarknessAdded(this);
         //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);

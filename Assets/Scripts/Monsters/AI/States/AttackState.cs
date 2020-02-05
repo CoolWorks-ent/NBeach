@@ -34,6 +34,7 @@ public class AttackState : Dark_State
         controller.pather.destination = controller.Target.location.position;
         if(controller.playerDist < controller.attackInitiationRange && !controller.attacked) 
         {
+            controller.darkHitBox.enabled = true;
             controller.pather.canMove = false;
             controller.animeController.SetTrigger(controller.attackHash);
             controller.attacked = true;
@@ -51,6 +52,8 @@ public class AttackState : Dark_State
     {
         controller.pather.endReachedDistance = 0.2f;
         controller.attacked = false;
+        controller.darkHitBox.enabled = false;
+        controller.animeController.SetTrigger(controller.idleHash);
         //controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 }
