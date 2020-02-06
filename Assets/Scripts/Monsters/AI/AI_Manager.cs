@@ -130,6 +130,7 @@ public class AI_Manager : MonoBehaviour {
 		yield return null;
 	}
 
+	///<summary>Contols the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
 	public IEnumerator ExecuteDarknessStates()
     {
         while(!paused)

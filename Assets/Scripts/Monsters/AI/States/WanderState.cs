@@ -21,7 +21,7 @@ public class WanderState : ChaseState
     public override void InitializeState(Darkness controller)
     {
         AI_Manager.OnRequestNewTarget(controller.creationID);
-        base.InitializeState(controller);
+        controller.animeController.SetTrigger(controller.chaseHash);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;

@@ -31,8 +31,7 @@ public class Darkness : MonoBehaviour {
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
                 idleHash = Animator.StringToHash("Idle"),
-                deathHash = Animator.StringToHash("Death"),
-                wanderHash = Animator.StringToHash("Wander");
+                deathHash = Animator.StringToHash("Death");
     public bool updateStates, attacked;
     public int creationID;
     public float attackInitiationRange, playerDist, swtichDist, navTargetDist, stopDistance;
@@ -61,7 +60,7 @@ public class Darkness : MonoBehaviour {
         //aIMovement.target = Target;
 	}
 
-    public IEnumerator StateTransition(Dark_State nextState)
+    /*public IEnumerator StateTransition(Dark_State nextState)
     {
         //if(nextState.stateType != currentState.stateType)
         if(nextState != currentState)
@@ -73,7 +72,7 @@ public class Darkness : MonoBehaviour {
             currentState.InitializeState(this);
         }
         yield return null;
-    }
+    }*/
 
     public void ChangeState(Dark_State nextState)
     {
@@ -93,12 +92,10 @@ public class Darkness : MonoBehaviour {
         
     }
 
-    public IEnumerator AttackCooldown(float idleTime, int animationID)
+    public IEnumerator AttackCooldown(float idleTime)
     {
         darkHitBox.enabled = true;
-        if(!attacked)
-            attacked = true;
-        animeController.SetTrigger(animationID);
+        //animeController.SetTrigger(animationID);
         yield return new WaitForSeconds(idleTime);
         attacked = false;
         darkHitBox.enabled = false;
