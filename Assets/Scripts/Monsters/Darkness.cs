@@ -40,7 +40,7 @@ public class Darkness : MonoBehaviour {
     {
         attackInitiationRange = 2.5f;
         stopDistance = 3;
-        swtichDist = attackInitiationRange*1.75f;
+        swtichDist = attackInitiationRange*1.85f;
         creationID = 0;
         navTargetDist = -1;
         updateStates = true;

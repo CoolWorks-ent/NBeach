@@ -14,6 +14,9 @@ public abstract class Dark_State : ScriptableObject
     public abstract void UpdateState(Darkness controller);
     public abstract void ExitState(Darkness controller);
 
+    [Range(0, 10)]
+    public float speedModifier;
+
     public virtual void Startup()
     {
         AI_Manager.RemoveDarkness += RemoveDarkness;

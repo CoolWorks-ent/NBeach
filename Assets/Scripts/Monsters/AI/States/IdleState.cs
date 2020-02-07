@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [CreateAssetMenu (menuName = "AI/Darkness/State/IdleState")]
 public class IdleState : Dark_State
 {
-    [Range(1, 5)]
+    [Range(0, 5)]
     public float idleTime;
     
     protected override void FirstTimeSetup()
@@ -16,8 +16,11 @@ public class IdleState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         //controller.aIMovement.EndMovement();
+        controller.pather.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+        controller.sekr.CancelCurrentPathRequest();
+        controller.pather.repathRate = 5.0f;
     }
 
     public override void UpdateState(Darkness controller)
