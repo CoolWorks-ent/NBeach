@@ -108,7 +108,10 @@ namespace Pathfinding {
 				for (int i = 0; i < processors; i++) {
 					var pathHandler = pathHandlers[i];
 					threads[i] = new Thread(() => CalculatePathsThreaded(pathHandler));
+#if !UNITY_SWITCH || UNITY_EDITOR
+					// Note: Setting the thread name seems to crash when deploying for Switch: https://forum.arongranberg.com/t/path-processor-crashing-nintendo-switch-build/6584
 					threads[i].Name = "Pathfinding Thread " + i;
+#endif
 					threads[i].IsBackground = true;
 					threads[i].Start();
 				}
@@ -315,6 +318,10 @@ namespace Pathfinding {
 				// Access the internal implementation methods
 				IPathInternals ipath = (IPathInternals)path;
 
+				// Trying to prevent simple modding to allow more than one thread
+				if (pathHandler.threadID > 0) {
+					throw new System.Exception("Thread Error");
+				}
 
 				AstarProfiler.StartFastProfile(0);
 				ipath.PrepareBase(pathHandler);

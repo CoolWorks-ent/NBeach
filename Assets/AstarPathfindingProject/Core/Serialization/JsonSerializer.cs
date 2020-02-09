@@ -546,9 +546,9 @@ namespace Pathfinding.Serialization {
 			zipStream = null;
 		}
 
-		NavGraph DeserializeGraph (int zipIndex, int graphIndex) {
+		NavGraph DeserializeGraph (int zipIndex, int graphIndex, System.Type[] availableGraphTypes) {
 			// Get the graph type from the metadata we deserialized earlier
-			var graphType = meta.GetGraphType(zipIndex);
+			var graphType = meta.GetGraphType(zipIndex, availableGraphTypes);
 
 			// Graph was null when saving, ignore
 			if (System.Type.Equals(graphType, null)) return null;
@@ -581,7 +581,7 @@ namespace Pathfinding.Serialization {
 		/// Deserializes graph settings.
 		/// Note: Stored in files named "graph<see cref=".json"/>" where # is the graph number.
 		/// </summary>
-		public NavGraph[] DeserializeGraphs () {
+		public NavGraph[] DeserializeGraphs (System.Type[] availableGraphTypes) {
 			// Allocate a list of graphs to be deserialized
 			var graphList = new List<NavGraph>();
 
@@ -589,7 +589,7 @@ namespace Pathfinding.Serialization {
 
 			for (int i = 0; i < meta.graphs; i++) {
 				var newIndex = graphList.Count + graphIndexOffset;
-				var graph = DeserializeGraph(i, newIndex);
+				var graph = DeserializeGraph(i, newIndex, availableGraphTypes);
 				if (graph != null) {
 					graphList.Add(graph);
 					graphIndexInZip[graph] = i;
@@ -864,23 +864,13 @@ namespace Pathfinding.Serialization {
 		public List<string> typeNames;
 
 		/// <summary>Returns the Type of graph number index</summary>
-		public Type GetGraphType (int index) {
+		public Type GetGraphType (int index, System.Type[] availableGraphTypes) {
 			// The graph was null when saving. Ignore it
 			if (String.IsNullOrEmpty(typeNames[index])) return null;
 
-#if ASTAR_FAST_NO_EXCEPTIONS || UNITY_WEBGL
-			System.Type[] types = AstarData.DefaultGraphTypes;
-
-			Type type = null;
-			for (int j = 0; j < types.Length; j++) {
-				if (types[j].FullName == typeNames[index]) type = types[j];
+			for (int j = 0; j < availableGraphTypes.Length; j++) {
+				if (availableGraphTypes[j].FullName == typeNames[index]) return availableGraphTypes[j];
 			}
-#else
-			// Note calling through assembly is more stable on e.g WebGL
-			Type type = WindowsStoreCompatibility.GetTypeInfo(typeof(AstarPath)).Assembly.GetType(typeNames[index]);
-#endif
-			if (!System.Type.Equals(type, null))
-				return type;
 
 			throw new Exception("No graph of type '" + typeNames[index] + "' could be created, type does not exist");
 		}

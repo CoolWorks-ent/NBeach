@@ -5,11 +5,15 @@ using UnityEngine;
 [CreateAssetMenu (menuName = "AI/Darkness/State/DeathState")]
 public class DeathState : Dark_State
 {
+    protected override void FirstTimeSetup()
+    {
+        stateType = StateType.DEATH;
+    }
+
     public override void InitializeState(Darkness controller)
     {
         Debug.LogWarning("Darkness entered death state");
-        controller.aIRichPath.canMove = false;
-        controller.sekr.CancelCurrentPathRequest();
+        //controller.aIRichPath.canMove = false;
         controller.animeController.SetTrigger(controller.deathHash);
         
         GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
@@ -18,14 +22,14 @@ public class DeathState : Dark_State
         //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
         controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
         AI_Manager.Instance.StartCoroutine(deathRoutine(controller));
-        controller.sekr.CancelCurrentPathRequest();
+        //controller.aIMovement.EndMovement();
     }
 
     public override void UpdateState(Darkness controller)
     {
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         //AI_Manager.OnDarknessRemoved(controller);
     }

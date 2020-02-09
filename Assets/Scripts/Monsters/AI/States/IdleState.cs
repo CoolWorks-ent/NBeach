@@ -5,27 +5,22 @@ using System.Collections.Generic;
 [CreateAssetMenu (menuName = "AI/Darkness/State/IdleState")]
 public class IdleState : Dark_State
 {
-    [Range(1, 5)]
+    [Range(0, 5)]
     public float idleTime;
-
-    protected override void Awake()
+    
+    protected override void FirstTimeSetup()
     {
         stateType = StateType.IDLE;
-        base.Awake();
     }
 
     public override void InitializeState(Darkness controller)
     {
-        controller.aIRichPath.canMove = false;
+        //controller.aIMovement.EndMovement();
+        controller.pather.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
-        
-        float idleTime = controller.actionIdle;
-        /*if(controller.animeController.GetBool(controller.attackAfterHash))
-        {
-            idleTime = idleTime/2;
-            controller.animeController.SetBool(controller.attackAfterHash, true);
-        }*/
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+        controller.sekr.CancelCurrentPathRequest();
+        base.InitializeState(controller);
     }
 
     public override void UpdateState(Darkness controller)
@@ -34,7 +29,7 @@ public class IdleState : Dark_State
         // controller.transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    protected override void ExitState(Darkness controller)
+    public override void ExitState(Darkness controller)
     {
         AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
         if(controller.animeController != null)

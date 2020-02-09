@@ -16,6 +16,8 @@ namespace Pathfinding {
 		/// See: <see cref="RemoveConnection"/>
 		///
 		/// Note: If you modify this array or the contents of it you must call <see cref="SetConnectivityDirty"/>.
+		///
+		/// Note: If you modify this array or the contents of it you must call <see cref="PointGraph.RegisterConnectionLength"/> with the length of the new connections.
 		/// </summary>
 		public Connection[] connections;
 
@@ -86,6 +88,22 @@ namespace Pathfinding {
 		///
 		/// Note: Only adds a one-way connection. Consider calling the same function on the other node
 		/// to get a two-way connection.
+		///
+		/// <code>
+		/// AstarPath.active.AddWorkItem(new AstarWorkItem(ctx => {
+		///     // Connect two nodes
+		///     var node1 = AstarPath.active.GetNearest(transform.position, NNConstraint.None).node;
+		///     var node2 = AstarPath.active.GetNearest(transform.position + Vector3.right, NNConstraint.None).node;
+		///     var cost = (uint)(node2.position - node1.position).costMagnitude;
+		///     node1.AddConnection(node2, cost);
+		///     node2.AddConnection(node1, cost);
+		///
+		///     node1.ContainsConnection(node2); // True
+		///
+		///     node1.RemoveConnection(node2);
+		///     node2.RemoveConnection(node1);
+		/// }));
+		/// </code>
 		/// </summary>
 		public override void AddConnection (GraphNode node, uint cost) {
 			if (node == null) throw new System.ArgumentNullException();
@@ -110,6 +128,9 @@ namespace Pathfinding {
 
 			connections = newconns;
 			AstarPath.active.hierarchicalGraph.AddDirtyNode(this);
+
+			// Make sure the graph knows that there exists a connection with this length
+			(this.Graph as PointGraph).RegisterConnectionLength((node.position - position).sqrMagnitudeLong);
 		}
 
 		/// <summary>
@@ -117,8 +138,24 @@ namespace Pathfinding {
 		/// If no such connection exists, nothing will be done.
 		///
 		/// Note: This only removes the connection from this node to the other node.
-		/// You may want to call the same function on the other node to remove its eventual connection
+		/// You may want to call the same function on the other node to remove its possible connection
 		/// to this node.
+		///
+		/// <code>
+		/// AstarPath.active.AddWorkItem(new AstarWorkItem(ctx => {
+		///     // Connect two nodes
+		///     var node1 = AstarPath.active.GetNearest(transform.position, NNConstraint.None).node;
+		///     var node2 = AstarPath.active.GetNearest(transform.position + Vector3.right, NNConstraint.None).node;
+		///     var cost = (uint)(node2.position - node1.position).costMagnitude;
+		///     node1.AddConnection(node2, cost);
+		///     node2.AddConnection(node1, cost);
+		///
+		///     node1.ContainsConnection(node2); // True
+		///
+		///     node1.RemoveConnection(node2);
+		///     node2.RemoveConnection(node1);
+		/// }));
+		/// </code>
 		/// </summary>
 		public override void RemoveConnection (GraphNode node) {
 			if (connections == null) return;

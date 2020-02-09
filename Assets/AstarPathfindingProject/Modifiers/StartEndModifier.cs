@@ -93,6 +93,8 @@ namespace Pathfinding {
 			/// The point is set to the closest point on one of the connections from the start/end node.
 			/// This mode may be useful in a grid based or point graph based world when using the AILerp script.
 			///
+			/// Note: If you are using this mode with a <see cref="Pathfinding.PointGraph"/> you probably also want to use the <see cref="Pathfinding.PointGraph.NodeDistanceMode Connection"/> for <see cref="Pathfinding.PointGraph.nearestNodeDistanceMode"/>.
+			///
 			/// [Open online documentation to see images]
 			/// </summary>
 			NodeConnection,
@@ -125,16 +127,41 @@ namespace Pathfinding {
 			// This modifier only supports ABPaths (doesn't make much sense for other paths anyway)
 			if (p == null || p.vectorPath.Count == 0) return;
 
+			bool singleNode = false;
+
 			if (p.vectorPath.Count == 1 && !addPoints) {
 				// Duplicate first point
 				p.vectorPath.Add(p.vectorPath[0]);
+				singleNode = true;
 			}
 
 			// Add instead of replacing points
 			bool forceAddStartPoint, forceAddEndPoint;
+			// Which connection the start/end point was on (only used for the Connection mode)
+			int closestStartConnection, closestEndConnection;
 
-			Vector3 pStart = Snap(p, exactStartPoint, true, out forceAddStartPoint);
-			Vector3 pEnd = Snap(p, exactEndPoint, false, out forceAddEndPoint);
+			Vector3 pStart = Snap(p, exactStartPoint, true, out forceAddStartPoint, out closestStartConnection);
+			Vector3 pEnd = Snap(p, exactEndPoint, false, out forceAddEndPoint, out closestEndConnection);
+
+			// This is a special case when the path is only a single node and the Connection mode is used.
+			// (forceAddStartPoint/forceAddEndPoint is only used for the Connection mode)
+			// In this case the start and end points lie on the connections of the node.
+			// There are two cases:
+			// 1. If the start and end points lie on the same connection we do *not* want
+			// the path to pass through the node center but instead go directly from point to point.
+			// This is the case of closestStartConnection == closestEndConnection.
+			// 2. If the start and end points lie on different connections we *want*
+			// the path to pass through the node center as it goes from one connection to another one.
+			// However in any case we only want the node center to be added once to the path
+			// so we set forceAddStartPoint to false anyway.
+			if (singleNode) {
+				if (closestStartConnection == closestEndConnection) {
+					forceAddStartPoint = false;
+					forceAddEndPoint = false;
+				} else {
+					forceAddStartPoint = false;
+				}
+			}
 
 			// Add or replace the start point
 			// Disable adding of points if the mode is SnapToNode since then
@@ -153,10 +180,12 @@ namespace Pathfinding {
 			}
 		}
 
-		Vector3 Snap (ABPath path, Exactness mode, bool start, out bool forceAddPoint) {
+		Vector3 Snap (ABPath path, Exactness mode, bool start, out bool forceAddPoint, out int closestConnectionIndex) {
 			var index = start ? 0 : path.path.Count - 1;
 			var node = path.path[index];
 			var nodePos = (Vector3)node.position;
+
+			closestConnectionIndex = 0;
 
 			forceAddPoint = false;
 
@@ -212,6 +241,7 @@ namespace Pathfinding {
 						if (dist < bestDist) {
 							bestPos = closest;
 							bestDist = dist;
+							closestConnectionIndex = i;
 
 							// If this node is not the adjacent node
 							// then the path should go through the start node as well

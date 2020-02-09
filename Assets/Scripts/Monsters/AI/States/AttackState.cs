@@ -6,35 +6,53 @@ public class AttackState : Dark_State
 {
     [Range(1, 3)]
     public int attackSpeedModifier;
+    [Range(0, 5)]
+    public float attackCooldown;
 
-    protected override void Awake()
+    [Range(0, 3)]
+    public float attackInitiationRange;
+
+
+    protected override void FirstTimeSetup()
     {
         stateType = StateType.ATTACK;
-        base.Awake();
     }
 
     public override void InitializeState(Darkness controller)
     {
-        //controller.aIRichPath.canMove = false;
-        //controller.aIRichPath.maxSpeed *= attackSpeedModifier;
-        controller.animeController.SetTrigger(controller.attackHash);
-        AI_Manager.Instance.StartCoroutine(IdleTime(controller, 2));
+        base.InitializeState(controller);
+        AI_Manager.OnRequestNewTarget(controller.creationID);
+        controller.pather.destination = controller.Target.location.position;
+        if(controller.playerDist > attackInitiationRange)
+            controller.pather.canMove = true;
+        else controller.pather.canMove = false;
+        controller.pather.canSearch = true;
     }
 
     public override void UpdateState(Darkness controller)
-    {
-        //controller.animeController.SetTrigger(controller.attackHash);
-        //controller.aIRichPath.maxSpeed /= attackSpeedModifier;
-    }
-
-    protected override void ExitState(Darkness controller)
-    {
-        //controller.animeController.SetBool(controller.attackAfterHash, true);
-    }
-
-    protected IEnumerator IdleTime(Darkness controller, float idleTime)
-    {
-        yield return AI_Manager.Instance.WaitTimer(idleTime);
+    { 
+        //TODO check if the darkness is facing the player. if not start rotating towards the player
+        controller.pather.destination = controller.Target.location.position;
+        if(controller.playerDist < attackInitiationRange && !controller.attacked) 
+        {
+            controller.attacked = true;
+            controller.animeController.SetTrigger(controller.attackHash);
+            controller.pather.canMove = false;
+            controller.StartCoroutine(controller.AttackCooldown(attackCooldown));
+            //if(controller.animeController.animation.)
+            //controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
+        }   
+        /*else 
+        {
+            controller.pather.canMove = true;
+        }*/
         CheckTransitions(controller);
+    }
+
+    public override void ExitState(Darkness controller)
+    {
+        controller.pather.endReachedDistance -= 1.0f;
+        //controller.attacked = false;
+        //controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 }

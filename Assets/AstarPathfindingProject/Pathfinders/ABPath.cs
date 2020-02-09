@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Pathfinding {
 	/// <summary>
@@ -101,6 +102,62 @@ namespace Pathfinding {
 		protected void Setup (Vector3 start, Vector3 end, OnPathDelegate callbackDelegate) {
 			callback = callbackDelegate;
 			UpdateStartEnd(start, end);
+		}
+
+		/// <summary>
+		/// Creates a fake path.
+		/// Creates a path that looks almost exactly like it would if the pathfinding system had calculated it.
+		///
+		/// This is useful if you want your agents to follow some known path that cannot be calculated using the pathfinding system for some reason.
+		///
+		/// <code>
+		/// var path = ABPath.FakePath(new List<Vector3> { new Vector3(1, 2, 3), new Vector3(4, 5, 6) });
+		///
+		/// ai.SetPath(path);
+		/// </code>
+		///
+		/// You can use it to combine existing paths like this:
+		///
+		/// <code>
+		/// var a = Vector3.zero;
+		/// var b = new Vector3(1, 2, 3);
+		/// var c = new Vector3(2, 3, 4);
+		/// var path1 = ABPath.Construct(a, b);
+		/// var path2 = ABPath.Construct(b, c);
+		///
+		/// AstarPath.StartPath(path1);
+		/// AstarPath.StartPath(path2);
+		/// path1.BlockUntilCalculated();
+		/// path2.BlockUntilCalculated();
+		///
+		/// // Combine the paths
+		/// // Note: Skip the first element in the second path as that will likely be the last element in the first path
+		/// var newVectorPath = path1.vectorPath.Concat(path2.vectorPath.Skip(1)).ToList();
+		/// var newNodePath = path1.path.Concat(path2.path.Skip(1)).ToList();
+		/// var combinedPath = ABPath.FakePath(newVectorPath, newNodePath);
+		/// </code>
+		/// </summary>
+		public static ABPath FakePath (List<Vector3> vectorPath, List<GraphNode> nodePath = null) {
+			var path = PathPool.GetPath<ABPath>();
+
+			for (int i = 0; i < vectorPath.Count; i++) path.vectorPath.Add(vectorPath[i]);
+
+			path.completeState = PathCompleteState.Complete;
+			((IPathInternals)path).AdvanceState(PathState.Returned);
+
+			if (vectorPath.Count > 0) {
+				path.UpdateStartEnd(vectorPath[0], vectorPath[vectorPath.Count - 1]);
+			}
+
+			if (nodePath != null) {
+				for (int i = 0; i < nodePath.Count; i++) path.path.Add(nodePath[i]);
+				if (nodePath.Count > 0) {
+					path.startNode = nodePath[0];
+					path.endNode = nodePath[nodePath.Count - 1];
+				}
+			}
+
+			return path;
 		}
 
 		/// <summary>@}</summary>

@@ -1106,6 +1106,15 @@ namespace Pathfinding {
 		Right = 2
 	}
 
+	public enum InspectorGridHexagonNodeSize {
+		/// <summary>Value is the distance between two opposing sides in the hexagon</summary>
+		Width,
+		/// <summary>Value is the distance between two opposing vertices in the hexagon</summary>
+		Diameter,
+		/// <summary>Value is the raw node size of the grid</summary>
+		NodeSize
+	}
+
 	public enum InspectorGridMode {
 		Grid,
 		IsometricGrid,

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,13 +8,16 @@ public class AI_Manager : MonoBehaviour {
 	public Dictionary<int, Darkness> ActiveDarkness;
 
 	[SerializeField]
-	private int darknessIDCounter, darknessMoveCounter, darknessConcurrentAttackLimit;
-	public int maxEnemyCount;
-    public int minEnemyCount;
-	private int indexNull;
+	private int darknessIDCounter, darknessConcurrentAttackLimit;
+	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
+	public float calculationTime, attackOffset;
 	private bool paused;
 
-	public Dark_State[] dark_States;
+	[SerializeField]
+	private Dark_State[] dark_States;
+	private NavigationTarget[] PatrolPoints;
+	private NavigationTarget[] AttackPoints;
+	private NavigationTarget StartPoint, PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
@@ -25,12 +27,31 @@ public class AI_Manager : MonoBehaviour {
 		get {return instance; }
 	}
 
+	public enum NavTargetTag {Attack, Patrol, Neutral, Chase}
+	public class NavigationTarget
+	{
+		public int targetID, 
+					weight, 
+					weightCap;
+		public Transform location;
+
+		private NavTargetTag targetTag;
+		public NavTargetTag navTargetTag { get{ return targetTag; }}
+
+		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag)//, int assignmentLimit)
+		{
+			location = loc;
+			targetID = iD;
+			targetTag = ntTag;
+			//assignedDarknessIDs = new int[assignmentLimit];
+		}
+	}
+
 	void Awake()
 	{
 		dark_States = Resources.LoadAll<Dark_State>("States");
 		darknessConcurrentAttackLimit = 2;
-		darknessIDCounter = darknessMoveCounter = 0;
-		indexNull = 0;
+		darknessIDCounter = darkTotalCount = darkAttackCount = darkStandbyCount = 0;
 		maxEnemyCount = 6;
         minEnemyCount = 1;
 		if(instance != null && !instance.gameObject.CompareTag("AI Manager"))
@@ -39,207 +60,285 @@ public class AI_Manager : MonoBehaviour {
 			//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 		}
 		else instance = this;
-		// engagementQueue = new Queue<Darkness>();
-		// approachQueue = new Queue<Darkness>();
 		ActiveDarkness = new Dictionary<int, Darkness>();
 		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
+		RequestNewTarget += ApproveDarknessTarget;
 		paused = false;
-		StartCoroutine(CompareNeighbors());
+		calculationTime = 0.5f;
+		attackOffset = 3.5f;
+		PatrolPoints = new NavigationTarget[4]; 
+		AttackPoints = new NavigationTarget[4]; 
+		StartCoroutine(ManagedDarknessUpdate());
+		StartCoroutine(ExecuteDarknessStates());
 		foreach(Dark_State d in dark_States)
         {
             d.Startup();
         }
 	}
 
-	void Update()
+	void Start()
 	{
-		/*if(AttackQueue.Count > 0)
-			ProcessAttackRequest();*/
-	}
-
-	public bool DarknessStateChange(Dark_State toState, Darkness fromController)
-	{
-		bool result = false;
-		switch(toState.stateType)
+		StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
+		PlayerPoint = new NavigationTarget(player, 0, NavTargetTag.Attack);
+		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			case Dark_State.StateType.REMAIN:
-				result = false;
-				break;
-			case Dark_State.StateType.IDLE:
-				Debug.LogWarning(String.Format("<color=blue>AI Manager IDLE:</color> Requesting {0} -> {1}",fromController.currentState,toState), fromController);
-				result = true;
-				break;
-			case Dark_State.StateType.CHASING:
-				if(fromController.currentState.stateType != Dark_State.StateType.CHASING)
-				{
-					darknessMoveCounter++; //lets check for player movement here
-					result = true;
-				}
-				else result = false; 
-				break;
-			case Dark_State.StateType.WANDER:
-				if((fromController.currentState.stateType != Dark_State.StateType.CHASING))
-				{
-					Debug.LogWarning(String.Format("<color=green>AI Manager Wander:</color> Transitioning from {0}",fromController.currentState), fromController);
-					darknessMoveCounter++;
-					result = true;
-				}
-				else{ result = false; Debug.LogWarning(String.Format("<color=yellow>AI Manager Wander:</color> Transitioning from {0}",fromController.currentState), fromController);}
-				break;
-			case Dark_State.StateType.ATTACK:
-				if(fromController.canAttack)
-					result = true; 
-				else result = false;
-				break;
+			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack);
+			AttackPoints[i].location.parent = player;
+			AttackPoints[i].targetID = i;
 		}
-		return result;
+
+		for(int i = 0; i < PatrolPoints.Length; i++)
+		{
+			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
+			float xOffset = 0;
+			PatrolPoints[i].location.parent = player; 
+			if(i % 2 == 0 || i == 0)
+				xOffset = player.position.x - Random.Range(5+i, 15);
+			else xOffset = player.position.x + Random.Range(5+i, 15);
+			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, player.position.z - Random.Range(9, 9+i));
+			PatrolPoints[i].targetID = i;
+		}
+
+		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
+		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
+		AttackPoints[2].location.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
+		AttackPoints[3].location.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 	}
 
-	private void AttackerSwap(int usurper, int deposed)
-	{
-		int temp = usurper;
-		Debug.LogError("Starting swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
-		attackApprovalPriority[usurper] = attackApprovalPriority[deposed];
-		attackApprovalPriority[deposed] = attackApprovalPriority[temp];
-		Debug.LogError("Ending swap of " + attackApprovalPriority[usurper] + " & " + attackApprovalPriority[deposed]);
-	}
+#region DarknessUpdateLoop
 
-	private IEnumerator CompareNeighbors() //TODO: Every n seconds go through the Darkness to see who is closer to the player. If found perform QueueSwap with the Darkness that is furthest away
+	///<summary>Contols the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
+	private IEnumerator ManagedDarknessUpdate() 
 	{
 		while(!paused)
 		{
-			if(attackApprovalPriority.Count > 1)
+			if(attackApprovalPriority.Count > 0)
 			{
 				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
-				foreach(KeyValuePair<int,Darkness> baba in ActiveDarkness)
+				foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
-					baba.Value.DistanceEvaluation();
+					dark.Value.PlayerDistanceEvaluation(player.position);
 				}
 				SortTheGoons();
-				yield return new WaitForSeconds(0.5f);
-				ApproveGoonAttack();
-				yield return new WaitForSeconds(1.5f);
+				yield return new WaitForSeconds(calculationTime/3);
+				UpdateDarknessAggresion();
+				yield return new WaitForSeconds(calculationTime);
 			}
-			else yield return new WaitForSeconds(1.0f);
+			else yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
 	}
 
-	private void ApproveGoonAttack() //TODO: Add checking for Darkness being swapped to lower position. Preferrably during that swap they would get set to false.
+	///<summary>Contols the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
+	public IEnumerator ExecuteDarknessStates()
+    {
+        while(!paused)
+        {
+			foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
+			{
+				dark.Value.currentState.UpdateState(dark.Value);
+			}
+            yield return new WaitForSeconds(calculationTime);
+        }
+        yield return null;
+    }
+
+	///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. Furtheset Darkness are set to idle priority</summary>
+	private void UpdateDarknessAggresion() 
 	{
+		darkStandbyCount = 0;
+		darkAttackCount = 0;
+		darkTotalCount = ActiveDarkness.Count;
 		for(int i = 0; i < attackApprovalPriority.Count; i++)
 		{
 			if(i < darknessConcurrentAttackLimit)
+			{ 
+				darkAttackCount++;
+				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
+			}
+			else if(i < darknessConcurrentAttackLimit+2)
 			{
-				ActiveDarkness[attackApprovalPriority[i]].canAttack = true;
+				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
+				{
+					darkStandbyCount++;
+					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
+				}
 			}
 			else 
 			{
-				if(ActiveDarkness[attackApprovalPriority[i]].canAttack)
-					ActiveDarkness[attackApprovalPriority[i]].canAttack = false;
+				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
+				{
+					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
+				}
 			}
 		}
-		//Debug.LogWarning("First two entries set to attack " + )
 	}
 
-	private void SortTheGoons() //check if the darkness should get on the attack list 
+	///<summary>Sorts the Darkness in ActiveDarkness based on their distance to target values</summary>
+	private void SortTheGoons() 
 	{
 		attackApprovalPriority.Sort(delegate(int a, int b)
 		{
-			return ActiveDarkness[a].targetDist.CompareTo(ActiveDarkness[b].targetDist);
+			return ActiveDarkness[a].playerDist.CompareTo(ActiveDarkness[b].playerDist);
 		});
 	}	
+	#endregion
 
-	///<summary>Check the current engagement collection. If the darkness is not in the list and the list is not full add it to the list</summary> //TODO add way for Darkness to be set to trade places if closer to player
-	// public bool CheckAttackRequest(int iD) //Search for an empty spot in the array. After checking all spots if none of them are empty or contain the item I'm looking for return false. If there is an empty spot add the item to that spot.
-	// {
+#region NavTargetHandling
 
-	// 	if(Array.Exists(attackApproved, i => i.Equals(indexNull)))
-	// 	{
-	// 		if(Array.Exists(attackApproved, i => i.Equals(iD)))
-	// 		{
-	// 			Debug.LogWarning(String.Format("<color=purple>Darkness <color=red>({0})</color> already in engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
-	// 			return false;	
-	// 		}
-	// 		for(int i = 0; i < attackApproved.Length; i++)
-	// 		{
-	// 			if(attackApproved[i] == indexNull && attackApproved[i] != iD)
-	// 			{
-	// 				Debug.LogWarning(String.Format("<color=white>Added darkness <color=green>({0})</color> to engagment list</color>", ActiveDarkness[iD].creationID),ActiveDarkness[iD]);
-	// 				attackApproved[i] = iD;
-	// 				ActiveDarkness[iD].canAttack = true;
-	// 				ActiveDarkness[iD].standBy = false;
-	// 				ActiveDarkness[iD].engIndex = i;
-	// 				return true;
-	// 			}
-	// 		}
-	// 	}
-	// 	ActiveDarkness[iD].canAttack = false;
-	// 	return false;
-	// }
+	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
+	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
+	{
+		int lowest = 0;
+		List<int> evenCount = new List<int>(); //In case there are entries at the same levels
+		for(int i = 0; i < navTargets.Length; i++)
+		{
+			if(navTargets[i].weight < navTargets[lowest].weight)
+				lowest = i;
+			else if(navTargets[i].weight == navTargets[lowest].weight)
+				evenCount.Add(i);
+		}
 
-	///<summary>Called when adding a new Darkness to the queue. Checks the first few in the queue and sets them to the standby status.</summary>
-	// private void UpdateStandbyDarkness() //TODO set 1-2 standby Darkness to wander between patrol nodes. Nodes should be selected in the Wander state
-	// {
-	// 	int i = 0;
-	// 	if(engagementQueue.Count > 0)
-	// 	{
-	// 		Darkness[] darkContainer = engagementQueue.ToArray();
-	// 		while(i < darknessConcurrentMovingLimit && i < darkContainer.Length)
-	// 		{
-	// 			if(ActiveDarkness[darkContainer[i].creationID].standBy)
-	// 				i++;
-	// 			else
-	// 			{
-	// 				ActiveDarkness[darkContainer[i].creationID].standBy = true;
-	// 				i++;
-	// 			}
-	// 		}
-	// 	}
-	// }
+		if(evenCount.Count >= 2)
+		{
+			int t = 0;
+			for(int x = 0; x <= 5; x++)
+			{	
+				t = evenCount[Random.Range(0, evenCount.Count-1)];
+				if(t == lowest)
+					continue;
+				else 
+				{
+					lowest = t;
+					break;
+				}
 
-	///<summary> Notified by the AddDarkness event. If the engagement count is not at cap add the Darkness. Otherwise assign to wait queue.</summary>
+			}
+			/*if(+1 < AttackPoints.Length)
+			{
+				patrol = PatrolPoints[darkness.Target.targetID+1];
+			}
+			else patrol = PatrolPoints[0];*/
+		}
+		return lowest;
+	}
+
+	///<summary>Returns an attack or patrol Navigation Target. Returns a null object if Darkness is not found in active list. </summary>
+	private NavigationTarget AssignNavigationTarget(int darkID) 
+	{
+		//Find if Darkness is in the collection
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(darkID, out darkness)) 
+		{
+			switch(darkness.agRatingCurrent)
+			{
+				case Darkness.AggresionRating.Attacking:
+					int index = LeastRequestedNavigationTarget(AttackPoints);
+					AttackPoints[index].weight++;
+					return AttackPoints[index];
+				case Darkness.AggresionRating.Wandering:
+					NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
+					if(darkness.Target.navTargetTag == NavTargetTag.Patrol)
+					{
+						if(darkness.Target.targetID+1 < PatrolPoints.Length)
+						{
+							patrol = PatrolPoints[darkness.Target.targetID+1];
+						}
+						else patrol = PatrolPoints[0];
+					}
+					return patrol;
+				default:
+					return StartPoint;
+			}
+		}
+		else 
+		{
+			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
+			return null;	
+		}
+	}
+
+	///<summary>Check the Darkness for current NavTarget. If the target is an attack Target the target will be set to the starting NavTarget.</summary>
+	private void RemoveFromNavTargets(int darkID)
+	{
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(darkID, out darkness))
+		{
+			if(darkness.Target.navTargetTag != NavTargetTag.Neutral)
+			{
+				darkness.Target.weight--;
+			}
+		}
+	}
+
+	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
+	public void ApproveDarknessTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
+	{
+		Darkness darkness;
+		if(ActiveDarkness.TryGetValue(darkID, out darkness))
+		{
+			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
+			{ 
+				if(darkness.navTargetDist <= darkness.swtichDist+0.25f)
+					darkness.Target = PlayerPoint;
+				else
+				{
+					NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+					if(nT != null)
+					{
+						RemoveFromNavTargets(darkID);
+						darkness.Target = nT;
+					}
+				}
+			}
+			else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
+			{
+				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+					if(nT != null)
+					{
+						RemoveFromNavTargets(darkID);
+						darkness.Target = nT;
+					}
+			}
+			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
+			{
+				RemoveFromNavTargets(darkID);
+				darkness.Target = PlayerPoint;
+			}
+			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
+			{
+				RemoveFromNavTargets(darkID);
+				darkness.Target = StartPoint;
+			}
+		}
+	}
+	#endregion
+
+	public IEnumerator WaitTimer(float timer)
+	{
+		yield return new WaitForSeconds(timer);
+	}
+
+#region DarknessCollectionUpdates
+	///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
 		updatedDarkness.transform.SetParent(Instance.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
-		//Debug.Log("New Darkness added. ID#" + updatedDarkness.creationID);
+		updatedDarkness.Target = StartPoint;
+
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
-		updatedDarkness.target = player;
-		/* if(!CheckAttackRequest(updatedDarkness.creationID)) //check to see if the queue has grunts in it first
-		{
-		}*/
-		
-		// engagementQueue.Enqueue(updatedDarkness);
-		// if(!CheckAttackRequest(engagementQueue.Peek().creationID))
-		// 	UpdateStandbyDarkness();
-		// else engagementQueue.Dequeue();
-		//updatedDarkness.GetComponent<AI_Movement>().target = player;
+		//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 	}
 
-	///<summary></summary>
+	///<summary>Removes Darkness from attack list if present. Also removes Darkness from active list and stops any relevant running funcitons</summary>
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
-		darknessMoveCounter--;
-		//if(attackApprovalPriority[updatedDarkness.engIndex] != indexNull && updatedDarkness.engIndex < attackApprovalPriority.Count)
-		//	attackApprovalPriority[updatedDarkness.engIndex] = indexNull;
-		// if (engagementQueue.Count >= 1)
-		// {
-		// 	if(engagementQueue.Peek() != null)
-		// 	{
-		// 		if(CheckAttackRequest(engagementQueue.Peek().creationID)) //Log ID number is being added number 
-		// 		{
-		// 			//Debug.LogWarning(String.Format("<color=gray>AI Darkness Removed:</color> Adding this darkness {0}", engagementQueue.Peek()), engagementQueue.Peek());
-		// 			engagementQueue.Dequeue();
-		// 			UpdateStandbyDarkness();
-		// 		}
-		// 	}
-		// 	else engagementQueue.Dequeue();
-		// }
+		//updatedDarkness.StopCoroutine(updatedDarkness.ExecuteCurrentState());
 		attackApprovalPriority.Remove(updatedDarkness.creationID);
         ActiveDarkness.Remove(updatedDarkness.creationID);
     }
@@ -253,40 +352,41 @@ public class AI_Manager : MonoBehaviour {
             ActiveDarkness.Remove(dark.Key);
         }
     }
-
-    public IEnumerator WaitTimer(float timer)
-	{
-		yield return new WaitForSeconds(timer);
-	}
+	#endregion
 
 #region AIManagerEvents
+	public delegate void AIEvent();
 	public delegate void AIEvent<T>(T obj);
-	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
-	//public delegate void AIEvent<T1,T2, T3>(T1 obj1, T2 obj2, T3 obj3);
-	//public static event AIEvent<Dark_State, Darkness, Action<bool, Dark_State, Darkness>> ChangeState;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-	
-	/* public static void OnChangeState(Dark_State to, Darkness from, Action<bool, Dark_State, Darkness> approved)
-	{
-		if(ChangeState != null)
-			ChangeState(to, from, approved);
-	}*/
-	///<summary>
-	///Adds Darkness to list. Darkness will be assigned their spot in the queue and set to attack if queue is not full.
-	///</summary>
+
+	public static event AIEvent<int> RequestNewTarget;
+	public static event AIEvent UpdateMovement;
+
 	public static void OnDarknessAdded(Darkness d)
 	{
 		if(AddDarkness != null)
 			AddDarkness(d);
 	}
-	///<summary>
-	///Removes Darkness from list. If in active queue, Darkness will be removed.
-	///</summary>
+
 	public static void OnDarknessRemoved(Darkness d)
 	{
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
 	}
+
+	public static void OnRequestNewTarget(int ID)
+	{
+		if(RequestNewTarget != null)
+			RequestNewTarget(ID);
+	}
+
+	/*public static void OnMovementUpdate()
+	{
+		if(UpdateMovement != null)
+			UpdateMovement();
+	}*/
+
 	#endregion
+	
 }

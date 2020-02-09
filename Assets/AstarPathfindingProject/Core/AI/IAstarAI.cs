@@ -106,15 +106,16 @@ namespace Pathfinding {
 
 		/// <summary>
 		/// True if the agent has reached the end of the current path.
-		/// This is the approximate distance the AI has to move to reach the end of the path it is currently traversing.
 		///
 		/// Note that setting the <see cref="destination"/> does not immediately update the path, nor is there any guarantee that the
 		/// AI will actually be able to reach the destination that you set. The AI will try to get as close as possible.
+		/// Often you want to use <see cref="reachedDestination"/> instead which is easier to work with.
 		///
 		/// It is very hard to provide a method for detecting if the AI has reached the <see cref="destination"/> that works across all different games
 		/// because the destination may not even lie on the navmesh and how that is handled differs from game to game (see also the code snippet in the docs for <see cref="destination)"/>.
 		///
 		/// See: <see cref="remainingDistance"/>
+		/// See: <see cref="reachedDestination"/>
 		/// </summary>
 		bool reachedEndOfPath { get; }
 

@@ -8,110 +8,114 @@ using Pathfinding;
  */
 public class Darkness : MonoBehaviour {
 
+
+    public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
+    [HideInInspector]
+    public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
-    public Transform target;
+    public AI_Manager.NavigationTarget Target;
+
+    [HideInInspector]
+    public AIPath pather;
+
+    [HideInInspector]
+    public Seeker sekr;
+    public Collider darkHitBox;
     
-    public int actionIdle, creationID;
-    
+    public GameObject deathFX;
+    public Dark_State DeathState;
+    public Animator animeController;
+
+    [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
                 attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
                 idleHash = Animator.StringToHash("Idle"),
-                deathHash = Animator.StringToHash("Death"),
-                wanderHash = Animator.StringToHash("Wander");
-    public bool canAttack, updateStates, standBy;
-    public float stateUpdateRate, attackInitiationRange, waitRange, stopDist, targetDist;
-    public enum AggresionDistanceRating {FarDistance = 1, StandbyDistance, ApproachDistance, AttackingDistance}
-    public AggresionDistanceRating adRating;
-    public Seeker sekr;
-    public AIDestinationSetter aIDestSet;
-    public GameObject deathFX;
-    public Dark_State DeathState;
-    public Animator animeController;
-    
-    //public AI_Movement aIMovement;
-    public RichAI aIRichPath;
+                deathHash = Animator.StringToHash("Death");
+    public bool updateStates, attacked;
+    public int creationID;
+    public float playerDist, swtichDist, navTargetDist, stopDistance;
 
     void Awake()
     {
-        actionIdle = 3;
-        attackInitiationRange = 3.5f;
-        waitRange = attackInitiationRange*2.5f;
-        stopDist = 1;
-        canAttack = standBy = false;
+        //attackInitiationRange = 2.5f;
+        stopDistance = 3;
+        swtichDist = 3; //attackInitiationRange*1.85f;
         creationID = 0;
+        navTargetDist = -1;
         updateStates = true;
-        stateUpdateRate = 0.5f;
+        agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
+        attacked = false;
     }
 
     void Start () {
-        AI_Manager.OnDarknessAdded(this);
         animeController = GetComponentInChildren<Animator>();
-        //aIMovement = GetComponent<AI_Movement>();
-        aIRichPath = GetComponent<RichAI>();
+        pather = GetComponent<AIPath>();
         sekr = GetComponent<Seeker>();
-        aIDestSet = GetComponent<AIDestinationSetter>();
+        darkHitBox = GetComponent<CapsuleCollider>();
+        AI_Manager.OnDarknessAdded(this);
+        //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
-        StartCoroutine(ExecuteCurrentState());
-        aIDestSet.target = target;
-        aIRichPath.endReachedDistance = stopDist;
+        darkHitBox.enabled = false;
+        //aIMovement.target = Target;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-        
-    }
 
-    // void FixedUpdate()
-    // {
-    //     if(!aIRichPath.canMove)
-    //     {
-    //         Vector3 dir = Vector3.RotateTowards(this.transform.position, target.position,0f,0f);
-    //         transform.rotation = Quaternion.LookRotation(dir);
-    //     }    
-    // }
-
-    public IEnumerator ExecuteCurrentState()
+    /*public IEnumerator StateTransition(Dark_State nextState)
     {
-        while(updateStates)
+        //if(nextState.stateType != currentState.stateType)
+        if(nextState != currentState)
         {
-            currentState.UpdateState(this);
-            yield return new WaitForSeconds(stateUpdateRate);
+            previousState = currentState;
+            currentState = nextState;
+            yield return new WaitForSeconds(previousState.transitionTime);
+            previousState.ExitState(this);            
+            currentState.InitializeState(this);
         }
         yield return null;
-    }
+    }*/
 
     public void ChangeState(Dark_State nextState)
     {
-        if(currentState != nextState)
+        previousState = currentState;
+        currentState = nextState;
+        previousState.ExitState(this);            
+        currentState.InitializeState(this);
+        /*if(nextState.stateType == Dark_State.StateType.DEATH)
         {
+            previousState = currentState;
+            currentState.ExitState(this);
             currentState = nextState;
             currentState.InitializeState(this);
-            previousState = currentState;
-        }
-    }
-
-    public void DistanceEvaluation()
-    {
-        targetDist = Vector3.Distance(transform.position, target.position);
-        if(targetDist > waitRange * 1.5f)
-            adRating = AggresionDistanceRating.FarDistance;
-        else if (targetDist < waitRange && targetDist > attackInitiationRange)
-            adRating = AggresionDistanceRating.StandbyDistance;
-        else if (targetDist > attackInitiationRange && targetDist < waitRange/1.5f)
-            adRating = AggresionDistanceRating.ApproachDistance;
-        else if(targetDist <= attackInitiationRange)
-            adRating = AggresionDistanceRating.AttackingDistance;
+        } 
+        //else if (nextState.stateType == Dark_State.StateType.ATTACK && currentState.stateType == Dark_State.StateType.CHASING)
+        else StartCoroutine(StateTransition(nextState));*/
         
     }
 
-    public bool TargetWithinDistance(float range)
+    public IEnumerator AttackCooldown(float idleTime)
     {
-        if(Vector3.Distance(transform.position, target.position) <= range)
+        darkHitBox.enabled = true;
+        //animeController.SetTrigger(animationID);
+        yield return new WaitForSeconds(idleTime);
+        attacked = false;
+        darkHitBox.enabled = false;
+    }
+
+    public void PlayerDistanceEvaluation(Vector3 location)
+    {
+        playerDist = Vector3.Distance(transform.position, location);
+        if(Target != null)
         {
-            return true;
+            navTargetDist = Vector3.Distance(transform.position, Target.location.position);
         }
-        else return false;
+        else navTargetDist = -1;
+    }
+
+    public void AggressionChanged(AggresionRating agR)
+    {
+        if(agR != agRatingCurrent)
+            agRatingPrevious = agRatingCurrent;
+		agRatingCurrent = agR;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -122,8 +126,6 @@ public class Darkness : MonoBehaviour {
             {
                 Debug.LogWarning("Darkness Destroyed");
                 ChangeState(DeathState);
-                //ChangeState(DeathState);
-                //EventManager.TriggerEvent("DarknessDeath", gameObject.name);
             }
         }
         else if(collider.gameObject.CompareTag("Player"))
