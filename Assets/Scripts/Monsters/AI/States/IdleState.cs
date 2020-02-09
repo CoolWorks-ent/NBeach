@@ -20,7 +20,7 @@ public class IdleState : Dark_State
         controller.animeController.SetTrigger(controller.idleHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
         controller.sekr.CancelCurrentPathRequest();
-        controller.pather.repathRate = 5.0f;
+        base.InitializeState(controller);
     }
 
     public override void UpdateState(Darkness controller)

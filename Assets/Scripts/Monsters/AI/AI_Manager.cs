@@ -69,7 +69,7 @@ public class AI_Manager : MonoBehaviour {
 		calculationTime = 0.5f;
 		attackOffset = 3.5f;
 		PatrolPoints = new NavigationTarget[4]; 
-		AttackPoints = new NavigationTarget[3]; 
+		AttackPoints = new NavigationTarget[4]; 
 		StartCoroutine(ManagedDarknessUpdate());
 		StartCoroutine(ExecuteDarknessStates());
 		foreach(Dark_State d in dark_States)
@@ -103,7 +103,8 @@ public class AI_Manager : MonoBehaviour {
 
 		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
 		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
-		AttackPoints[2].location.position = new Vector3(player.position.x, player.position.y-0.5f, player.position.z - attackOffset);//front of player
+		AttackPoints[2].location.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
+		AttackPoints[3].location.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 	}
 
 #region DarknessUpdateLoop

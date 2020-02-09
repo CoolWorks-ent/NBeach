@@ -34,13 +34,13 @@ public class Darkness : MonoBehaviour {
                 deathHash = Animator.StringToHash("Death");
     public bool updateStates, attacked;
     public int creationID;
-    public float attackInitiationRange, playerDist, swtichDist, navTargetDist, stopDistance;
+    public float playerDist, swtichDist, navTargetDist, stopDistance;
 
     void Awake()
     {
-        attackInitiationRange = 2.5f;
+        //attackInitiationRange = 2.5f;
         stopDistance = 3;
-        swtichDist = attackInitiationRange*1.85f;
+        swtichDist = 3; //attackInitiationRange*1.85f;
         creationID = 0;
         navTargetDist = -1;
         updateStates = true;

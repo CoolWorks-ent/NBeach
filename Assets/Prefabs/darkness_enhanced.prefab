@@ -815,18 +815,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   drawGizmos: 1
-  detailedGizmos: 1
+  detailedGizmos: 0
   startEndModifier:
     addPoints: 0
-    exactStartPoint: 3
-    exactEndPoint: 1
+    exactStartPoint: 1
+    exactEndPoint: 4
     useRaycasting: 0
     mask:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
   traversableTags: -1
-  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
 --- !u!114 &114446345711301086
@@ -872,7 +872,6 @@ MonoBehaviour:
   updateStates: 0
   attacked: 0
   creationID: 0
-  attackInitiationRange: 0
   playerDist: 0
   swtichDist: 0
   navTargetDist: 0
@@ -889,8 +888,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 2
-  radius: 0.75
-  height: 1.7
+  radius: 1
+  height: 1.5
   repathRate: 0.5
   canSearch: 0
   canMove: 0
@@ -908,7 +907,7 @@ MonoBehaviour:
   slowdownDistance: 0.6
   pickNextWaypointDist: 0.5
   endReachedDistance: 0.5
-  alwaysDrawGizmos: 0
+  alwaysDrawGizmos: 1
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 0
   constrainInsideGraph: 1

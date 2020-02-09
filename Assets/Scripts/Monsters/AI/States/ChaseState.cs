@@ -5,13 +5,6 @@ using UnityEditor;
 public class ChaseState : Dark_State
 {
 
-    [Range(0, 15)]
-    public float stopDist;
-    [Range(1,8)]
-    public float minSpeedRange, maxSpeedRange;
-    [Range(0,5)]
-    public float minRepathRate, maxRepathRate;
-
     protected override void FirstTimeSetup()
     {
         stateType = StateType.CHASING;
@@ -19,15 +12,13 @@ public class ChaseState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
+        base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.pickNextWaypointDist += 0.5f;
-        controller.pather.repathRate = 2.25f;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
-        controller.pather.rotationSpeed = 180;
-        controller.pather.endReachedDistance += 1.0f;
         /*controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);

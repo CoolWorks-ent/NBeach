@@ -6,16 +6,27 @@ using System.Linq;
 public abstract class Dark_State : ScriptableObject
 {
     public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
+
+    public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL}
     public StateType stateType;
     public AI_Transition[] transitions;
     public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
-    public abstract void InitializeState(Darkness controller);
-    public abstract void UpdateState(Darkness controller);
-    public abstract void ExitState(Darkness controller);
 
-    [Range(0, 10)]
+
+    [SerializeField, Range(0, 3)]
     public float speedModifier;
+
+    [SerializeField, Range(0, 15)]
+    protected float stopDist;
+
+    [SerializeField, Range(0,360)]
+    protected int rotationSpeed;
+
+    [SerializeField, Range(0, 5)]
+    protected float pathUpdateRate;
+
+
 
     public virtual void Startup()
     {
@@ -30,6 +41,16 @@ public abstract class Dark_State : ScriptableObject
                 ai.falseState.ReferencedBy.Add(this);
         }
     }
+
+    public virtual void InitializeState(Darkness controller)
+    {
+        controller.pather.rotationSpeed = rotationSpeed;
+        controller.pather.endReachedDistance = stopDist;
+        controller.pather.maxSpeed = speedModifier;
+        controller.pather.repathRate = pathUpdateRate;
+    }
+    public abstract void UpdateState(Darkness controller);
+    public abstract void ExitState(Darkness controller);
 
     protected virtual void FirstTimeSetup()
     {

@@ -4,10 +4,10 @@ using System.Collections;
 [CreateAssetMenu(menuName = "AI/Darkness/State/WanderState")]
 public class WanderState : ChaseState
 {
-    [Range(8,20)]
-    public int relativeRangeToPlayer;
-    [Range(1,8)]
-    public int wanderRadius;
+    //[Range(8,20)]
+    //public int relativeRangeToPlayer;
+    //[Range(1,8)]
+    //public int wanderRadius;
     protected override void FirstTimeSetup()
     {
         stateType = StateType.WANDER;
@@ -20,14 +20,13 @@ public class WanderState : ChaseState
 
     public override void InitializeState(Darkness controller)
     {
+        base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.pather.destination = controller.Target.location.position;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
-        controller.pather.repathRate = 3.0f;
         controller.pather.pickNextWaypointDist = 0.95f;
-        controller.pather.rotationSpeed = 180;
         //controller.aIMovement.wandering = true;
         //ChooseNewPatrolPoints(controller);
         /*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
