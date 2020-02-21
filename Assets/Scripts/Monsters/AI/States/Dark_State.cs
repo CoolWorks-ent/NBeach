@@ -9,7 +9,7 @@ public abstract class Dark_State : ScriptableObject
 
     public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL}
     public StateType stateType;
-    public AI_Transition[] transitions;
+    public Dark_Transition[] transitions;
     public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
 
@@ -33,7 +33,7 @@ public abstract class Dark_State : ScriptableObject
         AI_Manager.RemoveDarkness += RemoveDarkness;
         if(ReferencedBy == null || ReferencedBy.Count < 1)
             ReferencedBy = new List<Dark_State>();
-        foreach(AI_Transition ai in transitions)
+        foreach(Dark_Transition ai in transitions)
         {
             if(!ai.trueState.ReferencedBy.Contains(this))
                 ai.trueState.ReferencedBy.Add(this);
