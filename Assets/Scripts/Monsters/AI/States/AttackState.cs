@@ -22,22 +22,22 @@ public class AttackState : Dark_State
     {
         base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
-        controller.pather.destination = controller.Target.location.position;
+        /*controller.pather.destination = controller.Target.location.position;
         if(controller.playerDist > attackInitiationRange)
             controller.pather.canMove = true;
         else controller.pather.canMove = false;
-        controller.pather.canSearch = true;
+        controller.pather.canSearch = true;*/
     }
 
     public override void UpdateState(Darkness controller)
     { 
         //TODO check if the darkness is facing the player. if not start rotating towards the player
-        controller.pather.destination = controller.Target.location.position;
+        //controller.pather.destination = controller.Target.location.position;
         if(controller.playerDist < attackInitiationRange && !controller.attacked) 
         {
             controller.attacked = true;
             controller.animeController.SetTrigger(controller.attackHash);
-            controller.pather.canMove = false;
+            //controller.pather.canMove = false;
             controller.StartCoroutine(controller.AttackCooldown(attackCooldown));
             //if(controller.animeController.animation.)
             //controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
@@ -51,7 +51,7 @@ public class AttackState : Dark_State
 
     public override void ExitState(Darkness controller)
     {
-        controller.pather.endReachedDistance -= 1.0f;
+        //controller.pather.endReachedDistance -= 1.0f;
         //controller.attacked = false;
         //controller.animeController.SetBool(controller.attackAfterHash, true);
     }

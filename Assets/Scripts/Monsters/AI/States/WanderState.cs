@@ -23,17 +23,13 @@ public class WanderState : ChaseState
         base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.pather.destination = controller.Target.location.position;
+        /*controller.pather.destination = controller.Target.location.position;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
-        controller.pather.pickNextWaypointDist = 0.95f;
-        //controller.aIMovement.wandering = true;
-        //ChooseNewPatrolPoints(controller);
-        /*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
-        AI_Manager.Instance.StartCoroutine(NewPointBuffer(controller,5));
-        controller.aIMovement.CreatePath(controller.Target.position);
-        controller.aIMovement.moving = true;
-        controller.aIMovement.speed = 10;*/
+        controller.pather.pickNextWaypointDist = 0.95f;*/
+        controller.darkMovement.CreatePath(controller.Target.location.position);
+        controller.darkMovement.moving = true;
+        //controller.darkMovement.speed = 10;
     }
 
     public override void UpdateState(Darkness controller)
@@ -45,13 +41,13 @@ public class WanderState : ChaseState
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        if(controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.swtichDist)
+        if(controller.navTargetDist <= controller.swtichDist)
         {
             AI_Manager.OnRequestNewTarget(controller.creationID);
-            controller.pather.destination = controller.Target.location.position;
+            controller.darkMovement.CreatePath(controller.Target.location.position);
         }
-        if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
-            controller.pather.rotationSpeed = 400;
+        /*if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
+            controller.pather.rotationSpeed = 400;*/
         CheckTransitions(controller);
     }
 
@@ -86,10 +82,7 @@ public class WanderState : ChaseState
 
     public override void ExitState(Darkness controller)
     {
-        //controller.aIMovement.EndMovement();
-        //controller.aIMovement.wandering = false;
-        controller.pather.canMove = false;
-        controller.pather.canSearch = false;
+        controller.darkMovement.EndMovement();
         controller.sekr.CancelCurrentPathRequest();
     }
 }

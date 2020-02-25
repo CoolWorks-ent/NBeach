@@ -44,10 +44,10 @@ public abstract class Dark_State : ScriptableObject
 
     public virtual void InitializeState(Darkness controller)
     {
-        controller.pather.rotationSpeed = rotationSpeed;
+        /*controller.pather.rotationSpeed = rotationSpeed;
         controller.pather.endReachedDistance = stopDist;
         controller.pather.maxSpeed = speedModifier;
-        controller.pather.repathRate = pathUpdateRate;
+        controller.pather.repathRate = pathUpdateRate;*/
     }
     public abstract void UpdateState(Darkness controller);
     public abstract void ExitState(Darkness controller);

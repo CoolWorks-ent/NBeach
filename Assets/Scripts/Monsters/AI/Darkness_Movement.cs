@@ -4,7 +4,6 @@ using Pathfinding;
 
 public class Darkness_Movement : MonoBehaviour
 {
-    public Transform target;
     public Vector3 wayPoint, pathPoint, direction;
     public bool moving;
     public bool reachedEndOfPath, wandering, targetMoved;
@@ -13,19 +12,20 @@ public class Darkness_Movement : MonoBehaviour
     private Path navPath;
     private Rigidbody rigidbod;
     private Blocker bProvider;
+    private Darkness darkness;
 
     void Awake()
     { 
         //speed = 2;
         moving = false;
         wandering = targetMoved = reachedEndOfPath = false;
+        darkness = GetComponent<Darkness>();
         sekr = GetComponent<Seeker>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
     }
 
     void Start()
     {
-        
         sekr.pathCallback += PathComplete;
         bProvider = new Blocker();
         direction = new Vector3();

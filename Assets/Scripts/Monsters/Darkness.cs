@@ -15,8 +15,8 @@ public class Darkness : MonoBehaviour {
     public Dark_State previousState, currentState;
     public AI_Manager.NavigationTarget Target;
 
-    [HideInInspector]
-    public AIPath pather;
+    //[HideInInspector]
+    //public AIPath pather;
 
     [HideInInspector]
     public Seeker sekr;
@@ -25,6 +25,8 @@ public class Darkness : MonoBehaviour {
     public GameObject deathFX;
     public Dark_State DeathState;
     public Animator animeController;
+
+    public Darkness_Movement darkMovement;
 
     [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
@@ -50,7 +52,8 @@ public class Darkness : MonoBehaviour {
 
     void Start () {
         animeController = GetComponentInChildren<Animator>();
-        pather = GetComponent<AIPath>();
+        darkMovement = GetComponent<Darkness_Movement>();
+        //pather = GetComponent<AIPath>();
         sekr = GetComponent<Seeker>();
         darkHitBox = GetComponent<CapsuleCollider>();
         AI_Manager.OnDarknessAdded(this);
@@ -73,6 +76,16 @@ public class Darkness : MonoBehaviour {
         }
         yield return null;
     }*/
+
+    public void TargetChanged()
+    {
+        
+    }
+
+    public void UpdateMovement(Vector3 location, bool pathing, float pathUpdateFrequency)
+    {
+        
+    }
 
     public void ChangeState(Dark_State nextState)
     {
