@@ -9,6 +9,7 @@ public class Darkness_Movement : MonoBehaviour
     public bool reachedEndOfPath, wandering, targetMoved;
     
     private Seeker sekr;
+    private AIPath aIPath;
     private Path navPath;
     private Rigidbody rigidbod;
     private Blocker bProvider;
@@ -21,14 +22,17 @@ public class Darkness_Movement : MonoBehaviour
         wandering = targetMoved = reachedEndOfPath = false;
         darkness = GetComponent<Darkness>();
         sekr = GetComponent<Seeker>();
+        aIPath = GetComponent<AIPath>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
     }
 
     void Start()
     {
         sekr.pathCallback += PathComplete;
+        //AI_Manager.UpdateMovement += UpdatePath;
         bProvider = new Blocker();
         direction = new Vector3();
+
     }
 
     void FixedUpdate()
@@ -41,10 +45,10 @@ public class Darkness_Movement : MonoBehaviour
         }
     }
 
-    public void UpdatePath(Vector3 target)
+    public void UpdatePath()
     {
         if(sekr.IsDone())
-            CreatePath(target);
+            CreatePath(darkness.navTarget.location.position);
     }
 
     private void PathComplete(Path p)

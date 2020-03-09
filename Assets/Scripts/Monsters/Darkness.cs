@@ -13,7 +13,7 @@ public class Darkness : MonoBehaviour {
     [HideInInspector]
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
-    public AI_Manager.NavigationTarget Target;
+    public AI_Manager.NavigationTarget navTarget;
 
     //[HideInInspector]
     //public AIPath pather;
@@ -117,9 +117,9 @@ public class Darkness : MonoBehaviour {
     public void PlayerDistanceEvaluation(Vector3 location)
     {
         playerDist = Vector3.Distance(transform.position, location);
-        if(Target != null)
+        if(navTarget != null)
         {
-            navTargetDist = Vector3.Distance(transform.position, Target.location.position);
+            navTargetDist = Vector3.Distance(transform.position, navTarget.location.position);
         }
         else navTargetDist = -1;
     }

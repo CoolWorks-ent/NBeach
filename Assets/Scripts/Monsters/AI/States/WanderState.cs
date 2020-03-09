@@ -27,7 +27,7 @@ public class WanderState : ChaseState
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
         controller.pather.pickNextWaypointDist = 0.95f;*/
-        controller.darkMovement.CreatePath(controller.Target.location.position);
+        controller.darkMovement.CreatePath(controller.navTarget.location.position);
         controller.darkMovement.moving = true;
         //controller.darkMovement.speed = 10;
     }
@@ -44,7 +44,7 @@ public class WanderState : ChaseState
         if(controller.navTargetDist <= controller.swtichDist)
         {
             AI_Manager.OnRequestNewTarget(controller.creationID);
-            controller.darkMovement.CreatePath(controller.Target.location.position);
+            controller.darkMovement.CreatePath(controller.navTarget.location.position);
         }
         /*if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;*/
