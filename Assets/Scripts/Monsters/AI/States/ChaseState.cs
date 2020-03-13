@@ -19,10 +19,8 @@ public class ChaseState : Dark_State
         controller.pather.pickNextWaypointDist += 0.5f;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;*/
-        controller.darkMovement.CreatePath(controller.navTarget.location.position);
-        //controller.darkMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
-        //controller.darkMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
-        controller.darkMovement.moving = true;
+        controller.CreatePath(controller.navTarget.location.position);
+        controller.moving = true;
         //controller.aIRichPath.endReachedDistance = stopDist;
     }
 
@@ -40,6 +38,7 @@ public class ChaseState : Dark_State
         controller.pather.canSearch = false;
         controller.pather.pickNextWaypointDist -= 0.5f;
         controller.pather.endReachedDistance -= 1.0f;*/
-        controller.sekr.CancelCurrentPathRequest();
+        //controller.sekr.CancelCurrentPathRequest();
+        controller.EndMovement();
     }
 }

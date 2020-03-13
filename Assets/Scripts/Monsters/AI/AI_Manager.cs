@@ -101,8 +101,8 @@ public class AI_Manager : MonoBehaviour {
 			PatrolPoints[i].targetID = i;
 		}
 
-		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
-		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
+		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);
+		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);
 		AttackPoints[2].location.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
 		AttackPoints[3].location.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 	}
@@ -216,11 +216,6 @@ public class AI_Manager : MonoBehaviour {
 				}
 
 			}
-			/*if(+1 < AttackPoints.Length)
-			{
-				patrol = PatrolPoints[darkness.Target.targetID+1];
-			}
-			else patrol = PatrolPoints[0];*/
 		}
 		return lowest;
 	}

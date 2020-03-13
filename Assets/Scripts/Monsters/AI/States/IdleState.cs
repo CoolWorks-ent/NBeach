@@ -15,11 +15,11 @@ public class IdleState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
-        controller.darkMovement.EndMovement();
+        controller.EndMovement();
         //controller.pather.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-        controller.sekr.CancelCurrentPathRequest();
+        //controller.sekr.CancelCurrentPathRequest();
         base.InitializeState(controller);
     }
 
