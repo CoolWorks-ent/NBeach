@@ -21,10 +21,10 @@ public class Darkness : MonoBehaviour {
     
     public bool moving, updateStates, attacked;
     public int creationID;
-    public float playerDist, swtichDist, navTargetDist, stopDistance;
+    public float playerDist, swtichDist, navTargetDist, stopDistance, pathUpdateTime;
 
     public Vector3 wayPoint, pathPoint, direction;
-    private bool reachedEndOfPath, wandering, targetMoved;
+    private bool reachedEndOfPath, wandering, targetMoved, lookAtPlayer;
     
     public AI_Manager.NavigationTarget navTarget;
     private Seeker sekr;
@@ -46,29 +46,26 @@ public class Darkness : MonoBehaviour {
         stopDistance = 3;
         swtichDist = 3; 
         creationID = 0;
+        pathUpdateTime = 1.6f;
         navTargetDist = -1;
         updateStates = true;
         agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-        attacked = moving = wandering = targetMoved = reachedEndOfPath = false;
+        attacked = moving = wandering = targetMoved = reachedEndOfPath = lookAtPlayer = false;
+        animeController = GetComponentInChildren<Animator>();
+        darkHitBox = GetComponent<CapsuleCollider>();
+        sekr = GetComponent<Seeker>();
+        aIPath = GetComponent<AIPath>();
+        rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
     }
 
     void Start () {
         AI_Manager.OnDarknessAdded(this);
         currentState.InitializeState(this);
         sekr.pathCallback += PathComplete;
-        animeController = GetComponentInChildren<Animator>();
-        darkHitBox = GetComponent<CapsuleCollider>();
-        sekr = GetComponent<Seeker>();
-        aIPath = GetComponent<AIPath>();
-        rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
         darkHitBox.enabled = false;
         direction = new Vector3();
 	}
 
-    private void TargetChanged()
-    {
-        
-    }
 
     public void ChangeState(Dark_State nextState)
     {
@@ -76,32 +73,31 @@ public class Darkness : MonoBehaviour {
         currentState = nextState;
         previousState.ExitState(this);            
         currentState.InitializeState(this);
-        /*if(nextState.stateType == Dark_State.StateType.DEATH)
-        {
-            previousState = currentState;
-            currentState.ExitState(this);
-            currentState = nextState;
-            currentState.InitializeState(this);
-        } 
-        //else if (nextState.stateType == Dark_State.StateType.ATTACK && currentState.stateType == Dark_State.StateType.CHASING)
-        else StartCoroutine(StateTransition(nextState));*/
-        
     }
 
     void FixedUpdate()
     {
+        if(lookAtPlayer)
+        {
+            //TODO Rotate rigidbody manually in the background to face the player
+        }
         if(moving && navPath != null)
         {
-            direction = Vector3.Normalize(navPath.vectorPath[1] - this.transform.position);
-            rigidbod.AddForce(direction); //* speed);
-            //rigidbod.MovePosition(direction * speed * Time.deltaTime);
+            Vector3 nextPosition;
+            Quaternion nextRotation;
+
+            aIPath.MovementUpdate(Time.deltaTime, out nextPosition, out nextRotation);
+
+            aIPath.FinalizeMovement(nextPosition, nextRotation);
         }
     }
 
-    public void UpdatePath()
+    ///<summary>Called in state update loop to update path</summary>
+    public IEnumerator UpdatePath()
     {
         if(sekr.IsDone())
             CreatePath(navTarget.location.position);
+        yield return new WaitForSeconds(pathUpdateTime);
     }
 
     private void PathComplete(Path p)
@@ -136,7 +132,7 @@ public class Darkness : MonoBehaviour {
         //Debug.Break();
     }*/
 
-    public void CreatePath(Vector3 endPoint)
+    private void CreatePath(Vector3 endPoint)
     {
         //bProvider.blockedNodes.Clear();
         Path p = ABPath.Construct(transform.position, endPoint);
@@ -151,6 +147,7 @@ public class Darkness : MonoBehaviour {
             sekr.CancelCurrentPathRequest();
         moving = false;
         sekr.pathCallback -= PathComplete;
+        StopCoroutine(UpdatePath());
     }
 
     public IEnumerator AttackCooldown(float idleTime)
