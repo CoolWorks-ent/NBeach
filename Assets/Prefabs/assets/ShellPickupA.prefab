@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114646188040674006}
   - component: {fileID: 65673734684062070}
   - component: {fileID: 114770288824356438}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ShellPickupA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
