@@ -16,17 +16,17 @@ public class IdleState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         controller.EndMovement();
-        //controller.pather.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
         AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-        //controller.sekr.CancelCurrentPathRequest();
         base.InitializeState(controller);
     }
 
     public override void UpdateState(Darkness controller)
     {
-        // Vector3 dir = Vector3.RotateTowards(controller.transform.position, controller.target.position,0f,0f);
-        // controller.transform.rotation = Quaternion.LookRotation(dir);
+        Vector3 pDir = AI_Manager.Instance.player.position - controller.transform.position; 
+        Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+        controller.transform.rotation = Quaternion.LookRotation(dir);
+        controller.UpdateAnimator();
     }
 
     public override void ExitState(Darkness controller)

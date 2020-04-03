@@ -126,7 +126,7 @@ MonoBehaviour:
     seed: 0
     pivotPointRoot: {fileID: 0}
     spreadOutCount: 1
-  showGraphs: 1
+  showGraphs: 0
 --- !u!114 &114729928814456672
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -147,5 +147,6 @@ MonoBehaviour:
   darkAttackCount: 0
   darkStandbyCount: 0
   calculationTime: 0
+  attackOffset: 0
   dark_States: []
   attackApprovalPriority: 

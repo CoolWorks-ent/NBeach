@@ -204,7 +204,6 @@ GameObject:
   - component: {fileID: 54991120590850454}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
-  - component: {fileID: 114446345711301086}
   - component: {fileID: 114857173380954124}
   - component: {fileID: 136796206659899728}
   - component: {fileID: 114201816284845686}
@@ -816,7 +815,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   drawGizmos: 1
-  detailedGizmos: 0
+  detailedGizmos: 1
   startEndModifier:
     addPoints: 0
     exactStartPoint: 1
@@ -865,20 +864,6 @@ MonoBehaviour:
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 0
   constrainInsideGraph: 0
---- !u!114 &114446345711301086
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  penalty: 1000
-  randomStep: 10
 --- !u!114 &114482823206306784
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -934,6 +919,7 @@ MonoBehaviour:
   swtichDist: 0
   navTargetDist: 0
   stopDistance: 0
+  pathUpdateTime: 0
   wayPoint: {x: 0, y: 0, z: 0}
   pathPoint: {x: 0, y: 0, z: 0}
   direction: {x: 0, y: 0, z: 0}

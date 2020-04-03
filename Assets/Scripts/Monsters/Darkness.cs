@@ -23,22 +23,23 @@ public class Darkness : MonoBehaviour {
     public int creationID;
     public float playerDist, swtichDist, navTargetDist, stopDistance, pathUpdateTime;
 
-    public Vector3 wayPoint, pathPoint, direction;
+    public Vector3 wayPoint, pathPoint, playerDirection;
+    private Vector3 prevPos;
     private bool reachedEndOfPath, wandering, targetMoved, lookAtPlayer;
     
     public AI_Manager.NavigationTarget navTarget;
     private Seeker sekr;
     private AIPath aIPath;
     private Path navPath;
-    private Rigidbody rigidbod;
+    public Rigidbody rigidbod;
 
     public Animator animeController;
     [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
-                attackAfterHash = Animator.StringToHash("AfterAttack"),
                 chaseHash = Animator.StringToHash("Chase"),
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death");
+
 
     void Awake()
     {
@@ -63,9 +64,8 @@ public class Darkness : MonoBehaviour {
         currentState.InitializeState(this);
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
-        direction = new Vector3();
+        playerDirection = new Vector3();
 	}
-
 
     public void ChangeState(Dark_State nextState)
     {
@@ -118,11 +118,6 @@ public class Darkness : MonoBehaviour {
         }
     }
 
-    private void PathTargetUpdated(bool b)
-    {
-        targetMoved = b;
-    }
-
     /*private void BlockPathNodes(Path p)
     {
         foreach(GraphNode n in p.path)
@@ -150,6 +145,11 @@ public class Darkness : MonoBehaviour {
         StopCoroutine(UpdatePath());
     }
 
+    public void UpdateAnimator()
+    {
+        //if()
+    }
+
     public IEnumerator AttackCooldown(float idleTime)
     {
         darkHitBox.enabled = true;
@@ -159,9 +159,10 @@ public class Darkness : MonoBehaviour {
         darkHitBox.enabled = false;
     }
 
-    public void PlayerDistanceEvaluation(Vector3 location)
+    public void PlayerDistanceEvaluation(Vector3 playerLocation)
     {
-        playerDist = Vector3.Distance(transform.position, location);
+        playerDist = Vector3.Distance(transform.position, playerLocation);
+        playerDirection = playerLocation - transform.position;
         if(navTarget != null)
         {
             navTargetDist = Vector3.Distance(transform.position, navTarget.location.position);
@@ -189,20 +190,6 @@ public class Darkness : MonoBehaviour {
         else if(collider.gameObject.CompareTag("Player"))
         {
             //Debug.LogWarning("Darkness collided with Player");
-        }
-    }
-
-    class Blocker : ITraversalProvider
-    {
-        public HashSet<GraphNode> blockedNodes = new HashSet<GraphNode>();
-        public bool CanTraverse(Path path, GraphNode node)
-        {
-            return DefaultITraversalProvider.CanTraverse(path, node) && !blockedNodes.Contains(node);
-        }
-
-        public uint GetTraversalCost(Path path, GraphNode node)
-        {
-            return DefaultITraversalProvider.GetTraversalCost(path, node);
         }
     }
 }
