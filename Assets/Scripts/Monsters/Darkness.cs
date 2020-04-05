@@ -96,7 +96,7 @@ public class Darkness : MonoBehaviour {
     public IEnumerator UpdatePath()
     {
         if(sekr.IsDone())
-            CreatePath(navTarget.location.position);
+            CreatePath(navTarget.presence.position);
         yield return new WaitForSeconds(pathUpdateTime);
     }
 
@@ -165,7 +165,7 @@ public class Darkness : MonoBehaviour {
         playerDirection = playerLocation - transform.position;
         if(navTarget != null)
         {
-            navTargetDist = Vector3.Distance(transform.position, navTarget.location.position);
+            navTargetDist = Vector3.Distance(transform.position, navTarget.presence.position);
         }
         else navTargetDist = -1;
     }

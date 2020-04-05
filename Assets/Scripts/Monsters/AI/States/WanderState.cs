@@ -6,8 +6,8 @@ public class WanderState : Dark_State
 {
     //[Range(8,20)]
     //public int relativeRangeToPlayer;
-    //[Range(1,8)]
-    //public int wanderRadius;
+    [Range(4,20)]
+    public int wanderRadius;
     protected override void FirstTimeSetup()
     {
         stateType = StateType.WANDER;
@@ -21,7 +21,7 @@ public class WanderState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         base.InitializeState(controller);
-        AI_Manager.OnRequestNewTarget(controller.creationID);
+        controller.navTarget = new AI_Manager.NavigationTarget(ChoosePatrolPoint(controller), AI_Manager.NavTargetTag.Patrol);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.StartCoroutine(controller.UpdatePath());
         controller.moving = true;
@@ -38,7 +38,7 @@ public class WanderState : Dark_State
         //controller.aIMovement.UpdatePath(controller.Target.position);
         if(controller.navTargetDist <= controller.swtichDist)
         {
-            AI_Manager.OnRequestNewTarget(controller.creationID);
+            controller.navTarget = new AI_Manager.NavigationTarget(ChoosePatrolPoint(controller), AI_Manager.NavTargetTag.Patrol);
         }
 
         CheckTransitions(controller);
@@ -46,7 +46,10 @@ public class WanderState : Dark_State
 
     private Vector3 ChoosePatrolPoint(Darkness controller)
     {
-       return new Vector3();
+        Vector3 direction = Random.onUnitSphere * wanderRadius;
+        direction.y = controller.transform.position.y;
+        
+        return direction;
     }
 
     public override void ExitState(Darkness controller)

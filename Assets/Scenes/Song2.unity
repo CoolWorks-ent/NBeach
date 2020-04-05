@@ -84741,6 +84741,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1132894309862976, guid: 9f9052f46baa2b74096a95c103d67ae6, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9f9052f46baa2b74096a95c103d67ae6, type: 2}
   m_IsPrefabParent: 0
@@ -91234,6 +91238,10 @@ Prefab:
     - target: {fileID: 1132894309862976, guid: 9f9052f46baa2b74096a95c103d67ae6, type: 2}
       propertyPath: m_Name
       value: Boss_Bullet_test
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132894309862976, guid: 9f9052f46baa2b74096a95c103d67ae6, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9f9052f46baa2b74096a95c103d67ae6, type: 2}

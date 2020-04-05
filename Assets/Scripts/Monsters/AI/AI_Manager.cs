@@ -15,7 +15,7 @@ public class AI_Manager : MonoBehaviour {
 
 	[SerializeField]
 	private Dark_State[] dark_States;
-	private NavigationTarget[] PatrolPoints;
+	//private NavigationTarget[] PatrolPoints;
 	private NavigationTarget[] AttackPoints;
 	private NavigationTarget StartPoint, PlayerPoint;
 
@@ -33,17 +33,25 @@ public class AI_Manager : MonoBehaviour {
 		public int targetID, 
 					weight, 
 					weightCap;
-		public Transform location;
+		public Transform presence;
+		public Vector3 position;
 
 		private NavTargetTag targetTag;
 		public NavTargetTag navTargetTag { get{ return targetTag; }}
 
 		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag)//, int assignmentLimit)
 		{
-			location = loc;
+			presence = loc;
 			targetID = iD;
 			targetTag = ntTag;
 			//assignedDarknessIDs = new int[assignmentLimit];
+		}
+
+		public NavigationTarget(Vector3 pos, NavTargetTag ntTag)
+		{
+			position = pos;
+			targetTag = ntTag;
+			targetID = 99;
 		}
 	}
 
@@ -68,7 +76,7 @@ public class AI_Manager : MonoBehaviour {
 		paused = false;
 		calculationTime = 0.25f;
 		attackOffset = 3.5f;
-		PatrolPoints = new NavigationTarget[4]; 
+		//PatrolPoints = new NavigationTarget[4]; 
 		AttackPoints = new NavigationTarget[4]; 
 		StartCoroutine(ManagedDarknessUpdate());
 		StartCoroutine(ExecuteDarknessStates());
@@ -85,11 +93,11 @@ public class AI_Manager : MonoBehaviour {
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
 			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack);
-			AttackPoints[i].location.parent = player;
+			AttackPoints[i].presence.parent = player;
 			AttackPoints[i].targetID = i;
 		}
 
-		for(int i = 0; i < PatrolPoints.Length; i++)
+		/*for(int i = 0; i < PatrolPoints.Length; i++)
 		{
 			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
 			float xOffset = 0;
@@ -99,12 +107,12 @@ public class AI_Manager : MonoBehaviour {
 			else xOffset = player.position.x + Random.Range(5+i, 15);
 			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, player.position.z - Random.Range(9, 9+i));
 			PatrolPoints[i].targetID = i;
-		}
+		}*/
 
-		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);
-		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);
-		AttackPoints[2].location.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
-		AttackPoints[3].location.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
+		AttackPoints[0].presence.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);
+		AttackPoints[1].presence.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);
+		AttackPoints[2].presence.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
+		AttackPoints[3].presence.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 	}
 
 #region DarknessUpdateLoop
@@ -214,7 +222,6 @@ public class AI_Manager : MonoBehaviour {
 					lowest = t;
 					break;
 				}
-
 			}
 		}
 		return lowest;
@@ -233,7 +240,7 @@ public class AI_Manager : MonoBehaviour {
 					int index = LeastRequestedNavigationTarget(AttackPoints);
 					AttackPoints[index].weight++;
 					return AttackPoints[index];
-				case Darkness.AggresionRating.Wandering:
+				/*case Darkness.AggresionRating.Wandering:
 					NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
 					if(darkness.navTarget.navTargetTag == NavTargetTag.Patrol)
 					{
@@ -243,7 +250,7 @@ public class AI_Manager : MonoBehaviour {
 						}
 						else patrol = PatrolPoints[0];
 					}
-					return patrol;
+					return patrol;*/
 				default:
 					return StartPoint;
 			}
