@@ -40,7 +40,6 @@ public class Darkness : MonoBehaviour {
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death");
 
-
     void Awake()
     {
         //attackInitiationRange = 2.5f;
@@ -145,9 +144,9 @@ public class Darkness : MonoBehaviour {
         StopCoroutine(UpdatePath());
     }
 
-    public void UpdateAnimator()
+    public void UpdateAnimator(Dark_State.StateType stType) 
     {
-        //if()
+        //Ensure the correct animation is played in the animator. 
     }
 
     public IEnumerator AttackCooldown(float idleTime)

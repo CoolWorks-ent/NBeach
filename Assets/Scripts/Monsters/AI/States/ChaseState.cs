@@ -22,7 +22,7 @@ public class ChaseState : Dark_State
     public override void UpdateState(Darkness controller)
     {
         //controller.UpdatePath();
-        controller.UpdateAnimator();
+        controller.UpdateAnimator(this.stateType);
         CheckTransitions(controller);
     }
 

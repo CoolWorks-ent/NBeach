@@ -26,7 +26,7 @@ public class IdleState : Dark_State
         Vector3 pDir = AI_Manager.Instance.player.position - controller.transform.position; 
         Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
         controller.transform.rotation = Quaternion.LookRotation(dir);
-        controller.UpdateAnimator();
+        controller.UpdateAnimator(this.stateType);
     }
 
     public override void ExitState(Darkness controller)

@@ -33,7 +33,7 @@ public class AttackState : Dark_State
     { 
         //TODO check if the darkness is facing the player. if not start rotating towards the player
         //controller.pather.destination = controller.Target.location.position;
-        controller.UpdateAnimator();
+        controller.UpdateAnimator(this.stateType);
         if(controller.playerDist < attackInitiationRange && !controller.attacked) 
         {
             controller.attacked = true;
