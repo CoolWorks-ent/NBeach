@@ -819,13 +819,13 @@ MonoBehaviour:
   startEndModifier:
     addPoints: 0
     exactStartPoint: 1
-    exactEndPoint: 4
+    exactEndPoint: 1
     useRaycasting: 0
     mask:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags: -3
+  traversableTags: -1
   tagPenalties: 00000000960000002d0000000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
@@ -841,8 +841,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 2
-  radius: 0.5
-  height: 0.01
+  radius: 1
+  height: 1.8
   repathRate: 0.5
   canSearch: 0
   canMove: 0
@@ -922,10 +922,10 @@ MonoBehaviour:
   pathUpdateTime: 0
   wayPoint: {x: 0, y: 0, z: 0}
   pathPoint: {x: 0, y: 0, z: 0}
-  direction: {x: 0, y: 0, z: 0}
+  playerDirection: {x: 0, y: 0, z: 0}
+  rigidbod: {fileID: 0}
   animeController: {fileID: 0}
   attackHash: 1080829965
-  attackAfterHash: 530937694
   chaseHash: 1463555229
   idleHash: 2081823275
   deathHash: 646380074
