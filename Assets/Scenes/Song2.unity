@@ -7126,41 +7126,6 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 957796667}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: showGraphs
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: threadCount
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: data.dataString
-      value: UEsDBBQAAAgIAACAn+sBfj7wXgIAAAMFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVMty4jAQ/BVK5w1lATFhb7uGkD3kUSFbufgirDFWIUsuPQIkxb+vJAvsdU62e3pmenokfyEmdAOFkWqtGH2UFNDPEfLv6MeoCz7Akeyk2LBPuHDeGTWVJ5HAeSWGSYdjn6ZlDUax4pfYcU9OHGgFK6WqV3QHmdRGO7gkXIMLKWl8tnDQ1wgdY8IpPj/9c3R2bwUIA6pj4cVkfDuJVDwbTyP7Do8XyWyehiQrCk7qBqgX3+WmtzEvbWsLN1Zk+BEKyTnTURMypybMnJFGWzeRI1BG3IxBjVdQAdtVxn1M+8nPZanBxDkUOS2Zcla1VdFv2fpXE71vdX0QbiHoX0yCqLbq4zfCzQzPU5xOA6lUsn64tMeJb2UqVuxfyakg2vR87sPLTj8OLh0I35Mth/cKxJNcK2kFdUGjrE+1GibLXqnriFkFxb7jtYoHoG2+bxZ3mz0HE44ZZ/XWI+NZC2y4DLYvfA4ot6A/TnA4KTra7lAv4q+GN7LTXceI3zOljYvEfsKL20qrPBOtgmV+FmsyqQSoXoEGBOHm9OLKmOEiB7GeK4PIPfF3JzaPscuVGKQEuOMnySD0Ig/XXelKHh5BV8/WcCb6xXzkyfmUSSHag6YHUZ+3saokBXTD7iyj/x8wROl2kd7ezWdkCxjP8c02IdNpCkmCZ+WiLKconD0m3KCEv7RKoz9ua6IrLtw5u/xTRmtFmnDoqSKHNfusZc9zJkq5KRSAeG4rXIWDck3c5aQrypxDGzCGibBv9JUjLos90PxaKA+Tro5GkbyrkqOGfUjjkRxl4U+SozM6/wNQSwMEFAAACAgAAICf61uoFztyAAAAgwAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPSs9BRUEovSizIKAYKGIE4pZkpIHa0UkpKkqWZqYW5SWJSqqGhuaFukkGisbFZqoGBoUmaZVqasZKOQl5pTk4sUFdJZUGqX2JuKkRnQGJJRlpmXkpmXrqee1FmijvIApjqWgBQSwECLQAUAAAICAAAgJ/rAX4+8F4CAAADBQAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rW6gXO3IAAACDAAAACQAkAAAAAAAAAAAAAACrAgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAGgDAAAAAA==
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: debugMode
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: debugRoof
-      value: 130
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: showSearchTree
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: showUnwalkableNodes
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
@@ -91316,11 +91281,11 @@ MonoBehaviour:
   version: 1
   uniqueID: 8296225871108639115
   points:
-  - {x: -1.2382835, y: -0.84979105, z: 0.37660024}
-  - {x: 1.4859349, y: -0.84445494, z: -0.65752727}
-  - {x: 0.38815138, y: -1.3695639, z: 0.5697489}
-  - {x: 0.2804492, y: 0.2434691, z: -1.682193}
-  - {x: -1.0187337, y: 0.15745196, z: -1.2455577}
+  - {x: -0.81326485, y: -0.9509024, z: 0.40374628}
+  - {x: 1.1413538, y: -0.844456, z: -0.5512577}
+  - {x: 0.16088033, y: -1.369565, z: 0.63983953}
+  - {x: 0.41634446, y: -0.0648832, z: -1.2415533}
+  - {x: -1.0919528, y: -0.10922484, z: -0.80565304}
   convex: 1
   minBoundsHeight: 2.66
   penaltyDelta: 130

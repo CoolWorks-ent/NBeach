@@ -28,30 +28,31 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 	public enum NavTargetTag {Attack, Patrol, Neutral, Chase}
-	public class NavigationTarget
+	public struct NavigationTarget
 	{
-		public int targetID, 
-					weight, 
-					weightCap;
+		public int targetID, weight;
+
+		public float targetDistance;
 		public Transform presence;
-		public Vector3 position;
+		public bool active;
 
 		private NavTargetTag targetTag;
 		public NavTargetTag navTargetTag { get{ return targetTag; }}
 
-		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag)//, int assignmentLimit)
+		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag, bool act)//, int assignmentLimit)
 		{
 			presence = loc;
 			targetID = iD;
 			targetTag = ntTag;
+			targetDistance = -1;
+			active = act;
+			weight = 0;
 			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 
-		public NavigationTarget(Vector3 pos, NavTargetTag ntTag)
+		public void UpdateLocation(Vector3 spot)
 		{
-			position = pos;
-			targetTag = ntTag;
-			targetID = 99;
+			presence.position = spot;
 		}
 	}
 
@@ -88,11 +89,11 @@ public class AI_Manager : MonoBehaviour {
 
 	void Start()
 	{
-		StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
-		PlayerPoint = new NavigationTarget(player, 0, NavTargetTag.Attack);
+		//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
+		PlayerPoint = new NavigationTarget(player, 0, NavTargetTag.Attack, true);
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack);
+			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack, true);
 			AttackPoints[i].presence.parent = player;
 			AttackPoints[i].targetID = i;
 		}
@@ -127,7 +128,7 @@ public class AI_Manager : MonoBehaviour {
 				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
 				foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
-					dark.Value.PlayerDistanceEvaluation(player.position);
+					dark.Value.UpdateDistanceEvaluation(player.position);
 				}
 				SortTheGoons();
 				UpdateDarknessAggresion();
@@ -257,8 +258,8 @@ public class AI_Manager : MonoBehaviour {
 		}
 		else 
 		{
-			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
-			return null;	
+			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));	
+			return StartPoint;
 		}
 	}
 
@@ -268,9 +269,9 @@ public class AI_Manager : MonoBehaviour {
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.navTarget.navTargetTag != NavTargetTag.Neutral)
+			if(darkness.attackNavTarget.navTargetTag != NavTargetTag.Neutral)
 			{
-				darkness.navTarget.weight--;
+				darkness.attackNavTarget.weight--;
 			}
 		}
 	}
@@ -283,36 +284,36 @@ public class AI_Manager : MonoBehaviour {
 		{
 			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				if(darkness.navTargetDist <= darkness.swtichDist+0.25f)
-					darkness.navTarget = PlayerPoint;
+				if(darkness.attackNavTarget.targetDistance <= darkness.swtichDist+0.25f)
+					darkness.attackNavTarget = PlayerPoint;
 				else
 				{
 					NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
-					if(nT != null)
+					if(nT.active)
 					{
 						RemoveFromNavTargets(darkID);
-						darkness.navTarget = nT;
+						darkness.attackNavTarget = nT;
 					}
 				}
 			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
 			{
 				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
-					if(nT != null)
+					if(nT.active)
 					{
 						RemoveFromNavTargets(darkID);
-						darkness.navTarget = nT;
+						darkness.attackNavTarget = nT;
 					}
 			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{
 				RemoveFromNavTargets(darkID);
-				darkness.navTarget = PlayerPoint;
+				darkness.attackNavTarget = PlayerPoint;
 			}
 			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
 			{
 				RemoveFromNavTargets(darkID);
-				darkness.navTarget = StartPoint;
+				darkness.attackNavTarget = StartPoint;
 			}
 		}
 	}
@@ -330,7 +331,7 @@ public class AI_Manager : MonoBehaviour {
 		updatedDarkness.transform.SetParent(Instance.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
-		updatedDarkness.navTarget = StartPoint;
+		updatedDarkness.attackNavTarget = StartPoint;
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);

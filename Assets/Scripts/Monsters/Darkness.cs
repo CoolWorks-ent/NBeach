@@ -21,13 +21,13 @@ public class Darkness : MonoBehaviour {
     
     public bool moving, updateStates, attacked;
     public int creationID;
-    public float playerDist, swtichDist, navTargetDist, stopDistance, pathUpdateTime;
+    public float playerDist, swtichDist, stopDistance, pathUpdateTime;
 
     public Vector3 wayPoint, pathPoint, playerDirection;
     private Vector3 prevPos;
     private bool reachedEndOfPath, wandering, targetMoved, lookAtPlayer;
     
-    public AI_Manager.NavigationTarget navTarget;
+    public AI_Manager.NavigationTarget attackNavTarget, patrolNavTarget;
     private Seeker sekr;
     private AIPath aIPath;
     private Path navPath;
@@ -47,7 +47,6 @@ public class Darkness : MonoBehaviour {
         swtichDist = 3; 
         creationID = 0;
         pathUpdateTime = 1.6f;
-        navTargetDist = -1;
         updateStates = true;
         agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
         attacked = moving = wandering = targetMoved = reachedEndOfPath = lookAtPlayer = false;
@@ -56,6 +55,7 @@ public class Darkness : MonoBehaviour {
         sekr = GetComponent<Seeker>();
         aIPath = GetComponent<AIPath>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
+        patrolNavTarget = new AI_Manager.NavigationTarget(transform.GetChild(1), 10, AI_Manager.NavTargetTag.Patrol, false);
     }
 
     void Start () {
@@ -95,7 +95,7 @@ public class Darkness : MonoBehaviour {
     public IEnumerator UpdatePath()
     {
         if(sekr.IsDone())
-            CreatePath(navTarget.presence.position);
+            CreatePath(attackNavTarget.presence.position);
         yield return new WaitForSeconds(pathUpdateTime);
     }
 
@@ -158,15 +158,21 @@ public class Darkness : MonoBehaviour {
         darkHitBox.enabled = false;
     }
 
-    public void PlayerDistanceEvaluation(Vector3 playerLocation)
+    public void UpdateDistanceEvaluation(Vector3 playerLocation)
     {
         playerDist = Vector3.Distance(transform.position, playerLocation);
         playerDirection = playerLocation - transform.position;
-        if(navTarget != null)
+        if(attackNavTarget.active)
         {
-            navTargetDist = Vector3.Distance(transform.position, navTarget.presence.position);
+            attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.presence.position);
         }
-        else navTargetDist = -1;
+        else attackNavTarget.targetDistance = -1;
+
+        if(patrolNavTarget.active)
+        {
+            patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.presence.position);
+        }
+        else patrolNavTarget.targetDistance = -1;
     }
 
     public void AggressionChanged(AggresionRating agR)
