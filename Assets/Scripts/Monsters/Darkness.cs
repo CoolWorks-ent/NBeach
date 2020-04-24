@@ -64,6 +64,8 @@ public class Darkness : MonoBehaviour {
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
+        Debug.Log("Grabbed this game object as it's wander point " + patrolNavTarget.presence.gameObject + " at this position " + patrolNavTarget.presence.position.ToString());
+        patrolNavTarget.presence.position = Vector3.zero;
 	}
 
     public void ChangeState(Dark_State nextState)
@@ -95,7 +97,12 @@ public class Darkness : MonoBehaviour {
     public IEnumerator UpdatePath()
     {
         if(sekr.IsDone())
-            CreatePath(attackNavTarget.presence.position);
+        {
+            if(attackNavTarget.active)
+                CreatePath(attackNavTarget.presence.position);
+            else if(patrolNavTarget.active)
+                CreatePath(patrolNavTarget.presence.position);
+        }    
         yield return new WaitForSeconds(pathUpdateTime);
     }
 

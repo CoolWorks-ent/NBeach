@@ -228,8 +228,8 @@ public class AI_Manager : MonoBehaviour {
 		return lowest;
 	}
 
-	///<summary>Returns an attack or patrol Navigation Target. Returns a null object if Darkness is not found in active list. </summary>
-	private NavigationTarget AssignNavigationTarget(int darkID) 
+	///<summary>Returns an attack Navigation Target. Returns the StartPoint object if Darkness is not found or if they should not be attacking. </summary>
+	private NavigationTarget AssignAttackNavTarget(int darkID) 
 	{
 		//Find if Darkness is in the collection
 		Darkness darkness;
@@ -263,15 +263,20 @@ public class AI_Manager : MonoBehaviour {
 		}
 	}
 
-	///<summary>Check the Darkness for current NavTarget. If the target is an attack Target the target will be set to the starting NavTarget.</summary>
-	private void RemoveFromNavTargets(int darkID)
+	///<summary></summary>
+	private void DeactivateNavTarget(int darkID, bool aggresive)
 	{
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.attackNavTarget.navTargetTag != NavTargetTag.Neutral)
+			if(!aggresive)
 			{
 				darkness.attackNavTarget.weight--;
+				darkness.attackNavTarget.active = false;
+			}
+			else
+			{
+				darkness.patrolNavTarget.active = false;
 			}
 		}
 	}
@@ -288,31 +293,22 @@ public class AI_Manager : MonoBehaviour {
 					darkness.attackNavTarget = PlayerPoint;
 				else
 				{
-					NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+					NavigationTarget nT = AssignAttackNavTarget(darkness.creationID); 
 					if(nT.active)
 					{
-						RemoveFromNavTargets(darkID);
 						darkness.attackNavTarget = nT;
+						DeactivateNavTarget(darkID, true);
 					}
 				}
 			}
-			else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
-			{
-				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
-					if(nT.active)
-					{
-						RemoveFromNavTargets(darkID);
-						darkness.attackNavTarget = nT;
-					}
-			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{
-				RemoveFromNavTargets(darkID);
+				DeactivateNavTarget(darkID, true);
 				darkness.attackNavTarget = PlayerPoint;
 			}
 			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
 			{
-				RemoveFromNavTargets(darkID);
+				DeactivateNavTarget(darkID, false);
 				darkness.attackNavTarget = StartPoint;
 			}
 		}
