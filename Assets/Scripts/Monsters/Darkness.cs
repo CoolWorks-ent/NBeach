@@ -55,7 +55,7 @@ public class Darkness : MonoBehaviour {
         sekr = GetComponent<Seeker>();
         aIPath = GetComponent<AIPath>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-        patrolNavTarget = new AI_Manager.NavigationTarget(transform.GetChild(1), 10, AI_Manager.NavTargetTag.Patrol, false);
+        patrolNavTarget = new AI_Manager.NavigationTarget(transform.GetChild(1), null, 10, AI_Manager.NavTargetTag.Patrol, false);
     }
 
     void Start () {
@@ -64,15 +64,15 @@ public class Darkness : MonoBehaviour {
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
-        Debug.Log("Grabbed this game object as it's wander point " + patrolNavTarget.presence.gameObject + " at this position " + patrolNavTarget.presence.position.ToString());
-        patrolNavTarget.presence.position = Vector3.zero;
+        Debug.Log("Grabbed this game object as it's wander point " + patrolNavTarget.location.gameObject + " at this position " + patrolNavTarget.location.position.ToString());
+        patrolNavTarget.UpdateLocation(Vector3.zero);
 	}
 
     public void ChangeState(Dark_State nextState)
     {
         previousState = currentState;
         currentState = nextState;
-        previousState.ExitState(this);            
+        previousState.ExitState(this);
         currentState.InitializeState(this);
     }
 
@@ -99,9 +99,9 @@ public class Darkness : MonoBehaviour {
         if(sekr.IsDone())
         {
             if(attackNavTarget.active)
-                CreatePath(attackNavTarget.presence.position);
+                CreatePath(attackNavTarget.transform.position);
             else if(patrolNavTarget.active)
-                CreatePath(patrolNavTarget.presence.position);
+                CreatePath(patrolNavTarget.transform.position);
         }    
         yield return new WaitForSeconds(pathUpdateTime);
     }
@@ -171,13 +171,13 @@ public class Darkness : MonoBehaviour {
         playerDirection = playerLocation - transform.position;
         if(attackNavTarget.active)
         {
-            attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.presence.position);
+            attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.transform.position);
         }
         else attackNavTarget.targetDistance = -1;
 
         if(patrolNavTarget.active)
         {
-            patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.presence.position);
+            patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.transform.position);
         }
         else patrolNavTarget.targetDistance = -1;
     }

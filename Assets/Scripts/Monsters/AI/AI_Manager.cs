@@ -27,21 +27,30 @@ public class AI_Manager : MonoBehaviour {
 		get {return instance; }
 	}
 
-	public enum NavTargetTag {Attack, Patrol, Neutral, Chase}
+	public enum NavTargetTag {Attack, Patrol}
+
+	///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
 	public struct NavigationTarget
 	{
 		public int targetID, weight;
-
-		public float targetDistance;
-		public Transform presence;
 		public bool active;
+		public float targetDistance;
+
+		private Transform transform;
+		public Transform location { 
+			get {return transform; }}
 
 		private NavTargetTag targetTag;
 		public NavTargetTag navTargetTag { get{ return targetTag; }}
 
-		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag, bool act)//, int assignmentLimit)
+		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
+		///<param name="parent">Assign null if the object doesn't need to be parented. i.e the Player</param>
+		///<param name="act">Signifies if this NavTarget attack related</param>
+		public NavigationTarget(Transform loc, Transform parent, int iD, NavTargetTag ntTag, bool act)
 		{
-			presence = loc;
+			transform = loc;
+			if(parent != null)
+				transform.parent = parent;
 			targetID = iD;
 			targetTag = ntTag;
 			targetDistance = -1;
@@ -50,9 +59,9 @@ public class AI_Manager : MonoBehaviour {
 			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 
-		public void UpdateLocation(Vector3 spot)
+		public void UpdateLocation(Vector3 loc)
 		{
-			presence.position = spot;
+			transform.position = loc;
 		}
 	}
 
@@ -90,12 +99,10 @@ public class AI_Manager : MonoBehaviour {
 	void Start()
 	{
 		//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
-		PlayerPoint = new NavigationTarget(player, 0, NavTargetTag.Attack, true);
+		PlayerPoint = new NavigationTarget(player, null,  0, NavTargetTag.Attack, true);
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack, true);
-			AttackPoints[i].presence.parent = player;
-			AttackPoints[i].targetID = i;
+			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, player, i, NavTargetTag.Attack, true);
 		}
 
 		/*for(int i = 0; i < PatrolPoints.Length; i++)
@@ -110,10 +117,10 @@ public class AI_Manager : MonoBehaviour {
 			PatrolPoints[i].targetID = i;
 		}*/
 
-		AttackPoints[0].presence.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);
-		AttackPoints[1].presence.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);
-		AttackPoints[2].presence.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
-		AttackPoints[3].presence.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
+		AttackPoints[0].UpdateLocation(new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z));
+		AttackPoints[1].UpdateLocation(new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z));
+		AttackPoints[2].UpdateLocation(new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z));
+		AttackPoints[3].UpdateLocation(new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z));
 	}
 
 #region DarknessUpdateLoop
