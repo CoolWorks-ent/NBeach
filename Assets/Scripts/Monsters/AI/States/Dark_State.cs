@@ -30,7 +30,7 @@ public abstract class Dark_State : ScriptableObject
 
     public virtual void Startup()
     {
-        AI_Manager.RemoveDarkness += RemoveDarkness;
+        Darkness_Manager.RemoveDarkness += RemoveDarkness;
         if(ReferencedBy == null || ReferencedBy.Count < 1)
             ReferencedBy = new List<Dark_State>();
         foreach(Dark_Transition ai in transitions)

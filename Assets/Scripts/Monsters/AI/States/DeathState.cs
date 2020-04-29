@@ -21,7 +21,7 @@ public class DeathState : Dark_State
         
         //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
         controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
-        AI_Manager.Instance.StartCoroutine(deathRoutine(controller));
+        Darkness_Manager.Instance.StartCoroutine(deathRoutine(controller));
         //controller.aIMovement.EndMovement();
     }
 
@@ -53,7 +53,7 @@ public class DeathState : Dark_State
         //yield return new WaitForSeconds(fxTime);
         //AI_Manager.Instance.RemoveFromDarknessList(controller);
         controller.gameObject.SetActive(false);
-        AI_Manager.OnDarknessRemoved(controller);
+        Darkness_Manager.OnDarknessRemoved(controller);
         Destroy(controller.animeController);
         Destroy(controller.gameObject);
         yield return 0;

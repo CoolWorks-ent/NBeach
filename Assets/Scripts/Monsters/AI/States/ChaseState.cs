@@ -13,7 +13,7 @@ public class ChaseState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         base.InitializeState(controller);
-        AI_Manager.OnRequestNewTarget(controller.creationID);
+        Darkness_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.StartCoroutine(controller.UpdatePath());
         controller.moving = true;

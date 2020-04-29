@@ -27,7 +27,7 @@ public class Darkness : MonoBehaviour {
     private Vector3 prevPos;
     private bool reachedEndOfPath, wandering, targetMoved, lookAtPlayer;
     
-    public AI_Manager.NavigationTarget attackNavTarget, patrolNavTarget;
+    public Darkness_Manager.NavigationTarget attackNavTarget, patrolNavTarget;
     private Seeker sekr;
     private AIPath aIPath;
     private Path navPath;
@@ -42,6 +42,7 @@ public class Darkness : MonoBehaviour {
 
     void Awake()
     {
+        
         //attackInitiationRange = 2.5f;
         stopDistance = 3;
         swtichDist = 3; 
@@ -55,24 +56,24 @@ public class Darkness : MonoBehaviour {
         sekr = GetComponent<Seeker>();
         aIPath = GetComponent<AIPath>();
         rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-        patrolNavTarget = new AI_Manager.NavigationTarget(transform.GetChild(1), 10, AI_Manager.NavTargetTag.Patrol, false);
+        patrolNavTarget = new Darkness_Manager.NavigationTarget(transform.GetChild(1), null, 10, Darkness_Manager.NavTargetTag.Patrol, false);
     }
 
     void Start () {
-        AI_Manager.OnDarknessAdded(this);
+        Darkness_Manager.OnDarknessAdded(this);
         currentState.InitializeState(this);
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
-        Debug.Log("Grabbed this game object as it's wander point " + patrolNavTarget.presence.gameObject + " at this position " + patrolNavTarget.presence.position.ToString());
-        patrolNavTarget.presence.position = Vector3.zero;
+        Debug.Log("Grabbed this game object as it's wander point " + patrolNavTarget.locationInfo.gameObject + " at this position " + patrolNavTarget.locationInfo.position.ToString());
+        patrolNavTarget.UpdateLocation(Vector3.zero);
 	}
 
     public void ChangeState(Dark_State nextState)
     {
         previousState = currentState;
         currentState = nextState;
-        previousState.ExitState(this);            
+        previousState.ExitState(this);
         currentState.InitializeState(this);
     }
 
@@ -99,9 +100,9 @@ public class Darkness : MonoBehaviour {
         if(sekr.IsDone())
         {
             if(attackNavTarget.active)
-                CreatePath(attackNavTarget.presence.position);
+                CreatePath(attackNavTarget.locationInfo.position);
             else if(patrolNavTarget.active)
-                CreatePath(patrolNavTarget.presence.position);
+                CreatePath(patrolNavTarget.locationInfo.position);
         }    
         yield return new WaitForSeconds(pathUpdateTime);
     }
@@ -171,13 +172,13 @@ public class Darkness : MonoBehaviour {
         playerDirection = playerLocation - transform.position;
         if(attackNavTarget.active)
         {
-            attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.presence.position);
+            attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.locationInfo.position);
         }
         else attackNavTarget.targetDistance = -1;
 
         if(patrolNavTarget.active)
         {
-            patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.presence.position);
+            patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.locationInfo.position);
         }
         else patrolNavTarget.targetDistance = -1;
     }

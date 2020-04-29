@@ -21,7 +21,7 @@ public class AttackState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         base.InitializeState(controller);
-        AI_Manager.OnRequestNewTarget(controller.creationID);
+        Darkness_Manager.OnRequestNewTarget(controller.creationID);
         /*controller.pather.destination = controller.Target.location.position;
         if(controller.playerDist > attackInitiationRange)
             controller.pather.canMove = true;
