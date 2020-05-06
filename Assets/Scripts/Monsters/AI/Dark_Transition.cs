@@ -5,11 +5,13 @@ using UnityEngine;
 [System.Serializable]
 public class Dark_Transition
 {
-    public enum Transition_Priority {LOW = 1, MEDIUM = 3, HIGH = 5}
-    //public Transition_Priority priority;
     public AI_DecisionMaker decision = new AI_DecisionMaker();
 
+    ///<summary>Provides dropdown in the inspector using the DecisionName enum. The selection is by the Dark_State to determine if it should transition</summary>
     public AI_DecisionMaker.DecisionName decisionChoice;
+
+    //trueState and falseState are both assigned in the inspector
+    //These are the states that execute based on the results of the decisionChoice. Check inspector if execution needs to be changed.
     public Dark_State trueState;
     public Dark_State falseState;
 }

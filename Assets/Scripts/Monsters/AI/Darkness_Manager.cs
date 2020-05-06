@@ -10,7 +10,7 @@ public class Darkness_Manager : MonoBehaviour {
 	[SerializeField]
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
 	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
-	public float calculationTime, attackOffset;
+	public float calculationTime, attackOffset, ground;
 	private bool paused;
 
 	[SerializeField]
@@ -35,33 +35,38 @@ public class Darkness_Manager : MonoBehaviour {
 		public int targetID, weight;
 		public bool active;
 		public float targetDistance;
+		private float groundElavation;
 
-		private Transform transform;
-		public Transform locationInfo { 
-			get {return transform; }}
+		public Vector3 position;
+		private Vector3 positionOffset;
+		//public Transform locationInfo { 
+		//	get {return transform; }}
 
 		private NavTargetTag targetTag;
 		public NavTargetTag navTargetTag { get{ return targetTag; }}
 
 		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
-		///<param name="parent">Assign null if the object doesn't need to be parented. i.e the Player</param>
-		///<param name="act">Signifies if this NavTarget attack related</param>
-		public NavigationTarget(Transform loc, Transform parent, int iD, NavTargetTag ntTag, bool act)
+		///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
+		public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, int iD, NavTargetTag ntTag)//, bool act)
 		{
-			transform = loc;
-			if(parent != null)
-				transform.parent = parent;
+			position = loc;
+			groundElavation = elavation;
+			//if(parent != null)
+			//	transform.parent = parent;
+			positionOffset = offset;
 			targetID = iD;
 			targetTag = ntTag;
 			targetDistance = -1;
-			active = act;
 			weight = 0;
+			active = false;
 			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 
-		public void UpdateLocation(Vector3 loc)
+		public void UpdateLocation(Vector3 loc, bool applyOffset)
 		{
-			transform.position = loc;
+			if(!applyOffset)
+				position = new Vector3(loc.x, groundElavation, loc.y);
+			else position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
 		}
 	}
 
@@ -99,13 +104,19 @@ public class Darkness_Manager : MonoBehaviour {
 	void Start()
 	{
 		//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
+		ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
-		PlayerPoint = new NavigationTarget(player, null,  0, NavTargetTag.Attack, true);
+		PlayerPoint = new NavigationTarget(player.transform.position, Vector3.zero, ground, 0, NavTargetTag.Attack);
+		List<Vector3> offsets = new List<Vector3>();
+		offsets.Add(new Vector3(attackOffset, 0, 0));
+		offsets.Add(new Vector3(-attackOffset, 0, 0));
+		offsets.Add(new Vector3(-attackOffset/2, 0, 0));
+		offsets.Add(new Vector3(attackOffset/2, 0, 0));
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, player, i, NavTargetTag.Attack, true);
+			AttackPoints[i] = new NavigationTarget(PlayerPoint.position, offsets[i], ground, i, NavTargetTag.Attack);
 		}
-
+		
 		/*for(int i = 0; i < PatrolPoints.Length; i++)
 		{
 			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
@@ -117,16 +128,11 @@ public class Darkness_Manager : MonoBehaviour {
 			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, player.position.z - Random.Range(9, 9+i));
 			PatrolPoints[i].targetID = i;
 		}*/
-
-		AttackPoints[0].UpdateLocation(new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z));
-		AttackPoints[1].UpdateLocation(new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z));
-		AttackPoints[2].UpdateLocation(new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z));
-		AttackPoints[3].UpdateLocation(new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z));
 	}
 
 #region DarknessUpdateLoop
 
-	///<summary>Contols the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
+	///<summary>Controls the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
 		while(!paused)
@@ -138,6 +144,10 @@ public class Darkness_Manager : MonoBehaviour {
 				{
 					dark.Value.UpdateDistanceEvaluation(player.position);
 				}
+				foreach(NavigationTarget n in AttackPoints)
+				{
+					n.UpdateLocation(player.position, true);
+				}
 				SortTheGoons();
 				UpdateDarknessAggresion();
 				OnMovementUpdate();
@@ -148,7 +158,7 @@ public class Darkness_Manager : MonoBehaviour {
 		yield return null;
 	}
 
-	///<summary>Contols the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
+	///<summary>Controls the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
 	public IEnumerator ExecuteDarknessStates()
     {
         while(!paused)
@@ -157,7 +167,7 @@ public class Darkness_Manager : MonoBehaviour {
 			{
 				dark.Value.currentState.UpdateState(dark.Value);
 			}
-            yield return new WaitForSeconds(calculationTime);
+            yield return new WaitForSeconds(calculationTime*2);
         }
         yield return null;
     }

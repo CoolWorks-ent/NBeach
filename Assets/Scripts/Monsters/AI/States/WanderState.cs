@@ -22,7 +22,7 @@ public class WanderState : Dark_State
     {
         base.InitializeState(controller);
         controller.patrolNavTarget.active = true;
-        controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller));
+        controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.StartCoroutine(controller.UpdatePath());
         controller.moving = true;
@@ -39,7 +39,7 @@ public class WanderState : Dark_State
         //controller.aIMovement.UpdatePath(controller.Target.position);
         if(controller.patrolNavTarget.targetDistance <= controller.swtichDist)
         {
-            controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller));
+            controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
         }
 
         CheckTransitions(controller);
