@@ -24,7 +24,7 @@ public class WanderState : Dark_State
         controller.patrolNavTarget.active = true;
         controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.StartCoroutine(controller.UpdatePath());
+        controller.UpdatePath();
         controller.moving = true;
     }
 
@@ -37,7 +37,7 @@ public class WanderState : Dark_State
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        if(controller.patrolNavTarget.targetDistance <= controller.swtichDist)
+        if(controller.targetDistance <= controller.swtichDist)
         {
             controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
         }

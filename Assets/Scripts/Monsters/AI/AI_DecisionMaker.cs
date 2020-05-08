@@ -37,7 +37,7 @@ public class AI_DecisionMaker
 
     private bool CommitToAttack(Darkness controller)
     {
-        if(AggresiveCheck(controller) && (controller.attackNavTarget.targetDistance <= controller.swtichDist || controller.playerDist < controller.swtichDist)) 
+        if(AggresiveCheck(controller) && (controller.playerDist <= controller.swtichDist)) 
         {
             return true;
         }
@@ -80,21 +80,9 @@ public class AI_DecisionMaker
 
     private bool TargetDistClose(Darkness controller)
     {
-        if(controller.attackNavTarget.active)
+        if(controller.targetDistance < controller.swtichDist)
         {
-            if(controller.attackNavTarget.targetDistance < controller.swtichDist)
-            {
-                return true;
-            }
-            else return false;
-        }
-        else if(controller.patrolNavTarget.active)
-        {
-            if(controller.attackNavTarget.targetDistance < controller.swtichDist)
-            {
-                return true;
-            }
-            else return false;
+            return true;
         }
         else return false;
     }

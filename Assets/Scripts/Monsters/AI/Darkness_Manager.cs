@@ -11,7 +11,7 @@ public class Darkness_Manager : MonoBehaviour {
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
 	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
 	public float calculationTime, attackOffset, ground;
-	private bool paused;
+	private bool updatePaused, gamePaused;
 
 	[SerializeField]
 	private Dark_State[] dark_States;
@@ -34,7 +34,6 @@ public class Darkness_Manager : MonoBehaviour {
 	{
 		public int targetID, weight;
 		public bool active;
-		public float targetDistance;
 		private float groundElavation;
 
 		public Vector3 position;
@@ -56,7 +55,6 @@ public class Darkness_Manager : MonoBehaviour {
 			positionOffset = offset;
 			targetID = iD;
 			targetTag = ntTag;
-			targetDistance = -1;
 			weight = 0;
 			active = false;
 			//assignedDarknessIDs = new int[assignmentLimit];
@@ -88,13 +86,13 @@ public class Darkness_Manager : MonoBehaviour {
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
 		RequestNewTarget += ApproveDarknessTarget;
-		paused = false;
+		updatePaused = true;
+		gamePaused = false;
 		calculationTime = 0.25f;
 		attackOffset = 3.5f;
 		//PatrolPoints = new NavigationTarget[4]; 
 		AttackPoints = new NavigationTarget[4]; 
-		StartCoroutine(ManagedDarknessUpdate());
-		StartCoroutine(ExecuteDarknessStates());
+		//StartCoroutine(ExecuteDarknessStates());
 		foreach(Dark_State d in dark_States)
         {
             d.Startup();
@@ -130,51 +128,55 @@ public class Darkness_Manager : MonoBehaviour {
 		}*/
 	}
 
+	void LateUpdate()
+	{
+		foreach(NavigationTarget n in AttackPoints) //update the location of the attack points
+		{
+			n.UpdateLocation(player.position, true);
+		}
+	}
+
 #region DarknessUpdateLoop
 
 	///<summary>Controls the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
-		while(!paused)
+		Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
+		while(!updatePaused)
 		{
-			if(attackApprovalPriority.Count > 0)
+			if(ActiveDarkness.Count > 0)
 			{
-				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
-				foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
+				Debug.LogWarning("[Darkness_Manager] Executing ManagedUpdate");
+				/*foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
 					dark.Value.UpdateDistanceEvaluation(player.position);
-				}
-				foreach(NavigationTarget n in AttackPoints)
+				}*/
+
+				OnDistanceUpdate(player.position);
+
+				UpdateDarknessAggresionStatus();
+				//yield return new WaitForSeconds(calculationTime);
+				OnUpdateDarkStates();
+				//SortTheGoons();
+
+				/*foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
-					n.UpdateLocation(player.position, true);
-				}
-				SortTheGoons();
-				UpdateDarknessAggresion();
-				OnMovementUpdate();
+					dark.Value.currentState.UpdateState(dark.Value);
+				}*/
 				yield return new WaitForSeconds(calculationTime);
-			}
-			else yield return new WaitForSeconds(calculationTime);
+			} else yield return new WaitForSeconds(calculationTime*4);
 		}
 		yield return null;
 	}
 
-	///<summary>Controls the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
-	public IEnumerator ExecuteDarknessStates()
-    {
-        while(!paused)
-        {
-			foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
-			{
-				dark.Value.currentState.UpdateState(dark.Value);
-			}
-            yield return new WaitForSeconds(calculationTime*2);
-        }
-        yield return null;
-    }
-
 	///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. Furtheset Darkness are set to idle priority</summary>
-	private void UpdateDarknessAggresion() 
+	private void UpdateDarknessAggresionStatus() 
 	{
+		attackApprovalPriority.Sort(delegate(int a, int b)
+		{
+			return ActiveDarkness[a].playerDist.CompareTo(ActiveDarkness[b].playerDist);
+		});
+
 		darkStandbyCount = 0;
 		darkAttackCount = 0;
 		darkTotalCount = ActiveDarkness.Count;
@@ -203,14 +205,14 @@ public class Darkness_Manager : MonoBehaviour {
 		}
 	}
 
-	///<summary>Sorts the Darkness in ActiveDarkness based on their distance to target values</summary>
+	/*///<summary>Sorts the Darkness in ActiveDarkness based on their distance to target values</summary>
 	private void SortTheGoons() 
 	{
 		attackApprovalPriority.Sort(delegate(int a, int b)
 		{
 			return ActiveDarkness[a].playerDist.CompareTo(ActiveDarkness[b].playerDist);
 		});
-	}	
+	}	*/
 	#endregion
 
 #region NavTargetHandling
@@ -307,7 +309,7 @@ public class Darkness_Manager : MonoBehaviour {
 		{
 			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				if(darkness.attackNavTarget.targetDistance <= darkness.swtichDist+0.25f)
+				if(darkness.targetDistance <= darkness.swtichDist+0.25f)
 					darkness.attackNavTarget = PlayerPoint;
 				else
 				{
@@ -349,6 +351,12 @@ public class Darkness_Manager : MonoBehaviour {
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
+		if(updatePaused && !gamePaused)
+		{
+			updatePaused = false;
+			StartCoroutine(ManagedDarknessUpdate());
+		}
+			
 		//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 	}
 
@@ -356,13 +364,19 @@ public class Darkness_Manager : MonoBehaviour {
     public void RemoveFromDarknessList(Darkness updatedDarkness)
     {
 		//updatedDarkness.StopCoroutine(updatedDarkness.ExecuteCurrentState());
+
 		attackApprovalPriority.Remove(updatedDarkness.creationID);
         ActiveDarkness.Remove(updatedDarkness.creationID);
+		if(ActiveDarkness.Count == 0)
+		{
+			updatePaused = true;
+		}
     }
 
 	public void KillAllDarkness()
     {
         Debug.Log("[AI] All Darkness AI kill call");
+
         foreach(KeyValuePair<int, Darkness>dark in ActiveDarkness)
         {
 			OnDarknessRemoved(dark.Value);
@@ -374,37 +388,47 @@ public class Darkness_Manager : MonoBehaviour {
 #region AIManagerEvents
 	public delegate void AIEvent();
 	public delegate void AIEvent<T>(T obj);
+
+	public static event AIEvent UpdateDarkStates;
+	public static event AIEvent<Vector3> DistanceUpdate;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-
 	public static event AIEvent<int> RequestNewTarget;
-	public static event AIEvent UpdateMovement;
 
-	///<summary>Adds Darkness to tracking list. Called by the Darkness in Start after base variables have been assigned.</summary>
-	public static void OnDarknessAdded(Darkness d) //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
+	///<summary>Executes logic update for Darkness</summary>
+	public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by Darkness. Darkness will run the update for their current state.
+	{
+		if(UpdateDarkStates != null)
+			UpdateDarkStates();
+	}
+
+	///<summary>Executes distance update for Darkness</summary>
+	public static void OnDistanceUpdate(Vector3 pos) //Called by Darkness_Manager. Subsribed by Darkness
+	{
+		if(DistanceUpdate != null)
+			DistanceUpdate(pos);
+	}
+
+	///<summary>Adds Darkness to tracking list. Only call this for after initializing Darkness variables.</summary> //Called by Darkness. Subscribed by Darkness_Manager
+	public static void OnDarknessAdded(Darkness d) //Called by Darkness. Subscribed by Darkness_Manager
 	{
 		if(AddDarkness != null)
 			AddDarkness(d);
 	}
 
-	public static void OnDarknessRemoved(Darkness d)
+	///<summary>Removes Darkness from tracking list.</summary>
+	public static void OnDarknessRemoved(Darkness d) //Called by Darkness. Subscribed by Darkness_Manager
 	{
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
 	}
 
-	public static void OnRequestNewTarget(int ID)
+	///<summary>Request a new navigation target be assigned to the identified Darkness.</summary>
+	public static void OnRequestNewTarget(int ID) //Called by Dark_States. Subscribed by Darkness_Manager
 	{
 		if(RequestNewTarget != null)
 			RequestNewTarget(ID);
 	}
-
-	public static void OnMovementUpdate()
-	{
-		if(UpdateMovement != null)
-			UpdateMovement();
-	}
-
 	#endregion
 	
 }

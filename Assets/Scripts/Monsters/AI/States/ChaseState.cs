@@ -15,7 +15,7 @@ public class ChaseState : Dark_State
         base.InitializeState(controller);
         Darkness_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.StartCoroutine(controller.UpdatePath());
+        controller.UpdatePath();
         controller.moving = true;
     }
 
