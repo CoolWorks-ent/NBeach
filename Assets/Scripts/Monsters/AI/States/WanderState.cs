@@ -21,8 +21,8 @@ public class WanderState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         base.InitializeState(controller);
-        controller.patrolNavTarget.active = true;
-        controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
+        //controller.patrolNavTarget.active = true;
+        controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.UpdatePath();
         controller.moving = true;
@@ -39,7 +39,8 @@ public class WanderState : Dark_State
         //controller.aIMovement.UpdatePath(controller.Target.position);
         if(controller.targetDistance <= controller.swtichDist)
         {
-            controller.patrolNavTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
+            controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller), false);
+            controller.UpdatePath();
         }
 
         CheckTransitions(controller);

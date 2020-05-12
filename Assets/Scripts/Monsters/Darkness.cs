@@ -27,7 +27,8 @@ public class Darkness : MonoBehaviour {
     private Vector3 prevPos;
     private bool reachedEndOfPath, wandering, lookAtPlayer;
     
-    public Darkness_Manager.NavigationTarget attackNavTarget, patrolNavTarget;
+    public Darkness_Manager.NavigationTarget navTarget;//, patrolNavTarget;
+
     private Seeker sekr;
     private AIPath aIPath;
     private Path navPath;
@@ -58,7 +59,7 @@ public class Darkness : MonoBehaviour {
     }
 
     void Start () {
-        patrolNavTarget = new Darkness_Manager.NavigationTarget(this.transform.position, Vector3.zero, Darkness_Manager.Instance.ground, 10, Darkness_Manager.NavTargetTag.Patrol);
+        //patrolNavTarget = new Darkness_Manager.NavigationTarget(this.transform.position, Vector3.zero, Darkness_Manager.Instance.ground, 10, Darkness_Manager.NavTargetTag.Patrol);
         Darkness_Manager.OnDarknessAdded(this); //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
         Darkness_Manager.UpdateDarkStates += UpdateCurrentState;
         Darkness_Manager.DistanceUpdate += UpdateDistanceEvaluation;
@@ -66,7 +67,7 @@ public class Darkness : MonoBehaviour {
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
-        patrolNavTarget.UpdateLocation(Vector3.zero, false);
+        //patrolNavTarget.UpdateLocation(Vector3.zero, false);
 	}
 
     public void ChangeState(Dark_State nextState)
@@ -77,22 +78,6 @@ public class Darkness : MonoBehaviour {
         currentState.InitializeState(this);
     }
 
-    void FixedUpdate()
-    {
-        /*if(lookAtPlayer)
-        {
-            //TODO Rotate rigidbody manually in the background to face the player
-        }
-        if(moving && navPath != null)
-        {
-            Vector3 nextPosition;
-            Quaternion nextRotation;
-
-            aIPath.MovementUpdate(Time.deltaTime, out nextPosition, out nextRotation);
-
-            aIPath.FinalizeMovement(nextPosition, nextRotation);
-        }*/
-    }
 
     private void UpdateCurrentState()
     {
@@ -104,10 +89,10 @@ public class Darkness : MonoBehaviour {
     {
         if(sekr.IsDone())
         {
-            if(attackNavTarget.active)
-                CreatePath(attackNavTarget.position);
-            else if(patrolNavTarget.active)
-                CreatePath(patrolNavTarget.position);
+            //if(navTarget.active)
+            CreatePath(navTarget.position);
+            //else if(patrolNavTarget.active)
+            //    CreatePath(patrolNavTarget.position);
         }    
         //yield return new WaitForSeconds(pathUpdateTime);
     }

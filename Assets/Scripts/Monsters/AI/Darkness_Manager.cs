@@ -33,7 +33,7 @@ public class Darkness_Manager : MonoBehaviour {
 	public struct NavigationTarget
 	{
 		public int targetID, weight;
-		public bool active;
+		//public bool active;
 		private float groundElavation;
 
 		public Vector3 position;
@@ -56,7 +56,7 @@ public class Darkness_Manager : MonoBehaviour {
 			targetID = iD;
 			targetTag = ntTag;
 			weight = 0;
-			active = false;
+			//active = false;
 			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 
@@ -106,13 +106,15 @@ public class Darkness_Manager : MonoBehaviour {
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		PlayerPoint = new NavigationTarget(player.transform.position, Vector3.zero, ground, 0, NavTargetTag.Attack);
 		List<Vector3> offsets = new List<Vector3>();
-		offsets.Add(new Vector3(attackOffset, 0, 0));
-		offsets.Add(new Vector3(-attackOffset, 0, 0));
+		offsets.Add(new Vector3(attackOffset, 0, -2));
+		offsets.Add(new Vector3(-attackOffset, 0, -2));
 		offsets.Add(new Vector3(-attackOffset/2, 0, 0));
 		offsets.Add(new Vector3(attackOffset/2, 0, 0));
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(PlayerPoint.position, offsets[i], ground, i, NavTargetTag.Attack);
+			AttackPoints[i] = new NavigationTarget(player.transform.position, offsets[i], ground, i, NavTargetTag.Attack);
+			//Vector3 t = AttackPoints[i].position+offsets[i];
+			//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 		}
 		
 		/*for(int i = 0; i < PatrolPoints.Length; i++)
@@ -291,45 +293,41 @@ public class Darkness_Manager : MonoBehaviour {
 		{
 			if(!aggresive)
 			{
-				darkness.attackNavTarget.weight--;
-				darkness.attackNavTarget.active = false;
-			}
-			else
-			{
-				darkness.patrolNavTarget.active = false;
+				darkness.navTarget.weight--;
+				//darkness.attackNavTarget.active = false;
 			}
 		}
 	}
 
 	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
-	public void ApproveDarknessTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
+	public void ApproveDarknessTarget(int darkID, bool closeToPlayer) //TODO Darkness will make request for new Navigation Targets based on their status
 	{
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
 			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				if(darkness.targetDistance <= darkness.swtichDist+0.25f)
-					darkness.attackNavTarget = PlayerPoint;
+				if(closeToPlayer) 
+					darkness.navTarget = PlayerPoint;
 				else
 				{
-					NavigationTarget nT = AssignAttackNavTarget(darkness.creationID); 
-					if(nT.active)
+					darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
+					/*if(nT.active)
 					{
 						darkness.attackNavTarget = nT;
 						DeactivateNavTarget(darkID, true);
-					}
+					}*/
 				}
 			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{
 				DeactivateNavTarget(darkID, true);
-				darkness.attackNavTarget = PlayerPoint;
+				darkness.navTarget = PlayerPoint;
 			}
 			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
 			{
 				DeactivateNavTarget(darkID, false);
-				darkness.attackNavTarget = StartPoint;
+				darkness.navTarget = StartPoint;
 			}
 		}
 	}
@@ -347,7 +345,7 @@ public class Darkness_Manager : MonoBehaviour {
 		updatedDarkness.transform.SetParent(Instance.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
-		updatedDarkness.attackNavTarget = StartPoint;
+		updatedDarkness.navTarget = StartPoint;
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
@@ -388,12 +386,13 @@ public class Darkness_Manager : MonoBehaviour {
 #region AIManagerEvents
 	public delegate void AIEvent();
 	public delegate void AIEvent<T>(T obj);
+	public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
 
 	public static event AIEvent UpdateDarkStates;
 	public static event AIEvent<Vector3> DistanceUpdate;
 	public static event AIEvent<Darkness> AddDarkness;
 	public static event AIEvent<Darkness> RemoveDarkness;
-	public static event AIEvent<int> RequestNewTarget;
+	public static event AIEvent<int, bool> RequestNewTarget;
 
 	///<summary>Executes logic update for Darkness</summary>
 	public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by Darkness. Darkness will run the update for their current state.
@@ -424,10 +423,10 @@ public class Darkness_Manager : MonoBehaviour {
 	}
 
 	///<summary>Request a new navigation target be assigned to the identified Darkness.</summary>
-	public static void OnRequestNewTarget(int ID) //Called by Dark_States. Subscribed by Darkness_Manager
+	public static void OnRequestNewTarget(int ID, bool closeToPlayer) //Called by Dark_States. Subscribed by Darkness_Manager
 	{
 		if(RequestNewTarget != null)
-			RequestNewTarget(ID);
+			RequestNewTarget(ID, closeToPlayer);
 	}
 	#endregion
 	
