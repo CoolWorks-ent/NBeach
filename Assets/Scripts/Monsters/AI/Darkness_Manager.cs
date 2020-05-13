@@ -60,11 +60,12 @@ public class Darkness_Manager : MonoBehaviour {
 			//assignedDarknessIDs = new int[assignmentLimit];
 		}
 
-		public void UpdateLocation(Vector3 loc, bool applyOffset)
+		public void UpdateLocation(Vector3 loc)
 		{
-			if(!applyOffset)
-				position = new Vector3(loc.x, groundElavation, loc.y);
-			else position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
+			//if(!applyOffset)
+			//	position = new Vector3(loc.x, groundElavation, loc.y);
+			//else 
+			position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
 		}
 	}
 
@@ -105,6 +106,7 @@ public class Darkness_Manager : MonoBehaviour {
 		ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		PlayerPoint = new NavigationTarget(player.transform.position, Vector3.zero, ground, 0, NavTargetTag.Attack);
+		StartPoint = new NavigationTarget(Vector3.zero, Vector3.zero, ground, 99, NavTargetTag.Patrol);
 		List<Vector3> offsets = new List<Vector3>();
 		offsets.Add(new Vector3(attackOffset, 0, -2));
 		offsets.Add(new Vector3(-attackOffset, 0, -2));
@@ -134,7 +136,7 @@ public class Darkness_Manager : MonoBehaviour {
 	{
 		foreach(NavigationTarget n in AttackPoints) //update the location of the attack points
 		{
-			n.UpdateLocation(player.position, true);
+			n.UpdateLocation(player.position);
 		}
 	}
 

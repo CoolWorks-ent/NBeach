@@ -33,6 +33,8 @@ public class Darkness : MonoBehaviour {
     private AIPath aIPath;
     private Path navPath;
     public Rigidbody rigidbod;
+    public Vector3 nextPosition;
+    public Quaternion nextRotation;
 
     public Animator animeController;
     [HideInInspector]
@@ -83,6 +85,16 @@ public class Darkness : MonoBehaviour {
     {
         currentState.UpdateState(this);
     }
+
+    void FixedUpdate()
+    {
+        if(moving && navPath != null)
+        {
+            aIPath.MovementUpdate(Time.deltaTime, out nextPosition, out nextRotation);
+
+            aIPath.FinalizeMovement(nextPosition, nextRotation);
+        }
+    }   
 
     ///<summary>Called in state update loop to update path</summary>
     public void UpdatePath()
