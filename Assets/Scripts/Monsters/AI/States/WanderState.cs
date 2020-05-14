@@ -22,7 +22,7 @@ public class WanderState : Dark_State
     {
         base.InitializeState(controller);
         //controller.patrolNavTarget.active = true;
-        controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller));
+        //controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller));
         controller.animeController.SetTrigger(controller.chaseHash);
         controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, 5, 10));
         controller.UpdatePath();
@@ -38,21 +38,13 @@ public class WanderState : Dark_State
         //     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
         // }
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        if(controller.targetDistance <= controller.swtichDist)
+        if(controller.targetDistance <= controller.swtichDist/2)
         {
-            controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller));
+            controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, 5, 10));
             controller.UpdatePath();
         }
 
         CheckTransitions(controller);
-    }
-
-    private Vector3 ChoosePatrolPoint(Darkness controller)
-    {
-        Vector3 direction = Random.onUnitSphere * wanderRadius;
-        direction.y = controller.transform.position.y;
-        
-        return direction;
     }
 
     public override void ExitState(Darkness controller)
@@ -60,4 +52,12 @@ public class WanderState : Dark_State
         controller.EndMovement();
         //controller.sekr.CancelCurrentPathRequest();
     }
+
+    /*private Vector3 ChoosePatrolPoint(Darkness controller)
+    {
+        Vector3 direction = Random.onUnitSphere * wanderRadius;
+        direction.y = controller.transform.position.y;
+        
+        return direction;
+    }*/
 }
