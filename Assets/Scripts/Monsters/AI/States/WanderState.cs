@@ -6,8 +6,11 @@ public class WanderState : Dark_State
 {
     //[Range(8,20)]
     //public int relativeRangeToPlayer;
-    [Range(4,20)]
-    public int wanderRadius;
+    [Range(1,10)]
+    public int chooseNewTargetDist;
+    [Range(1,10)]
+    public float patrolDistLow, patrolDistUpper;
+
     protected override void FirstTimeSetup()
     {
         stateType = StateType.WANDER;
@@ -24,7 +27,7 @@ public class WanderState : Dark_State
         //controller.patrolNavTarget.active = true;
         //controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller));
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, 5, 10));
+        controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, patrolDistLow, patrolDistUpper));
         controller.UpdatePath();
         controller.moving = true;
     }

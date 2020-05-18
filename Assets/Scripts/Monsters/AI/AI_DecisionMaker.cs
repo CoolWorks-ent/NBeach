@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
+///<summary>DecisionMaker provides a way conditions to be set as requisite to transition to the next state.</summary>
 public class AI_DecisionMaker
 {
+    
     public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE}
+    
+    ///<summary>Holds all the function calls that are called in MakeDecision</summary>
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
     public AI_DecisionMaker()

@@ -5,9 +5,10 @@ using UnityEngine;
 [System.Serializable]
 public class Dark_Transition
 {
+    
     public AI_DecisionMaker decision = new AI_DecisionMaker();
 
-    ///<summary>Provides dropdown in the inspector using the DecisionName enum. The selection is by the Dark_State to determine if it should transition</summary>
+    ///<summary>Provides dropdown in the inspector using the DecisionName enum. Used in Dark_State Update</summary>
     public AI_DecisionMaker.DecisionName decisionChoice;
 
     //trueState and falseState are both assigned in the inspector

@@ -134,6 +134,7 @@ public class Darkness_Manager : MonoBehaviour {
 
 	void LateUpdate()
 	{
+		PlayerPoint.UpdateLocation(player.position);
 		foreach(NavigationTarget n in AttackPoints) //update the location of the attack points
 		{
 			n.UpdateLocation(player.position);
@@ -145,28 +146,18 @@ public class Darkness_Manager : MonoBehaviour {
 	///<summary>Controls the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
-		Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
+		//Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
 		while(!updatePaused)
 		{
 			if(ActiveDarkness.Count > 0)
 			{
-				Debug.LogWarning("[Darkness_Manager] Executing ManagedUpdate");
-				/*foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
-				{
-					dark.Value.UpdateDistanceEvaluation(player.position);
-				}*/
+				//Debug.LogWarning("[Darkness_Manager] Executing ManagedUpdate");
 
 				OnDistanceUpdate(player.position);
 
 				UpdateDarknessAggresionStatus();
-				//yield return new WaitForSeconds(calculationTime);
 				OnUpdateDarkStates();
-				//SortTheGoons();
 
-				/*foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
-				{
-					dark.Value.currentState.UpdateState(dark.Value);
-				}*/
 				yield return new WaitForSeconds(calculationTime);
 			} else yield return new WaitForSeconds(calculationTime*4);
 		}
@@ -208,15 +199,6 @@ public class Darkness_Manager : MonoBehaviour {
 			}
 		}
 	}
-
-	/*///<summary>Sorts the Darkness in ActiveDarkness based on their distance to target values</summary>
-	private void SortTheGoons() 
-	{
-		attackApprovalPriority.Sort(delegate(int a, int b)
-		{
-			return ActiveDarkness[a].playerDist.CompareTo(ActiveDarkness[b].playerDist);
-		});
-	}	*/
 	#endregion
 
 #region NavTargetHandling
@@ -302,24 +284,16 @@ public class Darkness_Manager : MonoBehaviour {
 	}
 
 	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
-	public void ApproveDarknessTarget(int darkID, bool closeToPlayer) //TODO Darkness will make request for new Navigation Targets based on their status
+	public void ApproveDarknessTarget(int darkID, bool closeToPlayer) 
 	{
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
 			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				if(closeToPlayer) 
+				if(closeToPlayer)
 					darkness.navTarget = PlayerPoint;
-				else
-				{
-					darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
-					/*if(nT.active)
-					{
-						darkness.attackNavTarget = nT;
-						DeactivateNavTarget(darkID, true);
-					}*/
-				}
+				else darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
 			}
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{
@@ -425,10 +399,10 @@ public class Darkness_Manager : MonoBehaviour {
 	}
 
 	///<summary>Request a new navigation target be assigned to the identified Darkness.</summary>
-	public static void OnRequestNewTarget(int ID, bool closeToPlayer) //Called by Dark_States. Subscribed by Darkness_Manager
+	public static void OnRequestNewTarget(int ID, bool playerPoint) //Called by Dark_States. Subscribed by Darkness_Manager
 	{
 		if(RequestNewTarget != null)
-			RequestNewTarget(ID, closeToPlayer);
+			RequestNewTarget(ID, playerPoint);
 	}
 	#endregion
 	

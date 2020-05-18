@@ -83,7 +83,7 @@ public abstract class Dark_State : ScriptableObject
         return new Vector3(point.x + center.x, center.y, point.y + center.y);
     }
 
-    protected void ProcessStateChange(Dark_State approvedState, Darkness controller) //TODO Have Darkness start a coroutine to begin transitioning. 
+    protected void ProcessStateChange(Dark_State approvedState, Darkness controller)
     {
         controller.ChangeState(approvedState);
     }
