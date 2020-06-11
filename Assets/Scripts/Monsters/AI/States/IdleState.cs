@@ -16,8 +16,9 @@ public class IdleState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         controller.EndMovement();
-        controller.animeController.SetTrigger(controller.idleHash);
-        Darkness_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+        //controller.animeController.SetTrigger(controller.idleHash);
+        controller.StartCoroutine(IdleTime(controller, idleTime));
+        controller.UpdateAnimator(this.stateType);
         base.InitializeState(controller);
     }
 
@@ -31,14 +32,13 @@ public class IdleState : Dark_State
 
     public override void ExitState(Darkness controller)
     {
+        //base.ExitState(controller);
         Darkness_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
-        if(controller.animeController != null)
-            controller.animeController.ResetTrigger(controller.idleHash);
     }
 
     protected IEnumerator IdleTime(Darkness controller, float idleTime)
     {
-        yield return Darkness_Manager.Instance.WaitTimer(idleTime);
+        yield return controller.WaitTimer(idleTime);
         CheckTransitions(controller);
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));

@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Darkness_Manager : MonoBehaviour {
 
+	private static Darkness_Manager instance;
+	public static Darkness_Manager Instance
+	{
+		get {return instance; }
+	}
 	public Transform player;
 	public Dictionary<int, Darkness> ActiveDarkness;
 
@@ -16,58 +21,11 @@ public class Darkness_Manager : MonoBehaviour {
 	[SerializeField]
 	private Dark_State[] dark_States;
 	//private NavigationTarget[] PatrolPoints;
-	private NavigationTarget[] AttackPoints;
-	private NavigationTarget StartPoint, PlayerPoint;
+	private Darkness.NavigationTarget[] AttackPoints;
+	private Darkness.NavigationTarget StartPoint, PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
-	private static Darkness_Manager instance;
-	public static Darkness_Manager Instance
-	{
-		get {return instance; }
-	}
-
-	public enum NavTargetTag {Attack, Patrol}
-
-	///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
-	public struct NavigationTarget
-	{
-		public int targetID, weight;
-		//public bool active;
-		private float groundElavation;
-
-		public Vector3 position;
-		private Vector3 positionOffset;
-		//public Transform locationInfo { 
-		//	get {return transform; }}
-
-		private NavTargetTag targetTag;
-		public NavTargetTag navTargetTag { get{ return targetTag; }}
-
-		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
-		///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
-		public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, int iD, NavTargetTag ntTag)//, bool act)
-		{
-			position = loc;
-			groundElavation = elavation;
-			//if(parent != null)
-			//	transform.parent = parent;
-			positionOffset = offset;
-			targetID = iD;
-			targetTag = ntTag;
-			weight = 0;
-			//active = false;
-			//assignedDarknessIDs = new int[assignmentLimit];
-		}
-
-		public void UpdateLocation(Vector3 loc)
-		{
-			//if(!applyOffset)
-			//	position = new Vector3(loc.x, groundElavation, loc.y);
-			//else 
-			position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
-		}
-	}
 
 	void Awake()
 	{
@@ -92,7 +50,7 @@ public class Darkness_Manager : MonoBehaviour {
 		calculationTime = 0.25f;
 		attackOffset = 3.5f;
 		//PatrolPoints = new NavigationTarget[4]; 
-		AttackPoints = new NavigationTarget[4]; 
+		AttackPoints = new Darkness.NavigationTarget[4]; 
 		//StartCoroutine(ExecuteDarknessStates());
 		foreach(Dark_State d in dark_States)
         {
@@ -105,8 +63,8 @@ public class Darkness_Manager : MonoBehaviour {
 		//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
 		ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
-		PlayerPoint = new NavigationTarget(player.transform.position, Vector3.zero, ground, 0, NavTargetTag.Attack);
-		StartPoint = new NavigationTarget(Vector3.zero, Vector3.zero, ground, 99, NavTargetTag.Patrol);
+		PlayerPoint = new Darkness.NavigationTarget(player.transform.position, Vector3.zero, ground, Darkness.NavTargetTag.Attack);
+		StartPoint = new Darkness.NavigationTarget(Vector3.zero, Vector3.zero, ground, Darkness.NavTargetTag.Patrol);
 		List<Vector3> offsets = new List<Vector3>();
 		offsets.Add(new Vector3(attackOffset, 0, -2));
 		offsets.Add(new Vector3(-attackOffset, 0, -2));
@@ -114,28 +72,16 @@ public class Darkness_Manager : MonoBehaviour {
 		offsets.Add(new Vector3(attackOffset/2, 0, 0));
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(player.transform.position, offsets[i], ground, i, NavTargetTag.Attack);
+			AttackPoints[i] = new Darkness.NavigationTarget(player.transform.position, offsets[i], ground, Darkness.NavTargetTag.Attack);
 			//Vector3 t = AttackPoints[i].position+offsets[i];
 			//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 		}
-		
-		/*for(int i = 0; i < PatrolPoints.Length; i++)
-		{
-			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
-			float xOffset = 0;
-			PatrolPoints[i].location.parent = player; 
-			if(i % 2 == 0 || i == 0)
-				xOffset = player.position.x - Random.Range(5+i, 15);
-			else xOffset = player.position.x + Random.Range(5+i, 15);
-			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, player.position.z - Random.Range(9, 9+i));
-			PatrolPoints[i].targetID = i;
-		}*/
 	}
 
 	void LateUpdate()
 	{
 		PlayerPoint.UpdateLocation(player.position);
-		foreach(NavigationTarget n in AttackPoints) //update the location of the attack points
+		foreach(Darkness.NavigationTarget n in AttackPoints) //update the location of the attack points
 		{
 			n.UpdateLocation(player.position);
 		}
@@ -159,7 +105,7 @@ public class Darkness_Manager : MonoBehaviour {
 				OnUpdateDarkStates();
 
 				yield return new WaitForSeconds(calculationTime);
-			} else yield return new WaitForSeconds(calculationTime*4);
+			} else yield return new WaitForSeconds(calculationTime);
 		}
 		yield return null;
 	}
@@ -204,7 +150,7 @@ public class Darkness_Manager : MonoBehaviour {
 #region NavTargetHandling
 
 	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
-	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
+	public int LeastRequestedNavigationTarget(Darkness.NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
 		int lowest = 0;
 		List<int> evenCount = new List<int>(); //In case there are entries at the same levels
@@ -235,7 +181,7 @@ public class Darkness_Manager : MonoBehaviour {
 	}
 
 	///<summary>Returns an attack Navigation Target. Returns the StartPoint object if Darkness is not found or if they should not be attacking. </summary>
-	private NavigationTarget AssignAttackNavTarget(int darkID) 
+	private Darkness.NavigationTarget AssignAttackNavTarget(int darkID) 
 	{
 		//Find if Darkness is in the collection
 		Darkness darkness;
@@ -309,16 +255,11 @@ public class Darkness_Manager : MonoBehaviour {
 	}
 	#endregion
 
-	public IEnumerator WaitTimer(float timer)
-	{
-		yield return new WaitForSeconds(timer);
-	}
-
 #region DarknessCollectionUpdates
 	///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
-		updatedDarkness.transform.SetParent(Instance.transform);
+		updatedDarkness.transform.SetParent(this.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
 		updatedDarkness.navTarget = StartPoint;

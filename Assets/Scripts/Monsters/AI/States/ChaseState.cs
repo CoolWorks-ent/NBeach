@@ -14,7 +14,6 @@ public class ChaseState : Dark_State
     {
         base.InitializeState(controller);
         Darkness_Manager.OnRequestNewTarget(controller.creationID, false);
-        controller.animeController.SetTrigger(controller.chaseHash);
         controller.UpdatePath();
         controller.moving = true;
     }
@@ -28,6 +27,7 @@ public class ChaseState : Dark_State
 
     public override void ExitState(Darkness controller)
     {
+        //base.ExitState(controller);
         controller.EndMovement();
     }
 }

@@ -6,9 +6,10 @@ using System.Linq;
 public abstract class Dark_State : ScriptableObject
 {
     public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
+    public enum StatePriority {LOW, MEDIUM, HIGH};
 
-    public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL}
     public StateType stateType;
+    public StatePriority statePriority;
     public Dark_Transition[] transitions;
     public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
@@ -26,7 +27,11 @@ public abstract class Dark_State : ScriptableObject
     [SerializeField, Range(0, 5)]
     protected float pathUpdateRate;
 
+    [SerializeField]
+    protected bool hasExitTimer;
 
+    [Range(0, 5)]
+    public float exitTime;
 
     public virtual void Startup()
     {
@@ -51,6 +56,14 @@ public abstract class Dark_State : ScriptableObject
     }
     public abstract void UpdateState(Darkness controller);
     public abstract void ExitState(Darkness controller);
+    /*{
+        if(hasExitTimer)
+        {
+            controller.timedStateExiting = true;
+            controller.StartCoroutine(controller.WaitTimer(exitTime));
+            controller.timedStateExiting = false;
+        } 
+    }*/
 
     protected virtual void FirstTimeSetup()
     {
@@ -80,7 +93,7 @@ public abstract class Dark_State : ScriptableObject
     protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
     {
         Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
-        return new Vector3(point.x + center.x, center.y, point.y + center.y);
+        return new Vector3(point.x + center.x, center.y, point.y + center.z);
     }
 
     protected void ProcessStateChange(Dark_State approvedState, Darkness controller)

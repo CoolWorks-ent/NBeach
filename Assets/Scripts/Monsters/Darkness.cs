@@ -12,14 +12,14 @@ public class Darkness : MonoBehaviour {
 
     [HideInInspector]
     public AggresionRating agRatingCurrent, agRatingPrevious;
-    public Dark_State previousState, currentState;
+    public Dark_State previousState, currentState, queuedState;
 
     [HideInInspector]
     public Collider darkHitBox;
     public GameObject deathFX;
     public Dark_State DeathState;
     
-    public bool moving, updateStates, attacked;
+    public bool moving, updateStates, attacked, timedState, timedStateExiting;
     public int creationID;
     public float playerDist, targetDistance, swtichDist, stopDistance, pathUpdateTime;
 
@@ -27,7 +27,7 @@ public class Darkness : MonoBehaviour {
     private Vector3 prevPos;
     private bool reachedEndOfPath, wandering, lookAtPlayer;
     
-    public Darkness_Manager.NavigationTarget navTarget;//, patrolNavTarget;
+    public NavigationTarget navTarget;
 
     private Seeker sekr;
     private AIPath aIPath;
@@ -36,12 +36,54 @@ public class Darkness : MonoBehaviour {
     public Vector3 nextPosition;
     public Quaternion nextRotation;
 
-    public Animator animeController;
+    private Animator animeController;
+
     [HideInInspector]
     public int attackHash = Animator.StringToHash("Attack"),
                 chaseHash = Animator.StringToHash("Chase"),
                 idleHash = Animator.StringToHash("Idle"),
                 deathHash = Animator.StringToHash("Death");
+
+    public enum NavTargetTag {Attack, Patrol}
+
+    ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
+	public struct NavigationTarget
+	{
+		public int weight;
+		//public bool active;
+		private float groundElavation;
+
+		public Vector3 position;
+		private Vector3 positionOffset;
+		//public Transform locationInfo { 
+		//	get {return transform; }}
+
+		private NavTargetTag targetTag;
+		public NavTargetTag navTargetTag { get{ return targetTag; }}
+
+		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
+		///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
+		public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
+		{
+			position = loc;
+			groundElavation = elavation;
+			//if(parent != null)
+			//	transform.parent = parent;
+			positionOffset = offset;
+			targetTag = ntTag;
+			weight = 0;
+			//active = false;
+			//assignedDarknessIDs = new int[assignmentLimit];
+		}
+
+		public void UpdateLocation(Vector3 loc)
+		{
+			//if(!applyOffset)
+			//	position = new Vector3(loc.x, groundElavation, loc.y);
+			//else 
+			position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
+		}
+	}
 
     void Awake()
     {
@@ -75,9 +117,33 @@ public class Darkness : MonoBehaviour {
     public void ChangeState(Dark_State nextState)
     {
         previousState = currentState;
-        currentState = nextState;
-        previousState.ExitState(this);
-        currentState.InitializeState(this);
+        if(!timedState) //if the timer on a state is still active don't switch yet
+        {
+            if(queuedState != null && queuedState != nextState)
+            {
+                if(nextState.statePriority > queuedState.statePriority)
+                {
+                    currentState = nextState;
+                    previousState.ExitState(this);
+                    currentState.InitializeState(this);
+                }
+                else if(queuedState.statePriority > nextState.statePriority)
+                {
+                    currentState = queuedState;
+                    previousState.ExitState(this);
+                    currentState.InitializeState(this);
+                }
+            }
+            else currentState = nextState;
+        }
+        else
+        {
+            if(!timedStateExiting)
+            {
+                StartCoroutine(StateTransitionTimer(currentState.exitTime));
+                timedState = false;
+            }            
+        }  //Check to see if this state has initiated it's timer to exit bevavior
     }
 
 
@@ -156,6 +222,21 @@ public class Darkness : MonoBehaviour {
     public void UpdateAnimator(Dark_State.StateType stType) 
     {
         //Ensure the correct animation is played in the animator. 
+        switch(stType)
+        {
+            case Dark_State.StateType.ATTACK:
+                animeController.SetTrigger(attackHash);
+                break;
+            case Dark_State.StateType.CHASING:
+                animeController.SetTrigger(chaseHash);
+                break;
+            case Dark_State.StateType.IDLE:
+                animeController.SetTrigger(idleHash);
+                break;
+            case Dark_State.StateType.DEATH:
+                animeController.SetTrigger(deathHash);
+                break;
+        }
     }
 
     public IEnumerator AttackCooldown(float idleTime)
@@ -190,6 +271,18 @@ public class Darkness : MonoBehaviour {
         if(agR != agRatingCurrent)
             agRatingPrevious = agRatingCurrent;
 		agRatingCurrent = agR;
+    }
+
+    public IEnumerator WaitTimer(float timer)
+	{
+		yield return new WaitForSeconds(timer);
+	}
+
+    private IEnumerator StateTransitionTimer(float timer)
+    {
+        timedStateExiting = true;
+        yield return new WaitForSeconds(timer);
+        timedStateExiting = false;
     }
 
     private void OnTriggerEnter(Collider collider)

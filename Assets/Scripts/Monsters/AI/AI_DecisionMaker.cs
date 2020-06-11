@@ -5,21 +5,22 @@ using System.Collections.Generic;
 public class AI_DecisionMaker
 {
     
-    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE}
+    public enum DecisionName {IN_ATTACK_RANGE, PLAYER_WITHIN_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, EXIT_TIMER_EXPIRED, PAUSED_FOR_NEXT_COMMAND, IS_AGGRESSIVE}
     
     ///<summary>Holds all the function calls that are called in MakeDecision</summary>
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
-    public AI_DecisionMaker()
+    public AI_DecisionMaker() //Should these choices be reduced 
     {
         Decisions = new Dictionary<DecisionName,Func<Darkness,bool>>();
         Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
         Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
-        Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
-        Decisions.Add(DecisionName.PLAYER_OUT_OF_RANGE, PlayerDistCheck);
-        Decisions.Add(DecisionName.IN_ATTACK_RANGE, CommitToAttack);
+        //Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
+        Decisions.Add(DecisionName.PLAYER_WITHIN_RANGE, PlayerWithinRange);
+        Decisions.Add(DecisionName.IN_ATTACK_RANGE, InAttackRange);
         Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
-        Decisions.Add(DecisionName.NAV_TARGET_CLOSE, TargetDistClose);
+        Decisions.Add(DecisionName.NAV_TARGET_CLOSE, NavTargetDistClose);
+        Decisions.Add(DecisionName.EXIT_TIMER_EXPIRED, ExitTimerExpired);
     }
 
     public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -29,7 +30,7 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    private bool AggresiveCheck(Darkness controller)
+    private bool AggresiveCheck(Darkness controller) //Should this be checked for state transitions here?
     {
         if(controller.agRatingCurrent == Darkness.AggresionRating.Attacking) 
         {
@@ -37,17 +38,26 @@ public class AI_DecisionMaker
         }
         else return false;
     }
-
-    private bool CommitToAttack(Darkness controller)
+    
+    public bool ExitTimerExpired(Darkness controller)
     {
-        if(AggresiveCheck(controller) && (controller.playerDist <= controller.swtichDist)) 
+        if(!controller.timedState)
         {
             return true;
         }
         else return false;
     }
 
-    private bool AttackSuccessfull(Darkness controller)
+    private bool InAttackRange(Darkness controller) //Should this be checked for state transitions here?
+    {
+        if(controller.playerDist <= controller.swtichDist) 
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    private bool AttackSuccessfull(Darkness controller) //Should this be checked for state transitions here?
     {
         if(controller.attacked)
         {
@@ -56,7 +66,7 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    private bool AwaitingNextCommand(Darkness controller)
+    private bool AwaitingNextCommand(Darkness controller) 
     {
         if(controller.agRatingCurrent == Darkness.AggresionRating.Idling) 
         {
@@ -65,23 +75,23 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    private bool ShouldWanderNear(Darkness controller) 
+    /*private bool ShouldWanderNear(Darkness controller) 
     {
         if(controller.agRatingCurrent == Darkness.AggresionRating.Wandering) 
         {
             return true;
         }
         else return false;
-    }
+    }*/
 
-    private bool PlayerDistCheck(Darkness controller)
+    private bool PlayerWithinRange(Darkness controller) //Should this be checked for state transitions here?
     {
-        if(controller.playerDist > controller.swtichDist) 
+        if(controller.playerDist < controller.swtichDist) 
             return true;
         else return false;
     }
 
-    private bool TargetDistClose(Darkness controller)
+    private bool NavTargetDistClose(Darkness controller) //Should this be checked for state transitions here?
     {
         if(controller.targetDistance < controller.swtichDist)
         {
