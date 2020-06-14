@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Dark_Transition
+public class Dark_Transition //repurpose for transtitioning between passive and aggressive states
 {
     
     public AI_DecisionMaker decision = new AI_DecisionMaker();

@@ -6,10 +6,8 @@ using System.Linq;
 public abstract class Dark_State : ScriptableObject
 {
     public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
-    public enum StatePriority {LOW, MEDIUM, HIGH};
 
     public StateType stateType;
-    public StatePriority statePriority;
     public Dark_Transition[] transitions;
     public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
@@ -68,6 +66,11 @@ public abstract class Dark_State : ScriptableObject
     protected virtual void FirstTimeSetup()
     {
         stateType = StateType.REMAIN;
+    }
+
+    protected void ActionSelector() //check if action has proper flags checked for 
+    {
+
     }
 
     protected void CheckTransitions(Darkness controller)
