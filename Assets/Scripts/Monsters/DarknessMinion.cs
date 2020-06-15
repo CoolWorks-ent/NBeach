@@ -3,7 +3,8 @@ using System.Collections;
 using UnityEngine;
 using Pathfinding;
 
-public class DarknessMinion : MonoBehaviour {
+public class DarknessMinion : MonoBehaviour 
+{
 
 	public enum AggresionRating {Aggressive, Passive}
 	public Rigidbody rigidbod;
@@ -130,6 +131,12 @@ public class DarknessMinion : MonoBehaviour {
         }    
         //yield return new WaitForSeconds(pathUpdateTime);
     }
+
+    public bool ConditionEvaluator() //checks the condition flags that need to be met for this action to execute
+	{
+		
+		return false;
+	}
 
     private void PathComplete(Path p)
     {

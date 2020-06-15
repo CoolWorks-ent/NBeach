@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dark_ActionSelector : MonoBehaviour {
+public class Dark_ActionSelector : MonoBehaviour 
+{
 	public enum ActioName {CHECK_PLAYER_DISTANCE, ROTATE_TOWARDS, PAUSE_FOR_COMMAND, MOVE_AWAY, MOVE_TOWARDS}
 
 	Dictionary<ActioName, Action<Darkness>> Actions;

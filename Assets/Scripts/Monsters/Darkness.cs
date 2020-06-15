@@ -116,7 +116,7 @@ public class Darkness : MonoBehaviour {
 
     public void ChangeState(Dark_State nextState)
     {
-        previousState = currentState;
+        /*previousState = currentState;
         if(!timedState) //if the timer on a state is still active don't switch yet
         {
             if(queuedState != null && queuedState != nextState)
@@ -143,7 +143,7 @@ public class Darkness : MonoBehaviour {
                 StartCoroutine(StateTransitionTimer(currentState.exitTime));
                 timedState = false;
             }            
-        }  //Check to see if this state has initiated it's timer to exit bevavior
+        }  //Check to see if this state has initiated it's timer to exit bevavior*/
     }
 
 
