@@ -14,7 +14,7 @@ public abstract class Dark_Action : ScriptableObject
     protected int rotationSpeed;
 
     [SerializeField, Range(0, 5)]
-    protected float pathUpdateRate;
+    public float pathUpdateRate;
 
     [SerializeField]
     protected bool hasExitTimer;

@@ -19,7 +19,7 @@ public class Darkness : MonoBehaviour {
     public GameObject deathFX;
     public Dark_State DeathState;
     
-    public bool moving, updateStates, attacked, timedState, timedStateExiting;
+    public bool moving, updateStates, attacked;
     public int creationID;
     public float playerDist, targetDistance, swtichDist, stopDistance, pathUpdateTime;
 
@@ -280,9 +280,9 @@ public class Darkness : MonoBehaviour {
 
     private IEnumerator StateTransitionTimer(float timer)
     {
-        timedStateExiting = true;
+        //timedStateExiting = true;
         yield return new WaitForSeconds(timer);
-        timedStateExiting = false;
+        //timedStateExiting = false;
     }
 
     private void OnTriggerEnter(Collider collider)

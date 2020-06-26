@@ -20,7 +20,7 @@ public class AI_DecisionMaker
         Decisions.Add(DecisionName.IN_ATTACK_RANGE, InAttackRange);
         Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
         Decisions.Add(DecisionName.NAV_TARGET_CLOSE, NavTargetDistClose);
-        Decisions.Add(DecisionName.EXIT_TIMER_EXPIRED, ExitTimerExpired);
+        //Decisions.Add(DecisionName.EXIT_TIMER_EXPIRED, ExitTimerExpired);
     }
 
     public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -39,14 +39,14 @@ public class AI_DecisionMaker
         else return false;
     }
     
-    public bool ExitTimerExpired(Darkness controller)
+    /*public bool ExitTimerExpired(Darkness controller)
     {
         if(!controller.timedState)
         {
             return true;
         }
         else return false;
-    }
+    }*/
 
     private bool InAttackRange(Darkness controller) //Should this be checked for state transitions here?
     {
