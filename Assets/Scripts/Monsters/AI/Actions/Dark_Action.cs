@@ -22,6 +22,8 @@ public abstract class Dark_Action : ScriptableObject
     [Range(0, 5)]
     public float exitTime;
 
+    public enum AnimationType {Chase, Idle, None, Attack}
+
 	//[SerializeField]
 	//public bool parallelAction; //can this action run in parallel with other actions or should it take precedent i.e the attack action should not be parallel
 
@@ -32,8 +34,6 @@ public abstract class Dark_Action : ScriptableObject
 
 	public abstract void ExecuteAction(DarknessMinion controller);
 	public abstract void TimedTransition(DarknessMinion controller);
-
-	
 
 	//public AI_DecisionMaker decision = new AI_DecisionMaker();
 

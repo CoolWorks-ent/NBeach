@@ -146,7 +146,6 @@ public class Darkness : MonoBehaviour {
         }  //Check to see if this state has initiated it's timer to exit bevavior*/
     }
 
-
     private void UpdateCurrentState()
     {
         currentState.UpdateState(this);
@@ -160,7 +159,7 @@ public class Darkness : MonoBehaviour {
 
             aIPath.FinalizeMovement(nextPosition, nextRotation);
         }
-    }   
+    } 
 
     ///<summary>Called in state update loop to update path</summary>
     public void UpdatePath()
@@ -219,12 +218,12 @@ public class Darkness : MonoBehaviour {
         sekr.pathCallback -= PathComplete;
     }
 
-    public void UpdateAnimator(Dark_State.StateType stType) 
+    /*public void UpdateAnimator(Dark_State.StateType stType) 
     {
         //Ensure the correct animation is played in the animator. 
         switch(stType)
         {
-            case Dark_State.StateType.ATTACK:
+            case Dark_State.StateType.AGGRESSIVE:
                 animeController.SetTrigger(attackHash);
                 break;
             case Dark_State.StateType.CHASING:
@@ -237,7 +236,7 @@ public class Darkness : MonoBehaviour {
                 animeController.SetTrigger(deathHash);
                 break;
         }
-    }
+    }*/
 
     public IEnumerator AttackCooldown(float idleTime)
     {

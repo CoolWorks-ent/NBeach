@@ -7,7 +7,7 @@ public class ChaseState : Dark_State
 
     protected override void FirstTimeSetup()
     {
-        stateType = StateType.CHASING;
+        //stateType = StateType.CHASING;
     }
 
     public override void InitializeState(Darkness controller)
@@ -21,7 +21,7 @@ public class ChaseState : Dark_State
     public override void UpdateState(Darkness controller)
     {
         controller.UpdatePath();
-        controller.UpdateAnimator(this.stateType);
+        //controller.UpdateAnimator(this.stateType);
         CheckTransitions(controller);
     }
 

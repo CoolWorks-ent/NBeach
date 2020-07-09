@@ -5,10 +5,11 @@ using System.Linq;
 
 public abstract class Dark_State : ScriptableObject
 {
-    public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
+    public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}
 
     public StateType stateType;
     public Dark_Transition[] transitions;
+    public Dark_Action[] actions;
     public List<Dark_State> ReferencedBy;
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
 

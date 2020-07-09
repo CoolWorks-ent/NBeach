@@ -15,7 +15,7 @@ public class AttackState : Dark_State
 
     protected override void FirstTimeSetup()
     {
-        stateType = StateType.ATTACK;
+        stateType = StateType.AGGRESSIVE;
     }
 
     public override void InitializeState(Darkness controller)
@@ -33,11 +33,11 @@ public class AttackState : Dark_State
     { 
         //TODO check if the darkness is facing the player. if not start rotating towards the player
         //controller.pather.destination = controller.Target.location.position;
-        controller.UpdateAnimator(StateType.CHASING);
+        //controller.UpdateAnimator(StateType.CHASING);
         if(controller.playerDist < attackInitiationRange && !controller.attacked) 
         {
             controller.attacked = true;
-            controller.UpdateAnimator(this.stateType);
+            //controller.UpdateAnimator(this.stateType);
             //controller.pather.canMove = false;
             controller.StartCoroutine(controller.AttackCooldown(attackCooldown));
             //if(controller.animeController.animation.)

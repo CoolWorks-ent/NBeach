@@ -182,23 +182,23 @@ public class DarknessMinion : MonoBehaviour
         sekr.pathCallback -= PathComplete;
     }
 
-    public void UpdateAnimator(Dark_State.StateType stType) 
+    public void UpdateAnimator(Dark_Action.AnimationType atType) 
     {
         //Ensure the correct animation is played in the animator. 
-        switch(stType)
+        switch(atType)
         {
-            case Dark_State.StateType.ATTACK:
+            case Dark_Action.AnimationType.Attack:
                 animeController.SetTrigger(attackHash);
                 break;
-            case Dark_State.StateType.CHASING:
+            case Dark_Action.AnimationType.Chase:
                 animeController.SetTrigger(chaseHash);
                 break;
-            case Dark_State.StateType.IDLE:
+            case Dark_Action.AnimationType.Idle:
                 animeController.SetTrigger(idleHash);
                 break;
-            case Dark_State.StateType.DEATH:
+            /*case Dark_State.StateType.DEATH:
                 animeController.SetTrigger(deathHash);
-                break;
+                break;*/
         }
     }
 

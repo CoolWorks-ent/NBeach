@@ -13,7 +13,7 @@ public class WanderState : Dark_State
 
     protected override void FirstTimeSetup()
     {
-        stateType = StateType.WANDER;
+        //stateType = StateType.WANDER;
     }
 
     public override void Startup()
@@ -26,7 +26,7 @@ public class WanderState : Dark_State
         base.InitializeState(controller);
         //controller.patrolNavTarget.active = true;
         //controller.navTarget.UpdateLocation(ChoosePatrolPoint(controller));
-        controller.UpdateAnimator(this.stateType);
+        //controller.UpdateAnimator(this.stateType);
         controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, patrolDistLow, patrolDistUpper));
         controller.UpdatePath();
         controller.moving = true;

@@ -14,7 +14,7 @@ public class DeathState : Dark_State
     {
         Debug.LogWarning("Darkness entered death state");
         //controller.aIRichPath.canMove = false;
-        controller.UpdateAnimator(this.stateType);
+        //controller.UpdateAnimator(this.stateType);
         
         GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
         //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
