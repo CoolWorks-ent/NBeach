@@ -104,10 +104,10 @@ public class Darkness : MonoBehaviour {
 
     void Start () {
         //patrolNavTarget = new Darkness_Manager.NavigationTarget(this.transform.position, Vector3.zero, Darkness_Manager.Instance.ground, 10, Darkness_Manager.NavTargetTag.Patrol);
-        Darkness_Manager.OnDarknessAdded(this); //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
+        //Darkness_Manager.OnDarknessAdded(this); //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
         Darkness_Manager.UpdateDarkStates += UpdateCurrentState;
         Darkness_Manager.DistanceUpdate += UpdateDistanceEvaluation;
-        currentState.InitializeState(this);
+        //currentState.InitializeState(this);
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
@@ -148,7 +148,7 @@ public class Darkness : MonoBehaviour {
 
     private void UpdateCurrentState()
     {
-        currentState.UpdateState(this);
+        //currentState.UpdateState(this);
     }
 
     void FixedUpdate()

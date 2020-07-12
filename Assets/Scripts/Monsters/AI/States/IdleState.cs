@@ -8,7 +8,7 @@ public class IdleState : Dark_State
     [Range(0, 5)]
     public float idleTime;
     
-    protected override void FirstTimeSetup()
+    /*protected override void FirstTimeSetup()
     {
         //stateType = StateType.IDLE;
     }
@@ -42,5 +42,5 @@ public class IdleState : Dark_State
         CheckTransitions(controller);
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-    }
+    }*/
 }

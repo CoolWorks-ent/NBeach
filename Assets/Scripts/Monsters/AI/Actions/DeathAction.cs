@@ -2,33 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "AI/Darkness/State/DeathState")]
-public class DeathState : Dark_State
-{
-    /*protected override void FirstTimeSetup()
+public class DeathAction : Dark_Action {
+    public override void ExecuteAction(DarknessMinion controller)
     {
-        stateType = StateType.DEATH;
-    }
-
-    public override void InitializeState(Darkness controller)
-    {
-        Debug.LogWarning("Darkness entered death state");
-        //controller.aIRichPath.canMove = false;
-        //controller.UpdateAnimator(this.stateType);
+        GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
+        //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
         
+        //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
+        controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
+        Darkness_Manager.Instance.StartCoroutine(deathRoutine(controller));
+        //controller.aIMovement.EndMovement();
+        Darkness_Manager.OnDarknessRemoved(controller);
+    }
+
+    public override void TimedTransition(DarknessMinion controller)
+    {
         
     }
 
-    public override void UpdateState(Darkness controller)
-    {
-    }
-
-    public override void ExitState(Darkness controller)
-    {
-        //AI_Manager.OnDarknessRemoved(controller);
-    }*/
-    
-    /*IEnumerator deathRoutine(Darkness controller)
+	IEnumerator deathRoutine(DarknessMinion controller)
     {
         float fxTime = 1;
         //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
@@ -51,5 +43,5 @@ public class DeathState : Dark_State
         //Destroy(controller.animeController);
         Destroy(controller.gameObject);
         yield return 0;
-    }*/
+    }
 }

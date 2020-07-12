@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEditor;
 
 [CreateAssetMenu (menuName = "AI/Darkness/State/ChaseState")]
-public class ChaseState : Dark_State
+public class ChaseState 
 {
 
-    protected override void FirstTimeSetup()
+    /*protected override void FirstTimeSetup()
     {
         //stateType = StateType.CHASING;
     }
@@ -29,5 +29,5 @@ public class ChaseState : Dark_State
     {
         //base.ExitState(controller);
         controller.EndMovement();
-    }
+    }*/
 }

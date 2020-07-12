@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public abstract class Dark_State : ScriptableObject
+public class Dark_State : ScriptableObject
 {
     public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}
 
     public StateType stateType;
     public Dark_Transition[] transitions;
     public Dark_Action[] actions;
-    public List<Dark_State> ReferencedBy;
-    //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
-
 
     [SerializeField, Range(0, 3)]
-    public float speedModifier;
+    public float attackSpeedModifier;
 
     [SerializeField, Range(0, 15)]
     protected float stopDist;
@@ -32,49 +29,32 @@ public abstract class Dark_State : ScriptableObject
     [Range(0, 5)]
     public float exitTime;
 
-    public virtual void Startup()
-    {
-        Darkness_Manager.RemoveDarkness += RemoveDarkness;
-        if(ReferencedBy == null || ReferencedBy.Count < 1)
-            ReferencedBy = new List<Dark_State>();
-        foreach(Dark_Transition ai in transitions)
-        {
-            if(!ai.trueState.ReferencedBy.Contains(this))
-                ai.trueState.ReferencedBy.Add(this);
-            if(!ai.falseState.ReferencedBy.Contains(this))
-                ai.falseState.ReferencedBy.Add(this);
-        }
-    }
-
-    public virtual void InitializeState(Darkness controller)
+    public virtual void InitializeState(DarknessMinion controller)
     {
         /*controller.pather.rotationSpeed = rotationSpeed;
         controller.pather.endReachedDistance = stopDist;
         controller.pather.maxSpeed = speedModifier;
         controller.pather.repathRate = pathUpdateRate;*/
     }
-    public abstract void UpdateState(Darkness controller);
-    public abstract void ExitState(Darkness controller);
-    /*{
-        if(hasExitTimer)
+    public void UpdateState(DarknessMinion controller)
+	{
+		
+	}
+    public void ExitState(DarknessMinion controller)
+    {
+        
+    }
+
+
+    protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
+    {
+        foreach(Dark_Action d_Action in actions)
         {
-            controller.timedStateExiting = true;
-            controller.StartCoroutine(controller.WaitTimer(exitTime));
-            controller.timedStateExiting = false;
-        } 
-    }*/
-
-    protected virtual void FirstTimeSetup()
-    {
-        stateType = StateType.REMAIN;
+            //if()
+        }
     }
 
-    protected void ActionSelector() //check if action has proper flags checked for 
-    {
-
-    }
-
-    protected void CheckTransitions(Darkness controller)
+    protected void CheckTransitions(DarknessMinion controller)
     {
         for(int i = 0; i < transitions.Length; i++)
         {
@@ -100,12 +80,12 @@ public abstract class Dark_State : ScriptableObject
         return new Vector3(point.x + center.x, center.y, point.y + center.z);
     }
 
-    protected void ProcessStateChange(Dark_State approvedState, Darkness controller)
+    protected void ProcessStateChange(Dark_State approvedState, DarknessMinion controller)
     {
         controller.ChangeState(approvedState);
     }
 
-    protected void RemoveDarkness(Darkness controller)
+    protected void RemoveDarkness(DarknessMinion controller)
     {
         if(stateType != Dark_State.StateType.DEATH)
         {

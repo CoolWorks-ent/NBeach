@@ -11,7 +11,7 @@ public class WanderState : Dark_State
     [Range(1,10)]
     public float patrolDistLow, patrolDistUpper;
 
-    protected override void FirstTimeSetup()
+   /* protected override void FirstTimeSetup()
     {
         //stateType = StateType.WANDER;
     }

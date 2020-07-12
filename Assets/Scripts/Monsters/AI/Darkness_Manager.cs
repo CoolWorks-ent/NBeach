@@ -10,7 +10,7 @@ public class Darkness_Manager : MonoBehaviour {
 		get {return instance; }
 	}
 	public Transform player;
-	public Dictionary<int, Darkness> ActiveDarkness;
+	public Dictionary<int, DarknessMinion> ActiveDarkness;
 
 	[SerializeField]
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
@@ -21,11 +21,11 @@ public class Darkness_Manager : MonoBehaviour {
 	[SerializeField]
 	private Dark_State[] dark_States;
 	//private NavigationTarget[] PatrolPoints;
-	private Darkness.NavigationTarget[] AttackPoints;
-	private Darkness.NavigationTarget StartPoint, PlayerPoint;
+	private DarknessMinion.NavigationTarget[] AttackPoints;
+	private DarknessMinion.NavigationTarget StartPoint, PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
-	//private Queue<Darkness> engagementQueue, approachQueue;
+	//private Queue<DarknessMinion> engagementQueue, approachQueue;
 
 	void Awake()
 	{
@@ -40,7 +40,7 @@ public class Darkness_Manager : MonoBehaviour {
 			//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 		}
 		else instance = this;
-		ActiveDarkness = new Dictionary<int, Darkness>();
+		ActiveDarkness = new Dictionary<int, DarknessMinion>();
 		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
@@ -50,12 +50,8 @@ public class Darkness_Manager : MonoBehaviour {
 		calculationTime = 0.25f;
 		attackOffset = 3.5f;
 		//PatrolPoints = new NavigationTarget[4]; 
-		AttackPoints = new Darkness.NavigationTarget[4]; 
+		AttackPoints = new DarknessMinion.NavigationTarget[4]; 
 		//StartCoroutine(ExecuteDarknessStates());
-		foreach(Dark_State d in dark_States)
-        {
-            d.Startup();
-        }
 	}
 
 	void Start()
@@ -63,8 +59,8 @@ public class Darkness_Manager : MonoBehaviour {
 		//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
 		ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
-		PlayerPoint = new Darkness.NavigationTarget(player.transform.position, Vector3.zero, ground, Darkness.NavTargetTag.Attack);
-		StartPoint = new Darkness.NavigationTarget(Vector3.zero, Vector3.zero, ground, Darkness.NavTargetTag.Patrol);
+		PlayerPoint = new DarknessMinion.NavigationTarget(player.transform.position, Vector3.zero, ground, DarknessMinion.NavTargetTag.Attack);
+		StartPoint = new DarknessMinion.NavigationTarget(Vector3.zero, Vector3.zero, ground, DarknessMinion.NavTargetTag.Patrol);
 		List<Vector3> offsets = new List<Vector3>();
 		offsets.Add(new Vector3(attackOffset, 0, -2));
 		offsets.Add(new Vector3(-attackOffset, 0, -2));
@@ -72,7 +68,7 @@ public class Darkness_Manager : MonoBehaviour {
 		offsets.Add(new Vector3(attackOffset/2, 0, 0));
 		for(int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new Darkness.NavigationTarget(player.transform.position, offsets[i], ground, Darkness.NavTargetTag.Attack);
+			AttackPoints[i] = new DarknessMinion.NavigationTarget(player.transform.position, offsets[i], ground, DarknessMinion.NavTargetTag.Attack);
 			//Vector3 t = AttackPoints[i].position+offsets[i];
 			//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 		}
@@ -81,7 +77,7 @@ public class Darkness_Manager : MonoBehaviour {
 	void LateUpdate()
 	{
 		PlayerPoint.UpdateLocation(player.position);
-		foreach(Darkness.NavigationTarget n in AttackPoints) //update the location of the attack points
+		foreach(DarknessMinion.NavigationTarget n in AttackPoints) //update the location of the attack points
 		{
 			n.UpdateLocation(player.position);
 		}
@@ -89,7 +85,7 @@ public class Darkness_Manager : MonoBehaviour {
 
 #region DarknessUpdateLoop
 
-	///<summary>Controls the update loop for Darkness objects. Calls Darkness sorting and Darkness approval functions </summary>
+	///<summary>Controls the update loop for DarknessMinion objects. Calls DarknessMinion sorting and DarknessMinion approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
 		//Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
@@ -110,7 +106,7 @@ public class Darkness_Manager : MonoBehaviour {
 		yield return null;
 	}
 
-	///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. Furtheset Darkness are set to idle priority</summary>
+	///<summary>Sets the closest DarknessMinion to attack state. DarknessMinion that are runners up are set to patrol nearby. Furtheset DarknessMinion are set to idle priority</summary>
 	private void UpdateDarknessAggresionStatus() 
 	{
 		attackApprovalPriority.Sort(delegate(int a, int b)
@@ -126,22 +122,23 @@ public class Darkness_Manager : MonoBehaviour {
 			if(i < darknessConcurrentAttackLimit)
 			{ 
 				darkAttackCount++;
-				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
+				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Aggressive);
 			}
-			else if(i < darknessConcurrentAttackLimit+2)
+			/*else if(i < darknessConcurrentAttackLimit+2)
 			{
-				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
+				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != DarknessMinion.AggresionRating.CatchingUp)
 				{
 					darkStandbyCount++;
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
+					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Wandering);
 				}
-			}
+			}*/
 			else 
 			{
-				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
+				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Passive);
+				/*if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != DarknessMinion.AggresionRating.CatchingUp)
 				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
-				}
+					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Idling);
+				}*/
 			}
 		}
 	}
@@ -150,7 +147,7 @@ public class Darkness_Manager : MonoBehaviour {
 #region NavTargetHandling
 
 	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
-	public int LeastRequestedNavigationTarget(Darkness.NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
+	public int LeastRequestedNavigationTarget(DarknessMinion.NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
 		int lowest = 0;
 		List<int> evenCount = new List<int>(); //In case there are entries at the same levels
@@ -180,20 +177,20 @@ public class Darkness_Manager : MonoBehaviour {
 		return lowest;
 	}
 
-	///<summary>Returns an attack Navigation Target. Returns the StartPoint object if Darkness is not found or if they should not be attacking. </summary>
-	private Darkness.NavigationTarget AssignAttackNavTarget(int darkID) 
+	///<summary>Returns an attack Navigation Target. Returns the StartPoint object if DarknessMinion is not found or if they should not be attacking. </summary>
+	private DarknessMinion.NavigationTarget AssignAttackNavTarget(int darkID) 
 	{
-		//Find if Darkness is in the collection
-		Darkness darkness;
+		//Find if DarknessMinion is in the collection
+		DarknessMinion darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness)) 
 		{
 			switch(darkness.agRatingCurrent)
 			{
-				case Darkness.AggresionRating.Attacking:
+				case DarknessMinion.AggresionRating.Aggressive:
 					int index = LeastRequestedNavigationTarget(AttackPoints);
 					AttackPoints[index].weight++;
 					return AttackPoints[index];
-				/*case Darkness.AggresionRating.Wandering:
+				/*case DarknessMinion.AggresionRating.Wandering:
 					NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
 					if(darkness.navTarget.navTargetTag == NavTargetTag.Patrol)
 					{
@@ -210,7 +207,7 @@ public class Darkness_Manager : MonoBehaviour {
 		}
 		else 
 		{
-			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));	
+			Debug.LogError(string.Format("DarknessMinion {0} does not exist", darkID));	
 			return StartPoint;
 		}
 	}
@@ -218,7 +215,7 @@ public class Darkness_Manager : MonoBehaviour {
 	///<summary></summary>
 	private void DeactivateNavTarget(int darkID, bool aggresive)
 	{
-		Darkness darkness;
+		DarknessMinion darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
 			if(!aggresive)
@@ -229,24 +226,24 @@ public class Darkness_Manager : MonoBehaviour {
 		}
 	}
 
-	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
+	///<summary>Processes DarknessMinion request for a  NavTarget. Assign a new target to the requestor DarknessMinion if a valid request</summary> //--Work in Progress--
 	public void ApproveDarknessTarget(int darkID, bool closeToPlayer) 
 	{
-		Darkness darkness;
+		DarknessMinion darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
+			if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive)
 			{ 
 				if(closeToPlayer)
 					darkness.navTarget = PlayerPoint;
 				else darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
 			}
-			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
+			else if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Passive)
 			{
 				DeactivateNavTarget(darkID, true);
 				darkness.navTarget = PlayerPoint;
 			}
-			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
+			else //if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Idling)
 			{
 				DeactivateNavTarget(darkID, false);
 				darkness.navTarget = StartPoint;
@@ -256,8 +253,8 @@ public class Darkness_Manager : MonoBehaviour {
 	#endregion
 
 #region DarknessCollectionUpdates
-	///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
-	private void AddtoDarknessList(Darkness updatedDarkness)
+	///<summary> Notified by the AddDarkness event. Initializes DarknessMinion parameters and adds to ActiveDakness </summary>
+	private void AddtoDarknessList(DarknessMinion updatedDarkness)
 	{
 		updatedDarkness.transform.SetParent(this.transform);
 		darknessIDCounter++;
@@ -275,8 +272,8 @@ public class Darkness_Manager : MonoBehaviour {
 		//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 	}
 
-	///<summary>Removes Darkness from attack list if present. Also removes Darkness from active list and stops any relevant running funcitons</summary>
-    public void RemoveFromDarknessList(Darkness updatedDarkness)
+	///<summary>Removes DarknessMinion from attack list if present. Also removes DarknessMinion from active list and stops any relevant running funcitons</summary>
+    public void RemoveFromDarknessList(DarknessMinion updatedDarkness)
     {
 		//updatedDarkness.StopCoroutine(updatedDarkness.ExecuteCurrentState());
 
@@ -290,9 +287,9 @@ public class Darkness_Manager : MonoBehaviour {
 
 	public void KillAllDarkness()
     {
-        Debug.Log("[AI] All Darkness AI kill call");
+        Debug.Log("[AI] All DarknessMinion AI kill call");
 
-        foreach(KeyValuePair<int, Darkness>dark in ActiveDarkness)
+        foreach(KeyValuePair<int, DarknessMinion>dark in ActiveDarkness)
         {
 			OnDarknessRemoved(dark.Value);
             ActiveDarkness.Remove(dark.Key);
@@ -307,39 +304,39 @@ public class Darkness_Manager : MonoBehaviour {
 
 	public static event AIEvent UpdateDarkStates;
 	public static event AIEvent<Vector3> DistanceUpdate;
-	public static event AIEvent<Darkness> AddDarkness;
-	public static event AIEvent<Darkness> RemoveDarkness;
+	public static event AIEvent<DarknessMinion> AddDarkness;
+	public static event AIEvent<DarknessMinion> RemoveDarkness;
 	public static event AIEvent<int, bool> RequestNewTarget;
 
-	///<summary>Executes logic update for Darkness</summary>
-	public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by Darkness. Darkness will run the update for their current state.
+	///<summary>Executes logic update for DarknessMinion</summary>
+	public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by DarknessMinion. DarknessMinion will run the update for their current state.
 	{
 		if(UpdateDarkStates != null)
 			UpdateDarkStates();
 	}
 
-	///<summary>Executes distance update for Darkness</summary>
-	public static void OnDistanceUpdate(Vector3 pos) //Called by Darkness_Manager. Subsribed by Darkness
+	///<summary>Executes distance update for DarknessMinion</summary>
+	public static void OnDistanceUpdate(Vector3 pos) //Called by Darkness_Manager. Subsribed by DarknessMinion
 	{
 		if(DistanceUpdate != null)
 			DistanceUpdate(pos);
 	}
 
-	///<summary>Adds Darkness to tracking list. Only call this for after initializing Darkness variables.</summary> //Called by Darkness. Subscribed by Darkness_Manager
-	public static void OnDarknessAdded(Darkness d) //Called by Darkness. Subscribed by Darkness_Manager
+	///<summary>Adds DarknessMinion to tracking list. Only call this for after initializing DarknessMinion variables.</summary> //Called by DarknessMinion. Subscribed by Darkness_Manager
+	public static void OnDarknessAdded(DarknessMinion d) //Called by DarknessMinion. Subscribed by Darkness_Manager
 	{
 		if(AddDarkness != null)
 			AddDarkness(d);
 	}
 
-	///<summary>Removes Darkness from tracking list.</summary>
-	public static void OnDarknessRemoved(Darkness d) //Called by Darkness. Subscribed by Darkness_Manager
+	///<summary>Removes DarknessMinion from tracking list.</summary>
+	public static void OnDarknessRemoved(DarknessMinion d) //Called by DarknessMinion. Subscribed by Darkness_Manager
 	{
 		if(RemoveDarkness != null)
 			RemoveDarkness(d);
 	}
 
-	///<summary>Request a new navigation target be assigned to the identified Darkness.</summary>
+	///<summary>Request a new navigation target be assigned to the identified DarknessMinion.</summary>
 	public static void OnRequestNewTarget(int ID, bool playerPoint) //Called by Dark_States. Subscribed by Darkness_Manager
 	{
 		if(RequestNewTarget != null)

@@ -5,12 +5,11 @@ using Pathfinding;
 
 public class DarknessMinion : MonoBehaviour 
 {
-
 	public enum AggresionRating {Aggressive, Passive}
 	public Rigidbody rigidbod;
     public Vector3 nextPosition;
     public Quaternion nextRotation;
-    public AggresionRating agRatingCurrent;
+    public AggresionRating agRatingCurrent, agRatingPrevious;
 	[HideInInspector]
     public Collider darkHitBox;
     public GameObject deathFX;
@@ -132,6 +131,40 @@ public class DarknessMinion : MonoBehaviour
         //yield return new WaitForSeconds(pathUpdateTime);
     }
 
+    public void ChangeState(Dark_State nextState)
+    {
+        /*previousState = currentState;
+        if(!timedState) //if the timer on a state is still active don't switch yet
+        {
+            if(queuedState != null && queuedState != nextState)
+            {
+                if(nextState.statePriority > queuedState.statePriority)
+                {
+                    currentState = nextState;
+                    previousState.ExitState(this);
+                    currentState.InitializeState(this);
+                }
+                else if(queuedState.statePriority > nextState.statePriority)
+                {
+                    currentState = queuedState;
+                    previousState.ExitState(this);
+                    currentState.InitializeState(this);
+                }
+            }
+            else currentState = nextState;
+        }
+        else
+        {
+            if(!timedStateExiting)
+            {
+                StartCoroutine(StateTransitionTimer(currentState.exitTime));
+                timedState = false;
+            }            
+        }  //Check to see if this state has initiated it's timer to exit bevavior*/
+    }
+
+    
+
     public bool ConditionEvaluator() //checks the condition flags that need to be met for this action to execute
 	{
 		
@@ -200,6 +233,13 @@ public class DarknessMinion : MonoBehaviour
                 animeController.SetTrigger(deathHash);
                 break;*/
         }
+    }
+
+    public void AggressionChanged(AggresionRating agR)
+    {
+        if(agR != agRatingCurrent)
+            agRatingPrevious = agRatingCurrent;
+		agRatingCurrent = agR;
     }
 
     public IEnumerator AttackCooldown(float idleTime)
