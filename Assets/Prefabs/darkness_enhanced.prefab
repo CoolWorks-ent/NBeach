@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 136796206659899728}
   - component: {fileID: 114201816284845686}
   - component: {fileID: 114482823206306784}
+  - component: {fileID: 114732482021839622}
   m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -892,6 +893,40 @@ MonoBehaviour:
   legacyMode: 0
   serializedVersion: 1
   legacyUseWorldSpace: 0
+--- !u!114 &114732482021839622
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e5ce026a410b44eaf357cf764ef278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidbod: {fileID: 0}
+  nextPosition: {x: 0, y: 0, z: 0}
+  nextRotation: {x: 0, y: 0, z: 0, w: 0}
+  agRatingCurrent: 0
+  agRatingPrevious: 0
+  darkHitBox: {fileID: 0}
+  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
+  DeathState: {fileID: 0}
+  creationID: 0
+  moving: 0
+  updateStates: 0
+  attacked: 0
+  transitioning: 0
+  playerDist: 0
+  targetDistance: 0
+  swtichDist: 0
+  stopDistance: 0
+  pathUpdateTime: 0
+  playerDirection: {x: 0, y: 0, z: 0}
+  attackHash: 1080829965
+  chaseHash: 1463555229
+  idleHash: 2081823275
+  deathHash: 646380074
 --- !u!114 &114857173380954124
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -31,9 +31,16 @@ public abstract class Dark_Action : ScriptableObject
 	//TODO add action type - Universal can be used by all while aggresive actions are reserved for aggressive states
 	public bool hasTransition, overrideTransition;
 
-	public ActionFlags[] Conditions;
+    [SerializeField]
+	private ActionFlags[] Conditions;
 
-    private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck;
+    private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>
+    {
+        {ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
+        {ActionFlags.NavTargetDistClose, NavTargetDistClose},
+        {ActionFlags.AttackSuccessfull, AttackSuccessfull}
+    };
+
 
 	public abstract void ExecuteAction(DarknessMinion controller);
 	public abstract void TimedTransition(DarknessMinion controller);
@@ -47,15 +54,7 @@ public abstract class Dark_Action : ScriptableObject
         }
 
         return true;
-    }  
-
-    void Awake() 
-    {
-        ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>();
-        ActionFlagCheck.Add(ActionFlags.PlayerInAttackRange, PlayerInAttackRange);
-        ActionFlagCheck.Add(ActionFlags.NavTargetDistClose, NavTargetDistClose);
-        ActionFlagCheck.Add(ActionFlags.AttackSuccessfull, AttackSuccessfull);
-    }
+    } 
 
     private bool CheckFlag(ActionFlags fName, DarknessMinion controller)
     {   
@@ -64,7 +63,7 @@ public abstract class Dark_Action : ScriptableObject
         else return false;
     }
 
-    private bool PlayerInAttackRange(DarknessMinion controller) 
+    private static bool PlayerInAttackRange(DarknessMinion controller) 
     {
         if(controller.playerDist <= controller.swtichDist) 
         {
@@ -73,7 +72,7 @@ public abstract class Dark_Action : ScriptableObject
         else return false;
     }
 
-    private bool AttackSuccessfull(DarknessMinion controller) 
+    private static bool AttackSuccessfull(DarknessMinion controller) 
     {
         if(controller.attacked)
         {
@@ -82,7 +81,7 @@ public abstract class Dark_Action : ScriptableObject
         else return false;
     }
 
-    private bool NavTargetDistClose(DarknessMinion controller) 
+    private static bool NavTargetDistClose(DarknessMinion controller) 
     {
         if(controller.targetDistance < controller.swtichDist)
         {
@@ -90,8 +89,4 @@ public abstract class Dark_Action : ScriptableObject
         }
         else return false;
     }
-
-	//public AI_DecisionMaker decision = new AI_DecisionMaker();
-
-	//public AI_DecisionMaker.DecisionName decisionChoice;
 }

@@ -50,7 +50,10 @@ public class Dark_State : ScriptableObject
     {
         foreach(Dark_Action d_Action in actions)
         {
-            //if()
+            if(d_Action.ConditionsMet(controller))
+            {
+                d_Action.ExecuteAction(controller);
+            }
         }
     }
 
