@@ -13,13 +13,13 @@ public class AI_DecisionMaker
     public AI_DecisionMaker() //Should these choices be reduced 
     {
         Decisions = new Dictionary<DecisionName,Func<DarknessMinion,bool>>();
-        //Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
+        Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
         //Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
         //Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
-        Decisions.Add(DecisionName.PLAYER_WITHIN_RANGE, PlayerWithinRange);
-        Decisions.Add(DecisionName.IN_ATTACK_RANGE, InAttackRange);
+        //Decisions.Add(DecisionName.PLAYER_WITHIN_RANGE, PlayerWithinRange);
+        //Decisions.Add(DecisionName.IN_ATTACK_RANGE, InAttackRange);
         Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
-        Decisions.Add(DecisionName.NAV_TARGET_CLOSE, NavTargetDistClose);
+        //Decisions.Add(DecisionName.NAV_TARGET_CLOSE, NavTargetDistClose);
         //Decisions.Add(DecisionName.EXIT_TIMER_EXPIRED, ExitTimerExpired);
     }
 
@@ -30,32 +30,24 @@ public class AI_DecisionMaker
         else return false;
     }
 
-    /*private bool AggresiveCheck(DarknessMinion controller) //Should this be checked for state transitions here?
+    private bool AggresiveCheck(DarknessMinion controller) //Should this be checked for state transitions here?
     {
-        if(controller.agRatingCurrent == Darkness.AggresionRating.Attacking) 
-        {
-            return true;
-        }
-        else return false;
-    }*/
-    
-    /*public bool ExitTimerExpired(Darkness controller)
-    {
-        if(!controller.timedState)
-        {
-            return true;
-        }
-        else return false;
-    }*/
-
-    private bool InAttackRange(DarknessMinion controller) //Should this be checked for state transitions here?
-    {
-        if(controller.playerDist <= controller.swtichDist) 
+        if(controller.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive) 
         {
             return true;
         }
         else return false;
     }
+    
+
+    /*private bool InAttackRange(DarknessMinion controller) //Should this be checked for state transitions here?
+    {
+        if(controller.playerDist <= controller.attackRange) 
+        {
+            return true;
+        }
+        else return false;
+    }*/
 
     private bool AttackSuccessfull(DarknessMinion controller) //Should this be checked for state transitions here?
     {
@@ -84,19 +76,12 @@ public class AI_DecisionMaker
         else return false;
     }*/
 
-    private bool PlayerWithinRange(DarknessMinion controller) //Should this be checked for state transitions here?
+    /*private bool NavTargetDistClose(DarknessMinion controller) //Should this be checked for state transitions here?
     {
-        if(controller.playerDist < controller.swtichDist) 
-            return true;
-        else return false;
-    }
-
-    private bool NavTargetDistClose(DarknessMinion controller) //Should this be checked for state transitions here?
-    {
-        if(controller.targetDistance < controller.swtichDist)
+        if(controller.targetDistance < controller.attackRange)
         {
             return true;
         }
         else return false;
-    }
+    }*/
 }

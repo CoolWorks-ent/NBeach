@@ -8,9 +8,15 @@ public class SetPatrolTargetAction : Dark_Action
     {
 
     }
-    
-	public override void TimedTransition(DarknessMinion controller)
+
+
+    public override void TimedTransition(DarknessMinion controller)
     {
 
+    }
+
+    public override void ExitAction(DarknessMinion controller)
+    {
+        
     }
 }

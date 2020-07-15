@@ -4,46 +4,27 @@ using UnityEngine;
 
 public abstract class Dark_Action : ScriptableObject
 {
-	[SerializeField, Range(0, 3)]
-    public float speedModifier;
-
-    [SerializeField, Range(0, 15)]
-    protected float stopDist;
-
-    [SerializeField, Range(0,360)]
-    protected int rotationSpeed;
-
-    [SerializeField, Range(0, 5)]
-    public float pathUpdateRate;
-
-    [SerializeField]
-    protected bool hasExitTimer;
-
-    [Range(0, 5)]
-    public float exitTime;
-
     public enum AnimationType {Chase, Idle, None, Attack}
-    public enum ActionFlags {PlayerInAttackRange, AttackSuccessfull, NavTargetDistClose}
+    public enum ActionFlags {PlayerInAttackRange, AttackSuccessfull, NavTargetDistClose, PlayerOutOfRange, EndOfPath}
 
 	//[SerializeField]
-	//public bool parallelAction; //can this action run in parallel with other actions or should it take precedent i.e the attack action should not be parallel
-
-	//TODO add action type - Universal can be used by all while aggresive actions are reserved for aggressive states
-	public bool hasTransition, overrideTransition;
+	public bool hasTimer; 
 
     [SerializeField]
 	private ActionFlags[] Conditions;
 
     private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>
     {
-        {ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
+        //{ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
         {ActionFlags.NavTargetDistClose, NavTargetDistClose},
-        {ActionFlags.AttackSuccessfull, AttackSuccessfull}
+        {ActionFlags.AttackSuccessfull, AttackSuccessfull},
+        //{ActionFlags.PlayerOutOfRange, PlayerOutOfRange}
     };
 
 
 	public abstract void ExecuteAction(DarknessMinion controller);
 	public abstract void TimedTransition(DarknessMinion controller);
+    public abstract void ExitAction(DarknessMinion controller);
 
     public bool ConditionsMet(DarknessMinion controller)
     {
@@ -63,14 +44,20 @@ public abstract class Dark_Action : ScriptableObject
         else return false;
     }
 
-    private static bool PlayerInAttackRange(DarknessMinion controller) 
+    private static bool EndOfPath(DarknessMinion controller)
     {
-        if(controller.playerDist <= controller.swtichDist) 
+        return controller.reachedEndOfPath;
+
+    }
+
+    /*private static bool PlayerInAttackRange(DarknessMinion controller) 
+    {
+        if(controller.playerDist <= controller.attackRange) 
         {
             return true;
         }
         else return false;
-    }
+    }*/
 
     private static bool AttackSuccessfull(DarknessMinion controller) 
     {
@@ -83,10 +70,19 @@ public abstract class Dark_Action : ScriptableObject
 
     private static bool NavTargetDistClose(DarknessMinion controller) 
     {
-        if(controller.targetDistance < controller.swtichDist)
+        if(controller.targetDistance < controller.switchTargetDistance || EndOfPath(controller))
         {
             return true;
         }
         else return false;
     }
+
+    /*private static bool PlayerOutOfRange(DarknessMinion controller) 
+    {
+        if(controller.playerDist > controller.attackRange)
+        {
+            return true;
+        }
+        else return false;
+    }*/
 }

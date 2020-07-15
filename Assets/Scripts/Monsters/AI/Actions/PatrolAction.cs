@@ -14,5 +14,8 @@ public class PatrolAction : Dark_Action
         
     }
 
-
+    public override void ExitAction(DarknessMinion controller)
+    {
+        
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+[CreateAssetMenu (menuName = "Darkness/State/DarkState")]
 public class Dark_State : ScriptableObject
 {
     public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}

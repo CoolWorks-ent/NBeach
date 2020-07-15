@@ -13,13 +13,14 @@ public class DarknessMinion : MonoBehaviour
 	[HideInInspector]
     public Collider darkHitBox;
     public GameObject deathFX;
-    public Dark_State DeathState;
+    public Dark_State DeathState, currentState;
 	public int creationID;
-	public bool moving, updateStates, attacked, transitioning;
-    public float playerDist, targetDistance, swtichDist, stopDistance, pathUpdateTime;
+	public bool moving, updateStates, attacked;
+    public float playerDist, targetDistance, stopDistance, switchTargetDistance, pathUpdateTime;
 
     public Vector3 playerDirection;
-    private bool reachedEndOfPath, lookAtPlayer;
+    public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
+    private float stateTime;
 	private Seeker sekr;
     private AIPath aIPath;
     private Path navPath;
@@ -38,7 +39,7 @@ public class DarknessMinion : MonoBehaviour
 
     ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
 	public struct NavigationTarget
-	{
+	{ 
 		public int weight;
 		//public bool active;
 		private float groundElavation;
@@ -75,17 +76,15 @@ public class DarknessMinion : MonoBehaviour
 		}
 	}
 
-
 	void Awake()
     {
         //attackInitiationRange = 2.5f;
         stopDistance = 3;
-        swtichDist = 3; 
         creationID = 0;
         pathUpdateTime = 1.6f;
         updateStates = true;
         //agRatingCurrent = AggresionRating.Idling;
-        attacked = moving = reachedEndOfPath = lookAtPlayer = false;
+        attacked = moving = false;
         animeController = GetComponentInChildren<Animator>();
         darkHitBox = GetComponent<CapsuleCollider>();
         sekr = GetComponent<Seeker>();
@@ -118,6 +117,11 @@ public class DarknessMinion : MonoBehaviour
         }
     }   
 
+    void Update()
+    {
+
+    }
+
     ///<summary>Called in state update loop to update path</summary>
     public void UpdatePath()
     {
@@ -133,6 +137,9 @@ public class DarknessMinion : MonoBehaviour
 
     public void ChangeState(Dark_State nextState)
     {
+        currentState.ExitState(this);
+        currentState = nextState;
+        currentState.InitializeState(this);
         /*previousState = currentState;
         if(!timedState) //if the timer on a state is still active don't switch yet
         {
@@ -162,14 +169,6 @@ public class DarknessMinion : MonoBehaviour
             }            
         }  //Check to see if this state has initiated it's timer to exit bevavior*/
     }
-
-    
-
-    public bool ConditionEvaluator() //checks the condition flags that need to be met for this action to execute
-	{
-		
-		return false;
-	}
 
     private void PathComplete(Path p)
     {

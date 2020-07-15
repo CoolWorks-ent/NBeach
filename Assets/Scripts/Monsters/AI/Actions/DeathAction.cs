@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu (menuName = "Darkness/Action/DeathState")]
 public class DeathAction : Dark_Action {
     public override void ExecuteAction(DarknessMinion controller)
     {
@@ -16,6 +17,11 @@ public class DeathAction : Dark_Action {
     }
 
     public override void TimedTransition(DarknessMinion controller)
+    {
+        
+    }
+
+    public override void ExitAction(DarknessMinion controller)
     {
         
     }

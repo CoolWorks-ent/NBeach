@@ -9,7 +9,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    Darkness darknessEnemy;
+    DarknessMinion darknessEnemy;
     [SerializeField]
     public float spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
@@ -32,7 +32,7 @@ public class EnemySpawner : MonoBehaviour
     void DarknessDeath(string enemyName)
     {
         //remove enemy from the list
-        Darkness enemyObj = GameObject.Find(enemyName).GetComponent<Darkness>();
+        DarknessMinion enemyObj = GameObject.Find(enemyName).GetComponent<DarknessMinion>();
         Destroy(enemyObj.gameObject);
     }
 
@@ -48,7 +48,7 @@ public class EnemySpawner : MonoBehaviour
                     if (spawnWait >= spawnRate)
                     {
                         Vector3 randomloc = Random.insideUnitCircle * 5;
-                        Darkness enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
+                        DarknessMinion enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
                         //add enemy to management list

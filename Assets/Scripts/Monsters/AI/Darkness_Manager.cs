@@ -106,7 +106,7 @@ public class Darkness_Manager : MonoBehaviour {
 		yield return null;
 	}
 
-	///<summary>Sets the closest DarknessMinion to attack state. DarknessMinion that are runners up are set to patrol nearby. Furtheset DarknessMinion are set to idle priority</summary>
+	///<summary>Sets the closest DarknessMinion to aggressive. DarknessMinion that are runners up are set to patrol nearby. Furtheset DarknessMinion are set to idle priority</summary>
 	private void UpdateDarknessAggresionStatus() 
 	{
 		attackApprovalPriority.Sort(delegate(int a, int b)
