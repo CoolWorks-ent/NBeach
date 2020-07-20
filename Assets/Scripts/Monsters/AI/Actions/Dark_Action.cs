@@ -5,12 +5,18 @@ using UnityEngine;
 public abstract class Dark_Action : ScriptableObject
 {
     public enum AnimationType {Chase, Idle, None, Attack}
-    public enum ActionFlags {PlayerInAttackRange, AttackSuccessfull, NavTargetDistClose, PlayerOutOfRange, EndOfPath}
-
-	//[SerializeField]
-	public bool hasTimer; 
 
     [SerializeField]
+    ///<summary>Assigned in inspector. Determines the animation clip used to play during the action</summary> 
+    protected AnimationType animationType; 
+    public bool hasTimer; 
+
+    public enum ActionFlags {PlayerInAttackRange, AttackSuccessfull, NavTargetDistClose, PlayerOutOfRange, EndOfPath}
+
+	public abstract void ExecuteAction(DarknessMinion controller);
+	public abstract void TimedTransition(DarknessMinion controller);
+    public abstract void ExitAction(DarknessMinion controller);
+    
 	private ActionFlags[] Conditions;
 
     private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>
@@ -22,9 +28,7 @@ public abstract class Dark_Action : ScriptableObject
     };
 
 
-	public abstract void ExecuteAction(DarknessMinion controller);
-	public abstract void TimedTransition(DarknessMinion controller);
-    public abstract void ExitAction(DarknessMinion controller);
+	
 
     public bool ConditionsMet(DarknessMinion controller)
     {
@@ -47,7 +51,6 @@ public abstract class Dark_Action : ScriptableObject
     private static bool EndOfPath(DarknessMinion controller)
     {
         return controller.reachedEndOfPath;
-
     }
 
     /*private static bool PlayerInAttackRange(DarknessMinion controller) 

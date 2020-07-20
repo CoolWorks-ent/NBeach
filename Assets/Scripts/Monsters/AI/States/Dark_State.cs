@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using System.Collections;
 
 [CreateAssetMenu (menuName = "Darkness/State/DarkState")]
 public class Dark_State : ScriptableObject
@@ -36,25 +34,36 @@ public class Dark_State : ScriptableObject
         controller.pather.endReachedDistance = stopDist;
         controller.pather.maxSpeed = speedModifier;
         controller.pather.repathRate = pathUpdateRate;*/
+        if(hasExitTimer)
+            controller.StartCoroutine(controller.WaitTimer(exitTime));
     }
     public void UpdateState(DarknessMinion controller)
 	{
-		
+		//if(!hasExitTimer)
 	}
+    
     public void ExitState(DarknessMinion controller)
     {
         
     }
 
+    protected IEnumerator IdleTime(DarknessMinion controller, float idleTime)
+    {
+        yield return controller.WaitTimer(idleTime);
+        CheckTransitions(controller);
+        //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
+        //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+    }
 
     protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
     {
         foreach(Dark_Action d_Action in actions)
         {
-            if(d_Action.ConditionsMet(controller))
+            d_Action.ExecuteAction(controller);
+            /*if(d_Action.ConditionsMet(controller))
             {
                 d_Action.ExecuteAction(controller);
-            }
+            }*/
         }
     }
 

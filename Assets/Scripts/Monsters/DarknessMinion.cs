@@ -10,10 +10,13 @@ public class DarknessMinion : MonoBehaviour
     public Vector3 nextPosition;
     public Quaternion nextRotation;
     public AggresionRating agRatingCurrent, agRatingPrevious;
+
 	[HideInInspector]
     public Collider darkHitBox;
     public GameObject deathFX;
     public Dark_State DeathState, currentState;
+
+    [HideInInspector]
 	public int creationID;
 	public bool moving, updateStates, attacked;
     public float playerDist, targetDistance, stopDistance, switchTargetDistance, pathUpdateTime;
@@ -94,10 +97,10 @@ public class DarknessMinion : MonoBehaviour
 
     void Start () {
         //patrolNavTarget = new Darkness_Manager.NavigationTarget(this.transform.position, Vector3.zero, Darkness_Manager.Instance.ground, 10, Darkness_Manager.NavTargetTag.Patrol);
-        //Darkness_Manager.OnDarknessAdded(this); //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
-        //Darkness_Manager.UpdateDarkStates += UpdateCurrentState;
-        //Darkness_Manager.DistanceUpdate += UpdateDistanceEvaluation;
-        //currentState.InitializeState(this);
+        Darkness_Manager.OnDarknessAdded(this); //Called in Start instead of at instantiation becuase the Darkness needs to be fully setup before the Manager approves behavior changes.
+        Darkness_Manager.UpdateDarkStates += UpdateCurrentState;
+        Darkness_Manager.DistanceUpdate += UpdateDistanceEvaluation;
+        currentState.InitializeState(this);
         sekr.pathCallback += PathComplete;
         darkHitBox.enabled = false;
         playerDirection = new Vector3();
@@ -117,9 +120,9 @@ public class DarknessMinion : MonoBehaviour
         }
     }   
 
-    void Update()
+    private void UpdateCurrentState()
     {
-
+        currentState.UpdateState(this);
     }
 
     ///<summary>Called in state update loop to update path</summary>
