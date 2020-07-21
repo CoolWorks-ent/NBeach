@@ -81,11 +81,21 @@ public class Darkness_Manager : MonoBehaviour {
 		{
 			n.UpdateLocation(player.position);
 		}
+		OnDistanceUpdate(player.position);
+		UpdateDarknessAggresionStatus();
+	}
+
+	void Update()
+	{
+		if(ActiveDarkness.Count > 0)
+		{
+			OnUpdateDarkStates();
+		}
 	}
 
 #region DarknessUpdateLoop
 
-	///<summary>Controls the update loop for DarknessMinion objects. Calls DarknessMinion sorting and DarknessMinion approval functions </summary>
+	/*///<summary>Controls the update loop for DarknessMinion objects. Calls DarknessMinion sorting and DarknessMinion approval functions </summary>
 	private IEnumerator ManagedDarknessUpdate() 
 	{
 		//Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
@@ -104,7 +114,7 @@ public class Darkness_Manager : MonoBehaviour {
 			} else yield return new WaitForSeconds(calculationTime);
 		}
 		yield return null;
-	}
+	}*/
 
 	///<summary>Sets the closest DarknessMinion to aggressive. DarknessMinion that are runners up are set to patrol nearby. Furtheset DarknessMinion are set to idle priority</summary>
 	private void UpdateDarknessAggresionStatus() 
@@ -263,11 +273,11 @@ public class Darkness_Manager : MonoBehaviour {
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);
-		if(updatePaused && !gamePaused)
+		/*if(updatePaused && !gamePaused)
 		{
 			updatePaused = false;
 			StartCoroutine(ManagedDarknessUpdate());
-		}
+		}*/
 			
 		//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 	}
