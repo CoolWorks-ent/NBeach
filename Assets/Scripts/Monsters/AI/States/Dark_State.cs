@@ -1,110 +1,102 @@
 using UnityEngine;
 using System.Collections;
 
-[CreateAssetMenu (menuName = "Darkness/State/DarkState")]
-public class Dark_State : ScriptableObject
+namespace Darkness
 {
-    public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}
-
-    public StateType stateType;
-    public Dark_Transition[] transitions;
-    public Dark_Action[] actions;
-
-    [SerializeField, Range(0, 3)]
-    public float attackSpeedModifier;
-
-    [SerializeField, Range(0, 15)]
-    protected float stopDist;
-
-    [SerializeField, Range(0,360)]
-    protected int rotationSpeed;
-
-    [SerializeField, Range(0, 5)]
-    protected float pathUpdateRate;
-
-    [SerializeField]
-    protected bool hasExitTimer;
-
-    [Range(0, 5)]
-    public float exitTime;
-
-    public virtual void InitializeState(DarknessMinion controller)
+    [CreateAssetMenu (menuName = "Darkness/State/DarkState")]
+    public class Dark_State : ScriptableObject
     {
-        /*controller.pather.rotationSpeed = rotationSpeed;
-        controller.pather.endReachedDistance = stopDist;
-        controller.pather.maxSpeed = speedModifier;
-        controller.pather.repathRate = pathUpdateRate;*/
-        if(hasExitTimer)
-            controller.StartCoroutine(controller.WaitTimer(exitTime));
-    }
-    public void UpdateState(DarknessMinion controller)
-	{
-		//if(!hasExitTimer)
-	}
-    
-    public void ExitState(DarknessMinion controller)
-    {
-        
-    }
+        public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}
 
-    protected IEnumerator IdleTime(DarknessMinion controller, float idleTime)
-    {
-        yield return controller.WaitTimer(idleTime);
-        CheckTransitions(controller);
-        //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
-        //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-    }
+        public StateType stateType;
+        public Dark_Transition[] transitions;
+        public Dark_Action[] actions;
 
-    protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
-    {
-        foreach(Dark_Action d_Action in actions)
+        [SerializeField, Range(0, 15)]
+        protected float stopDist;
+
+        [SerializeField, Range(0,360)]
+        protected int rotationSpeed;
+
+        [SerializeField, Range(0, 5)]
+        protected float pathUpdateRate;
+
+        //[SerializeField]
+        //protected bool hasExitTimer;
+
+        //[Range(0, 5)]
+        //public float exitTime;
+
+        public virtual void InitializeState(DarknessMinion controller)
         {
-            d_Action.ExecuteAction(controller);
-            /*if(d_Action.ConditionsMet(controller))
-            {
-                d_Action.ExecuteAction(controller);
-            }*/
+            /*controller.pather.rotationSpeed = rotationSpeed;
+            controller.pather.endReachedDistance = stopDist;
+            controller.pather.maxSpeed = speedModifier;
+            controller.pather.repathRate = pathUpdateRate;*/
+            //if(hasExitTimer)
+                //controller.StartCoroutine(controller.WaitTimer(exitTime));
         }
-    }
-
-    protected void CheckTransitions(DarknessMinion controller)
-    {
-        for(int i = 0; i < transitions.Length; i++)
+        public void UpdateState(DarknessMinion controller)
         {
-            bool decisionResult = transitions[i].decision.MakeDecision(transitions[i].decisionChoice,controller);
-            if(decisionResult) 
-            {
-                if(transitions[i].trueState.stateType == StateType.REMAIN)
-                    continue;
-                else ProcessStateChange(transitions[i].trueState, controller); 
-            }
-            else if(!decisionResult) 
-            {
-                if(transitions[i].falseState.stateType == StateType.REMAIN)
-                    continue;
-                else ProcessStateChange(transitions[i].falseState, controller);
-            }
-        }   
-    }
+            //if(!hasExitTimer)
+            ExecuteActions(controller);
+            CheckTransitions(controller);
+        }
 
-    protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
-    {
-        Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
-        return new Vector3(point.x + center.x, center.y, point.y + center.z);
-    }
-
-    protected void ProcessStateChange(Dark_State approvedState, DarknessMinion controller)
-    {
-        controller.ChangeState(approvedState);
-    }
-
-    protected void RemoveDarkness(DarknessMinion controller)
-    {
-        if(stateType != Dark_State.StateType.DEATH)
+        /*protected IEnumerator IdleTime(DarknessMinion controller, float idleTime)
         {
-            this.ExitState(controller);
-            controller.updateStates = false;
-            //controller.ChangeState(controller.DeathState);
+            yield return controller.WaitTimer(idleTime);
+            CheckTransitions(controller);
+            //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
+            //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+        }*/
+
+        protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
+        {
+            foreach(Dark_Action d_Action in actions)
+            {
+                //d_Action.ExecuteAction(controller);
+                if(d_Action.ConditionsMet(controller))
+                {
+                    d_Action.ExecuteAction(controller);
+                }
+            }
+        }
+
+        protected void CheckTransitions(DarknessMinion controller)
+        {
+            for(int i = 0; i < transitions.Length; i++)
+            {
+                bool decisionResult = transitions[i].decision.MakeDecision(transitions[i].decisionChoice,controller);
+                if(decisionResult) 
+                {
+                    if(transitions[i].trueState.stateType == StateType.REMAIN)
+                        continue;
+                    else controller.ChangeState(transitions[i].trueState); 
+                }
+                else if(!decisionResult) 
+                {
+                    if(transitions[i].falseState.stateType == StateType.REMAIN)
+                        continue;
+                    else controller.ChangeState(transitions[i].falseState);
+                }
+            }   
+        }
+
+        protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
+        {
+            Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
+            return new Vector3(point.x + center.x, center.y, point.y + center.z);
+        }
+
+        protected void RemoveDarkness(DarknessMinion controller)
+        {
+            if(stateType != Dark_State.StateType.DEATH)
+            {
+                //this.ExitState(controller);
+                controller.updateStates = false;
+                //controller.ChangeState(controller.DeathState);
+            }
         }
     }
 }

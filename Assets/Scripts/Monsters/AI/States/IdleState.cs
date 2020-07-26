@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [CreateAssetMenu (menuName = "AI/Darkness/State/IdleState")]
-public class IdleState : Dark_State
+public class IdleState : Darkness.Dark_State
 {
     [Range(0, 5)]
     public float idleTime;

@@ -1,32 +1,21 @@
 using System.Collections;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Darkness/Action/IdleAction")]
-public class IdleAction : Dark_Action
+namespace Darkness
 {
-    [SerializeField, Range(0,5)]
-    private float idleTime;
-
-    public override void ExecuteAction(DarknessMinion controller)
+    [CreateAssetMenu (menuName = "Darkness/Action/IdleAction")]
+    public class IdleAction : Dark_Action
     {
-        controller.EndMovement();
-        controller.StartCoroutine(IdleTime(controller, idleTime));
-    }
+        [SerializeField, Range(0,5)]
+        private float idleTime;
 
+        public override void ExecuteAction(DarknessMinion controller) //TODO How am I going to make this halt the darkness from moving while still rotating to look at the player?
+        {
+            controller.EndMovement();
 
+            //controller.StartActionCooldown(this.GetInstanceID, idleTime);
+            //controller.StartCoroutine(IdleTime(controller, idleTime));
+        }
 
-    public override void TimedTransition(DarknessMinion controller)
-    {
-        
-    }
-
-    public override void ExitAction(DarknessMinion controller)
-    {
-        
-    }
-
-    protected IEnumerator IdleTime(DarknessMinion controller, float idleTime)
-    {
-        yield return controller.WaitTimer(idleTime);
     }
 }

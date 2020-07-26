@@ -1,22 +1,13 @@
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Darkness/Action/SetPatrolTarget")]
-public class SetPatrolTargetAction : Dark_Action 
+namespace Darkness
 {
-    
-	public override void ExecuteAction(DarknessMinion controller)
+    //[CreateAssetMenu (menuName = "Darkness/Action/SetPatrolTarget")]
+    public class SetPatrolTargetAction : Dark_Action 
     {
+        public override void ExecuteAction(DarknessMinion controller)
+        {
 
-    }
-
-
-    public override void TimedTransition(DarknessMinion controller)
-    {
-
-    }
-
-    public override void ExitAction(DarknessMinion controller)
-    {
-        
+        }
     }
 }

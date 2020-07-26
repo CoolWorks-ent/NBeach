@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [CreateAssetMenu(menuName = "AI/Darkness/State/WanderState")]
-public class WanderState : Dark_State
+public class WanderState : Darkness.Dark_State
 {
     //[Range(8,20)]
     //public int relativeRangeToPlayer;

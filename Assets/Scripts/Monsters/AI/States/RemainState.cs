@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CreateAssetMenu (menuName = "AI/Darkness/State/RemainState")]
-public class RemainState: Dark_State
+public class RemainState: Darkness.Dark_State
 {
     /*public override void InitializeState(Darkness controller) {
         stateType = StateType.REMAIN;

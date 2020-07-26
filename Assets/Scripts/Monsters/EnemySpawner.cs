@@ -9,7 +9,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    DarknessMinion darknessEnemy;
+    Darkness.DarknessMinion darknessEnemy;
     [SerializeField]
     public float spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
@@ -32,7 +32,7 @@ public class EnemySpawner : MonoBehaviour
     void DarknessDeath(string enemyName)
     {
         //remove enemy from the list
-        DarknessMinion enemyObj = GameObject.Find(enemyName).GetComponent<DarknessMinion>();
+        Darkness.DarknessMinion enemyObj = GameObject.Find(enemyName).GetComponent<Darkness.DarknessMinion>();
         Destroy(enemyObj.gameObject);
     }
 
@@ -43,12 +43,12 @@ public class EnemySpawner : MonoBehaviour
         {
             if (pauseSpawning == false)
             {
-                if (Darkness_Manager.Instance.ActiveDarkness.Count < Darkness_Manager.Instance.maxEnemyCount)
+                if (Darkness.Darkness_Manager.Instance.ActiveDarkness.Count < Darkness.Darkness_Manager.Instance.maxEnemyCount)
                 {
                     if (spawnWait >= spawnRate)
                     {
                         Vector3 randomloc = Random.insideUnitCircle * 5;
-                        DarknessMinion enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
+                        Darkness.DarknessMinion enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
                         //add enemy to management list
@@ -77,7 +77,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                if (Darkness_Manager.Instance.ActiveDarkness.Count <= Darkness_Manager.Instance.minEnemyCount)
+                if (Darkness.Darkness_Manager.Instance.ActiveDarkness.Count <= Darkness.Darkness_Manager.Instance.minEnemyCount)
                 {
                     //resume spawning of enemies
                     pauseSpawning = false;
