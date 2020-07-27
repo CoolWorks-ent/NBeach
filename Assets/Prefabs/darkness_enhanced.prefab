@@ -904,25 +904,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30e5ce026a410b44eaf357cf764ef278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbod: {fileID: 0}
   nextPosition: {x: 0, y: 0, z: 0}
   nextRotation: {x: 0, y: 0, z: 0, w: 0}
-  agRatingCurrent: 0
-  agRatingPrevious: 0
+  agRatingCurrent: 1
+  agRatingPrevious: 1
   darkHitBox: {fileID: 0}
-  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
-  DeathState: {fileID: 0}
-  creationID: 0
-  moving: 0
+  DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
+  currentState: {fileID: 11400000, guid: 3326cc8a8b99ace41baa228176c8f57e, type: 2}
   updateStates: 0
-  attacked: 0
-  transitioning: 0
-  playerDist: 0
-  targetDistance: 0
-  swtichDist: 0
-  stopDistance: 0
+  attackOnCooldown: 0
+  attackActive: 0
+  attackEnded: 0
+  idleOnCooldown: 0
+  movementOnCooldown: 0
+  switchTargetDistance: 0
   pathUpdateTime: 0
+  approachDistance: 0
+  creationID: 0
+  targetDistance: 0
+  patrolDistance: 0
+  playerDist: 0
   playerDirection: {x: 0, y: 0, z: 0}
+  moving: 0
   attackHash: 1080829965
   chaseHash: 1463555229
   idleHash: 2081823275

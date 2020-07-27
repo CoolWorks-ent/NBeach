@@ -17,16 +17,22 @@ namespace Darkness
         public Collider darkHitBox;
         
         public Dark_State DeathState, currentState;
+        
+        public bool updateStates, attackOnCooldown, attackActive, attackEnded, idleOnCooldown, movementOnCooldown;
+        public float switchTargetDistance, pathUpdateTime, approachDistance;
 
         [HideInInspector]
         public int creationID;
-        public bool moving, updateStates, attackOnCooldown, idleOnCooldown, movementOnCooldown;
-        public float playerDist, targetDistance, switchTargetDistance, pathUpdateTime;
+
+        [HideInInspector]
+        public float targetDistance, patrolDistance, playerDist;
 
         public Vector3 playerDirection;
         public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
-        public bool cooldownActive;
+        public bool activeCooldownsComplete{get{return activeActionCooldowns.Count <= 0;}}
 
+        [SerializeField]
+        private bool moving;
         private Rigidbody rigidbod;
         private float stateTime, actionTimer;
         private Seeker sekr;
@@ -46,7 +52,7 @@ namespace Darkness
                     idleHash = Animator.StringToHash("Idle"),
                     deathHash = Animator.StringToHash("Death");
 
-        public enum NavTargetTag {Attack, Patrol}
+        public enum NavTargetTag {Attack, Patrol, Player}
         public NavigationTarget navTarget;
 
         ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
@@ -95,15 +101,16 @@ namespace Darkness
             creationID = 0;
             actionTimer = 0;
             pathUpdateTime = 1.6f;
+            patrolDistance = switchTargetDistance * 2;
             updateStates = true;
             //agRatingCurrent = AggresionRating.Idling;
-            attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = false;
             animeController = GetComponentInChildren<Animator>();
             darkHitBox = GetComponent<CapsuleCollider>();
             sekr = GetComponent<Seeker>();
             aIPath = GetComponent<AIPath>();
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
             activeActionCooldowns = new List<Dark_Action.ActionCooldownInfo>();
+            ResetCooldowns();
         }
 
         void Start () {
@@ -138,7 +145,7 @@ namespace Darkness
             //if(animeController.animation.)
         }
 
-        public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime)
+        public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime) //return true if the if succesful and false if the cooldown is already active
         {
             /*if(!activeActionCooldowns.ContainsKey(actionName))
             {
@@ -166,6 +173,14 @@ namespace Darkness
                     {
                         activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
                         movementOnCooldown = true;
+                    }
+                    break;
+                case Dark_Action.ActionCooldownType.AttackActive:
+                    if(attackActive == false)
+                    {
+                        activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
+                        attackActive = true;
+                        attackEnded = false;
                     }
                     break;
                 default: 
@@ -198,6 +213,10 @@ namespace Darkness
                             break;
                         case Dark_Action.ActionCooldownType.Movement:
                             movementOnCooldown = false;
+                            break;
+                        case Dark_Action.ActionCooldownType.AttackActive:
+                            attackActive = false;
+                            attackEnded = true;
                             break;
                     }
                 }
@@ -252,6 +271,12 @@ namespace Darkness
             }  //Check to see if this state has initiated it's timer to exit bevavior*/
         }
 
+        private void ResetCooldowns()
+        {
+            attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = false;
+            activeActionCooldowns.Clear();
+        }
+
         private void PathComplete(Path p)
         {
             Debug.LogWarning("path callback complete");
@@ -286,6 +311,12 @@ namespace Darkness
             //p.traversalProvider = bProvider;
             sekr.StartPath(p, null);
             p.BlockUntilCalculated();
+        }
+
+        public void ResumeMovement()
+        {
+            moving = true;
+            sekr.pathCallback += PathComplete;
         }
 
         public void EndMovement()
@@ -352,12 +383,12 @@ namespace Darkness
         }
 
 
-        public IEnumerator WaitTimer(float timer)
+        /*public IEnumerator WaitTimer(float timer)
         {
             yield return new WaitForSeconds(timer);
             timedActionStatus = "";
-            cooldownActive = true;
-        }
+            //cooldownActive = true;
+        }*/
 
         private void OnTriggerEnter(Collider collider)
         {

@@ -6699,6 +6699,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114287730069052126, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34,
+        type: 2}
+      propertyPath: spawnLocs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4257258748893558, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34, type: 2}
       propertyPath: m_LocalPosition.x
       value: 195.1
@@ -6754,6 +6759,17 @@ Prefab:
     - target: {fileID: 1549041826443956, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34, type: 2}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114287730069052126, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34,
+        type: 2}
+      propertyPath: darknessEnemy
+      value: 
+      objectReference: {fileID: 114732482021839622, guid: 8b7fc8043cc42c94797b7ca168061631,
+        type: 2}
+    - target: {fileID: 114287730069052126, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34,
+        type: 2}
+      propertyPath: spawnRate
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8cf80c2d37ccf8d4b81a8741e76b7c34, type: 2}
@@ -60219,7 +60235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6ebef78d6927241b99983bf31b06af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  darknessEnemy: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
+  darknessEnemy: {fileID: 114732482021839622, guid: 8b7fc8043cc42c94797b7ca168061631,
     type: 2}
   spawnRate: 3
   spawnLocs:
@@ -90981,6 +90997,31 @@ Prefab:
         type: 2}
       propertyPath: m_SizeDelta.y
       value: -134.15999
+      objectReference: {fileID: 0}
+    - target: {fileID: 114414523675699442, guid: ab4b23574890f2749801c9d80d9313b0,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114414523675699442, guid: ab4b23574890f2749801c9d80d9313b0,
+        type: 2}
+      propertyPath: intensity
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114414523675699442, guid: ab4b23574890f2749801c9d80d9313b0,
+        type: 2}
+      propertyPath: vignetteShader
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114414523675699442, guid: ab4b23574890f2749801c9d80d9313b0,
+        type: 2}
+      propertyPath: separableBlurShader
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114414523675699442, guid: ab4b23574890f2749801c9d80d9313b0,
+        type: 2}
+      propertyPath: chromAberrationShader
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ab4b23574890f2749801c9d80d9313b0, type: 2}

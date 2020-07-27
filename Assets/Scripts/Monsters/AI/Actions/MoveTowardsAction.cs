@@ -10,10 +10,10 @@ namespace Darkness
         public override void ExecuteAction(DarknessMinion controller)
         {
             if(controller.navTarget.navTargetTag != navTargetType)
-                Darkness_Manager.OnRequestNewTarget(controller.creationID, false);
+                Darkness_Manager.OnRequestNewTarget(controller.creationID, navTargetType);
+            controller.UpdateAnimator(animationType);
             controller.UpdatePath();
-            controller.moving = true;
+            controller.ResumeMovement();
         }
-
     }
 }

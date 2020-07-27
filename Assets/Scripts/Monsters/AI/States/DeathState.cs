@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "AI/Darkness/State/DeathState")]
+//[CreateAssetMenu (menuName = "AI/Darkness/State/DeathState")]
 public class DeathState : Darkness.Dark_State
 {
     /*protected override void FirstTimeSetup()

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-[CreateAssetMenu (menuName = "AI/Darkness/State/ChaseState")]
+//[CreateAssetMenu (menuName = "AI/Darkness/State/ChaseState")]
 public class ChaseState 
 {
 

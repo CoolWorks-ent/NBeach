@@ -18,7 +18,7 @@ namespace Darkness
         //public float executionTime;
 
         public enum ActionFlags {PlayerInAttackRange, AttackOnCooldown, NavTargetDistClose, PlayerOutOfRange, EndOfPath, MovementOnCooldown, IdleOnCooldown}
-        public enum ActionCooldownType {Attack, Idle, Movement}
+        public enum ActionCooldownType {Attack, AttackActive, Idle, Movement}
 
         public struct ActionCooldownInfo 
         {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-[CreateAssetMenu (menuName = "AI/Darkness/State/AttackState")]
+//[CreateAssetMenu (menuName = "AI/Darkness/State/AttackState")]
 public class AttackState 
 {
    /* [Range(1, 3)]

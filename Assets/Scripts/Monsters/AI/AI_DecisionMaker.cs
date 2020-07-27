@@ -8,7 +8,7 @@ namespace Darkness
     public class AI_DecisionMaker
     {
         
-        public enum DecisionName {IN_ATTACK_RANGE, PLAYER_WITHIN_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, EXIT_TIMER_EXPIRED, PAUSED_FOR_NEXT_COMMAND, IS_AGGRESSIVE}
+        public enum DecisionName {IS_AGGRESSIVE, IDLE_FINISHED, ATTACK_FINISHED, IN_PATROL_DISTANCE, ACTIONS_COMPLETE}//, PLAYER_WITHIN_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, EXIT_TIMER_EXPIRED, PAUSED_FOR_NEXT_COMMAND}
         
         ///<summary>Holds all the function calls that are called in MakeDecision</summary>
         Dictionary<DecisionName,Func<DarknessMinion,bool>> Decisions;
@@ -17,13 +17,10 @@ namespace Darkness
         {
             Decisions = new Dictionary<DecisionName,Func<DarknessMinion,bool>>();
             Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
-            //Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
-            //Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
-            //Decisions.Add(DecisionName.PLAYER_WITHIN_RANGE, PlayerWithinRange);
-            //Decisions.Add(DecisionName.IN_ATTACK_RANGE, InAttackRange);
-            Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
-            //Decisions.Add(DecisionName.NAV_TARGET_CLOSE, NavTargetDistClose);
-            //Decisions.Add(DecisionName.EXIT_TIMER_EXPIRED, ExitTimerExpired);
+            Decisions.Add(DecisionName.ATTACK_FINISHED, AttackComplete);
+            Decisions.Add(DecisionName.IDLE_FINISHED, IdleComplete);
+            Decisions.Add(DecisionName.IN_PATROL_DISTANCE, WithinPatrolPerimeter);
+            Decisions.Add(DecisionName.ACTIONS_COMPLETE, ActionsCompleted);
         }
 
         public bool MakeDecision(DecisionName dName, DarknessMinion controller)
@@ -42,50 +39,24 @@ namespace Darkness
             else return false;
         }
         
-
-        /*private bool InAttackRange(DarknessMinion controller) //Should this be checked for state transitions here?
+        private bool ActionsCompleted(DarknessMinion controller)
         {
-            if(controller.playerDist <= controller.attackRange) 
-            {
-                return true;
-            }
-            else return false;
-        }*/
-
-        private bool AttackSuccessfull(DarknessMinion controller) //Should this be checked for state transitions here?
-        {
-            if(controller.attackOnCooldown)
-            {
-                return true;
-            }
-            else return false;
+            return controller.activeCooldownsComplete;
         }
 
-        /*private bool AwaitingNextCommand(DarknessMinion controller) 
+        private bool WithinPatrolPerimeter(DarknessMinion controller)
         {
-            if(controller.agRatingCurrent == Darkness.AggresionRating.Idling) 
-            {
-                return true;
-            }
-            else return false;
-        }*/
+            return controller.playerDist < controller.patrolDistance;
+        }
 
-        /*private bool ShouldWanderNear(Darkness controller) 
+        private bool AttackComplete(DarknessMinion controller) //Should this be checked for state transitions here?
         {
-            if(controller.agRatingCurrent == Darkness.AggresionRating.Wandering) 
-            {
-                return true;
-            }
-            else return false;
-        }*/
+            return controller.attackOnCooldown;
+        }
 
-        /*private bool NavTargetDistClose(DarknessMinion controller) //Should this be checked for state transitions here?
+        private bool IdleComplete(DarknessMinion controller)
         {
-            if(controller.targetDistance < controller.attackRange)
-            {
-                return true;
-            }
-            else return false;
-        }*/
+            return controller.idleOnCooldown;
+        }
     }
 }

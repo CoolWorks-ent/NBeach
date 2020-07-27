@@ -239,14 +239,14 @@ namespace Darkness
 		}
 
 		///<summary>Processes DarknessMinion request for a  NavTarget. Assign a new target to the requestor DarknessMinion if a valid request</summary> //--Work in Progress--
-		public void ApproveDarknessTarget(int darkID, bool closeToPlayer) 
+		public void ApproveDarknessTarget(int darkID, DarknessMinion.NavTargetTag navTargetTag) 
 		{
 			DarknessMinion darkness;
 			if(ActiveDarkness.TryGetValue(darkID, out darkness))
 			{
 				if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive)
 				{ 
-					if(closeToPlayer)
+					if(navTargetTag == DarknessMinion.NavTargetTag.Player)
 						darkness.navTarget = PlayerPoint;
 					else darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
 				}
@@ -318,7 +318,7 @@ namespace Darkness
 		public static event AIEvent<Vector3> DistanceUpdate;
 		public static event AIEvent<DarknessMinion> AddDarkness;
 		public static event AIEvent<DarknessMinion> RemoveDarkness;
-		public static event AIEvent<int, bool> RequestNewTarget;
+		public static event AIEvent<int, DarknessMinion.NavTargetTag> RequestNewTarget;
 
 		///<summary>Executes logic update for DarknessMinion</summary>
 		public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by DarknessMinion. DarknessMinion will run the update for their current state.
@@ -349,10 +349,10 @@ namespace Darkness
 		}
 
 		///<summary>Request a new navigation target be assigned to the identified DarknessMinion.</summary>
-		public static void OnRequestNewTarget(int ID, bool playerPoint) //Called by Dark_States. Subscribed by Darkness_Manager
+		public static void OnRequestNewTarget(int ID, DarknessMinion.NavTargetTag navTargetTag) //Called by Dark_States. Subscribed by Darkness_Manager
 		{
 			if(RequestNewTarget != null)
-				RequestNewTarget(ID, playerPoint);
+				RequestNewTarget(ID, navTargetTag);
 		}
 		#endregion
 		
