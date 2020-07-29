@@ -17,7 +17,7 @@ namespace Darkness
         //[SerializeField]
         //public float executionTime;
 
-        public enum ActionFlags {PlayerInAttackRange, AttackOnCooldown, NavTargetDistClose, PlayerOutOfRange, EndOfPath, MovementOnCooldown, IdleOnCooldown}
+        public enum ActionFlags {AttackOnCooldown, AttackOffCooldown, NavTargetDistClose, EndOfPath, MovementOnCooldown, IdleOnCooldown, IdleOffCooldown, PlayerInAttackRange, PlayerOutOfRange}
         public enum ActionCooldownType {Attack, AttackActive, Idle, Movement}
 
         public struct ActionCooldownInfo 
@@ -46,12 +46,14 @@ namespace Darkness
 
         private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>
         {
-            //{ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
+            {ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
             {ActionFlags.NavTargetDistClose, NavTargetDistCloseCheck},
             {ActionFlags.AttackOnCooldown, AttackOnCooldownCheck},
             {ActionFlags.IdleOnCooldown, IdleOnCooldownCheck},
-            {ActionFlags.MovementOnCooldown, MovementOnCooldownCheck}
-            //{ActionFlags.PlayerOutOfRange, PlayerOutOfRange}
+            {ActionFlags.MovementOnCooldown, MovementOnCooldownCheck},
+            {ActionFlags.EndOfPath, EndOfPathCheck},
+            {ActionFlags.PlayerOutOfRange, PlayerOutOfRange},
+            {ActionFlags.IdleOffCooldown, IdleOffCooldownCheck}
         };
 
         public bool ConditionsMet(DarknessMinion controller)
@@ -82,23 +84,37 @@ namespace Darkness
             return controller.idleOnCooldown;
         }
 
+        private static bool IdleOffCooldownCheck(DarknessMinion controller)
+        {
+            if(!controller.idleOnCooldown)
+                return true;
+            else return false;
+        }
+
         private static bool MovementOnCooldownCheck(DarknessMinion controller)
         {
             return controller.movementOnCooldown;
         }
 
-        /*private static bool PlayerInAttackRange(DarknessMinion controller) 
+        private static bool PlayerInAttackRange(DarknessMinion controller) 
         {
-            if(controller.playerDist <= controller.attackRange) 
+            if(controller.playerDist <= controller.switchTargetDistance) 
             {
                 return true;
             }
             else return false;
-        }*/
+        }
 
         private static bool AttackOnCooldownCheck(DarknessMinion controller) 
         {
             return controller.attackOnCooldown;
+        }
+
+        private static bool AttackOffCooldownCheck(DarknessMinion controller)
+        {
+            if(!controller.attackOnCooldown)
+                return true;
+            else return false;
         }
 
         private static bool NavTargetDistCloseCheck(DarknessMinion controller) 
@@ -110,13 +126,13 @@ namespace Darkness
             else return false;
         }
 
-        /*private static bool PlayerOutOfRange(DarknessMinion controller) 
+        private static bool PlayerOutOfRange(DarknessMinion controller) 
         {
-            if(controller.playerDist > controller.attackRange)
+            if(controller.playerDist > controller.switchTargetDistance)
             {
                 return true;
             }
             else return false;
-        }*/
+        }
     }
 }

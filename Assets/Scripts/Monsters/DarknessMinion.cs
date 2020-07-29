@@ -11,14 +11,14 @@ namespace Darkness
         
         public Vector3 nextPosition;
         public Quaternion nextRotation;
-        public AggresionRating agRatingCurrent, agRatingPrevious;
+        public AggresionRating agRatingCurrent;//, agRatingPrevious;
 
         [HideInInspector]
         public Collider darkHitBox;
         
         public Dark_State DeathState, currentState;
         
-        public bool updateStates, attackOnCooldown, attackActive, attackEnded, idleOnCooldown, movementOnCooldown;
+        public bool updateStates, attackOnCooldown, attackActive, attackEnded, idleOnCooldown, idleActive, movementOnCooldown;
         public float switchTargetDistance, pathUpdateTime, approachDistance;
 
         [HideInInspector]
@@ -43,8 +43,6 @@ namespace Darkness
         private string timedActionStatus;
 
         private List<Dark_Action.ActionCooldownInfo> activeActionCooldowns;
-
-        //private Dictionary<Dark_State, int> StateSelectionHistory; //Used to weigh selection of a new state. If a state has been used a lot try to pick one used less often
 
         [HideInInspector]
         public int attackHash = Animator.StringToHash("Attack"),
@@ -111,6 +109,7 @@ namespace Darkness
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
             activeActionCooldowns = new List<Dark_Action.ActionCooldownInfo>();
             ResetCooldowns();
+            //idleActive = true;
         }
 
         void Start () {
@@ -155,10 +154,11 @@ namespace Darkness
             switch(actionType)
             {
                 case Dark_Action.ActionCooldownType.Idle: //basically idle will request movement be on cooldown while idle. then set the idle cooldown after the idle duration
-                    if(idleOnCooldown == false)
+                    if(idleOnCooldown == false && idleActive == false)
                     {
                         activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
-                        idleOnCooldown = true;
+                        idleOnCooldown = false;
+                        idleActive = true;
                     }
                     break;
                 case Dark_Action.ActionCooldownType.Attack:
@@ -206,7 +206,8 @@ namespace Darkness
                     switch(acInfo.acType)
                     {
                         case Dark_Action.ActionCooldownType.Idle: 
-                            idleOnCooldown = false;
+                            idleOnCooldown = true;
+                            idleActive = false;
                             break;
                         case Dark_Action.ActionCooldownType.Attack:
                             attackOnCooldown = false;
@@ -240,6 +241,7 @@ namespace Darkness
         {
             //currentState.ExitState(this);
             currentState = nextState;
+            ResetCooldowns();
             currentState.InitializeState(this);
             /*previousState = currentState;
             if(!timedState) //if the timer on a state is still active don't switch yet
@@ -273,24 +275,25 @@ namespace Darkness
 
         private void ResetCooldowns()
         {
-            attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = false;
+            attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = idleActive = false;
             activeActionCooldowns.Clear();
         }
 
         private void PathComplete(Path p)
         {
             Debug.LogWarning("path callback complete");
-            p.Claim(this);
+            
+            //p.Claim(this);
             //BlockPathNodes(p);
             if(!p.error)
             {
-                if(navPath != null) 
-                    navPath.Release(this);
+                //if(navPath != null) 
+                    //navPath.Release(this);
                 navPath = p;
             }
             else 
             {
-                p.Release(this);
+                //p.Release(this);
                 Debug.LogError("Path failed calculation for " + this + " because " + p.errorLog);
             }
         }
@@ -349,8 +352,8 @@ namespace Darkness
 
         public void AggressionChanged(AggresionRating agR)
         {
-            if(agR != agRatingCurrent)
-                agRatingPrevious = agRatingCurrent;
+            //if(agR != agRatingCurrent)
+                //agRatingPrevious = agRatingCurrent;
             agRatingCurrent = agR;
         }
 

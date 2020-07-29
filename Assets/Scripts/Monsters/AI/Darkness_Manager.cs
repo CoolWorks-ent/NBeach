@@ -12,7 +12,9 @@ namespace Darkness
 			get {return instance; }
 		}
 		public Transform player;
-		public Dictionary<int, DarknessMinion> ActiveDarkness;
+		public int activeDarknessCount {get{return ActiveDarkness.Count;}}
+
+		private Dictionary<int, DarknessMinion> ActiveDarkness;
 
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;

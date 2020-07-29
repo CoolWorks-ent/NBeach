@@ -12,14 +12,14 @@ namespace Darkness
         public Dark_Transition[] transitions;
         public Dark_Action[] actions;
 
-        [SerializeField, Range(0, 15)]
-        protected float stopDist;
+        //[SerializeField, Range(0, 15)]
+        //protected float stopDist;
 
-        [SerializeField, Range(0,360)]
-        protected int rotationSpeed;
+        //[SerializeField, Range(0,360)]
+        //protected int rotationSpeed;
 
-        [SerializeField, Range(0, 5)]
-        protected float pathUpdateRate;
+        //[SerializeField, Range(0, 5)]
+        //protected float pathUpdateRate;
 
         //[SerializeField]
         //protected bool hasExitTimer;
@@ -42,14 +42,6 @@ namespace Darkness
             ExecuteActions(controller);
             CheckTransitions(controller);
         }
-
-        /*protected IEnumerator IdleTime(DarknessMinion controller, float idleTime)
-        {
-            yield return controller.WaitTimer(idleTime);
-            CheckTransitions(controller);
-            //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
-            //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
-        }*/
 
         protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
         {

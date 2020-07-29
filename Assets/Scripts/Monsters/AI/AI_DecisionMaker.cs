@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Darkness
 {
-
     ///<summary>DecisionMaker provides a way conditions to be set as requisite to transition to the next state.</summary>
     public class AI_DecisionMaker
     {
-        
         public enum DecisionName {IS_AGGRESSIVE, IDLE_FINISHED, ATTACK_FINISHED, IN_PATROL_DISTANCE, ACTIONS_COMPLETE}//, PLAYER_WITHIN_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, EXIT_TIMER_EXPIRED, PAUSED_FOR_NEXT_COMMAND}
         
         ///<summary>Holds all the function calls that are called in MakeDecision</summary>
@@ -54,9 +52,14 @@ namespace Darkness
             return controller.attackOnCooldown;
         }
 
+        private bool MovementCooldownComplete(DarknessMinion controller)
+        {
+            return controller.movementOnCooldown;
+        }
+
         private bool IdleComplete(DarknessMinion controller)
         {
-            return controller.idleOnCooldown;
+            return controller.idleActive;
         }
     }
 }

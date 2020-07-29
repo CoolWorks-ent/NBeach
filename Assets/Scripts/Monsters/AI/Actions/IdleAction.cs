@@ -7,17 +7,17 @@ namespace Darkness
     public class IdleAction : Dark_Action
     {
         [SerializeField, Range(0,5)]
-        private float idleTime;
+        protected float idleTime;
 
         public override void ExecuteAction(DarknessMinion controller) //TODO How am I going to make this halt the darkness from moving while still rotating to look at the player?
         {
             controller.EndMovement();
             controller.UpdateAnimator(animationType);
-            if(!controller.movementOnCooldown)
+            if(!controller.idleOnCooldown)
                 RequestActionCooldown(controller, idleTime, ActionCooldownType.Movement);
             else 
             {
-                controller.idleOnCooldown = true;
+                RequestActionCooldown(controller, idleTime, ActionCooldownType.Idle);
                 return;
             }
             
