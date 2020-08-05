@@ -35,6 +35,7 @@ namespace Darkness
                 Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Attack);
                 if(!controller.attackActive)
                 {
+                    controller.ResumeMovement();
                     RequestActionCooldown(controller, attackHitboxTime, ActionCooldownType.AttackActive);
                     controller.darkHitBox.enabled = true;
                     controller.UpdateAnimator(animationType);

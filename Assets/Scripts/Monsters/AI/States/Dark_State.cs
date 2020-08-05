@@ -45,6 +45,7 @@ namespace Darkness
 
         protected void ExecuteActions(DarknessMinion controller) //check if action has proper flags checked for 
         {
+            //Debug.Break();
             foreach(Dark_Action d_Action in actions)
             {
                 //d_Action.ExecuteAction(controller);

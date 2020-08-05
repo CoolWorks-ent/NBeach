@@ -34,7 +34,7 @@ namespace Darkness
             }
         }
 
-        public abstract void ExecuteAction(DarknessMinion controller);
+        public abstract void ExecuteAction(DarknessMinion controller);//make virtual and add time update for how this action has been executing
 
         protected void RequestActionCooldown(DarknessMinion controller, float coolDownTime, ActionCooldownType actionCooldownType)
         {

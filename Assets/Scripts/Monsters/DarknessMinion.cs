@@ -39,8 +39,6 @@ namespace Darkness
         private AIPath aIPath;
         private Path navPath;
         private Animator animeController;
-        private List<int> actionCooldownList;
-        private string timedActionStatus;
 
         private List<Dark_Action.ActionCooldownInfo> activeActionCooldowns;
 
@@ -95,7 +93,6 @@ namespace Darkness
         void Awake()
         {
             //attackInitiationRange = 2.5f;
-            actionCooldownList = new List<int>();
             creationID = 0;
             actionTimer = 0;
             pathUpdateTime = 1.6f;
@@ -144,7 +141,7 @@ namespace Darkness
             //if(animeController.animation.)
         }
 
-        public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime) //return true if the if succesful and false if the cooldown is already active
+        public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime) //TODO How do I want to store cooldowns and be able to checkk their status going forward?
         {
             /*if(!activeActionCooldowns.ContainsKey(actionName))
             {
