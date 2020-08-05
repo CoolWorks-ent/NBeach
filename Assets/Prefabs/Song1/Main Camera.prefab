@@ -97,8 +97,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1570860959981088}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0.3104027, z: -0, w: 0.9506052}
+  m_LocalPosition: {x: 197.5, y: 45.803, z: 1695.8}
   m_LocalScale: {x: 0.3333333, y: 0.3333333, z: 0.3333333}
   m_Children:
   - {fileID: 4844833274767802}
@@ -106,7 +106,7 @@ Transform:
   - {fileID: 4633541067040796}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -36.167, z: 0}
 --- !u!4 &4546636846682062
 Transform:
   m_ObjectHideFlags: 1
@@ -231,7 +231,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 56093e0668fb5054ba6e07479c498f39, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -373,6 +373,7 @@ MonoBehaviour:
   m_ScreenMesh: {fileID: 0}
   m_AnimTextures: []
   speedFxOverlay: {fileID: 0}
+  animationControl: {fileID: 0}
 --- !u!114 &114455363281897942
 MonoBehaviour:
   m_ObjectHideFlags: 1
