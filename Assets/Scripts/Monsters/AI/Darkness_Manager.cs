@@ -55,7 +55,7 @@ namespace Darkness
 			attackOffset = 3.5f;
 			//PatrolPoints = new NavigationTarget[4]; 
 			AttackPoints = new DarknessMinion.NavigationTarget[4]; 
-			//StartCoroutine(ExecuteDarknessStates());
+			StartCoroutine(ManagedDarknessUpdate());
 		}
 
 		void Start()
@@ -86,20 +86,20 @@ namespace Darkness
 				n.UpdateLocation(player.position);
 			}
 			OnDistanceUpdate(player.position);
-			UpdateDarknessAggresionStatus();
+			//UpdateDarknessAggresionStatus();
 		}
 
 		void Update()
 		{
-			if(ActiveDarkness.Count > 0)
+			/*if(ActiveDarkness.Count > 0)
 			{
 				OnUpdateDarkStates();
-			}
+			}*/
 		}
 
 	#region DarknessUpdateLoop
 
-		/*///<summary>Controls the update loop for DarknessMinion objects. Calls DarknessMinion sorting and DarknessMinion approval functions </summary>
+		///<summary>Controls the update loop for DarknessMinion objects. Calls DarknessMinion sorting and DarknessMinion approval functions </summary>
 		private IEnumerator ManagedDarknessUpdate() 
 		{
 			//Debug.LogWarning("[Darkness_Manager] Started ManagedUpdate");
@@ -109,7 +109,7 @@ namespace Darkness
 				{
 					//Debug.LogWarning("[Darkness_Manager] Executing ManagedUpdate");
 
-					OnDistanceUpdate(player.position);
+					//OnDistanceUpdate(player.position);
 
 					UpdateDarknessAggresionStatus();
 					OnUpdateDarkStates();
@@ -118,7 +118,7 @@ namespace Darkness
 				} else yield return new WaitForSeconds(calculationTime);
 			}
 			yield return null;
-		}*/
+		}
 
 		///<summary>Sets the closest DarknessMinion to aggressive. DarknessMinion that are runners up are set to patrol nearby. Furtheset DarknessMinion are set to idle priority</summary>
 		private void UpdateDarknessAggresionStatus() 

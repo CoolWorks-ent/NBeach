@@ -40,6 +40,12 @@ namespace Darkness
         {
             controller.ProcessActionCooldown(actionCooldownType, coolDownTime);
         }
+
+        protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
+        {
+            Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
+            return new Vector3(point.x + center.x, center.y, point.y + center.z);
+        }
         
         [SerializeField]
         private ActionFlags[] Conditions;

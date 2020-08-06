@@ -76,18 +76,12 @@ namespace Darkness
             }   
         }
 
-        protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
-        {
-            Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
-            return new Vector3(point.x + center.x, center.y, point.y + center.z);
-        }
-
         protected void RemoveDarkness(DarknessMinion controller)
         {
             if(stateType != Dark_State.StateType.DEATH)
             {
                 //this.ExitState(controller);
-                controller.updateStates = false;
+                //controller.updateStates = false;
                 //controller.ChangeState(controller.DeathState);
             }
         }

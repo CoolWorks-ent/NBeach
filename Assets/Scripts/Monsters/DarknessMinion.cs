@@ -18,7 +18,7 @@ namespace Darkness
         
         public Dark_State DeathState, currentState;
         
-        public bool updateStates, attackOnCooldown, attackActive, attackEnded, idleOnCooldown, idleActive, movementOnCooldown;
+        public bool attackOnCooldown, attackActive, attackEnded, idleOnCooldown, idleActive, movementOnCooldown;
         public float switchTargetDistance, pathUpdateTime, approachDistance;
 
         [HideInInspector]
@@ -97,7 +97,6 @@ namespace Darkness
             actionTimer = 0;
             pathUpdateTime = 1.6f;
             patrolDistance = switchTargetDistance * 2;
-            updateStates = true;
             //agRatingCurrent = AggresionRating.Idling;
             animeController = GetComponentInChildren<Animator>();
             darkHitBox = GetComponent<CapsuleCollider>();
@@ -131,14 +130,29 @@ namespace Darkness
             }
         }   
 
-        private void UpdateCurrentState()
+        void Update()
         {
             if(activeActionCooldowns.Count > 0)
             {
                 UpdateCooldowns();
             }
+        }
+
+        private void UpdateCurrentState()
+        {
             currentState.UpdateState(this);
             //if(animeController.animation.)
+        }
+
+        public bool CheckActiveCooldown(Dark_Action.ActionCooldownType actionType)
+        {
+            foreach(Dark_Action.ActionCooldownInfo actInfo in activeActionCooldowns)
+            {
+                if(actInfo.acType != actionType)
+                    continue;
+                else return true;
+            }
+            return false;
         }
 
         public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime) //TODO How do I want to store cooldowns and be able to checkk their status going forward?
@@ -183,24 +197,16 @@ namespace Darkness
                 default: 
                     return;
             }
-            
-            //TODO just make sure this isn't being set multiple times
-            //start an ienumarator that will clear this status upon execution
-            /*if(timedActionStatus == "")
-            {
-                timedActionStatus = actionName;
-                StartCoroutine(WaitTimer(coolDownTime));
-            }*/
         }
 
         private void UpdateCooldowns() //update all cooldown statuses 
         {
-            foreach(Dark_Action.ActionCooldownInfo acInfo in activeActionCooldowns)
+            for(int i = activeActionCooldowns.Count-1; i >= 0; i--)// acInfo in activeActionCooldowns)
             {
-                if(Time.deltaTime - acInfo.initialTime >= acInfo.coolDownTime)
+                if(Time.deltaTime -  activeActionCooldowns[i].initialTime >= activeActionCooldowns[i].coolDownTime)
                 {
-                    activeActionCooldowns.Remove(acInfo);
-                    switch(acInfo.acType)
+                    activeActionCooldowns.Remove(activeActionCooldowns[i]);
+                    switch(activeActionCooldowns[i].acType)
                     {
                         case Dark_Action.ActionCooldownType.Idle: 
                             idleOnCooldown = true;
