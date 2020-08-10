@@ -16,30 +16,32 @@ namespace Darkness
 
         public override void ExecuteAction(DarknessMinion controller)
         {
-            
-            if(controller.attackEnded)
-            {
-                controller.darkHitBox.enabled = false;
-                RequestActionCooldown(controller, attackCooldown, ActionCooldownType.Attack);
-            }
+            if(controller.navTarget.navTargetTag != DarknessMinion.NavTargetTag.Attack)
+                Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Attack);
+            controller.ResumeMovement(); //TODO determine if it's not already moving
             if(controller.playerDist < attackInitiationRange)
             {
                 //TODO add utility function on the Dark_State level for rotating the darkness to face the player
                 //If the rotation is within a certain range say +/-5 degrees then try a sphere cast to see if I can attack
                 //if that returns the player chomp em
-                Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Player);
-                controller.ResumeMovement();
+                //Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Player);
+                
+                if(!controller.CheckTimedActions(this.name) && !controller.CheckActionsOnCooldown(this.name)) //the start of the chompin
+                {
+                    TimedActionActivation(controller, this.name, attackCooldown, attackCooldown);
+                    controller.darkHitBox.enabled = true;
+                }
             }
             else 
             {
-                Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Attack);
-                if(!controller.attackActive)
+                //Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Attack);
+                /*if(!controller.attackActive)
                 {
                     controller.ResumeMovement();
-                    RequestActionCooldown(controller, attackHitboxTime, ActionCooldownType.AttackActive);
+                    TimedActionActivation(controller, attackHitboxTime, ActionCooldownType.AttackActive);
                     controller.darkHitBox.enabled = true;
                     controller.UpdateAnimator(animationType);
-                }
+                }*/
             }
         }
     }

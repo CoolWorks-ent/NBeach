@@ -14,31 +14,32 @@ namespace Darkness
         protected AnimationType animationType; 
         //public bool hasTimer;
 
-        //[SerializeField]
-        //public float executionTime;
+        [SerializeField, Range(0, 10)]
+        protected float executionTime, coolDownTime;
 
-        public enum ActionFlags {AttackOnCooldown, AttackOffCooldown, NavTargetDistClose, EndOfPath, MovementOnCooldown, IdleOnCooldown, IdleOffCooldown, PlayerInAttackRange, PlayerOutOfRange}
-        public enum ActionCooldownType {Attack, AttackActive, Idle, Movement}
+        public enum ActionFlags { NavTargetDistClose, EndOfPath, PlayerInAttackRange, PlayerOutOfRange} //AttackOnCooldown, AttackOffCooldown, MovementOnCooldown, IdleOnCooldown, IdleOffCooldown,
+        //public enum ActionCooldownType {Attack, AttackActive, Idle, Movement}
 
         public struct ActionCooldownInfo 
         {
-            public ActionCooldownType acType;
-            public float initialTime;
+            //public ActionCooldownType acType;
+            public string name;
+            public float durationTime;
             public float coolDownTime;
 
-            public ActionCooldownInfo(ActionCooldownType act,float initTime, float cdTime)
+            public ActionCooldownInfo(string nam, float durTime, float cdTime)
             {
-                acType = act;
-                initialTime = initTime;
+                name = nam;
+                durationTime = durTime;
                 coolDownTime = cdTime; 
             }
         }
 
         public abstract void ExecuteAction(DarknessMinion controller);//make virtual and add time update for how this action has been executing
 
-        protected void RequestActionCooldown(DarknessMinion controller, float coolDownTime, ActionCooldownType actionCooldownType)
+        protected void TimedActionActivation(DarknessMinion controller, string name, float durationTime, float coolDownTime)
         {
-            controller.ProcessActionCooldown(actionCooldownType, coolDownTime);
+            controller.ProcessActionCooldown(name, durationTime, coolDownTime);
         }
 
         protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
@@ -54,12 +55,13 @@ namespace Darkness
         {
             {ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
             {ActionFlags.NavTargetDistClose, NavTargetDistCloseCheck},
-            {ActionFlags.AttackOnCooldown, AttackOnCooldownCheck},
-            {ActionFlags.IdleOnCooldown, IdleOnCooldownCheck},
-            {ActionFlags.MovementOnCooldown, MovementOnCooldownCheck},
             {ActionFlags.EndOfPath, EndOfPathCheck},
             {ActionFlags.PlayerOutOfRange, PlayerOutOfRange},
-            {ActionFlags.IdleOffCooldown, IdleOffCooldownCheck}
+            //{ActionFlags.AttackOnCooldown, AttackOnCooldownCheck},
+            //{ActionFlags.IdleOnCooldown, IdleOnCooldownCheck},
+            //{ActionFlags.MovementOnCooldown, MovementOnCooldownCheck},
+            
+            //{ActionFlags.IdleOffCooldown, IdleOffCooldownCheck}
         };
 
         public bool ConditionsMet(DarknessMinion controller)
@@ -85,7 +87,13 @@ namespace Darkness
             return controller.reachedEndOfPath;
         }
 
-        private static bool IdleOnCooldownCheck(DarknessMinion controller)
+        private static bool ThisActionOnCooldown(DarknessMinion controller)
+        {
+            //TODO check if the action is in the cooldown list on the DarknessMinion
+            return false; //controller.CheckActionsOnCooldown(this.name); //TODO this bullshit needs to be fixed. someway there needs to be an identifier to check this nonsense
+        }
+
+        /*private static bool IdleOnCooldownCheck(DarknessMinion controller)
         {
             return controller.idleOnCooldown;
         }
@@ -95,12 +103,12 @@ namespace Darkness
             if(!controller.idleOnCooldown)
                 return true;
             else return false;
-        }
+        }*/
 
-        private static bool MovementOnCooldownCheck(DarknessMinion controller)
+        /*private static bool MovementOnCooldownCheck(DarknessMinion controller)
         {
             return controller.movementOnCooldown;
-        }
+        }*/
 
         private static bool PlayerInAttackRange(DarknessMinion controller) 
         {
@@ -111,7 +119,7 @@ namespace Darkness
             else return false;
         }
 
-        private static bool AttackOnCooldownCheck(DarknessMinion controller) 
+        /*private static bool AttackOnCooldownCheck(DarknessMinion controller) 
         {
             return controller.attackOnCooldown;
         }
@@ -121,7 +129,7 @@ namespace Darkness
             if(!controller.attackOnCooldown)
                 return true;
             else return false;
-        }
+        }*/
 
         private static bool NavTargetDistCloseCheck(DarknessMinion controller) 
         {

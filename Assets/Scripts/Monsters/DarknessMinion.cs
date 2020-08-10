@@ -18,7 +18,7 @@ namespace Darkness
         
         public Dark_State DeathState, currentState;
         
-        public bool attackOnCooldown, attackActive, attackEnded, idleOnCooldown, idleActive, movementOnCooldown;
+        //public bool attackOnCooldown, attackActive, attackEnded, idleOnCooldown, idleActive, movementOnCooldown;
         public float switchTargetDistance, pathUpdateTime, approachDistance;
 
         [HideInInspector]
@@ -29,7 +29,7 @@ namespace Darkness
 
         public Vector3 playerDirection;
         public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
-        public bool activeCooldownsComplete{get{return activeActionCooldowns.Count <= 0;}}
+        public bool activeCooldownsComplete{get{return activeTimedActions.Count <= 0;}}
 
         [SerializeField]
         private bool moving;
@@ -40,7 +40,7 @@ namespace Darkness
         private Path navPath;
         private Animator animeController;
 
-        private List<Dark_Action.ActionCooldownInfo> activeActionCooldowns;
+        private Dictionary<string, Dark_Action.ActionCooldownInfo> actionsOnCooldown, activeTimedActions;
 
         [HideInInspector]
         public int attackHash = Animator.StringToHash("Attack"),
@@ -103,7 +103,8 @@ namespace Darkness
             sekr = GetComponent<Seeker>();
             aIPath = GetComponent<AIPath>();
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-            activeActionCooldowns = new List<Dark_Action.ActionCooldownInfo>();
+            activeTimedActions = new Dictionary<string, Dark_Action.ActionCooldownInfo>();
+            actionsOnCooldown = new Dictionary<string, Dark_Action.ActionCooldownInfo>();
             ResetCooldowns();
             //idleActive = true;
         }
@@ -132,10 +133,10 @@ namespace Darkness
 
         void Update()
         {
-            if(activeActionCooldowns.Count > 0)
+            /*if(activeActionCooldowns.Count > 0)
             {
                 UpdateCooldowns();
-            }
+            }*/
         }
 
         private void UpdateCurrentState()
@@ -144,101 +145,78 @@ namespace Darkness
             //if(animeController.animation.)
         }
 
-        public bool CheckActiveCooldown(Dark_Action.ActionCooldownType actionType)
+        #region Cooldown Handling
+
+        public bool CheckTimedActions(string actionName)
         {
-            foreach(Dark_Action.ActionCooldownInfo actInfo in activeActionCooldowns)
+            return activeTimedActions.ContainsKey(actionName);
+            /*foreach(Dark_Action.ActionCooldownInfo actInfo in activeActionCooldowns)
             {
                 if(actInfo.acType != actionType)
                     continue;
                 else return true;
             }
-            return false;
+            return false;*/
         }
 
-        public void ProcessActionCooldown(Dark_Action.ActionCooldownType actionType, float coolDownTime) //TODO How do I want to store cooldowns and be able to checkk their status going forward?
+        public bool CheckActionsOnCooldown(string actionName)
         {
-            /*if(!activeActionCooldowns.ContainsKey(actionName))
+            return actionsOnCooldown.ContainsKey(actionName);
+        }
+        
+        public void ProcessActionCooldown(string actionName, float durationTime, float coolDownTime) //TODO just return a bool so 
+        {
+            if(!activeTimedActions.ContainsKey(actionName) && !actionsOnCooldown.ContainsKey(actionName))
             {
-                activeActionCooldowns.Add(actionName, new Dark_Action.ActionCooldownInfo(Time.deltaTime, coolDownTime));
-            }*/
-
-            switch(actionType)
-            {
-                case Dark_Action.ActionCooldownType.Idle: //basically idle will request movement be on cooldown while idle. then set the idle cooldown after the idle duration
-                    if(idleOnCooldown == false && idleActive == false)
-                    {
-                        activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
-                        idleOnCooldown = false;
-                        idleActive = true;
-                    }
-                    break;
-                case Dark_Action.ActionCooldownType.Attack:
-                    if(attackOnCooldown == false)
-                    {
-                        activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
-                        attackOnCooldown = true;
-                    }
-                    break;
-                case Dark_Action.ActionCooldownType.Movement:
-                    if(movementOnCooldown == false)
-                    {
-                        activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
-                        movementOnCooldown = true;
-                    }
-                    break;
-                case Dark_Action.ActionCooldownType.AttackActive:
-                    if(attackActive == false)
-                    {
-                        activeActionCooldowns.Add(new Dark_Action.ActionCooldownInfo(actionType, Time.deltaTime, coolDownTime));
-                        attackActive = true;
-                        attackEnded = false;
-                    }
-                    break;
-                default: 
-                    return;
+                if(durationTime > 0)
+                {
+                    activeTimedActions.Add(actionName, new Dark_Action.ActionCooldownInfo(actionName, durationTime, coolDownTime));
+                    StartCoroutine(ActiveActionTimer(actionName));
+                }
+                else
+                {
+                    actionsOnCooldown.Add(actionName, new Dark_Action.ActionCooldownInfo(actionName, durationTime, coolDownTime));
+                    StartCoroutine(ActionCooldownTimer(actionName));
+                } 
             }
         }
 
-        private void UpdateCooldowns() //update all cooldown statuses 
+        private IEnumerator ActiveActionTimer(string actionName)
         {
-            for(int i = activeActionCooldowns.Count-1; i >= 0; i--)// acInfo in activeActionCooldowns)
+            Dark_Action.ActionCooldownInfo info;
+            if(activeTimedActions.TryGetValue(actionName, out info))
             {
-                if(Time.deltaTime -  activeActionCooldowns[i].initialTime >= activeActionCooldowns[i].coolDownTime)
+                yield return new WaitForSeconds(info.durationTime);
+                if(info.coolDownTime > 0 && !actionsOnCooldown.ContainsKey(info.name))
                 {
-                    activeActionCooldowns.Remove(activeActionCooldowns[i]);
-                    switch(activeActionCooldowns[i].acType)
-                    {
-                        case Dark_Action.ActionCooldownType.Idle: 
-                            idleOnCooldown = true;
-                            idleActive = false;
-                            break;
-                        case Dark_Action.ActionCooldownType.Attack:
-                            attackOnCooldown = false;
-                            break;
-                        case Dark_Action.ActionCooldownType.Movement:
-                            movementOnCooldown = false;
-                            break;
-                        case Dark_Action.ActionCooldownType.AttackActive:
-                            attackActive = false;
-                            attackEnded = true;
-                            break;
-                    }
+                    actionsOnCooldown.Add(info.name, info);
+                    StartCoroutine(ActionCooldownTimer(info.name));
                 }
             }
+            yield return null;
         }
 
-        ///<summary>Called in state update loop to update path</summary>
-        public void UpdatePath()
+        private IEnumerator ActionCooldownTimer(string actionName)
         {
-            if(sekr.IsDone())
+            Dark_Action.ActionCooldownInfo info;
+            if(activeTimedActions.TryGetValue(actionName, out info))
             {
-                //if(navTarget.active)
-                CreatePath(navTarget.position);
-                //else if(patrolNavTarget.active)
-                //    CreatePath(patrolNavTarget.position);
+                yield return new WaitForSeconds(info.coolDownTime);
+                actionsOnCooldown.Remove(info.name);
             }
-            //yield return new WaitForSeconds(pathUpdateTime);
+            yield return null;
         }
+
+        private void ResetCooldowns()
+        {
+            //attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = idleActive = false;
+            StopAllCoroutines();
+            //activeActionCooldowns.Clear();
+        }
+
+        #endregion
+
+        
 
         public void ChangeState(Dark_State nextState)
         {
@@ -276,10 +254,19 @@ namespace Darkness
             }  //Check to see if this state has initiated it's timer to exit bevavior*/
         }
 
-        private void ResetCooldowns()
+        #region Pathing
+
+        ///<summary>Called in state update loop to update path</summary>
+        public void UpdatePath()
         {
-            attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = idleActive = false;
-            activeActionCooldowns.Clear();
+            if(sekr.IsDone())
+            {
+                //if(navTarget.active)
+                CreatePath(navTarget.position);
+                //else if(patrolNavTarget.active)
+                //    CreatePath(patrolNavTarget.position);
+            }
+            //yield return new WaitForSeconds(pathUpdateTime);
         }
 
         private void PathComplete(Path p)
@@ -332,6 +319,7 @@ namespace Darkness
             moving = false;
             sekr.pathCallback -= PathComplete;
         }
+        #endregion
 
         public void UpdateAnimator(Dark_Action.AnimationType atType) 
         {
@@ -362,11 +350,11 @@ namespace Darkness
 
         public IEnumerator AttackActivation(float idleTime)
         {
-            attackOnCooldown = true;
+            //attackOnCooldown = true;
             darkHitBox.enabled = true;
             //animeController.SetTrigger(animationID);
             yield return new WaitForSeconds(idleTime);
-            attackOnCooldown = false;
+            //attackOnCooldown = false;
             darkHitBox.enabled = false;
         }
 
