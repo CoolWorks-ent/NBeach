@@ -17,7 +17,7 @@ namespace Darkness
         [SerializeField, Range(0, 10)]
         protected float executionTime, coolDownTime;
 
-        public enum ActionFlags { NavTargetDistClose, EndOfPath, PlayerInAttackRange, PlayerOutOfRange} //AttackOnCooldown, AttackOffCooldown, MovementOnCooldown, IdleOnCooldown, IdleOffCooldown,
+        public enum ActionFlags { NavTargetDistClose, EndOfPath, PlayerInAttackRange, PlayerOutOfRange, ThisActionNotOnCoolDown} //AttackOnCooldown, AttackOffCooldown, MovementOnCooldown, IdleOnCooldown, IdleOffCooldown,
         //public enum ActionCooldownType {Attack, AttackActive, Idle, Movement}
 
         public struct ActionCooldownInfo 
@@ -47,16 +47,22 @@ namespace Darkness
             Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
             return new Vector3(point.x + center.x, center.y, point.y + center.z);
         }
+
+        public void OnEnable()
+        {
+
+        }
         
         [SerializeField]
         private ActionFlags[] Conditions;
 
-        private Dictionary<ActionFlags,Func<DarknessMinion,bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, bool>>
+        private Dictionary<ActionFlags,Func<DarknessMinion, string, bool>> ActionFlagCheck = new Dictionary<ActionFlags, Func<DarknessMinion, string, bool>>
         {
             {ActionFlags.PlayerInAttackRange, PlayerInAttackRange},
             {ActionFlags.NavTargetDistClose, NavTargetDistCloseCheck},
             {ActionFlags.EndOfPath, EndOfPathCheck},
             {ActionFlags.PlayerOutOfRange, PlayerOutOfRange},
+            {ActionFlags.ThisActionNotOnCoolDown, ThisActionNotOnCooldown}
             //{ActionFlags.AttackOnCooldown, AttackOnCooldownCheck},
             //{ActionFlags.IdleOnCooldown, IdleOnCooldownCheck},
             //{ActionFlags.MovementOnCooldown, MovementOnCooldownCheck},
@@ -78,19 +84,19 @@ namespace Darkness
         private bool CheckFlag(ActionFlags fName, DarknessMinion controller)
         {   
             if(controller != null)
-                return ActionFlagCheck[fName].Invoke(controller);
+                return ActionFlagCheck[fName].Invoke(controller, this.name);
             else return false;
         }
 
-        private static bool EndOfPathCheck(DarknessMinion controller)
+        private static bool EndOfPathCheck(DarknessMinion controller, string name)
         {
             return controller.reachedEndOfPath;
         }
 
-        private static bool ThisActionOnCooldown(DarknessMinion controller)
+        private static bool ThisActionNotOnCooldown(DarknessMinion controller, string name)
         {
             //TODO check if the action is in the cooldown list on the DarknessMinion
-            return false; //controller.CheckActionsOnCooldown(this.name); //TODO this bullshit needs to be fixed. someway there needs to be an identifier to check this nonsense
+            return controller.CheckActionsOnCooldown(name); //TODO this bullshit needs to be fixed. someway there needs to be an identifier to check this nonsense
         }
 
         /*private static bool IdleOnCooldownCheck(DarknessMinion controller)
@@ -110,7 +116,7 @@ namespace Darkness
             return controller.movementOnCooldown;
         }*/
 
-        private static bool PlayerInAttackRange(DarknessMinion controller) 
+        private static bool PlayerInAttackRange(DarknessMinion controller, string name) 
         {
             if(controller.playerDist <= controller.switchTargetDistance) 
             {
@@ -131,16 +137,16 @@ namespace Darkness
             else return false;
         }*/
 
-        private static bool NavTargetDistCloseCheck(DarknessMinion controller) 
+        private static bool NavTargetDistCloseCheck(DarknessMinion controller, string name) 
         {
-            if(controller.targetDistance < controller.switchTargetDistance || EndOfPathCheck(controller))
+            if(controller.targetDistance < controller.switchTargetDistance || EndOfPathCheck(controller, name))
             {
                 return true;
             }
             else return false;
         }
 
-        private static bool PlayerOutOfRange(DarknessMinion controller) 
+        private static bool PlayerOutOfRange(DarknessMinion controller, string name) 
         {
             if(controller.playerDist > controller.switchTargetDistance)
             {
