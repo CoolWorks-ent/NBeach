@@ -49,8 +49,7 @@ namespace Darkness
 			AddDarkness += AddtoDarknessList;
 			RemoveDarkness += RemoveFromDarknessList;
 			RequestNewTarget += ApproveDarknessTarget;
-			updatePaused = true;
-			gamePaused = false;
+			updatePaused = false;
 			calculationTime = 0.25f;
 			attackOffset = 3.5f;
 			//PatrolPoints = new NavigationTarget[4]; 
@@ -138,21 +137,14 @@ namespace Darkness
 					darkAttackCount++;
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Aggressive);
 				}
-				/*else if(i < darknessConcurrentAttackLimit+2)
+				else if(i < darknessConcurrentAttackLimit+2)
 				{
-					if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != DarknessMinion.AggresionRating.CatchingUp)
-					{
-						darkStandbyCount++;
-						ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Wandering);
-					}
-				}*/
+					darkStandbyCount++;
+					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Patrol);
+				}
 				else 
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Passive);
-					/*if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != DarknessMinion.AggresionRating.CatchingUp)
-					{
-						ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(DarknessMinion.AggresionRating.Idling);
-					}*/
 				}
 			}
 		}
@@ -198,32 +190,16 @@ namespace Darkness
 			DarknessMinion darkness;
 			if(ActiveDarkness.TryGetValue(darkID, out darkness)) 
 			{
-				switch(darkness.agRatingCurrent)
+				if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive)
 				{
-					case DarknessMinion.AggresionRating.Aggressive:
-						int index = LeastRequestedNavigationTarget(AttackPoints);
-						AttackPoints[index].weight++;
-						return AttackPoints[index];
-					/*case DarknessMinion.AggresionRating.Wandering:
-						NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
-						if(darkness.navTarget.navTargetTag == NavTargetTag.Patrol)
-						{
-							if(darkness.navTarget.targetID+1 < PatrolPoints.Length)
-							{
-								patrol = PatrolPoints[darkness.navTarget.targetID+1];
-							}
-							else patrol = PatrolPoints[0];
-						}
-						return patrol;*/
-					default:
-						return StartPoint;
+					int index = LeastRequestedNavigationTarget(AttackPoints);
+					AttackPoints[index].weight++;
+					return AttackPoints[index];
 				}
 			}
-			else 
-			{
-				Debug.LogError(string.Format("DarknessMinion {0} does not exist", darkID));	
-				return StartPoint;
-			}
+			
+			Debug.LogError(string.Format("DarknessMinion {0} does not exist", darkID));	
+			return StartPoint;
 		}
 
 		///<summary></summary>
@@ -330,7 +306,7 @@ namespace Darkness
 		}
 
 		///<summary>Executes distance update for DarknessMinion</summary>
-		public static void OnDistanceUpdate(Vector3 pos) //Called by Darkness_Manager. Subsribed by DarknessMinion
+		private static void OnDistanceUpdate(Vector3 pos) //Called by Darkness_Manager. Subsribed by DarknessMinion
 		{
 			if(DistanceUpdate != null)
 				DistanceUpdate(pos);

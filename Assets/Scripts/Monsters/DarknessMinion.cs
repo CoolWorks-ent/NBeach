@@ -7,10 +7,11 @@ namespace Darkness
 {
     public class DarknessMinion : MonoBehaviour 
     {
-        public enum AggresionRating {Aggressive, Passive}
+        public enum AggresionRating {Aggressive, Passive, Patrol}
+        public AggresionRating agRatingCurrent;
+
+        [HideInInspector]
         public Vector3 nextPosition;
-        
-        public AggresionRating agRatingCurrent;//, agRatingPrevious;
 
         [HideInInspector]
         public Collider darkHitBox;
@@ -27,7 +28,7 @@ namespace Darkness
 
         [HideInInspector]
         public float targetDistance, patrolDistance, playerDist;
-
+        [HideInInspector]
         public Vector3 playerDirection;
         public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
         public bool activeCooldownsComplete{get{return activeTimedActions.Count <= 0;}}
