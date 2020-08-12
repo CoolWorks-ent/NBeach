@@ -6,9 +6,9 @@ namespace Darkness
     [CreateAssetMenu (menuName = "Darkness/State/DarkState")]
     public class Dark_State : ScriptableObject
     {
-        public enum StateType {PASSIVE, AGGRESSIVE, DEATH, REMAIN}
+        public enum SpecialStateType {NONE, DEATH, REMAIN}
 
-        public StateType stateType;
+        public SpecialStateType specialStateType;
         public Dark_Transition[] transitions;
         public Dark_Action[] actions;
 
@@ -63,13 +63,13 @@ namespace Darkness
                 bool decisionResult = transitions[i].decision.MakeDecision(transitions[i].decisionChoice,controller);
                 if(decisionResult) 
                 {
-                    if(transitions[i].trueState.stateType == StateType.REMAIN)
+                    if(transitions[i].trueState.specialStateType == SpecialStateType.REMAIN)
                         continue;
                     else controller.ChangeState(transitions[i].trueState); 
                 }
                 else if(!decisionResult) 
                 {
-                    if(transitions[i].falseState.stateType == StateType.REMAIN)
+                    if(transitions[i].falseState.specialStateType == SpecialStateType.REMAIN)
                         continue;
                     else controller.ChangeState(transitions[i].falseState);
                 }
@@ -78,7 +78,7 @@ namespace Darkness
 
         protected void RemoveDarkness(DarknessMinion controller)
         {
-            if(stateType != Dark_State.StateType.DEATH)
+            if(specialStateType != Dark_State.SpecialStateType.DEATH)
             {
                 //this.ExitState(controller);
                 //controller.updateStates = false;

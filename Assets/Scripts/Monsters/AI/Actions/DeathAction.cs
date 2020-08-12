@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Darkness
@@ -7,6 +6,11 @@ namespace Darkness
     [CreateAssetMenu (menuName = "Darkness/Action/DeathAction")]
     public class DeathAction : Dark_Action {
         public GameObject deathFX;
+
+        public void OnEnable()
+        {
+            actionType = ActionType.Death;
+        }
 
         public override void ExecuteAction(DarknessMinion controller)
         {

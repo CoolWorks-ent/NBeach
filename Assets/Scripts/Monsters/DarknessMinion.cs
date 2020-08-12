@@ -8,13 +8,14 @@ namespace Darkness
     public class DarknessMinion : MonoBehaviour 
     {
         public enum AggresionRating {Aggressive, Passive}
-        
         public Vector3 nextPosition;
-        public Quaternion nextRotation;
+        
         public AggresionRating agRatingCurrent;//, agRatingPrevious;
 
         [HideInInspector]
         public Collider darkHitBox;
+        [HideInInspector]
+        public Quaternion nextRotation;
         
         public Dark_State DeathState, currentState;
         
@@ -40,55 +41,13 @@ namespace Darkness
         private Path navPath;
         private Animator animeController;
 
-        private Dictionary<string, Dark_Action.ActionCooldownInfo> actionsOnCooldown, activeTimedActions;
+        private Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> actionsOnCooldown, activeTimedActions;
 
         [HideInInspector]
-        public int attackHash = Animator.StringToHash("Attack"),
-                    chaseHash = Animator.StringToHash("Chase"),
-                    idleHash = Animator.StringToHash("Idle"),
-                    deathHash = Animator.StringToHash("Death");
+        public int attackHash, chaseHash, idleHash, deathHash;
 
         public enum NavTargetTag {Attack, Patrol, Player}
         public NavigationTarget navTarget;
-
-        ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
-        public struct NavigationTarget
-        { 
-            public int weight;
-            //public bool active;
-            private float groundElavation;
-
-            public Vector3 position;
-            private Vector3 positionOffset;
-            //public Transform locationInfo { 
-            //	get {return transform; }}
-
-            private NavTargetTag targetTag;
-            public NavTargetTag navTargetTag { get{ return targetTag; }}
-
-            ///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
-            ///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
-            public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
-            {
-                position = loc;
-                groundElavation = elavation;
-                //if(parent != null)
-                //	transform.parent = parent;
-                positionOffset = offset;
-                targetTag = ntTag;
-                weight = 0;
-                //active = false;
-                //assignedDarknessIDs = new int[assignmentLimit];
-            }
-
-            public void UpdateLocation(Vector3 loc)
-            {
-                //if(!applyOffset)
-                //	position = new Vector3(loc.x, groundElavation, loc.y);
-                //else 
-                position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
-            }
-        }
 
         void Awake()
         {
@@ -103,10 +62,14 @@ namespace Darkness
             sekr = GetComponent<Seeker>();
             aIPath = GetComponent<AIPath>();
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-            activeTimedActions = new Dictionary<string, Dark_Action.ActionCooldownInfo>();
-            actionsOnCooldown = new Dictionary<string, Dark_Action.ActionCooldownInfo>();
+            activeTimedActions = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
+            actionsOnCooldown = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
             ResetCooldowns();
             //idleActive = true;
+            attackHash = Animator.StringToHash("Attack");
+            chaseHash = Animator.StringToHash("Chase");
+            idleHash = Animator.StringToHash("Idle");
+            deathHash = Animator.StringToHash("Death");
         }
 
         void Start () {
@@ -131,80 +94,74 @@ namespace Darkness
             }
         }   
 
-        void Update()
-        {
-            /*if(activeActionCooldowns.Count > 0)
-            {
-                UpdateCooldowns();
-            }*/
-        }
-
+        #region State Handling
         private void UpdateCurrentState()
         {
             currentState.UpdateState(this);
             //if(animeController.animation.)
         }
 
+        public void ChangeState(Dark_State nextState)
+        {
+            currentState = nextState;
+            ResetCooldowns();
+            currentState.InitializeState(this);
+        }
+        #endregion
+
         #region Cooldown Handling
 
-        public bool CheckTimedActions(string actionName)
+        public bool CheckTimedActions(Dark_Action.ActionType actType)
         {
-            return activeTimedActions.ContainsKey(actionName);
-            /*foreach(Dark_Action.ActionCooldownInfo actInfo in activeActionCooldowns)
-            {
-                if(actInfo.acType != actionType)
-                    continue;
-                else return true;
-            }
-            return false;*/
+            return activeTimedActions.ContainsKey(actType);
         }
 
-        public bool CheckActionsOnCooldown(string actionName)
+        public bool CheckActionsOnCooldown(Dark_Action.ActionType actType)
         {
-            return actionsOnCooldown.ContainsKey(actionName);
+            return actionsOnCooldown.ContainsKey(actType);
         }
         
-        public void ProcessActionCooldown(string actionName, float durationTime, float coolDownTime) //TODO just return a bool so 
+        public void ProcessActionCooldown(Dark_Action.ActionType actType, float durationTime, float coolDownTime) //TODO just return a bool so 
         {
-            if(!activeTimedActions.ContainsKey(actionName) && !actionsOnCooldown.ContainsKey(actionName))
+            if(!activeTimedActions.ContainsKey(actType) && !actionsOnCooldown.ContainsKey(actType))
             {
                 if(durationTime > 0)
                 {
-                    activeTimedActions.Add(actionName, new Dark_Action.ActionCooldownInfo(actionName, durationTime, coolDownTime));
-                    StartCoroutine(ActiveActionTimer(actionName));
+                    activeTimedActions.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime));
+                    StartCoroutine(ActiveActionTimer(actType));
                 }
                 else
                 {
-                    actionsOnCooldown.Add(actionName, new Dark_Action.ActionCooldownInfo(actionName, durationTime, coolDownTime));
-                    StartCoroutine(ActionCooldownTimer(actionName));
+                    actionsOnCooldown.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime));
+                    StartCoroutine(ActionCooldownTimer(actType));
                 } 
             }
         }
 
-        private IEnumerator ActiveActionTimer(string actionName)
+        private IEnumerator ActiveActionTimer(Dark_Action.ActionType actType)
         {
             Dark_Action.ActionCooldownInfo info;
-            if(activeTimedActions.TryGetValue(actionName, out info))
+            if(activeTimedActions.TryGetValue(actType, out info))
             {
                 yield return new WaitForSeconds(info.durationTime);
-                if(info.coolDownTime > 0 && !actionsOnCooldown.ContainsKey(info.name))
+                if(info.coolDownTime > 0 && !actionsOnCooldown.ContainsKey(actType))
                 {
-                    actionsOnCooldown.Add(info.name, info);
-                    StartCoroutine(ActionCooldownTimer(info.name));
+                    actionsOnCooldown.Add(actType, info);
+                    StartCoroutine(ActionCooldownTimer(actType));
                 }
             }
-            yield return null;
+            yield break;
         }
 
-        private IEnumerator ActionCooldownTimer(string actionName)
+        private IEnumerator ActionCooldownTimer(Dark_Action.ActionType actType)
         {
             Dark_Action.ActionCooldownInfo info;
-            if(activeTimedActions.TryGetValue(actionName, out info))
+            if(activeTimedActions.TryGetValue(actType, out info))
             {
                 yield return new WaitForSeconds(info.coolDownTime);
-                actionsOnCooldown.Remove(info.name);
+                actionsOnCooldown.Remove(actType);
             }
-            yield return null;
+            yield break;
         }
 
         private void ResetCooldowns()
@@ -215,44 +172,6 @@ namespace Darkness
         }
 
         #endregion
-
-        
-
-        public void ChangeState(Dark_State nextState)
-        {
-            //currentState.ExitState(this);
-            currentState = nextState;
-            ResetCooldowns();
-            currentState.InitializeState(this);
-            /*previousState = currentState;
-            if(!timedState) //if the timer on a state is still active don't switch yet
-            {
-                if(queuedState != null && queuedState != nextState)
-                {
-                    if(nextState.statePriority > queuedState.statePriority)
-                    {
-                        currentState = nextState;
-                        previousState.ExitState(this);
-                        currentState.InitializeState(this);
-                    }
-                    else if(queuedState.statePriority > nextState.statePriority)
-                    {
-                        currentState = queuedState;
-                        previousState.ExitState(this);
-                        currentState.InitializeState(this);
-                    }
-                }
-                else currentState = nextState;
-            }
-            else
-            {
-                if(!timedStateExiting)
-                {
-                    StartCoroutine(StateTransitionTimer(currentState.exitTime));
-                    timedState = false;
-                }            
-            }  //Check to see if this state has initiated it's timer to exit bevavior*/
-        }
 
         #region Pathing
 
@@ -321,24 +240,10 @@ namespace Darkness
         }
         #endregion
 
-        public void UpdateAnimator(Dark_Action.AnimationType atType) 
+        public void UpdateAnimator(int atType) 
         {
             //Ensure the correct animation is played in the animator. 
-            switch(atType)
-            {
-                case Dark_Action.AnimationType.Attack:
-                    animeController.SetTrigger(attackHash);
-                    break;
-                case Dark_Action.AnimationType.Chase:
-                    animeController.SetTrigger(chaseHash);
-                    break;
-                case Dark_Action.AnimationType.Idle:
-                    animeController.SetTrigger(idleHash);
-                    break;
-                /*case Dark_State.StateType.DEATH:
-                    animeController.SetTrigger(deathHash);
-                    break;*/
-            }
+            animeController.SetTrigger(atType);
         }
 
         public void AggressionChanged(AggresionRating agR)
@@ -348,41 +253,12 @@ namespace Darkness
             agRatingCurrent = agR;
         }
 
-        public IEnumerator AttackActivation(float idleTime)
-        {
-            //attackOnCooldown = true;
-            darkHitBox.enabled = true;
-            //animeController.SetTrigger(animationID);
-            yield return new WaitForSeconds(idleTime);
-            //attackOnCooldown = false;
-            darkHitBox.enabled = false;
-        }
-
         ///<summary>Called once per tick by the Darkness_Manager. Updates the playerDist, attackNavTarget/patrolNavTarget targetDistance values. If either NavTarget is inactive the distance is set to -1</summary>
         public void UpdateDistanceEvaluation(Vector3 playerLocation)
         {
             playerDist = Vector3.Distance(transform.position, playerLocation);
-            playerDirection = playerLocation - transform.position;
-            /*if(attackNavTarget.active)
-            {
-                attackNavTarget.targetDistance = Vector3.Distance(transform.position, attackNavTarget.position);
-            }
-            else attackNavTarget.targetDistance = -1;
-
-            if(patrolNavTarget.active)
-            {
-                patrolNavTarget.targetDistance = Vector3.Distance(transform.position, patrolNavTarget.position);
-            }
-            else patrolNavTarget.targetDistance = -1;*/
+            playerDirection = playerLocation - transform.position;  
         }
-
-
-        /*public IEnumerator WaitTimer(float timer)
-        {
-            yield return new WaitForSeconds(timer);
-            timedActionStatus = "";
-            //cooldownActive = true;
-        }*/
 
         private void OnTriggerEnter(Collider collider)
         {
@@ -400,5 +276,43 @@ namespace Darkness
             }
         }
 
+        ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
+        public struct NavigationTarget
+        { 
+            public int weight;
+            //public bool active;
+            private float groundElavation;
+
+            public Vector3 position;
+            private Vector3 positionOffset;
+            //public Transform locationInfo { 
+            //	get {return transform; }}
+
+            private NavTargetTag targetTag;
+            public NavTargetTag navTargetTag { get{ return targetTag; }}
+
+            ///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
+            ///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
+            public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
+            {
+                position = loc;
+                groundElavation = elavation;
+                //if(parent != null)
+                //	transform.parent = parent;
+                positionOffset = offset;
+                targetTag = ntTag;
+                weight = 0;
+                //active = false;
+                //assignedDarknessIDs = new int[assignmentLimit];
+            }
+
+            public void UpdateLocation(Vector3 loc)
+            {
+                //if(!applyOffset)
+                //	position = new Vector3(loc.x, groundElavation, loc.y);
+                //else 
+                position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
+            }
+        }
     }
 }
