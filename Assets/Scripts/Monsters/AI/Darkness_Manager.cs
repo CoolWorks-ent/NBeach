@@ -26,7 +26,7 @@ namespace Darkness
 		private Dark_State[] dark_States;
 		//private NavigationTarget[] PatrolPoints;
 		private DarknessMinion.NavigationTarget[] AttackPoints;
-		private DarknessMinion.NavigationTarget StartPoint, PlayerPoint;
+		private DarknessMinion.NavigationTarget StartPoint;
 
 		public List<int> attackApprovalPriority; 
 		//private Queue<DarknessMinion> engagementQueue, approachQueue;
@@ -48,7 +48,7 @@ namespace Darkness
 			attackApprovalPriority = new List<int>();
 			AddDarkness += AddtoDarknessList;
 			RemoveDarkness += RemoveFromDarknessList;
-			RequestNewTarget += ApproveDarknessTarget;
+			RequestNewTarget += ApproveTargetRequest;
 			updatePaused = false;
 			calculationTime = 0.25f;
 			attackOffset = 3.5f;
@@ -62,7 +62,7 @@ namespace Darkness
 			//StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
 			ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 			player = GameObject.FindGameObjectWithTag("Player").transform;
-			PlayerPoint = new DarknessMinion.NavigationTarget(player.transform.position, Vector3.zero, ground, DarknessMinion.NavTargetTag.Attack);
+			//PlayerPoint = new DarknessMinion.NavigationTarget(player.transform.position, Vector3.zero, ground, DarknessMinion.NavTargetTag.Attack);
 			StartPoint = new DarknessMinion.NavigationTarget(Vector3.zero, Vector3.zero, ground, DarknessMinion.NavTargetTag.Patrol);
 			List<Vector3> offsets = new List<Vector3>();
 			offsets.Add(new Vector3(attackOffset, 0, -2));
@@ -79,7 +79,7 @@ namespace Darkness
 
 		void LateUpdate()
 		{
-			PlayerPoint.UpdateLocation(player.position);
+			//PlayerPoint.UpdateLocation(player.position);
 			foreach(DarknessMinion.NavigationTarget n in AttackPoints) //update the location of the attack points
 			{
 				n.UpdateLocation(player.position);
@@ -183,25 +183,6 @@ namespace Darkness
 			return lowest;
 		}
 
-		///<summary>Returns an attack Navigation Target. Returns the StartPoint object if DarknessMinion is not found or if they should not be attacking. </summary>
-		private DarknessMinion.NavigationTarget AssignAttackNavTarget(int darkID) 
-		{
-			//Find if DarknessMinion is in the collection
-			DarknessMinion darkness;
-			if(ActiveDarkness.TryGetValue(darkID, out darkness)) 
-			{
-				if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive)
-				{
-					int index = LeastRequestedNavigationTarget(AttackPoints);
-					AttackPoints[index].weight++;
-					return AttackPoints[index];
-				}
-			}
-			
-			Debug.LogError(string.Format("DarknessMinion {0} does not exist", darkID));	
-			return StartPoint;
-		}
-
 		///<summary></summary>
 		private void DeactivateNavTarget(int darkID, bool aggresive)
 		{
@@ -217,21 +198,25 @@ namespace Darkness
 		}
 
 		///<summary>Processes DarknessMinion request for a  NavTarget. Assign a new target to the requestor DarknessMinion if a valid request</summary> //--Work in Progress--
-		public void ApproveDarknessTarget(int darkID, DarknessMinion.NavTargetTag navTargetTag) 
+		public void ApproveTargetRequest(int darkID) 
 		{
 			DarknessMinion darkness;
 			if(ActiveDarkness.TryGetValue(darkID, out darkness))
 			{
 				if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Aggressive)
 				{ 
-					if(navTargetTag == DarknessMinion.NavTargetTag.Player)
-						darkness.navTarget = PlayerPoint;
-					else darkness.navTarget = AssignAttackNavTarget(darkness.creationID); 
+					//if(navTargetTag == DarknessMinion.NavTargetTag.Player)
+						//darkness.navTarget = PlayerPoint;
+					//else 
+
+					int index = LeastRequestedNavigationTarget(AttackPoints);
+					AttackPoints[index].weight++;
+					darkness.navTarget = AttackPoints[index];
 				}
 				else if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Passive)
 				{
 					DeactivateNavTarget(darkID, true);
-					darkness.navTarget = PlayerPoint;
+					//arkness.navTarget = PlayerPoint;
 				}
 				else //if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Idling)
 				{
@@ -296,7 +281,7 @@ namespace Darkness
 		public static event AIEvent<Vector3> DistanceUpdate;
 		public static event AIEvent<DarknessMinion> AddDarkness;
 		public static event AIEvent<DarknessMinion> RemoveDarkness;
-		public static event AIEvent<int, DarknessMinion.NavTargetTag> RequestNewTarget;
+		public static event AIEvent<int> RequestNewTarget;
 
 		///<summary>Executes logic update for DarknessMinion</summary>
 		public static void OnUpdateDarkStates() //Called by Darkness_Manager. Subsribed by DarknessMinion. DarknessMinion will run the update for their current state.
@@ -327,10 +312,10 @@ namespace Darkness
 		}
 
 		///<summary>Request a new navigation target be assigned to the identified DarknessMinion.</summary>
-		public static void OnRequestNewTarget(int ID, DarknessMinion.NavTargetTag navTargetTag) //Called by Dark_States. Subscribed by Darkness_Manager
+		public static void OnRequestNewTarget(int ID) //Called by Dark_States. Subscribed by Darkness_Manager
 		{
 			if(RequestNewTarget != null)
-				RequestNewTarget(ID, navTargetTag);
+				RequestNewTarget(ID);
 		}
 		#endregion
 		

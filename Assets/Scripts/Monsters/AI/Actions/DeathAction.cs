@@ -5,7 +5,6 @@ namespace Darkness
 {
     [CreateAssetMenu (menuName = "Darkness/Action/DeathAction")]
     public class DeathAction : Dark_Action {
-        public GameObject deathFX;
 
         public void OnEnable()
         {
@@ -14,7 +13,7 @@ namespace Darkness
 
         public override void ExecuteAction(DarknessMinion controller)
         {
-            GameObject newFX = Instantiate(deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
+            GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
             //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
             
             //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects

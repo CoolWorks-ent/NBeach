@@ -49,6 +49,7 @@ namespace Darkness
 
         public enum NavTargetTag {Attack, Patrol, Player}
         public NavigationTarget navTarget;
+        public GameObject deathFX;
 
         void Awake()
         {
@@ -171,7 +172,6 @@ namespace Darkness
             StopAllCoroutines();
             //activeActionCooldowns.Clear();
         }
-
         #endregion
 
         #region Pathing

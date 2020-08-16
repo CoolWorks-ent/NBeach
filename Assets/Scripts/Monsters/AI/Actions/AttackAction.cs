@@ -26,7 +26,7 @@ namespace Darkness
             //Face player then chomp
 
             if(controller.navTarget.navTargetTag != DarknessMinion.NavTargetTag.Attack)
-                Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Attack);
+                Darkness_Manager.OnRequestNewTarget(controller.creationID);
             //TODO determine if it's not already moving
             if(controller.playerDist < attackInitiationRange)
             {

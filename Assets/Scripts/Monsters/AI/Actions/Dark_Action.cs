@@ -9,7 +9,6 @@ namespace Darkness
     {
         public enum ActionType {Chase, Idle, Attack, Patrol, Death}
 
-        [SerializeField]
         protected ActionType actionType;
 
         [SerializeField, Range(0, 10)]
