@@ -35,11 +35,14 @@ namespace Darkness
         {
             public float durationTime;
             public float coolDownTime;
+            public Coroutine activeCoroutine;
+            //public Coroutine durationRoutine;
 
-            public ActionCooldownInfo(float durTime, float cdTime)
+            public ActionCooldownInfo(float durTime, float cdTime, Coroutine routine)
             {
                 durationTime = durTime;
                 coolDownTime = cdTime; 
+                activeCoroutine = routine;
             }
         }
 

@@ -129,13 +129,11 @@ namespace Darkness
             {
                 if(durationTime > 0)
                 {
-                    activeTimedActions.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime));
-                    StartCoroutine(ActiveActionTimer(actType));
+                    activeTimedActions.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime, StartCoroutine(ActiveActionTimer(actType))));
                 }
                 else
                 {
-                    actionsOnCooldown.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime));
-                    StartCoroutine(ActionCooldownTimer(actType));
+                    actionsOnCooldown.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime, StartCoroutine(ActionCooldownTimer(actType))));
                 } 
             }
         }
@@ -149,7 +147,7 @@ namespace Darkness
                 if(info.coolDownTime > 0 && !actionsOnCooldown.ContainsKey(actType))
                 {
                     actionsOnCooldown.Add(actType, info);
-                    StartCoroutine(ActionCooldownTimer(actType));
+                    info.activeCoroutine = StartCoroutine(ActionCooldownTimer(actType));
                 }
             }
             yield break;
@@ -169,6 +167,10 @@ namespace Darkness
         private void ResetCooldowns()
         {
             //attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = idleActive = false;
+            foreach(KeyValuePair<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> info in activeTimedActions)
+            {
+                StopCoroutine(info.Value.activeCoroutine);
+            }
             StopAllCoroutines();
             //activeActionCooldowns.Clear();
         }

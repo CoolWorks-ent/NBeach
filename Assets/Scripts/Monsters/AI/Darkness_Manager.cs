@@ -275,7 +275,6 @@ namespace Darkness
 	#region AIManagerEvents
 		public delegate void AIEvent();
 		public delegate void AIEvent<T>(T obj);
-		public delegate void AIEvent<T1,T2>(T1 obj1, T2 obj2);
 
 		public static event AIEvent UpdateDarkStates;
 		public static event AIEvent<Vector3> DistanceUpdate;
