@@ -199,6 +199,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4849616495344730}
+  - component: {fileID: 114732482021839622}
   - component: {fileID: 65387374068129854}
   - component: {fileID: 65625734434817152}
   - component: {fileID: 54991120590850454}
@@ -206,8 +207,6 @@ GameObject:
   - component: {fileID: 114857173380954124}
   - component: {fileID: 136796206659899728}
   - component: {fileID: 114201816284845686}
-  - component: {fileID: 114482823206306784}
-  - component: {fileID: 114732482021839622}
   m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -863,36 +862,7 @@ MonoBehaviour:
   alwaysDrawGizmos: 0
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 0
-  constrainInsideGraph: 0
---- !u!114 &114482823206306784
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efee954c69f0d421086729bb8df1137f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  uniqueID: 969271741509056566
-  points: []
-  convex: 1
-  minBoundsHeight: 1
-  penaltyDelta: 105
-  modifyWalkability: 0
-  setWalkability: 0
-  applyOnStart: 1
-  applyOnScan: 1
-  updatePhysics: 0
-  resetPenaltyOnPhysics: 1
-  updateErosion: 0
-  modifyTag: 1
-  setTag: 2
-  legacyMode: 0
-  serializedVersion: 1
-  legacyUseWorldSpace: 0
+  constrainInsideGraph: 1
 --- !u!114 &114732482021839622
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -904,19 +874,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30e5ce026a410b44eaf357cf764ef278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextPosition: {x: 0, y: 0, z: 0}
-  nextRotation: {x: 0, y: 0, z: 0, w: 0}
   agRatingCurrent: 1
-  agRatingPrevious: 1
+  nextPosition: {x: 0, y: 0, z: 0}
   darkHitBox: {fileID: 0}
+  nextRotation: {x: 0, y: 0, z: 0, w: 0}
   DeathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   currentState: {fileID: 11400000, guid: 3326cc8a8b99ace41baa228176c8f57e, type: 2}
-  updateStates: 0
-  attackOnCooldown: 0
-  attackActive: 0
-  attackEnded: 0
-  idleOnCooldown: 0
-  movementOnCooldown: 0
   switchTargetDistance: 0
   pathUpdateTime: 0
   approachDistance: 0
@@ -930,6 +893,7 @@ MonoBehaviour:
   chaseHash: 1463555229
   idleHash: 2081823275
   deathHash: 646380074
+  deathFX: {fileID: 1476987270811012, guid: ae3616444caed0140b56fbb38dcb183e, type: 2}
 --- !u!114 &114857173380954124
 MonoBehaviour:
   m_ObjectHideFlags: 1

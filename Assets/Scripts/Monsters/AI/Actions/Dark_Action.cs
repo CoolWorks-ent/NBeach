@@ -43,6 +43,7 @@ namespace Darkness
                 durationTime = durTime;
                 coolDownTime = cdTime; 
                 activeCoroutine = routine;
+                Debug.LogWarning(String.Format("Action Cooldown requested. Starting coroutine {0}", routine));
             }
         }
 
@@ -61,12 +62,14 @@ namespace Darkness
 
         public bool ConditionsMet(DarknessMinion controller)
         {
-            foreach(ActionFlags actCond in Conditions)
+            if(Conditions.Length > 0)
             {
-                if(!CheckFlag(actCond, controller))
-                    return false;
+                foreach(ActionFlags actCond in Conditions)
+                {
+                    if(!CheckFlag(actCond, controller))
+                        return false;
+                }
             }
-
             return true;
         } 
 

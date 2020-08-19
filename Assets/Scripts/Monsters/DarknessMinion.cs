@@ -66,7 +66,7 @@ namespace Darkness
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
             activeTimedActions = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
             actionsOnCooldown = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
-            ResetCooldowns();
+            //ResetCooldowns();
             //idleActive = true;
             attackHash = Animator.StringToHash("Attack");
             chaseHash = Animator.StringToHash("Chase");
@@ -115,16 +115,21 @@ namespace Darkness
 
         public bool CheckTimedActions(Dark_Action.ActionType actType)
         {
-            return activeTimedActions.ContainsKey(actType);
+            if (activeTimedActions.Count > 0)
+                return activeTimedActions.ContainsKey(actType);
+            return false;
         }
 
         public bool CheckActionsOnCooldown(Dark_Action.ActionType actType)
         {
-            return actionsOnCooldown.ContainsKey(actType);
+            if (actionsOnCooldown.Count > 0)
+                return actionsOnCooldown.ContainsKey(actType);
+            return false;
         }
-        
+
         public void ProcessActionCooldown(Dark_Action.ActionType actType, float durationTime, float coolDownTime) //TODO just return a bool so 
         {
+            //Debug.LogWarning(string.Format("cooldown requested {0}. In activeTimedActions {1} || In actionsOnCooldown {2}", actType, activeTimedActions.ContainsKey(actType), actionsOnCooldown.ContainsKey(actType)));
             if(!activeTimedActions.ContainsKey(actType) && !actionsOnCooldown.ContainsKey(actType))
             {
                 if(durationTime > 0)
@@ -171,8 +176,10 @@ namespace Darkness
             {
                 StopCoroutine(info.Value.activeCoroutine);
             }
-            StopAllCoroutines();
-            //activeActionCooldowns.Clear();
+            //StopAllCoroutines();
+            actionsOnCooldown.Clear();
+            activeTimedActions.Clear();
+
         }
         #endregion
 
