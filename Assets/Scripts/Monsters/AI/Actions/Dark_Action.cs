@@ -49,15 +49,9 @@ namespace Darkness
 
         public abstract void ExecuteAction(DarknessMinion controller);//make virtual and add time update for how this action has been executing
 
-        protected void TimedActionActivation(DarknessMinion controller, float durationTime, float coolDownTime)
+        protected void TimerRequest(DarknessMinion controller, float durationTime, float coolDownTime)
         {
             controller.ProcessActionCooldown(actionType, durationTime, coolDownTime);
-        }
-
-        protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
-        {
-            Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
-            return new Vector3(point.x + center.x, center.y, point.y + center.z);
         }
 
         public bool ConditionsMet(DarknessMinion controller)

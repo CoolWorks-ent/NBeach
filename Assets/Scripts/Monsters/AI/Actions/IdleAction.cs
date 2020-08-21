@@ -16,8 +16,8 @@ namespace Darkness
         {
             controller.EndMovement();
             controller.UpdateAnimator(controller.idleHash);
-            if(!controller.CheckTimedActions(actionType) && !controller.CheckActionsOnCooldown(actionType))
-                TimedActionActivation(controller, executionTime, coolDownTime);
+            //if(!controller.CheckTimedActions(actionType) && !controller.CheckActionsOnCooldown(actionType)) //TODO How can this not be simplified?
+                //TimerRequest(controller, executionTime, coolDownTime);
 
             Vector3 pDir = Darkness_Manager.Instance.player.position - controller.transform.position; 
             Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);

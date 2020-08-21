@@ -15,6 +15,7 @@ namespace Darkness
 
         [HideInInspector]
         public Collider darkHitBox;
+
         [HideInInspector]
         public Quaternion nextRotation;
         
@@ -28,8 +29,10 @@ namespace Darkness
 
         [HideInInspector]
         public float targetDistance, patrolDistance, playerDist;
+
         [HideInInspector]
         public Vector3 playerDirection;
+
         public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
         public bool activeCooldownsComplete{get{return activeTimedActions.Count <= 0;}}
 
@@ -47,8 +50,9 @@ namespace Darkness
         [HideInInspector]
         public int attackHash, chaseHash, idleHash, deathHash;
 
-        public enum NavTargetTag {Attack, Patrol, Player}
+        public enum NavTargetTag {Attack, Patrol}
         public NavigationTarget navTarget;
+        public NavigationTarget[] patrolTargets;
         public GameObject deathFX;
 
         void Awake()
@@ -56,6 +60,7 @@ namespace Darkness
             //attackInitiationRange = 2.5f;
             creationID = 0;
             actionTimer = 0;
+            stateTime = 0;
             pathUpdateTime = 1.6f;
             patrolDistance = switchTargetDistance * 2;
             //agRatingCurrent = AggresionRating.Idling;
@@ -181,6 +186,12 @@ namespace Darkness
             activeTimedActions.Clear();
 
         }
+
+        public bool CheckCooldown(float duration)
+        {
+            stateTime += Time.deltaTime;
+            return (stateTime >= duration);
+        }
         #endregion
 
         #region Pathing
@@ -298,7 +309,7 @@ namespace Darkness
             //public Transform locationInfo { 
             //	get {return transform; }}
 
-            private NavTargetTag targetTag;
+            private readonly NavTargetTag targetTag;
             public NavTargetTag navTargetTag { get{ return targetTag; }}
 
             ///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>

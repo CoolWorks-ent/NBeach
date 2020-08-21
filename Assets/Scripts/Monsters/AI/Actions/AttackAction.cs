@@ -36,7 +36,7 @@ namespace Darkness
                 //if that returns the player chomp em
                 //Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Player);
                 controller.UpdateAnimator(controller.attackHash);
-                TimedActionActivation(controller, attackHitboxTime, attackCooldown);
+                TimerRequest(controller, attackHitboxTime, attackCooldown);
                 controller.StartCoroutine(AttackActivation(controller));
                 
             } 

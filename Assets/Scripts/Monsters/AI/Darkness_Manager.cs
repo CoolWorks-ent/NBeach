@@ -24,9 +24,8 @@ namespace Darkness
 
 		[SerializeField]
 		private Dark_State[] dark_States;
-		//private NavigationTarget[] PatrolPoints;
 		private DarknessMinion.NavigationTarget[] AttackPoints;
-		private DarknessMinion.NavigationTarget StartPoint;
+		//private DarknessMinion.NavigationTarget StartPoint;
 
 		public List<int> attackApprovalPriority; 
 		//private Queue<DarknessMinion> engagementQueue, approachQueue;
@@ -63,7 +62,7 @@ namespace Darkness
 			ground = GameObject.FindGameObjectWithTag("Water").transform.position.y;
 			player = GameObject.FindGameObjectWithTag("Player").transform;
 			//PlayerPoint = new DarknessMinion.NavigationTarget(player.transform.position, Vector3.zero, ground, DarknessMinion.NavTargetTag.Attack);
-			StartPoint = new DarknessMinion.NavigationTarget(Vector3.zero, Vector3.zero, ground, DarknessMinion.NavTargetTag.Patrol);
+			//StartPoint = new DarknessMinion.NavigationTarget(Vector3.zero, Vector3.zero, ground, DarknessMinion.NavTargetTag.Patrol);
 			List<Vector3> offsets = new List<Vector3>();
 			offsets.Add(new Vector3(attackOffset, 0, -2));
 			offsets.Add(new Vector3(-attackOffset, 0, -2));
@@ -221,7 +220,7 @@ namespace Darkness
 				else //if(darkness.agRatingCurrent == DarknessMinion.AggresionRating.Idling)
 				{
 					DeactivateNavTarget(darkID, false);
-					darkness.navTarget = StartPoint;
+					//darkness.navTarget = StartPoint;
 				}
 			}
 		}
@@ -234,7 +233,7 @@ namespace Darkness
 			updatedDarkness.transform.SetParent(this.transform);
 			darknessIDCounter++;
 			updatedDarkness.creationID = darknessIDCounter;
-			updatedDarkness.navTarget = StartPoint;
+			//updatedDarkness.navTarget = StartPoint;
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);

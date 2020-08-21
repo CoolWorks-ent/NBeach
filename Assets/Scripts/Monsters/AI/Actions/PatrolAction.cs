@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Darkness
 {    
     public class PatrolAction : Dark_Action
@@ -21,9 +23,14 @@ namespace Darkness
             {
                 controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, 5, 10));
                 controller.UpdatePath();
-                TimedActionActivation(controller, 0, 2);
+                TimerRequest(controller, 0, 2);
             }
         }
 
+        protected Vector3 RandomPoint(Vector3 center, float radiusLower, float radiusUpper)
+        {
+            Vector2 point = UnityEngine.Random.insideUnitCircle * Mathf.Sqrt(UnityEngine.Random.Range(radiusLower, radiusUpper));
+            return new Vector3(point.x + center.x, center.y, point.y + center.z);
+        }
     }
 }
