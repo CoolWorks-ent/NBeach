@@ -35,9 +35,9 @@ namespace Darkness
                 //If the rotation is within a certain range say +/-5 degrees then try a sphere cast to see if I can attack
                 //if that returns the player chomp em
                 //Darkness_Manager.OnRequestNewTarget(controller.creationID, DarknessMinion.NavTargetTag.Player);
-                controller.UpdateAnimator(controller.attackHash);
-                TimerRequest(controller, attackHitboxTime, attackCooldown);
-                controller.StartCoroutine(AttackActivation(controller));
+                
+                if(!controller.darkHitBox.enabled)
+                    controller.StartCoroutine(AttackActivation(controller)); // after this then put on cooldown
                 
             } 
             else controller.ResumeMovement();
@@ -47,10 +47,12 @@ namespace Darkness
         {
             //attackOnCooldown = true;
             controller.darkHitBox.enabled = true;
+            controller.UpdateAnimator(controller.attackHash);
             //animeController.SetTrigger(animationID);
             yield return new WaitForSeconds(attackHitboxTime);
             //attackOnCooldown = false;
             controller.darkHitBox.enabled = false;
+            controller.AddCooldown(new ActionCooldownInfo(coolDownTime, actionType));
         }
     }      
 }
