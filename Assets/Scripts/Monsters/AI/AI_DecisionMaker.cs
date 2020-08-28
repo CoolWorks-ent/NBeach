@@ -6,7 +6,7 @@ namespace Darkness
     ///<summary>DecisionMaker provides a way conditions to be set as requisite to transition to the next state.</summary>
     public class AI_DecisionMaker
     {
-        public enum DecisionName {IS_AGGRESSIVE, IN_PATROL_DISTANCE, ACTIONS_COMPLETE}//IDLE_FINISHED, ATTACK_FINISHED,PLAYER_WITHIN_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, PAUSED_FOR_NEXT_COMMAND}
+        public enum DecisionName {IS_AGGRESSIVE, IN_PATROL_DISTANCE, ACTIONS_COMPLETE, PLAYER_WITHIN_RANGE}//IDLE_FINISHED, ATTACK_FINISHED,, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, PAUSED_FOR_NEXT_COMMAND}
         
         ///<summary>Holds all the function calls that are called in MakeDecision</summary>
         Dictionary<DecisionName,Func<DarknessMinion,bool>> Decisions;

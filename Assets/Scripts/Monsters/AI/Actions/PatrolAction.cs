@@ -21,9 +21,9 @@ namespace Darkness
             controller.UpdateAnimator(controller.chaseHash);
             if(controller.reachedEndOfPath)
             {
+                controller.AddCooldown(new ActionCooldownInfo(coolDownTime, actionType));
                 controller.navTarget.UpdateLocation(RandomPoint(controller.transform.position, 5, 10));
                 controller.UpdatePath();
-                TimerRequest(controller, 0, 2);
             }
         }
 

@@ -33,26 +33,34 @@ namespace Darkness
 
         public struct ActionCooldownInfo 
         {
-            public float durationTime;
+            public ActionType acType { get; private set; }
+            public float remainingTime;
             public float coolDownTime;
-            public Coroutine activeCoroutine;
             //public Coroutine durationRoutine;
 
-            public ActionCooldownInfo(float durTime, float cdTime, Coroutine routine)
+            public ActionCooldownInfo(float cdTime, ActionType acT)
             {
-                durationTime = durTime;
-                coolDownTime = cdTime; 
-                activeCoroutine = routine;
-                Debug.LogWarning(String.Format("Action Cooldown requested. Starting coroutine {0}", routine));
+                remainingTime = cdTime;
+                coolDownTime = cdTime;
+                acType = acT;
+            }
+
+            public bool CheckTimerComplete(float time)
+            {
+                remainingTime -= Mathf.Max(remainingTime - time, 0);
+                if (remainingTime == 0)
+                    return true;
+                else return false;
             }
         }
 
         public abstract void ExecuteAction(DarknessMinion controller);//make virtual and add time update for how this action has been executing
 
-        protected void TimerRequest(DarknessMinion controller, float durationTime, float coolDownTime)
+        /*protected void TimerRequest(DarknessMinion controller, float durationTime, float coolDownTime)
         {
-            controller.ProcessActionCooldown(actionType, durationTime, coolDownTime);
-        }
+            ActionCooldownInfo actionCooldownInfo = new ActionCooldownInfo(coolDownTime, this.actionType);
+            controller.AddCooldown(actionCooldownInfo);
+        }*/
 
         public bool ConditionsMet(DarknessMinion controller)
         {

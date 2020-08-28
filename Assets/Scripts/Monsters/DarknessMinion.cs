@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using Pathfinding;
+using System.Linq;
 
 namespace Darkness
 {
@@ -101,6 +102,12 @@ namespace Darkness
             }
         }   
 
+        void Update()
+        {
+            if (actionsOnCooldown.Count > 0)
+                UpdateCooldownTimers();
+        }
+
         #region State Handling
         private void UpdateCurrentState()
         {
@@ -132,59 +139,64 @@ namespace Darkness
             return false;
         }
 
-        public void ProcessActionCooldown(Dark_Action.ActionType actType, float durationTime, float coolDownTime) //TODO just return a bool so 
+        public void AddCooldown(Dark_Action.ActionCooldownInfo actionCooldownInfo)
+        {
+            if(!actionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
+            {
+                actionsOnCooldown.Add(actionCooldownInfo.acType, actionCooldownInfo);
+            }    
+        }
+
+        /*public void ProcessActionCooldown(Dark_Action.ActionType actType, float durationTime, float coolDownTime) //TODO just return a bool so 
         {
             //Debug.LogWarning(string.Format("cooldown requested {0}. In activeTimedActions {1} || In actionsOnCooldown {2}", actType, activeTimedActions.ContainsKey(actType), actionsOnCooldown.ContainsKey(actType)));
             if(!activeTimedActions.ContainsKey(actType) && !actionsOnCooldown.ContainsKey(actType))
             {
                 if(durationTime > 0)
                 {
-                    activeTimedActions.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime, StartCoroutine(ActiveActionTimer(actType))));
+                    activeTimedActions.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime)));
                 }
                 else
                 {
                     actionsOnCooldown.Add(actType, new Dark_Action.ActionCooldownInfo(durationTime, coolDownTime, StartCoroutine(ActionCooldownTimer(actType))));
                 } 
             }
-        }
+        }*/
 
         private IEnumerator ActiveActionTimer(Dark_Action.ActionType actType)
         {
             Dark_Action.ActionCooldownInfo info;
             if(activeTimedActions.TryGetValue(actType, out info))
             {
-                yield return new WaitForSeconds(info.durationTime);
+                yield return new WaitForSeconds(info.remainingTime);
                 if(info.coolDownTime > 0 && !actionsOnCooldown.ContainsKey(actType))
                 {
                     actionsOnCooldown.Add(actType, info);
-                    info.activeCoroutine = StartCoroutine(ActionCooldownTimer(actType));
+                    //info.activeCoroutine = StartCoroutine(ActionCooldownTimer(actType));
                 }
             }
             yield break;
         }
 
-        private IEnumerator ActionCooldownTimer(Dark_Action.ActionType actType)
+        private void UpdateCooldownTimers()
         {
-            Dark_Action.ActionCooldownInfo info;
-            if(activeTimedActions.TryGetValue(actType, out info))
+            for(int i = actionsOnCooldown.Count-1; i >= 0; i--)
             {
-                yield return new WaitForSeconds(info.coolDownTime);
-                actionsOnCooldown.Remove(actType);
+                if(actionsOnCooldown.ElementAt(i).Value.CheckTimerComplete(Time.deltaTime))
+                    actionsOnCooldown.Remove(actionsOnCooldown.ElementAt(i).Key);
             }
-            yield break;
         }
 
         private void ResetCooldowns()
         {
             //attackOnCooldown = moving = idleOnCooldown = movementOnCooldown = attackActive = attackEnded = idleActive = false;
-            foreach(KeyValuePair<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> info in activeTimedActions)
+            /*foreach(KeyValuePair<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> info in activeTimedActions)
             {
                 StopCoroutine(info.Value.activeCoroutine);
-            }
+            }*/
             //StopAllCoroutines();
             actionsOnCooldown.Clear();
             activeTimedActions.Clear();
-
         }
 
         public bool CheckCooldown(float duration)
