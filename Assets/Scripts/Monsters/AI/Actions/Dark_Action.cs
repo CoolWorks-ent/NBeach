@@ -7,14 +7,14 @@ namespace Darkness
 {
     public abstract class Dark_Action : ScriptableObject
     {
-        public enum ActionType {Chase, Idle, Attack, Patrol, Death}
+        public enum ActionType {Chase, Idle, IdleOnly, Attack, Patrol, Death}
 
         protected ActionType actionType;
 
         [SerializeField, Range(0, 10)]
-        protected float executionTime, coolDownTime;
+        protected float coolDownTime;
 
-        public enum ActionFlags { NavTargetDistClose, EndOfPath, PlayerInAttackRange, PlayerOutOfRange, AttackOnCooldown, ChaseOnCooldown, IdleOnCooldown, NotCurrentlyAttacking}
+        public enum ActionFlags { NavTargetDistClose, EndOfPath, PlayerInAttackRange, PlayerOutOfRange, AttackOnCooldown, ChaseOnCooldown, IdleOnCooldown, NotCurrentlyAttacking, PauseForIdle}
 
         [SerializeField]
         private ActionFlags[] Conditions;
@@ -28,7 +28,8 @@ namespace Darkness
             {ActionFlags.AttackOnCooldown, AttackOnCooldown},
             {ActionFlags.IdleOnCooldown, IdleOnCooldown},
             {ActionFlags.ChaseOnCooldown, ChaseOnCooldown},
-            {ActionFlags.NotCurrentlyAttacking, NotCurrentlyAttacking}
+            {ActionFlags.NotCurrentlyAttacking, NotCurrentlyAttacking},
+            {ActionFlags.PauseForIdle, PauseIdlingCheck}
         };
 
         public struct ActionCooldownInfo 
@@ -47,7 +48,7 @@ namespace Darkness
 
             public bool CheckTimerComplete(float time)
             {
-                remainingTime -= Mathf.Max(remainingTime - time, 0);
+                remainingTime = Mathf.Max(remainingTime - time, 0);
                 if (remainingTime == 0)
                     return true;
                 else return false;
@@ -82,6 +83,11 @@ namespace Darkness
             else return false;
         }
 
+        private static bool PauseIdlingCheck(DarknessMinion controller)
+        {
+            return controller.CheckActionsOnCooldown(ActionType.IdleOnly);
+        }
+
         private static bool EndOfPathCheck(DarknessMinion controller)
         {
             return controller.reachedEndOfPath;
@@ -99,7 +105,7 @@ namespace Darkness
 
         private static bool NotCurrentlyAttacking(DarknessMinion controller)
         {
-            return !controller.CheckTimedActions(ActionType.Attack);
+            return !controller.darkHitBox.enabled;
         }
 
         private static bool IdleOnCooldown(DarknessMinion controller)

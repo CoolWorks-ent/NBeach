@@ -6,7 +6,7 @@ namespace Darkness
     ///<summary>DecisionMaker provides a way conditions to be set as requisite to transition to the next state.</summary>
     public class AI_DecisionMaker
     {
-        public enum DecisionName {IS_AGGRESSIVE, IN_PATROL_DISTANCE, ACTIONS_COMPLETE, PLAYER_WITHIN_RANGE}//IDLE_FINISHED, ATTACK_FINISHED,, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, PAUSED_FOR_NEXT_COMMAND}
+        public enum DecisionName {IS_AGGRESSIVE, IN_PATROL_DISTANCE, ACTIONS_COMPLETE, PLAYER_WITHIN_RANGE, IDLE_FINISHED}//, ATTACK_FINISHED,, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, PAUSED_FOR_NEXT_COMMAND}
         
         ///<summary>Holds all the function calls that are called in MakeDecision</summary>
         Dictionary<DecisionName,Func<DarknessMinion,bool>> Decisions;
@@ -16,7 +16,7 @@ namespace Darkness
             Decisions = new Dictionary<DecisionName,Func<DarknessMinion,bool>>();
             Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
             //Decisions.Add(DecisionName.ATTACK_FINISHED, AttackComplete);
-            //Decisions.Add(DecisionName.IDLE_FINISHED, IdleComplete);
+            Decisions.Add(DecisionName.IDLE_FINISHED, IdleComplete);
             Decisions.Add(DecisionName.IN_PATROL_DISTANCE, WithinPatrolPerimeter);
             Decisions.Add(DecisionName.ACTIONS_COMPLETE, ActionsCompleted);
         }
@@ -55,11 +55,11 @@ namespace Darkness
         private bool MovementCooldownComplete(DarknessMinion controller)
         {
             return controller.movementOnCooldown;
-        }
+        }*/
 
         private bool IdleComplete(DarknessMinion controller)
         {
-            return controller.idleActive;
-        }*/
+            return controller.CheckActionsOnCooldown(Dark_Action.ActionType.Idle);
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace Darkness
         public Vector3 playerDirection;
 
         public bool reachedEndOfPath {get{ return aIPath.reachedEndOfPath;}}
-        public bool activeCooldownsComplete{get{return activeTimedActions.Count <= 0;}}
+        public bool activeCooldownsComplete{get{return actionsOnCooldown.Count <= 0;}}
 
         [SerializeField]
         private bool moving;
@@ -46,7 +46,7 @@ namespace Darkness
         private Path navPath;
         private Animator animeController;
 
-        private Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> actionsOnCooldown, activeTimedActions;
+        private Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo> actionsOnCooldown;//, activeTimedActions;
 
         [HideInInspector]
         public int attackHash, chaseHash, idleHash, deathHash;
@@ -70,7 +70,7 @@ namespace Darkness
             sekr = GetComponent<Seeker>();
             aIPath = GetComponent<AIPath>();
             rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-            activeTimedActions = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
+            //activeTimedActions = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
             actionsOnCooldown = new Dictionary<Dark_Action.ActionType, Dark_Action.ActionCooldownInfo>();
             //ResetCooldowns();
             //idleActive = true;
@@ -125,13 +125,6 @@ namespace Darkness
 
         #region Cooldown Handling
 
-        public bool CheckTimedActions(Dark_Action.ActionType actType)
-        {
-            if (activeTimedActions.Count > 0)
-                return activeTimedActions.ContainsKey(actType);
-            return false;
-        }
-
         public bool CheckActionsOnCooldown(Dark_Action.ActionType actType)
         {
             if (actionsOnCooldown.Count > 0)
@@ -163,7 +156,7 @@ namespace Darkness
             }
         }*/
 
-        private IEnumerator ActiveActionTimer(Dark_Action.ActionType actType)
+        /*private IEnumerator ActiveActionTimer(Dark_Action.ActionType actType)
         {
             Dark_Action.ActionCooldownInfo info;
             if(activeTimedActions.TryGetValue(actType, out info))
@@ -176,7 +169,7 @@ namespace Darkness
                 }
             }
             yield break;
-        }
+        }*/
 
         private void UpdateCooldownTimers()
         {
@@ -196,7 +189,7 @@ namespace Darkness
             }*/
             //StopAllCoroutines();
             actionsOnCooldown.Clear();
-            activeTimedActions.Clear();
+            //activeTimedActions.Clear();
         }
 
         public bool CheckCooldown(float duration)
