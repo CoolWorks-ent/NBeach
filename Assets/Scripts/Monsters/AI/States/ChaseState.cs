@@ -12,10 +12,10 @@ public class ChaseState : Dark_State
 
     public override void InitializeState(Darkness controller)
     {
-        base.InitializeState(controller);
+        //base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.pather.destination = controller.Target.location.position;
+        controller.pather.destination = controller.Target.position;
         controller.pather.pickNextWaypointDist += 0.5f;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
@@ -29,8 +29,13 @@ public class ChaseState : Dark_State
     public override void UpdateState(Darkness controller)
     {
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        controller.pather.destination = controller.Target.location.position;
+        controller.pather.destination = controller.Target.position;
         CheckTransitions(controller);
+    }
+
+    public override void MovementUpdate(Darkness controller)
+    {
+
     }
 
     public override void ExitState(Darkness controller)

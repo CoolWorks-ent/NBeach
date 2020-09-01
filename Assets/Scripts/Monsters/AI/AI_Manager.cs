@@ -5,19 +5,20 @@ using UnityEngine;
 public class AI_Manager : MonoBehaviour {
 
 	public Transform player;
+	public Transform oceanPlane;
 	public Dictionary<int, Darkness> ActiveDarkness;
 
 	[SerializeField]
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
 	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
 	public float calculationTime, attackOffset;
+	
 	private bool paused;
 
 	[SerializeField]
 	private Dark_State[] dark_States;
-	private NavigationTarget[] PatrolPoints;
-	private NavigationTarget[] AttackPoints;
-	private NavigationTarget StartPoint, PlayerPoint;
+	private Darkness.NavigationTarget[] AttackPoints;
+	private Darkness.NavigationTarget StartPoint, PlayerPoint;
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
@@ -25,26 +26,6 @@ public class AI_Manager : MonoBehaviour {
 	public static AI_Manager Instance
 	{
 		get {return instance; }
-	}
-
-	public enum NavTargetTag {Attack, Patrol, Neutral, Chase}
-	public class NavigationTarget
-	{
-		public int targetID, 
-					weight, 
-					weightCap;
-		public Transform location;
-
-		private NavTargetTag targetTag;
-		public NavTargetTag navTargetTag { get{ return targetTag; }}
-
-		public NavigationTarget(Transform loc, int iD, NavTargetTag ntTag)//, int assignmentLimit)
-		{
-			location = loc;
-			targetID = iD;
-			targetTag = ntTag;
-			//assignedDarknessIDs = new int[assignmentLimit];
-		}
 	}
 
 	void Awake()
@@ -68,10 +49,8 @@ public class AI_Manager : MonoBehaviour {
 		paused = false;
 		calculationTime = 0.5f;
 		attackOffset = 3.5f;
-		PatrolPoints = new NavigationTarget[4]; 
-		AttackPoints = new NavigationTarget[4]; 
+		AttackPoints = new Darkness.NavigationTarget[4]; 
 		StartCoroutine(ManagedDarknessUpdate());
-		StartCoroutine(ExecuteDarknessStates());
 		foreach(Dark_State d in dark_States)
         {
             d.Startup();
@@ -80,31 +59,24 @@ public class AI_Manager : MonoBehaviour {
 
 	void Start()
 	{
-		StartPoint = new NavigationTarget(this.transform, 0, NavTargetTag.Neutral);
-		PlayerPoint = new NavigationTarget(player, 0, NavTargetTag.Attack);
-		for(int i = 0; i < AttackPoints.Length; i++)
+		StartPoint = new Darkness.NavigationTarget(this.transform.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Neutral);
+		PlayerPoint = new Darkness.NavigationTarget(player.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Attack);
+		List<Vector3> offsets = new List<Vector3>();
+		offsets.Add(new Vector3(attackOffset, 0, -2));
+		offsets.Add(new Vector3(-attackOffset, 0, -2));
+		offsets.Add(new Vector3(-attackOffset / 2, 0, 0));
+		offsets.Add(new Vector3(attackOffset / 2, 0, 0));
+		for (int i = 0; i < AttackPoints.Length; i++)
 		{
-			AttackPoints[i] = new NavigationTarget(new GameObject("attackPoint" + i).transform, i, NavTargetTag.Attack);
-			AttackPoints[i].location.parent = player;
-			AttackPoints[i].targetID = i;
+			AttackPoints[i] = new Darkness.NavigationTarget(player.transform.position, offsets[i], oceanPlane.position.y, Darkness.NavTargetTag.Attack);
+			//Vector3 t = AttackPoints[i].position+offsets[i];
+			//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 		}
 
-		for(int i = 0; i < PatrolPoints.Length; i++)
-		{
-			PatrolPoints[i] = new NavigationTarget(new GameObject("patrolPoint" + i).transform, i, NavTargetTag.Patrol);
-			float xOffset = 0;
-			PatrolPoints[i].location.parent = player; 
-			if(i % 2 == 0 || i == 0)
-				xOffset = player.position.x - Random.Range(5+i, 15);
-			else xOffset = player.position.x + Random.Range(5+i, 15);
-			PatrolPoints[i].location.position = new Vector3(xOffset, player.position.y, player.position.z - Random.Range(9, 9+i));
-			PatrolPoints[i].targetID = i;
-		}
-
-		AttackPoints[0].location.position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
-		AttackPoints[1].location.position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
-		AttackPoints[2].location.position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
-		AttackPoints[3].location.position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
+		//AttackPoints[0].position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
+		//AttackPoints[1].position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
+		//AttackPoints[2].position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
+		//AttackPoints[3].position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 	}
 
 #region DarknessUpdateLoop
@@ -125,25 +97,12 @@ public class AI_Manager : MonoBehaviour {
 				yield return new WaitForSeconds(calculationTime/3);
 				UpdateDarknessAggresion();
 				yield return new WaitForSeconds(calculationTime);
+				OnUpdateDarkness();
 			}
 			else yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
 	}
-
-	///<summary>Contols the state execution loop for Darkness objects. Calls Darkness Update State function for each Darkness in ActiveDarkness </summary>
-	public IEnumerator ExecuteDarknessStates()
-    {
-        while(!paused)
-        {
-			foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
-			{
-				dark.Value.currentState.UpdateState(dark.Value);
-			}
-            yield return new WaitForSeconds(calculationTime);
-        }
-        yield return null;
-    }
 
 	///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. Furtheset Darkness are set to idle priority</summary>
 	private void UpdateDarknessAggresion() 
@@ -189,7 +148,7 @@ public class AI_Manager : MonoBehaviour {
 #region NavTargetHandling
 
 	///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
-	public int LeastRequestedNavigationTarget(NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
+	public int LeastRequestedNavigationTarget(Darkness.NavigationTarget[] navTargets) //TODO Create checking for if all targets are at capacity
 	{
 		int lowest = 0;
 		List<int> evenCount = new List<int>(); //In case there are entries at the same levels
@@ -226,7 +185,7 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 	///<summary>Returns an attack or patrol Navigation Target. Returns a null object if Darkness is not found in active list. </summary>
-	private NavigationTarget AssignNavigationTarget(int darkID) 
+	private Darkness.NavigationTarget AssignAttackNavigationTarget(int darkID) 
 	{
 		//Find if Darkness is in the collection
 		Darkness darkness;
@@ -238,7 +197,7 @@ public class AI_Manager : MonoBehaviour {
 					int index = LeastRequestedNavigationTarget(AttackPoints);
 					AttackPoints[index].weight++;
 					return AttackPoints[index];
-				case Darkness.AggresionRating.Wandering:
+				/*case Darkness.AggresionRating.Wandering:
 					NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
 					if(darkness.Target.navTargetTag == NavTargetTag.Patrol)
 					{
@@ -248,7 +207,7 @@ public class AI_Manager : MonoBehaviour {
 						}
 						else patrol = PatrolPoints[0];
 					}
-					return patrol;
+					return patrol;*/
 				default:
 					return StartPoint;
 			}
@@ -256,7 +215,7 @@ public class AI_Manager : MonoBehaviour {
 		else 
 		{
 			Debug.LogError(string.Format("Darkness {0} does not exist", darkID));
-			return null;	
+			return new Darkness.NavigationTarget(Vector3.zero, Vector3.zero, 0, Darkness.NavTargetTag.Null);	
 		}
 	}
 
@@ -266,7 +225,7 @@ public class AI_Manager : MonoBehaviour {
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.Target.navTargetTag != NavTargetTag.Neutral)
+			if(darkness.Target.navTargetTag != Darkness.NavTargetTag.Neutral)
 			{
 				darkness.Target.weight--;
 			}
@@ -281,27 +240,27 @@ public class AI_Manager : MonoBehaviour {
 		{
 			if(darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 			{ 
-				if(darkness.navTargetDist <= darkness.swtichDist+0.25f)
+				/*if(darkness.navTargetDist <= darkness.swtichDist+0.25f)
 					darkness.Target = PlayerPoint;
 				else
+				{*/
+				Darkness.NavigationTarget nT = AssignAttackNavigationTarget(darkness.creationID); 
+				if(nT.navTargetTag != Darkness.NavTargetTag.Neutral)
 				{
-					NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
-					if(nT != null)
-					{
-						RemoveFromNavTargets(darkID);
-						darkness.Target = nT;
-					}
+					RemoveFromNavTargets(darkID);
+					darkness.Target = nT;
 				}
+				//}
 			}
-			else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
+			/*else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
 			{
-				NavigationTarget nT = AssignNavigationTarget(darkness.creationID); 
+				NavigationTarget nT = AssignAttackNavigationTarget(darkness.creationID); 
 					if(nT != null)
 					{
 						RemoveFromNavTargets(darkID);
 						darkness.Target = nT;
 					}
-			}
+			}*/
 			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
 			{
 				RemoveFromNavTargets(darkID);
@@ -316,12 +275,7 @@ public class AI_Manager : MonoBehaviour {
 	}
 	#endregion
 
-	public IEnumerator WaitTimer(float timer)
-	{
-		yield return new WaitForSeconds(timer);
-	}
-
-#region DarknessCollectionUpdates
+	#region DarknessCollectionUpdates
 	///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
 	private void AddtoDarknessList(Darkness updatedDarkness)
 	{
@@ -361,7 +315,7 @@ public class AI_Manager : MonoBehaviour {
 	public static event AIEvent<Darkness> RemoveDarkness;
 
 	public static event AIEvent<int> RequestNewTarget;
-	public static event AIEvent UpdateMovement;
+	public static event AIEvent UpdateDarkness;
 
 	public static void OnDarknessAdded(Darkness d)
 	{
@@ -381,11 +335,11 @@ public class AI_Manager : MonoBehaviour {
 			RequestNewTarget(ID);
 	}
 
-	/*public static void OnMovementUpdate()
+	public static void OnUpdateDarkness()
 	{
-		if(UpdateMovement != null)
-			UpdateMovement();
-	}*/
+		if(UpdateDarkness != null)
+			UpdateDarkness();
+	}
 
 	#endregion
 	

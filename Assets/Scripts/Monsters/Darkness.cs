@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
+using System.Linq;
+using System;
 
 /*************Darkness Enemy Script**********
  * Base script for mini-darkness.  very basic movement and AI
@@ -10,10 +12,12 @@ public class Darkness : MonoBehaviour {
 
 
     public enum AggresionRating {Attacking = 1, CatchingUp, Idling, Wandering}
+    public enum NavTargetTag { Attack, Patrol, Neutral, Chase, Null }
     [HideInInspector]
     public AggresionRating agRatingCurrent, agRatingPrevious;
     public Dark_State previousState, currentState;
-    public AI_Manager.NavigationTarget Target;
+    public NavigationTarget Target;
+    public NavigationTarget[] PatrolPoints;
 
     [HideInInspector]
     public AIPath pather;
@@ -36,6 +40,8 @@ public class Darkness : MonoBehaviour {
     public int creationID;
     public float playerDist, swtichDist, navTargetDist, stopDistance;
 
+    private Dictionary<Dark_State.CooldownStatus, Dark_State.CooldownInfo> stateActionsOnCooldown;
+
     void Awake()
     {
         //attackInitiationRange = 2.5f;
@@ -46,6 +52,7 @@ public class Darkness : MonoBehaviour {
         updateStates = true;
         agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
         attacked = false;
+        stateActionsOnCooldown = new Dictionary<Dark_State.CooldownStatus, Dark_State.CooldownInfo>();
     }
 
     void Start () {
@@ -54,9 +61,11 @@ public class Darkness : MonoBehaviour {
         sekr = GetComponent<Seeker>();
         darkHitBox = GetComponent<CapsuleCollider>();
         AI_Manager.OnDarknessAdded(this);
+        AI_Manager.UpdateDarkness += UpdateStates;
         //aIMovement = GetComponent<AI_Movement>();
         currentState.InitializeState(this);
         darkHitBox.enabled = false;
+        
         //aIMovement.target = Target;
 	}
 
@@ -92,21 +101,29 @@ public class Darkness : MonoBehaviour {
         
     }
 
-    public IEnumerator AttackCooldown(float idleTime)
+    void FixedUpdate()
     {
-        darkHitBox.enabled = true;
-        //animeController.SetTrigger(animationID);
-        yield return new WaitForSeconds(idleTime);
-        attacked = false;
-        darkHitBox.enabled = false;
+        if (currentState.stateType != Dark_State.StateType.REMAIN)
+            currentState.MovementUpdate(this);
+    }
+
+    void Update()
+    {
+        if (stateActionsOnCooldown.Count > 0)
+            UpdateCooldownTimers();
+    }
+
+    public void UpdateStates()
+    {
+        currentState.UpdateState(this);
     }
 
     public void PlayerDistanceEvaluation(Vector3 location)
     {
         playerDist = Vector3.Distance(transform.position, location);
-        if(Target != null)
+        if(Target.navTargetTag != NavTargetTag.Neutral)
         {
-            navTargetDist = Vector3.Distance(transform.position, Target.location.position);
+            navTargetDist = Vector3.Distance(transform.position, Target.position);
         }
         else navTargetDist = -1;
     }
@@ -116,6 +133,64 @@ public class Darkness : MonoBehaviour {
         if(agR != agRatingCurrent)
             agRatingPrevious = agRatingCurrent;
 		agRatingCurrent = agR;
+    }
+
+    public void PopulatePatrolPoints(int size)
+    {
+        PatrolPoints = new NavigationTarget[size];
+        for (int i = 0; i < PatrolPoints.Length; i++)
+        {
+            float xOffset = 0;
+            //PatrolPoints[i].position.parent = this.transform;
+            if (i % 2 == 0 || i == 0)
+                xOffset = transform.position.x - UnityEngine.Random.Range(5 + i, 15);
+            else xOffset = transform.position.x + UnityEngine.Random.Range(5 + i, 15);
+            Vector3 offset = new Vector3(xOffset, transform.position.y, transform.position.z - UnityEngine.Random.Range(9, 9 + i));
+            PatrolPoints[i] = new NavigationTarget(transform.position, offset, AI_Manager.Instance.oceanPlane.position.y, NavTargetTag.Patrol);
+            //PatrolPoints[i].targetID = i;
+        }
+    }
+
+
+    public bool CheckActionsOnCooldown(Dark_State.CooldownStatus actType)
+    {
+        if (stateActionsOnCooldown.Count > 0)
+            return stateActionsOnCooldown.ContainsKey(actType);
+        return false;
+    }
+
+    public void AddCooldown(Dark_State.CooldownInfo actionCooldownInfo)
+    {
+        if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
+        {
+            Debug.LogWarning("Adding cooldown for " + actionCooldownInfo.acType);
+            stateActionsOnCooldown.Add(actionCooldownInfo.acType, actionCooldownInfo);
+        }
+    }
+
+    private void UpdateCooldownTimers()
+    {
+        List<Dark_State.CooldownStatus> deletedEntries = new List<Dark_State.CooldownStatus>();
+        foreach(KeyValuePair<Dark_State.CooldownStatus,Dark_State.CooldownInfo> info in stateActionsOnCooldown)
+        { 
+            info.Value.UpdateTime(Time.deltaTime);
+            if (info.Value.CheckTimerComplete())
+            {
+                Debug.LogWarning("Executing callback using: " + info.Value.Callback.ToString());
+                deletedEntries.Add(info.Key);
+            }
+        }
+
+        foreach(Dark_State.CooldownStatus cdStatus in deletedEntries)
+        {
+            stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
+            stateActionsOnCooldown.Remove(cdStatus);
+        }
+    }
+
+    private void ResetCooldowns()
+    {
+        stateActionsOnCooldown.Clear();
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -131,6 +206,44 @@ public class Darkness : MonoBehaviour {
         else if(collider.gameObject.CompareTag("Player"))
         {
             //Debug.LogWarning("Darkness collided with Player");
+        }
+    }
+
+
+
+    ///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
+    public struct NavigationTarget
+    {
+        public int weight;
+        //public bool active;
+        private float groundElavation;
+
+        public Vector3 position;
+        private Vector3 positionOffset;
+        //public Transform locationInfo { 
+        //	get {return transform; }}
+
+        private readonly NavTargetTag targetTag;
+        public NavTargetTag navTargetTag { get { return targetTag; } }
+
+        ///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
+        ///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
+        public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
+        {
+            position = loc;
+            groundElavation = elavation;
+            //if(parent != null)
+            //	transform.parent = parent;
+            positionOffset = offset;
+            targetTag = ntTag;
+            weight = 0;
+            //active = false;
+            //assignedDarknessIDs = new int[assignmentLimit];
+        }
+
+        public void UpdateLocation(Vector3 loc)
+        {
+            position = new Vector3(loc.x, groundElavation, loc.y) + positionOffset;
         }
     }
 }

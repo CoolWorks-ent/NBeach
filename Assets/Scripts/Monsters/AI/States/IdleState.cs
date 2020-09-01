@@ -18,27 +18,35 @@ public class IdleState : Dark_State
         //controller.aIMovement.EndMovement();
         controller.pather.canMove = false;
         controller.animeController.SetTrigger(controller.idleHash);
-        AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
+        controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, IdleCallback));
         controller.sekr.CancelCurrentPathRequest();
-        base.InitializeState(controller);
+        //base.InitializeState(controller);
     }
 
     public override void UpdateState(Darkness controller)
     {
-        // Vector3 dir = Vector3.RotateTowards(controller.transform.position, controller.target.position,0f,0f);
+        Vector3 pDir = AI_Manager.Instance.player.position - controller.transform.position;
+        Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
         // controller.transform.rotation = Quaternion.LookRotation(dir);
+        //CheckTransitions(controller);
+        //if (controller.CheckActionsOnCooldown(CooldownStatus.Idling))
+            //CheckTransitions(controller);
+    }
+
+    public override void MovementUpdate(Darkness controller)
+    {
+
     }
 
     public override void ExitState(Darkness controller)
     {
-        AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
+        //AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
         if(controller.animeController != null)
             controller.animeController.ResetTrigger(controller.idleHash);
     }
 
-    protected IEnumerator IdleTime(Darkness controller, float idleTime)
+    protected void IdleCallback(Darkness controller)
     {
-        yield return AI_Manager.Instance.WaitTimer(idleTime);
         CheckTransitions(controller);
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
         //AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));

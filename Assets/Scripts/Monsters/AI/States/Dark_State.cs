@@ -6,6 +6,7 @@ using System.Linq;
 public abstract class Dark_State : ScriptableObject
 {
     public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
+    public enum CooldownStatus { Attacking, Moving, Idling }
 
     public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL}
     public StateType stateType;
@@ -14,17 +15,17 @@ public abstract class Dark_State : ScriptableObject
     //protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
 
 
-    [SerializeField, Range(0, 3)]
-    public float speedModifier;
+    //[SerializeField, Range(0, 3)]
+    //public float speedModifier;
 
-    [SerializeField, Range(0, 15)]
-    protected float stopDist;
+    //[SerializeField, Range(0, 15)]
+    //protected float stopDist;
 
-    [SerializeField, Range(0,360)]
-    protected int rotationSpeed;
+    //[SerializeField, Range(0,360)]
+    //protected int rotationSpeed;
 
-    [SerializeField, Range(0, 5)]
-    protected float pathUpdateRate;
+    //[SerializeField, Range(0, 5)]
+    //protected float pathUpdateRate;
 
 
 
@@ -42,15 +43,10 @@ public abstract class Dark_State : ScriptableObject
         }
     }
 
-    public virtual void InitializeState(Darkness controller)
-    {
-        controller.pather.rotationSpeed = rotationSpeed;
-        controller.pather.endReachedDistance = stopDist;
-        controller.pather.maxSpeed = speedModifier;
-        controller.pather.repathRate = pathUpdateRate;
-    }
+    public abstract void InitializeState(Darkness controller);
     public abstract void UpdateState(Darkness controller);
     public abstract void ExitState(Darkness controller);
+    public abstract void MovementUpdate(Darkness controller);
 
     protected virtual void FirstTimeSetup()
     {
@@ -89,6 +85,35 @@ public abstract class Dark_State : ScriptableObject
             this.ExitState(controller);
             controller.updateStates = false;
             //controller.ChangeState(controller.DeathState);
+        }
+    }
+
+    public class CooldownInfo
+    {
+        public CooldownStatus acType { get; private set; }
+        public float remainingTime;
+        public float coolDownTime;
+        public Action<Darkness> Callback;
+        //public Coroutine durationRoutine;
+
+        public CooldownInfo(float cdTime, CooldownStatus acT, Action<Darkness> cback)
+        {
+            remainingTime = cdTime;
+            coolDownTime = cdTime;
+            acType = acT;
+            Callback = cback;
+        }
+
+        public void UpdateTime(float time)
+        {
+            remainingTime = Mathf.Max(remainingTime - time, 0);
+        }
+
+        public bool CheckTimerComplete()
+        {
+            if (remainingTime == 0)
+                return true;
+            else return false;
         }
     }
 }

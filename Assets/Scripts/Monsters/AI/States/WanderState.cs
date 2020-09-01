@@ -23,7 +23,7 @@ public class WanderState : ChaseState
         base.InitializeState(controller);
         AI_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.pather.destination = controller.Target.location.position;
+        controller.pather.destination = controller.Target.position;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
         controller.pather.pickNextWaypointDist = 0.95f;
@@ -48,11 +48,16 @@ public class WanderState : ChaseState
         if(controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.swtichDist)
         {
             AI_Manager.OnRequestNewTarget(controller.creationID);
-            controller.pather.destination = controller.Target.location.position;
+            controller.pather.destination = controller.Target.position;
         }
         if(controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
             controller.pather.rotationSpeed = 400;
         CheckTransitions(controller);
+    }
+
+    public override void MovementUpdate(Darkness controller)
+    {
+
     }
 
     /*private void ChooseNewPatrolPoints(Darkness controller)

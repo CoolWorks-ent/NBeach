@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AI_DecisionMaker
 {
-    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE}
+    public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, IDLE_COMPLETE}
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
     public AI_DecisionMaker()
@@ -17,13 +17,21 @@ public class AI_DecisionMaker
         Decisions.Add(DecisionName.IN_ATTACK_RANGE, CommitToAttack);
         Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
         Decisions.Add(DecisionName.NAV_TARGET_CLOSE, TargetDistClose);
+        Decisions.Add(DecisionName.IDLE_COMPLETE, IdleOnCooldown);
     }
+
+
 
     public bool MakeDecision(DecisionName dName, Darkness controller)
     {   
         if(controller != null)
             return Decisions[dName].Invoke(controller);
         else return false;
+    }
+
+    private bool IdleOnCooldown(Darkness controller)
+    {
+        return !controller.CheckActionsOnCooldown(Dark_State.CooldownStatus.Idling);
     }
 
     private bool AggresiveCheck(Darkness controller)
@@ -51,6 +59,11 @@ public class AI_DecisionMaker
             return true;
         }
         else return false;
+    }
+
+    private bool AttackOnCooldown(Darkness controller)
+    {
+        return controller.CheckActionsOnCooldown(Dark_State.CooldownStatus.Attacking);
     }
 
     private bool AwaitingNextCommand(Darkness controller)
