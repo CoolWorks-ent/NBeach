@@ -4,7 +4,8 @@ using UnityEditor;
 [CreateAssetMenu (menuName = "AI/Darkness/State/ChaseState")]
 public class ChaseState : Dark_State
 {
-
+    [Range(0.25f, 5)]
+    public float pathUpdateRate;
     protected override void FirstTimeSetup()
     {
         stateType = StateType.CHASING;
@@ -13,12 +14,14 @@ public class ChaseState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         //base.InitializeState(controller);
-        AI_Manager.OnRequestNewTarget(controller.creationID);
+        Darkness_Manager.OnRequestNewTarget(controller.creationID);
         controller.animeController.SetTrigger(controller.chaseHash);
-        controller.pather.destination = controller.Target.position;
+        controller.pather.destination = controller.navTarget.navPosition;
         controller.pather.pickNextWaypointDist += 0.5f;
         controller.pather.canMove = true;
         controller.pather.canSearch = true;
+        controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
+
         /*controller.aIMovement.CreatePath(controller.Target.position);
         controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
         controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -29,13 +32,19 @@ public class ChaseState : Dark_State
     public override void UpdateState(Darkness controller)
     {
         //controller.aIMovement.UpdatePath(controller.Target.position);
-        controller.pather.destination = controller.Target.position;
+        
         CheckTransitions(controller);
     }
 
     public override void MovementUpdate(Darkness controller)
     {
 
+    }
+
+    protected override void CooldownCallback(Darkness controller)
+    {
+        controller.pather.destination = controller.navTarget.navPosition;
+        controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
     }
 
     public override void ExitState(Darkness controller)

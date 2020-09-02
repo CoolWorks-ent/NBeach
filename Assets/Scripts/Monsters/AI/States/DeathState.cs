@@ -35,6 +35,7 @@ public class DeathState : Dark_State
     }
 
     public override void MovementUpdate(Darkness controller){}
+    protected override void CooldownCallback(Darkness controller) {}
 
     IEnumerator deathRoutine(Darkness controller)
     {
@@ -55,7 +56,7 @@ public class DeathState : Dark_State
         //yield return new WaitForSeconds(fxTime);
         //AI_Manager.Instance.RemoveFromDarknessList(controller);
         controller.gameObject.SetActive(false);
-        AI_Manager.OnDarknessRemoved(controller);
+        Darkness_Manager.OnDarknessRemoved(controller);
         Destroy(controller.animeController);
         Destroy(controller.gameObject);
         yield return 0;

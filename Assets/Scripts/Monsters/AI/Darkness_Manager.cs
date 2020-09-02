@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AI_Manager : MonoBehaviour {
+public class Darkness_Manager : MonoBehaviour {
 
 	public Transform player;
 	public Transform oceanPlane;
@@ -10,9 +10,9 @@ public class AI_Manager : MonoBehaviour {
 
 	[SerializeField]
 	private int darknessIDCounter, darknessConcurrentAttackLimit;
-	public int maxEnemyCount, minEnemyCount, darkTotalCount, darkAttackCount, darkStandbyCount;
-	public float calculationTime, attackOffset;
-	
+	public int maxEnemyCount, minEnemyCount, darkAttackCount, darkStandbyCount;
+
+	private float calculationTime, attackOffset;
 	private bool paused;
 
 	[SerializeField]
@@ -22,8 +22,8 @@ public class AI_Manager : MonoBehaviour {
 
 	public List<int> attackApprovalPriority; 
 	//private Queue<Darkness> engagementQueue, approachQueue;
-	private static AI_Manager instance;
-	public static AI_Manager Instance
+	private static Darkness_Manager instance;
+	public static Darkness_Manager Instance
 	{
 		get {return instance; }
 	}
@@ -32,7 +32,7 @@ public class AI_Manager : MonoBehaviour {
 	{
 		dark_States = Resources.LoadAll<Dark_State>("States");
 		darknessConcurrentAttackLimit = 2;
-		darknessIDCounter = darkTotalCount = darkAttackCount = darkStandbyCount = 0;
+		darknessIDCounter = darkAttackCount = darkStandbyCount = 0;
 		maxEnemyCount = 6;
         minEnemyCount = 1;
 		if(instance != null && !instance.gameObject.CompareTag("AI Manager"))
@@ -45,7 +45,7 @@ public class AI_Manager : MonoBehaviour {
 		attackApprovalPriority = new List<int>();
 		AddDarkness += AddtoDarknessList;
 		RemoveDarkness += RemoveFromDarknessList;
-		RequestNewTarget += ApproveDarknessTarget;
+		RequestNewTarget += ApproveAttackTarget;
 		paused = false;
 		calculationTime = 0.5f;
 		attackOffset = 3.5f;
@@ -91,7 +91,7 @@ public class AI_Manager : MonoBehaviour {
 				//ActiveDarkness.Values.CopyTo(closestDarkness,0);
 				foreach(KeyValuePair<int,Darkness> dark in ActiveDarkness)
 				{
-					dark.Value.PlayerDistanceEvaluation(player.position);
+					dark.Value.DistanceEvaluation(player.position);
 				}
 				SortTheGoons();
 				yield return new WaitForSeconds(calculationTime/3);
@@ -109,7 +109,6 @@ public class AI_Manager : MonoBehaviour {
 	{
 		darkStandbyCount = 0;
 		darkAttackCount = 0;
-		darkTotalCount = ActiveDarkness.Count;
 		for(int i = 0; i < attackApprovalPriority.Count; i++)
 		{
 			if(i < darknessConcurrentAttackLimit)
@@ -119,18 +118,12 @@ public class AI_Manager : MonoBehaviour {
 			}
 			else if(i < darknessConcurrentAttackLimit+2)
 			{
-				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
-				{
-					darkStandbyCount++;
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
-				}
+				darkStandbyCount++;
+				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
 			}
 			else 
 			{
-				if(ActiveDarkness[attackApprovalPriority[i]].agRatingCurrent != Darkness.AggresionRating.CatchingUp)
-				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
-				}
+				ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
 			}
 		}
 	}
@@ -225,15 +218,15 @@ public class AI_Manager : MonoBehaviour {
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
 		{
-			if(darkness.Target.navTargetTag != Darkness.NavTargetTag.Neutral)
+			if(darkness.navTarget.navTargetTag != Darkness.NavTargetTag.Neutral)
 			{
-				darkness.Target.weight--;
+				darkness.navTarget.weight--;
 			}
 		}
 	}
 
 	///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
-	public void ApproveDarknessTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
+	public void ApproveAttackTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
 	{
 		Darkness darkness;
 		if(ActiveDarkness.TryGetValue(darkID, out darkness))
@@ -248,28 +241,14 @@ public class AI_Manager : MonoBehaviour {
 				if(nT.navTargetTag != Darkness.NavTargetTag.Neutral)
 				{
 					RemoveFromNavTargets(darkID);
-					darkness.Target = nT;
+					darkness.navTarget = nT;
 				}
 				//}
-			}
-			/*else if(darkness.agRatingCurrent == Darkness.AggresionRating.Wandering)
-			{
-				NavigationTarget nT = AssignAttackNavigationTarget(darkness.creationID); 
-					if(nT != null)
-					{
-						RemoveFromNavTargets(darkID);
-						darkness.Target = nT;
-					}
-			}*/
-			else if(darkness.agRatingCurrent == Darkness.AggresionRating.CatchingUp)
-			{
-				RemoveFromNavTargets(darkID);
-				darkness.Target = PlayerPoint;
 			}
 			else //if(darkness.agRatingCurrent == Darkness.AggresionRating.Idling)
 			{
 				RemoveFromNavTargets(darkID);
-				darkness.Target = StartPoint;
+				darkness.navTarget = StartPoint;
 			}
 		}
 	}
@@ -282,7 +261,7 @@ public class AI_Manager : MonoBehaviour {
 		updatedDarkness.transform.SetParent(Instance.transform);
 		darknessIDCounter++;
 		updatedDarkness.creationID = darknessIDCounter;
-		updatedDarkness.Target = StartPoint;
+		updatedDarkness.navTarget = StartPoint;
 
 		ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 		attackApprovalPriority.Add(updatedDarkness.creationID);

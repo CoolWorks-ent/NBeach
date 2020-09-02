@@ -21,8 +21,8 @@ public class AttackState : Dark_State
     public override void InitializeState(Darkness controller)
     {
         //base.InitializeState(controller);
-        AI_Manager.OnRequestNewTarget(controller.creationID);
-        controller.pather.destination = controller.Target.position;
+        Darkness_Manager.OnRequestNewTarget(controller.creationID);
+        controller.pather.destination = controller.navTarget.navPosition;
         if(controller.playerDist > attackInitiationRange)
             controller.pather.canMove = true;
         else controller.pather.canMove = false;
@@ -32,13 +32,13 @@ public class AttackState : Dark_State
     public override void UpdateState(Darkness controller)
     { 
         //TODO check if the darkness is facing the player. if not start rotating towards the player
-        controller.pather.destination = controller.Target.position;
+        controller.pather.destination = controller.navTarget.navPosition;
         if(controller.playerDist < attackInitiationRange && !controller.attacked) 
         {
             //controller.attacked = true;
             controller.animeController.SetTrigger(controller.attackHash);
             controller.pather.canMove = false;
-            controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, AttackCooldown));
+            controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
             controller.darkHitBox.enabled = true;
             controller.attacked = true;
             //if(controller.animeController.animation.)
@@ -63,7 +63,12 @@ public class AttackState : Dark_State
         //controller.animeController.SetBool(controller.attackAfterHash, true);
     }
 
-    public void AttackCooldown(Darkness controller)
+    private void AttackInitiated(Darkness controller)
+    {
+
+    }
+
+    protected override void CooldownCallback(Darkness controller)
     {
         //animeController.SetTrigger(animationID);
         controller.attacked = false;

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AI_DecisionMaker
+public class Dark_DecisionMaker
 {
     public enum DecisionName {IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, IDLE_COMPLETE}
     Dictionary<DecisionName,Func<Darkness,bool>> Decisions;
 
-    public AI_DecisionMaker()
+    public Dark_DecisionMaker()
     {
         Decisions = new Dictionary<DecisionName,Func<Darkness,bool>>();
         Decisions.Add(DecisionName.IS_AGGRESSIVE,AggresiveCheck);
