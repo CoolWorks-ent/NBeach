@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DarknessMinion;
 
 /*
  * Class to manage enemies in the scene & the spawning of enemies

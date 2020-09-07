@@ -85103,6 +85103,31 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 957796667}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: threadCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: showGraphs
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 2059134424}
+    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: oceanPlane
+      value: 
+      objectReference: {fileID: 165405107}
+    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: maxEnemyCount
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
@@ -91054,6 +91079,11 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!4 &2059134424 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4818625620185768, guid: ab4b23574890f2749801c9d80d9313b0,
+    type: 2}
+  m_PrefabInternal: {fileID: 2045182312}
 --- !u!4 &2063721534
 Transform:
   m_ObjectHideFlags: 0
