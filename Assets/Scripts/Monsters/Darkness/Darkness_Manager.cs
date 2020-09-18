@@ -48,7 +48,7 @@ namespace DarknessMinion
 			attackApprovalPriority = new List<int>();
 			AddDarkness += AddtoDarknessList;
 			RemoveDarkness += RemoveFromDarknessList;
-			RequestNewTarget += ApproveAttackTarget;
+			RequestNewTarget += ApproveRequestedTarget;
 			paused = false;
 			calculationTime = 0.5f;
 			attackOffset = 3.5f;
@@ -150,15 +150,16 @@ namespace DarknessMinion
 			List<int> evenCount = new List<int>(); //In case there are entries at the same levels
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
-				if (AttackPoints[i].weight < AttackPoints[lowest].weight)
-					lowest = i;
-				else if (AttackPoints[i].weight == AttackPoints[lowest].weight)
-					evenCount.Add(i);
+				if (AttackPoints[i].navTargetClaimed)//(AttackPoints[i].navTargetWeight < AttackPoints[lowest].navTargetWeight)
+					continue;
+				else evenCount.Add(i); //if (AttackPoints[i].navTargetWeight == AttackPoints[lowest].navTargetWeight)
 			}
 
 			if (evenCount.Count >= 2)
 			{
-				int t = 0;
+				lowest = evenCount[Random.Range(0, evenCount.Count - 1)];
+				return lowest;
+				/*int t = 0;
 				for (int x = 0; x <= 5; x++)
 				{
 					t = evenCount[Random.Range(0, evenCount.Count - 1)];
@@ -169,15 +170,11 @@ namespace DarknessMinion
 						lowest = t;
 						break;
 					}
-
-				}
-				/*if(+1 < AttackPoints.Length)
-				{
-					patrol = PatrolPoints[darkness.Target.targetID+1];
-				}
-				else patrol = PatrolPoints[0];*/
+				}*/
 			}
-			return lowest;
+			else if (evenCount.Count < 2 && evenCount.Count > 0)
+				return evenCount[0];
+			else return -1;
 		}
 
 		///<summary>Returns an attack or patrol Navigation Target. Returns a null object if Darkness is not found in active list. </summary>
@@ -191,8 +188,12 @@ namespace DarknessMinion
 				{
 					case Darkness.AggresionRating.Attacking:
 						int index = LeastRequestedAttackTarget();
-						AttackPoints[index].weight++;
-						return AttackPoints[index];
+						if (index != -1)
+						{
+							AttackPoints[index].ClaimTarget(darkID);
+							return AttackPoints[index];
+						}
+						else return PointNearPlayer(darkness); //TODO return a point near the player
 					/*case Darkness.AggresionRating.Wandering:
 						NavigationTarget patrol = PatrolPoints[Random.Range(0, PatrolPoints.Length)]; 
 						if(darkness.Target.navTargetTag == NavTargetTag.Patrol)
@@ -215,6 +216,12 @@ namespace DarknessMinion
 			}
 		}
 
+		private Darkness.NavigationTarget PointNearPlayer(Darkness dark)
+        {
+			Vector3 dir = (player.position - dark.transform.position).normalized;
+			Vector3 offset = player.position - dir * 8; //Find a lattitude x offset away from the player and 
+			return new Darkness.NavigationTarget(player.position, offset, oceanPlane.position.y, Darkness.NavTargetTag.AttackStandby);
+        }
 		///<summary>Check the Darkness for current NavTarget. If the target is an attack Target the target will be set to the starting NavTarget.</summary>
 		private void RemoveFromNavTargets(int darkID)
 		{
@@ -223,13 +230,13 @@ namespace DarknessMinion
 			{
 				if (darkness.navTarget.navTargetTag != Darkness.NavTargetTag.Neutral)
 				{
-					darkness.navTarget.weight--;
+					darkness.navTarget.ReleaseTarget();
 				}
 			}
 		}
 
 		///<summary>Processes Darkness request for a  NavTarget. Assign a new target to the requestor Darkness if a valid request</summary> //--Work in Progress--
-		public void ApproveAttackTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
+		public void ApproveRequestedTarget(int darkID) //TODO Darkness will make request for new Navigation Targets based on their status
 		{
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))

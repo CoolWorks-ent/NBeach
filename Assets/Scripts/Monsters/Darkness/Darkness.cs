@@ -14,9 +14,8 @@ namespace DarknessMinion
 	public class Darkness : MonoBehaviour
 	{
 
-
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
-		public enum NavTargetTag { Attack, Patrol, Neutral, Chase, Null }
+		public enum NavTargetTag { Attack, Patrol, Neutral, Null, AttackStandby}
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
 		public Dark_State previousState, currentState;
@@ -220,16 +219,17 @@ namespace DarknessMinion
 		///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
 		public struct NavigationTarget
 		{
-			public int weight;
-			//public bool active;
+			private int weight;
+			private int claimedID;
+			private bool claimed;
 			private float groundElavation;
-
 			private Vector3 position;
 			private Vector3 positionOffset;
-			//public Transform locationInfo { 
-			//	get {return transform; }}
-
 			private readonly NavTargetTag targetTag;
+			
+
+			public bool navTargetClaimed {  get { return claimed; } }
+			public int navTargetWeight { get { return weight; } }
 			public NavTargetTag navTargetTag { get { return targetTag; } }
 			public Vector3 navPosition { get { return position + positionOffset; } }
 
@@ -244,9 +244,27 @@ namespace DarknessMinion
 				positionOffset = offset;
 				targetTag = ntTag;
 				weight = 0;
+				claimed = false;
+				claimedID = 0;
 				//active = false;
 				//assignedDarknessIDs = new int[assignmentLimit];
 			}
+
+			public void ClaimTarget(int cID)
+            {
+				claimedID = cID;
+				claimed = true;
+            }
+
+			public void ReleaseTarget()
+            {
+				if (weight - 1 < 0)
+					weight = 0;
+
+				claimedID = -1;
+				claimed = false;
+
+            }
 
 			public void UpdateLocation(Vector3 loc)
 			{
