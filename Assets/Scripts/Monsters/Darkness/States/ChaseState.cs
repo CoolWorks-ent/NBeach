@@ -16,17 +16,20 @@ namespace DarknessMinion
 
 		public override void InitializeState(Darkness controller)
 		{
-			if(controller.navTarget.navTargetTag != Darkness.NavTargetTag.Attack || controller.navTarget.navTargetTag != Darkness.NavTargetTag.AttackStandby)
+			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
+			if (controller.navTarget != null && (controller.navTarget.navTargetTag != Darkness.NavTargetTag.Attack || controller.navTarget.navTargetTag != Darkness.NavTargetTag.AttackStandby))
             {
+				controller.navTarget.ReleaseTarget();
 				Darkness_Manager.OnRequestNewTarget(controller.creationID);
+				//controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 			}
-			
+			else if(controller.navTarget == null)
+				Darkness_Manager.OnRequestNewTarget(controller.creationID);
+
 			controller.animeController.SetTrigger(controller.chaseHash);
 			controller.pather.destination = controller.navTarget.navPosition;
 			controller.pather.canMove = true;
 			controller.pather.canSearch = true;
-			controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
-
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
 			controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -37,7 +40,7 @@ namespace DarknessMinion
 		public override void UpdateState(Darkness controller)
 		{
 			//controller.aIMovement.UpdatePath(controller.Target.position);
-
+			controller.pather.destination = controller.navTarget.navPosition;
 			CheckTransitions(controller);
 		}
 

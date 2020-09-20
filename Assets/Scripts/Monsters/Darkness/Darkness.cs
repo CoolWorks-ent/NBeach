@@ -69,7 +69,7 @@ namespace DarknessMinion
 			//aIMovement = GetComponent<AI_Movement>();
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
-			pather.repathRate = 1;
+			pather.repathRate = 1.25f;
 
 			//aIMovement.target = Target;
 		}
@@ -126,7 +126,7 @@ namespace DarknessMinion
 		public void DistanceEvaluation(Vector3 location)
 		{
 			playerDist = Vector3.Distance(transform.position, location);
-			if (navTarget.navTargetTag != NavTargetTag.Neutral)
+			if (navTarget != null)
 			{
 				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
 			}
@@ -138,22 +138,6 @@ namespace DarknessMinion
 			if (agR != agRatingCurrent)
 				agRatingPrevious = agRatingCurrent;
 			agRatingCurrent = agR;
-		}
-
-		public void PopulatePatrolPoints(int size)
-		{
-			PatrolPoints = new NavigationTarget[size];
-			for (int i = 0; i < PatrolPoints.Length; i++)
-			{
-				float xOffset = 0;
-				//PatrolPoints[i].position.parent = this.transform;
-				if (i % 2 == 0 || i == 0)
-					xOffset = transform.position.x - UnityEngine.Random.Range(5 + i, 15);
-				else xOffset = transform.position.x + UnityEngine.Random.Range(5 + i, 15);
-				Vector3 offset = new Vector3(xOffset, transform.position.y, transform.position.z - UnityEngine.Random.Range(9, 9 + i));
-				PatrolPoints[i] = new NavigationTarget(transform.position, offset, Darkness_Manager.Instance.oceanPlane.position.y, NavTargetTag.Patrol);
-				//PatrolPoints[i].targetID = i;
-			}
 		}
 
 
@@ -168,7 +152,7 @@ namespace DarknessMinion
 		{
 			if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
 			{
-				Debug.LogWarning("Adding cooldown for " + actionCooldownInfo.acType);
+				//Debug.LogWarning("Adding cooldown for " + actionCooldownInfo.acType);
 				stateActionsOnCooldown.Add(actionCooldownInfo.acType, actionCooldownInfo);
 			}
 		}
@@ -181,7 +165,7 @@ namespace DarknessMinion
 				info.Value.UpdateTime(Time.deltaTime);
 				if (info.Value.CheckTimerComplete())
 				{
-					Debug.LogWarning("Executing callback using: " + info.Value.Callback.ToString());
+					Debug.LogWarning("Executing callback using: " + info.Value.Callback);
 					deletedEntries.Add(info.Key);
 				}
 			}
@@ -214,22 +198,48 @@ namespace DarknessMinion
 			}
 		}
 
+        private void OnDrawGizmos()
+        {
+			if(navTarget != null)
+            {
+				switch (navTarget.navTargetTag)
+				{
+					case NavTargetTag.Attack:
+						Gizmos.color = Color.red;
+						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
+						break;
+					case NavTargetTag.AttackStandby:
+						Gizmos.color = Color.yellow;
+						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1.5f);
+						break;
+					case NavTargetTag.Neutral:
+						Gizmos.color = Color.white;
+						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
+						break;
+					case NavTargetTag.Patrol:
+						Gizmos.color = Color.cyan;
+						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
+						break;
+				}
+			}
+        }
 
 
+		[System.Serializable]
 		///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
-		public struct NavigationTarget
+		public class NavigationTarget
 		{
-			private int weight;
-			private int claimedID;
+			[SerializeField]
 			private bool claimed;
+			[SerializeField]
+			private Vector3 position, positionOffset;
+
+			private int claimedID;
 			private float groundElavation;
-			private Vector3 position;
-			private Vector3 positionOffset;
 			private readonly NavTargetTag targetTag;
 			
 
 			public bool navTargetClaimed {  get { return claimed; } }
-			public int navTargetWeight { get { return weight; } }
 			public NavTargetTag navTargetTag { get { return targetTag; } }
 			public Vector3 navPosition { get { return position + positionOffset; } }
 
@@ -243,7 +253,6 @@ namespace DarknessMinion
 				//	transform.parent = parent;
 				positionOffset = offset;
 				targetTag = ntTag;
-				weight = 0;
 				claimed = false;
 				claimedID = 0;
 				//active = false;
@@ -258,8 +267,6 @@ namespace DarknessMinion
 
 			public void ReleaseTarget()
             {
-				if (weight - 1 < 0)
-					weight = 0;
 
 				claimedID = -1;
 				claimed = false;
@@ -268,7 +275,7 @@ namespace DarknessMinion
 
 			public void UpdateLocation(Vector3 loc)
 			{
-				position = new Vector3(loc.x, groundElavation, loc.y);
+				position = new Vector3(loc.x, groundElavation, loc.z);
 			}
 		}
 	}

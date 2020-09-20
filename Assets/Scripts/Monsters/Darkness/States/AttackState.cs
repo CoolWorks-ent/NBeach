@@ -23,6 +23,7 @@ namespace DarknessMinion
 
         public override void InitializeState(Darkness controller)
         {
+            Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
             //base.InitializeState(controller);
             Darkness_Manager.OnRequestNewTarget(controller.creationID);
             controller.pather.destination = controller.navTarget.navPosition;

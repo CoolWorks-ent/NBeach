@@ -19,7 +19,10 @@ namespace DarknessMinion
 
 		public override void InitializeState(Darkness controller)
 		{
+			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			//controller.aIMovement.EndMovement();
+			if(controller.navTarget != null)
+				controller.navTarget.ReleaseTarget();
 			controller.pather.canMove = false;
 			controller.animeController.SetTrigger(controller.idleHash);
 			controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));

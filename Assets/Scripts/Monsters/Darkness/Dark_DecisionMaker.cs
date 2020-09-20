@@ -40,16 +40,12 @@ namespace DarknessMinion
 
         private bool AggresiveCheck(Darkness controller)
         {
-            if (controller.agRatingCurrent == Darkness.AggresionRating.Attacking)
-            {
-                return true;
-            }
-            else return false;
+           return controller.agRatingCurrent == Darkness.AggresionRating.Attacking;
         }
 
         private bool CommitToAttack(Darkness controller)
         {
-            if (AggresiveCheck(controller) && (controller.navTargetDist <= controller.swtichDist || controller.playerDist < controller.swtichDist))
+            if (controller.playerDist < controller.swtichDist)
             {
                 return true;
             }

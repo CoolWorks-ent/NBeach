@@ -6,8 +6,12 @@ namespace DarknessMinion
     [CreateAssetMenu (menuName = "AI/Darkness/State/RemainState")]
     public class RemainState: Dark_State
     {
-        public override void InitializeState(Darkness controller) {
+        protected override void FirstTimeSetup()
+        {
             stateType = StateType.REMAIN;
+        }
+        public override void InitializeState(Darkness controller) {
+            Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
         }
         public override void UpdateState(Darkness controller) {}
         public override void ExitState(Darkness controller) {}

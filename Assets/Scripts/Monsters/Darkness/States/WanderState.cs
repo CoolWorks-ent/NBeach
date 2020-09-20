@@ -28,15 +28,16 @@ namespace DarknessMinion
 		{
 			base.InitializeState(controller);
 			//AI_Manager.OnRequestNewTarget(controller.creationID);
-
+			controller.navTarget.ReleaseTarget();
+			PopulatePatrolPoints(5, controller);
 			controller.animeController.SetTrigger(controller.chaseHash);
-			controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
+			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
 			controller.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
 			controller.pather.destination = controller.navTarget.navPosition;
 			controller.pather.canMove = true;
 			controller.pather.canSearch = true;
 			controller.pather.pickNextWaypointDist = 0.95f;
-			controller.pather.repathRate = timeToPickNextPoint;
+			//controller.pather.repathRate = timeToPickNextPoint;
 			//controller.aIMovement.wandering = true;
 			//ChooseNewPatrolPoints(controller);
 			/*controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
@@ -85,6 +86,22 @@ namespace DarknessMinion
 			return navTarget;
 		}
 
+		public void PopulatePatrolPoints(int size, Darkness controller)
+		{
+			controller.PatrolPoints = new Darkness.NavigationTarget[size];
+			for (int i = 0; i < controller.PatrolPoints.Length; i++)
+			{
+				float xOffset = 0;
+				//PatrolPoints[i].position.parent = this.transform;
+				if (i % 2 == 0 || i == 0)
+					xOffset = controller.transform.position.x - UnityEngine.Random.Range(5 + i, 15);
+				else xOffset = controller.transform.position.x + UnityEngine.Random.Range(5 + i, 15);
+				Vector3 offset = new Vector3(xOffset, controller.transform.position.y, controller.transform.position.z - UnityEngine.Random.Range(9, 9 + i));
+				controller.PatrolPoints[i] = new Darkness.NavigationTarget(controller.transform.position, offset, Darkness_Manager.Instance.oceanPlane.position.y, Darkness.NavTargetTag.Patrol);
+				//PatrolPoints[i].targetID = i;
+			}
+		}
+
 		/*private void ChooseNewPatrolPoints(Darkness controller)
 		{
 			Vector3 direction =  (controller.Target.transform.position - controller.transform.position).normalized;
@@ -103,16 +120,7 @@ namespace DarknessMinion
 		{
 		   return controller.aIMovement.PatrolPoints[Random.Range(0,controller.aIMovement.PatrolPoints.Length)];
 		}
-
-		protected IEnumerator NewPointBuffer(Darkness controller, float idleTime)
-		{
-			while(controller.aIMovement.wandering)
-			{
-				controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
-				yield return new WaitForSeconds(idleTime);
-			}
-			yield return null;
-		}*/
+		*/
 
 		public override void ExitState(Darkness controller)
 		{
