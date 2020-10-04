@@ -858,6 +858,11 @@ MonoBehaviour:
   agRatingPrevious: 0
   previousState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
   currentState: {fileID: 11400000, guid: 927371344fc53d8489b36537c5814893, type: 2}
+  navTarget:
+    claimed: 0
+    position: {x: 0, y: 0, z: 0}
+    positionOffset: {x: 0, y: 0, z: 0}
+  PatrolPoints: []
   pather: {fileID: 0}
   sekr: {fileID: 0}
   darkHitBox: {fileID: 0}

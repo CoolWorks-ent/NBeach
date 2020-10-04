@@ -25,8 +25,9 @@ namespace DarknessMinion
         {
             Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
             //base.InitializeState(controller);
-            Darkness_Manager.OnRequestNewTarget(controller.creationID);
-            controller.pather.destination = controller.navTarget.navPosition;
+            //Dark_Event_Manager.OnRequestNewTarget(controller.creationID);
+            
+            controller.pather.destination = controller.navTarget.srcPosition;
             if (controller.playerDist > attackInitiationRange)
                 controller.pather.canMove = true;
             else controller.pather.canMove = false;

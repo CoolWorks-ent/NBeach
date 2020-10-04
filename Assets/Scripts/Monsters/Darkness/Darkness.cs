@@ -49,7 +49,7 @@ namespace DarknessMinion
 		{
 			//attackInitiationRange = 2.5f;
 			stopDistance = 3;
-			swtichDist = 3; //attackInitiationRange*1.85f;
+			swtichDist = 4.6f; //attackInitiationRange*1.85f;
 			creationID = 0;
 			navTargetDist = -1;
 			updateStates = true;
@@ -64,8 +64,8 @@ namespace DarknessMinion
 			pather = GetComponent<AIPath>();
 			sekr = GetComponent<Seeker>();
 			darkHitBox = GetComponent<CapsuleCollider>();
-			Darkness_Manager.OnDarknessAdded(this);
-			Darkness_Manager.UpdateDarkness += UpdateStates;
+			Dark_Event_Manager.OnDarknessAdded(this);
+			Dark_Event_Manager.UpdateDarkness += UpdateStates;
 			//aIMovement = GetComponent<AI_Movement>();
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
@@ -207,6 +207,9 @@ namespace DarknessMinion
 					case NavTargetTag.Attack:
 						Gizmos.color = Color.red;
 						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
+
+						Gizmos.color = Color.white;
+						Gizmos.DrawSphere(navTarget.srcPosition, 2);
 						break;
 					case NavTargetTag.AttackStandby:
 						Gizmos.color = Color.yellow;
@@ -243,6 +246,8 @@ namespace DarknessMinion
 			public NavTargetTag navTargetTag { get { return targetTag; } }
 			public Vector3 navPosition { get { return position + positionOffset; } }
 
+			public Vector3 srcPosition { get { return position; } }
+
 			///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
 			///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
 			public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
@@ -267,10 +272,8 @@ namespace DarknessMinion
 
 			public void ReleaseTarget()
             {
-
 				claimedID = -1;
 				claimed = false;
-
             }
 
 			public void UpdateLocation(Vector3 loc)

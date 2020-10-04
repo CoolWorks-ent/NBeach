@@ -18,13 +18,18 @@ namespace DarknessMinion
 		{
 			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			if (controller.navTarget != null && (controller.navTarget.navTargetTag != Darkness.NavTargetTag.Attack || controller.navTarget.navTargetTag != Darkness.NavTargetTag.AttackStandby))
-            {
+			{
 				controller.navTarget.ReleaseTarget();
-				Darkness_Manager.OnRequestNewTarget(controller.creationID);
+				Dark_Event_Manager.OnRequestNewTarget(controller.creationID);
 				//controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 			}
-			else if(controller.navTarget == null)
-				Darkness_Manager.OnRequestNewTarget(controller.creationID);
+			else if (controller.navTarget == null)
+			{
+				Dark_Event_Manager.OnRequestNewTarget(controller.creationID);
+				Debug.Log(string.Format("nav target {0} not initialised for {1}", controller.navTarget, controller.creationID));
+			}
+
+			
 
 			controller.animeController.SetTrigger(controller.chaseHash);
 			controller.pather.destination = controller.navTarget.navPosition;
@@ -57,13 +62,12 @@ namespace DarknessMinion
 
 		public override void ExitState(Darkness controller)
 		{
-			controller.navTarget.ReleaseTarget();
 			//controller.aIMovement.EndMovement();
-			controller.pather.canMove = false;
-			controller.pather.canSearch = false;
+			//controller.pather.canMove = false;
+			//controller.pather.canSearch = false;
 			//controller.pather.pickNextWaypointDist -= 0.5f;
-			controller.pather.endReachedDistance -= 1.0f;
-			controller.sekr.CancelCurrentPathRequest();
+			//controller.pather.endReachedDistance -= 1.0f;
+			//controller.sekr.CancelCurrentPathRequest();
 		}
 	}
 }
