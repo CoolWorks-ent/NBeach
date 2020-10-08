@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DarknessMinion
 {
-    static class Dark_Event_Manager
+    static class DarkEventManager
     {
 		public delegate void DarkEvent();
 		public delegate void DarkEvent<T>(T obj);

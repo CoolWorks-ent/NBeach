@@ -5,7 +5,7 @@ namespace DarknessMinion
 {
 
 	[CreateAssetMenu(menuName = "AI/Darkness/State/ChaseState")]
-	public class ChaseState : Dark_State
+	public class ChaseState : DarkState
 	{
 		[Range(0.25f, 5)]
 		public float pathUpdateRate;
@@ -20,16 +20,14 @@ namespace DarknessMinion
 			if (controller.navTarget != null && (controller.navTarget.navTargetTag != Darkness.NavTargetTag.Attack || controller.navTarget.navTargetTag != Darkness.NavTargetTag.AttackStandby))
 			{
 				controller.navTarget.ReleaseTarget();
-				Dark_Event_Manager.OnRequestNewTarget(controller.creationID);
+				DarkEventManager.OnRequestNewTarget(controller.creationID);
 				//controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 			}
 			else if (controller.navTarget == null)
 			{
-				Dark_Event_Manager.OnRequestNewTarget(controller.creationID);
-				Debug.Log(string.Format("nav target {0} not initialised for {1}", controller.navTarget, controller.creationID));
+				Debug.LogWarning(string.Format("nav target {0} not initialised for {1}", controller.navTarget, controller.creationID));
+				DarkEventManager.OnRequestNewTarget(controller.creationID);
 			}
-
-			
 
 			controller.animeController.SetTrigger(controller.chaseHash);
 			controller.pather.destination = controller.navTarget.navPosition;

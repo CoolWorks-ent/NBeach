@@ -78,7 +78,7 @@ namespace DarknessMinion
 
 		private Darkness.NavigationTarget ChooseNewPatrolPoint(float radius)
 		{
-			Darkness.NavigationTarget navTarget = new Darkness.NavigationTarget(Vector3.zero, Vector3.zero, Darkness_Manager.Instance.oceanPlane.position.y, Darkness.NavTargetTag.Patrol);
+			Darkness.NavigationTarget navTarget = new Darkness.NavigationTarget(Vector3.zero, Vector3.zero, DarknessManager.Instance.oceanPlane.position.y, Darkness.NavTargetTag.Patrol);
 			Vector3 t = Random.insideUnitSphere * wanderRadius; //subtract the player position from Darkness position. Add some offset to get a starting point a bit ahead of the player
 
 			navTarget.UpdateLocation(t);
@@ -88,8 +88,8 @@ namespace DarknessMinion
 
 		public void PopulatePatrolPoints(int size, Darkness controller)
 		{
-			controller.PatrolPoints = new Darkness.NavigationTarget[size];
-			for (int i = 0; i < controller.PatrolPoints.Length; i++)
+			controller.patrolPoints = new Darkness.NavigationTarget[size];
+			for (int i = 0; i < controller.patrolPoints.Length; i++)
 			{
 				float xOffset = 0;
 				//PatrolPoints[i].position.parent = this.transform;
@@ -97,7 +97,7 @@ namespace DarknessMinion
 					xOffset = controller.transform.position.x - UnityEngine.Random.Range(5 + i, 15);
 				else xOffset = controller.transform.position.x + UnityEngine.Random.Range(5 + i, 15);
 				Vector3 offset = new Vector3(xOffset, controller.transform.position.y, controller.transform.position.z - UnityEngine.Random.Range(9, 9 + i));
-				controller.PatrolPoints[i] = new Darkness.NavigationTarget(controller.transform.position, offset, Darkness_Manager.Instance.oceanPlane.position.y, Darkness.NavTargetTag.Patrol);
+				controller.patrolPoints[i] = new Darkness.NavigationTarget(controller.transform.position, offset, DarknessManager.Instance.oceanPlane.position.y, Darkness.NavTargetTag.Patrol);
 				//PatrolPoints[i].targetID = i;
 			}
 		}

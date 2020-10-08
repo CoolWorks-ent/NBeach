@@ -6,12 +6,12 @@ using UnityEngine;
 namespace DarknessMinion
 {
 
-    public class Dark_DecisionMaker
+    public class DarkDecisionMaker
     {
         public enum DecisionName { IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, IDLE_COMPLETE }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
-        public Dark_DecisionMaker()
+        public DarkDecisionMaker()
         {
             Decisions = new Dictionary<DecisionName, Func<Darkness, bool>>();
             Decisions.Add(DecisionName.IS_AGGRESSIVE, AggresiveCheck);
@@ -35,7 +35,7 @@ namespace DarknessMinion
 
         private bool IdleOnCooldown(Darkness controller)
         {
-            return !controller.CheckActionsOnCooldown(Dark_State.CooldownStatus.Idling);
+            return !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Idling);
         }
 
         private bool AggresiveCheck(Darkness controller)
@@ -63,7 +63,7 @@ namespace DarknessMinion
 
         private bool AttackOnCooldown(Darkness controller)
         {
-            return controller.CheckActionsOnCooldown(Dark_State.CooldownStatus.Attacking);
+            return controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking);
         }
 
         private bool AwaitingNextCommand(Darkness controller)

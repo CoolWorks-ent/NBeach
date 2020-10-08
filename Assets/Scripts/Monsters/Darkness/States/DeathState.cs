@@ -6,7 +6,7 @@ namespace DarknessMinion
 {
 
     [CreateAssetMenu(menuName = "AI/Darkness/State/DeathState")]
-    public class DeathState : Dark_State
+    public class DeathState : DarkState
     {
         protected override void FirstTimeSetup()
         {
@@ -60,7 +60,7 @@ namespace DarknessMinion
             //AI_Manager.Instance.RemoveFromDarknessList(controller);
             controller.gameObject.SetActive(false);
             controller.navTarget.ReleaseTarget();
-            Dark_Event_Manager.OnDarknessRemoved(controller);
+            DarkEventManager.OnDarknessRemoved(controller);
             Destroy(controller.animeController);
             Destroy(controller.gameObject);
             yield return 0;

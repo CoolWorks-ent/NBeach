@@ -757,7 +757,7 @@ public class song2_lvl : Level {
         */
         print("Enemy Wave 2");
         enemySpawners.spawnRate = darkSpawnRate_Stage0_1;
-        Darkness_Manager.Instance.maxEnemyCount = 7;
+        DarknessManager.Instance.maxEnemyCount = 7;
 
         Debug.Log("time till next stage = " + (waitTime * (.5f)));
         //yield return new WaitForSeconds(waitTime * .5f);
@@ -823,7 +823,7 @@ public class song2_lvl : Level {
 
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         
-        Darkness_Manager.Instance.maxEnemyCount = 15;
+        DarknessManager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
         darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage1;
         //Increase speed of dark ball attack
@@ -882,7 +882,7 @@ public class song2_lvl : Level {
 
         //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
-        Darkness_Manager.Instance.maxEnemyCount = 15;
+        DarknessManager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
         darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage2;
         //Increase speed of dark ball attack
@@ -960,7 +960,7 @@ public class song2_lvl : Level {
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
-        Darkness_Manager.Instance.maxEnemyCount = 20;
+        DarknessManager.Instance.maxEnemyCount = 20;
         StartCoroutine(AdjustRainAmt(RainFX_3, rainEmissionRate_stage3End));
 
         //Decrease Time between attacks

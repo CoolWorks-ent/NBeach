@@ -6,18 +6,16 @@ using System.Linq;
 namespace DarknessMinion
 {
 
-	public abstract class Dark_State : ScriptableObject
+	public abstract class DarkState : ScriptableObject
 	{
-		public enum StateType { CHASING, IDLE, ATTACK, DEATH, PAUSE, REMAIN, WANDER }
+		public enum StateType { CHASING, IDLE, ATTACK, DEATH, REMAIN, WANDER }
 		public enum CooldownStatus { Attacking, Patrolling, Idling, Moving }
 
-		public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL }
+		//public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL }
 		public StateType stateType;
-		public Dark_Transition[] transitions;
-		public List<Dark_State> ReferencedBy;
+		public DarkTransition[] transitions;
+		public List<DarkState> referencedBy;
 		//protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
-
-
 		//[SerializeField, Range(0, 3)]
 		//public float speedModifier;
 
@@ -34,15 +32,15 @@ namespace DarknessMinion
 
 		public virtual void Startup()
 		{
-			Dark_Event_Manager.RemoveDarkness += RemoveDarkness;
-			if (ReferencedBy == null || ReferencedBy.Count < 1)
-				ReferencedBy = new List<Dark_State>();
-			foreach (Dark_Transition ai in transitions)
+			DarkEventManager.RemoveDarkness += RemoveDarkness;
+			if (referencedBy == null || referencedBy.Count < 1)
+				referencedBy = new List<DarkState>();
+			foreach (DarkTransition ai in transitions)
 			{
-				if (!ai.trueState.ReferencedBy.Contains(this))
-					ai.trueState.ReferencedBy.Add(this);
-				if (!ai.falseState.ReferencedBy.Contains(this))
-					ai.falseState.ReferencedBy.Add(this);
+				if (!ai.trueState.referencedBy.Contains(this))
+					ai.trueState.referencedBy.Add(this);
+				if (!ai.falseState.referencedBy.Contains(this))
+					ai.falseState.referencedBy.Add(this);
 			}
 		}
 
@@ -61,32 +59,25 @@ namespace DarknessMinion
 
 		protected void CheckTransitions(Darkness controller)
 		{
-			for (int i = 0; i < transitions.Length; i++)
+			foreach (DarkTransition darkTran in transitions)
 			{
-				bool decisionResult = transitions[i].decision.MakeDecision(transitions[i].decisionChoice, controller);
+				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, controller);
 				if (decisionResult)
 				{
-					if (transitions[i].trueState.stateType == StateType.REMAIN)
-						continue;
-					else ProcessStateChange(transitions[i].trueState, controller);
+					if (darkTran.trueState.stateType != StateType.REMAIN)
+						controller.ChangeState(darkTran.trueState);
 				}
-				else if (!decisionResult)
+				else 
 				{
-					if (transitions[i].falseState.stateType == StateType.REMAIN)
-						continue;
-					else ProcessStateChange(transitions[i].falseState, controller);
+					if (darkTran.falseState.stateType != StateType.REMAIN) 
+						controller.ChangeState(darkTran.falseState);
 				}
 			}
 		}
 
-		protected void ProcessStateChange(Dark_State approvedState, Darkness controller) //TODO Have Darkness start a coroutine to begin transitioning. 
-		{
-			controller.ChangeState(approvedState);
-		}
-
 		protected void RemoveDarkness(Darkness controller)
 		{
-			if (stateType != Dark_State.StateType.DEATH)
+			if (stateType != DarkState.StateType.DEATH)
 			{
 				this.ExitState(controller);
 				controller.updateStates = false;
@@ -97,15 +88,15 @@ namespace DarknessMinion
 		public class CooldownInfo
 		{
 			public CooldownStatus acType { get; private set; }
-			public float remainingTime;
-			public float coolDownTime;
+			private float remainingTime;
+			//public float coolDownTime;
 			public Action<Darkness> Callback;
 			//public Coroutine durationRoutine;
 
 			public CooldownInfo(float cdTime, CooldownStatus acT, Action<Darkness> cback)
 			{
 				remainingTime = cdTime;
-				coolDownTime = cdTime;
+				//coolDownTime = cdTime;
 				acType = acT;
 				Callback = cback;
 			}

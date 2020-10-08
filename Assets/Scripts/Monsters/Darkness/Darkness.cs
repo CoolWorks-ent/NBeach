@@ -18,9 +18,9 @@ namespace DarknessMinion
 		public enum NavTargetTag { Attack, Patrol, Neutral, Null, AttackStandby}
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		public Dark_State previousState, currentState;
+		public DarkState previousState, currentState;
 		public NavigationTarget navTarget;
-		public NavigationTarget[] PatrolPoints;
+		public NavigationTarget[] patrolPoints;
 
 		[HideInInspector]
 		public AIPath pather;
@@ -30,7 +30,7 @@ namespace DarknessMinion
 		public Collider darkHitBox;
 
 		public GameObject deathFX;
-		public Dark_State DeathState;
+		public DarkState deathState;
 		public Animator animeController;
 
 		[HideInInspector]
@@ -43,7 +43,7 @@ namespace DarknessMinion
 		public int creationID;
 		public float playerDist, swtichDist, navTargetDist, stopDistance;
 
-		private Dictionary<Dark_State.CooldownStatus, Dark_State.CooldownInfo> stateActionsOnCooldown;
+		private Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo> stateActionsOnCooldown;
 
 		void Awake()
 		{
@@ -55,7 +55,7 @@ namespace DarknessMinion
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			attacked = false;
-			stateActionsOnCooldown = new Dictionary<Dark_State.CooldownStatus, Dark_State.CooldownInfo>();
+			stateActionsOnCooldown = new Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo>();
 		}
 
 		void Start()
@@ -64,8 +64,8 @@ namespace DarknessMinion
 			pather = GetComponent<AIPath>();
 			sekr = GetComponent<Seeker>();
 			darkHitBox = GetComponent<CapsuleCollider>();
-			Dark_Event_Manager.OnDarknessAdded(this);
-			Dark_Event_Manager.UpdateDarkness += UpdateStates;
+			DarkEventManager.OnDarknessAdded(this);
+			DarkEventManager.UpdateDarkness += UpdateStates;
 			//aIMovement = GetComponent<AI_Movement>();
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
@@ -88,7 +88,7 @@ namespace DarknessMinion
 			yield return null;
 		}*/
 
-		public void ChangeState(Dark_State nextState)
+		public void ChangeState(DarkState nextState)
 		{
 			previousState = currentState;
 			currentState = nextState;
@@ -108,7 +108,7 @@ namespace DarknessMinion
 
 		void FixedUpdate()
 		{
-			if (currentState.stateType != Dark_State.StateType.REMAIN)
+			if (currentState.stateType != DarkState.StateType.REMAIN)
 				currentState.MovementUpdate(this);
 		}
 
@@ -141,14 +141,14 @@ namespace DarknessMinion
 		}
 
 
-		public bool CheckActionsOnCooldown(Dark_State.CooldownStatus actType)
+		public bool CheckActionsOnCooldown(DarkState.CooldownStatus actType)
 		{
 			if (stateActionsOnCooldown.Count > 0)
 				return stateActionsOnCooldown.ContainsKey(actType);
 			return false;
 		}
 
-		public void AddCooldown(Dark_State.CooldownInfo actionCooldownInfo)
+		public void AddCooldown(DarkState.CooldownInfo actionCooldownInfo)
 		{
 			if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
 			{
@@ -159,8 +159,8 @@ namespace DarknessMinion
 
 		private void UpdateCooldownTimers()
 		{
-			List<Dark_State.CooldownStatus> deletedEntries = new List<Dark_State.CooldownStatus>();
-			foreach (KeyValuePair<Dark_State.CooldownStatus, Dark_State.CooldownInfo> info in stateActionsOnCooldown)
+			List<DarkState.CooldownStatus> deletedEntries = new List<DarkState.CooldownStatus>();
+			foreach (KeyValuePair<DarkState.CooldownStatus, DarkState.CooldownInfo> info in stateActionsOnCooldown)
 			{
 				info.Value.UpdateTime(Time.deltaTime);
 				if (info.Value.CheckTimerComplete())
@@ -170,7 +170,7 @@ namespace DarknessMinion
 				}
 			}
 
-			foreach (Dark_State.CooldownStatus cdStatus in deletedEntries)
+			foreach (DarkState.CooldownStatus cdStatus in deletedEntries)
 			{
 				stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
 				stateActionsOnCooldown.Remove(cdStatus);
@@ -189,7 +189,7 @@ namespace DarknessMinion
 				if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
 				{
 					Debug.LogWarning("Darkness Destroyed");
-					ChangeState(DeathState);
+					ChangeState(deathState);
 				}
 			}
 			else if (collider.gameObject.CompareTag("Player"))
@@ -205,7 +205,7 @@ namespace DarknessMinion
 				switch (navTarget.navTargetTag)
 				{
 					case NavTargetTag.Attack:
-						Gizmos.color = Color.red;
+						Gizmos.color = new Color(1f, 0.43f, 0.24f);
 						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
 
 						Gizmos.color = Color.white;
@@ -229,8 +229,7 @@ namespace DarknessMinion
 
 
 		[System.Serializable]
-		///<summary>NavigationTarget is used by Darkness for pathfinding purposes. </summary>
-		public class NavigationTarget
+		public class NavigationTarget //NavigationTarget is used by Darkness for pathfinding purposes. 
 		{
 			[SerializeField]
 			private bool claimed;
@@ -249,7 +248,7 @@ namespace DarknessMinion
 			public Vector3 srcPosition { get { return position; } }
 
 			///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
-			///<parem name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
+			///<param name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
 			public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
 			{
 				position = loc;

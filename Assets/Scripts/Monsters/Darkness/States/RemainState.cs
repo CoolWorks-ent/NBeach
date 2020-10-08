@@ -4,7 +4,7 @@ using UnityEditor;
 namespace DarknessMinion
 { 
     [CreateAssetMenu (menuName = "AI/Darkness/State/RemainState")]
-    public class RemainState: Dark_State
+    public class RemainState: DarkState
     {
         protected override void FirstTimeSetup()
         {

@@ -5,7 +5,7 @@ namespace DarknessMinion
 {
 
     [CreateAssetMenu(menuName = "AI/Darkness/State/AttackState")]
-    public class AttackState : Dark_State
+    public class AttackState : DarkState
     {
         [Range(1, 3)]
         public int attackSpeedModifier;

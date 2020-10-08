@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DarknessMinion
 {
-	public class Darkness_Manager : MonoBehaviour
+	public class DarknessManager : MonoBehaviour
 	{
 
 		public Transform player;
@@ -19,7 +20,7 @@ namespace DarknessMinion
 		private bool paused;
 
 		[SerializeField]
-		private Dark_State[] dark_States;
+		private DarkState[] darkStates;
 		[SerializeField]
 		private Darkness.NavigationTarget[] AttackPoints;
 		[SerializeField]
@@ -27,12 +28,12 @@ namespace DarknessMinion
 
 		public List<int> attackApprovalPriority;
 
-		public static Darkness_Manager Instance { get; private set; }
+		public static DarknessManager Instance { get; private set; }
 
 		void Awake()
 		{
 			Instance = this;
-			dark_States = Resources.LoadAll<Dark_State>("States");
+			darkStates = Resources.LoadAll<DarkState>("States");
 			darknessConcurrentAttackLimit = 2;
 			darknessIDCounter = darkAttackCount = darkStandbyCount = 0;
 			maxEnemyCount = 6;
@@ -45,15 +46,15 @@ namespace DarknessMinion
 			else Instance = this;
 			ActiveDarkness = new Dictionary<int, Darkness>();
 			attackApprovalPriority = new List<int>();
-			Dark_Event_Manager.AddDarkness += AddtoDarknessList;
-			Dark_Event_Manager.RemoveDarkness += RemoveFromDarknessList;
-			Dark_Event_Manager.RequestNewTarget += ApproveRequestedTarget;
+			DarkEventManager.AddDarkness += AddtoDarknessList;
+			DarkEventManager.RemoveDarkness += RemoveFromDarknessList;
+			DarkEventManager.RequestNewTarget += ApproveRequestedTarget;
 			paused = false;
 			calculationTime = 0.5f;
 			attackOffset = 3.5f;
 			AttackPoints = new Darkness.NavigationTarget[4];
 			StartCoroutine(ManagedDarknessUpdate());
-			foreach (Dark_State d in dark_States)
+			foreach (DarkState d in darkStates)
 			{
 				d.Startup();
 			}
@@ -108,14 +109,15 @@ namespace DarknessMinion
 					yield return new WaitForSeconds(calculationTime / 3);
 					UpdateDarknessAggresion();
 					yield return new WaitForSeconds(calculationTime);
-					Dark_Event_Manager.OnUpdateDarkness();
+					DarkEventManager.OnUpdateDarkness();
 				}
 				else yield return new WaitForSeconds(0.5f);
 			}
 			yield return null;
 		}
 
-		///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. Furtheset Darkness are set to idle priority</summary>
+		///<summary>Sets the closest Darkness to attack state. Darkness that are runners up are set to patrol nearby. 
+		///Furtheset Darkness are set to idle priority</summary>
 		private void UpdateDarknessAggresion()
 		{
 			for (int i = 0; i < attackApprovalPriority.Count; i++)
@@ -181,12 +183,13 @@ namespace DarknessMinion
 			else return -1;
 		}
 
-		private Darkness.NavigationTarget PointNearPlayer(Darkness dark)
+		/*private Darkness.NavigationTarget PointNearPlayer(Darkness dark)
 		{
 			Vector3 dir = (player.position - dark.transform.position).normalized;
-			Vector3 offset = player.position - dir * 8; //Find a lattitude x offset away from the player and 
+			Vector3 offset = player.position - dir * 8; //Find a lattitude x offset away from the player 
 			return new Darkness.NavigationTarget(player.position, offset, oceanPlane.position.y, Darkness.NavTargetTag.AttackStandby);
-		}
+		}*/
+
 		///<summary>Check the Darkness for current NavTarget. If the target is an attack Target the target will be set to the starting NavTarget.</summary>
 		private void RemoveFromNavTargets(int darkID)
 		{
@@ -206,18 +209,17 @@ namespace DarknessMinion
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))
 			{
+				int index = LeastRequestedAttackTarget();
 				if (darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 				{
-					int index = LeastRequestedAttackTarget();
 					Darkness.NavigationTarget nT;
 					if (index != -1)
 					{
 						AttackPoints[index].ClaimTarget(darkID);
-						nT = AttackPoints[index];
+						darkness.navTarget = AttackPoints[index]; //nT
 					}
-					else nT = PointNearPlayer(darkness);
-
-					darkness.navTarget = nT;
+					//else nT = PointNearPlayer(darkness); //If the attackers are full start navigating near the player
+					//darkness.navTarget = nT;
 				}
 				else 
 				{
@@ -255,7 +257,7 @@ namespace DarknessMinion
 			Debug.Log("[AI] All Darkness AI kill call");
 			foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
 			{
-				dark.Value.ChangeState(dark.Value.DeathState);
+				dark.Value.ChangeState(dark.Value.deathState);
 				RemoveFromDarknessList(dark.Value);
 				ActiveDarkness.Remove(dark.Key);
 			}

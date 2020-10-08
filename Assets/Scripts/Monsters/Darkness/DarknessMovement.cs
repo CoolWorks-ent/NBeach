@@ -4,7 +4,7 @@ using Pathfinding;
 
 namespace DarknessMinion
 {
-    public class Darkness_Movement : MonoBehaviour
+    public class DarknessMovement : MonoBehaviour
     {
         public Transform target;
         public Vector3 wayPoint, pathPoint, direction;

@@ -44,7 +44,7 @@ public class EnemySpawner : MonoBehaviour
         {
             if (pauseSpawning == false)
             {
-                if (Darkness_Manager.Instance.ActiveDarkness.Count < Darkness_Manager.Instance.maxEnemyCount)
+                if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
                 {
                     if (spawnWait >= spawnRate)
                     {
@@ -78,7 +78,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                if (Darkness_Manager.Instance.ActiveDarkness.Count <= Darkness_Manager.Instance.minEnemyCount)
+                if (DarknessManager.Instance.ActiveDarkness.Count <= DarknessManager.Instance.minEnemyCount)
                 {
                     //resume spawning of enemies
                     pauseSpawning = false;
