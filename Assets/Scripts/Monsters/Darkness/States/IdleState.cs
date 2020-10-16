@@ -55,6 +55,7 @@ namespace DarknessMinion
 		protected override void CooldownCallback(Darkness controller)
 		{
 			CheckTransitions(controller);
+			controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
 		}

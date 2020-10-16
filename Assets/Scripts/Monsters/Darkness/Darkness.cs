@@ -165,7 +165,7 @@ namespace DarknessMinion
 				info.Value.UpdateTime(Time.deltaTime);
 				if (info.Value.CheckTimerComplete())
 				{
-					Debug.LogWarning("Executing callback using: " + info.Value.Callback);
+					Debug.LogWarning("Executing callback using: " + info.Value.acType);
 					deletedEntries.Add(info.Key);
 				}
 			}
@@ -182,17 +182,17 @@ namespace DarknessMinion
 			stateActionsOnCooldown.Clear();
 		}
 
-		private void OnTriggerEnter(Collider collider)
+		private void OnTriggerEnter(Collider col)
 		{
-			if (collider.gameObject.CompareTag("Projectile"))
+			if (col.gameObject.CompareTag("Projectile"))
 			{
-				if (collider.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
+				if (col.gameObject.GetComponent<Projectile_Shell>().projectileFired == true)
 				{
 					Debug.LogWarning("Darkness Destroyed");
 					ChangeState(deathState);
 				}
 			}
-			else if (collider.gameObject.CompareTag("Player"))
+			else if (col.gameObject.CompareTag("Player"))
 			{
 				//Debug.LogWarning("Darkness collided with Player");
 			}
@@ -205,7 +205,7 @@ namespace DarknessMinion
 				switch (navTarget.navTargetTag)
 				{
 					case NavTargetTag.Attack:
-						Gizmos.color = new Color(1f, 0.43f, 0.24f);
+						Gizmos.color = Color.red; //new Color(1f, 0.43f, 0.24f);
 						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
 
 						Gizmos.color = Color.white;

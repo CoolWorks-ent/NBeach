@@ -24,8 +24,6 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.IDLE_COMPLETE, IdleOnCooldown);
         }
 
-
-
         public bool MakeDecision(DecisionName dName, Darkness controller)
         {
             if (controller != null)

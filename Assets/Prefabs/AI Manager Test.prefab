@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1447573566969392}
+  m_IsPrefabParent: 1
+--- !u!1 &1447573566969392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4079910569860250}
+  - component: {fileID: 114894097869648208}
+  - component: {fileID: 114495943733897664}
+  m_Layer: 0
+  m_Name: AI Manager Test
+  m_TagString: AI Manager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4079910569860250
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1447573566969392}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114495943733897664
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1447573566969392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb3fa065d3ac01d4fb37dd0c11a3771f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  oceanPlane: {fileID: 0}
+  darknessIDCounter: 0
+  darknessConcurrentAttackLimit: 0
+  maxEnemyCount: 5
+  minEnemyCount: 0
+  darkAttackCount: 0
+  darkStandbyCount: 0
+  darkStates: []
+  AttackPoints: []
+  PlayerPoint:
+    claimed: 0
+    position: {x: 0, y: 0, z: 0}
+    positionOffset: {x: 0, y: 0, z: 0}
+  attackApprovalPriority: 
+--- !u!114 &114894097869648208
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1447573566969392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78396926cbbfc4ac3b48fc5fc34a87d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  data:
+    dataString: UEsDBBQAAAgIAACAn+uXVOpQVwIAAAYFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQF1VMty4jAQ/BVK5w1l8zBhb7tAyB4IVMhWLr4Ia4xVyJJLj/BI8e8ryQI7Tu3Jrpnume6ZsT8R5aqCTAu5lJSsBAH0s4fcO/rRa5LPcMJ7wbf0AjfMOyW6cCDsMa9YU2HjsaMpUYKWNPvF98yBIxs0nOZClguyh5lQWtlwjpkCm5JCOza3oc8eOgXCOTwv7tm72rcMuAbZoOLpoD8eBOgo6g/iOBmOk8BJJp5keMZwWQFx4lvcyY0Yjx49kFtjAeNSmWCMqqAK6XPlXW+rAiQ424Ria9LLcZ4LoPtCd7nrPFeggxGJz3Mq7azqoui3qAdYYnWohX1gZlybR+vMa6qrrr4BHkbxJLFmPSiXony+tY8j10oXNDu84nOGlQtqaaATnX+Vb/gRswPeMXgvgL+IpRSGk4ZqFAzmrZXdHc4KyA4NrhbcCZrq+2bjZrNXP4PTjNFy5zL9ZFhHtkz4qU8dCaTdzx+r2J+KCqVs1Kn4q+AN79s3FRJPVCptU6Ejd/J2wkgHRQs/M+fG6JmQHGS7QgUcM33e2Dq6u8pO7v+sJ+w+n9A95G5fRYfiww0+ijqpjTje16UKcVyBKtZGM8rbxVzmxU5qJjivT001i7jRtkbmOGvT9oaSryeGCNlNk/HjZIR3EMeT+GEX4eEwgSiKR/k0z4fIXx/l1ihmm1ppmI/dG2/acntqt99Kbylx5c+eSHxc0kspWgIpz8U2kwB8XVe42wJpm9ivkywItRPagtaU+42jzxQxkR2ApPdCqbe6OGmJ06ZKiir6IbSLpGjmfyYpuqLrP1BLAwQUAAAICAAAgJ/rIQVdsWwAAAB3AAAACQAkAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAatWKkstKs7Mz1OyUjDRM9Kz0FFQSi9KLMgoBgoYgjilmSkgdrRSSkqSpZmphblJYlKqoaG5oW6SQaKxsVmqgYGhSZplWpqxUixQfUllQapfYm4qRE9AYklGWmZeSmZeup57UWaKO8hopdhaAFBLAQItABQAAAgIAACAn+uXVOpQVwIAAAYFAAALACQAAAAAAAAAAAAAAAAAAABncmFwaDAuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLAQItABQAAAgIAACAn+shBV2xbAAAAHcAAAAJACQAAAAAAAAAAAAAAKQCAABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwUGAAAAAAIAAgC4AAAAWwMAAAAA
+    upgradeData: 
+    file_cachedStartup: {fileID: 4900000, guid: 21f303a13747b394aac2cb72b2113fdd,
+      type: 3}
+    data_cachedStartup: 
+    cacheStartup: 1
+  showNavGraphs: 1
+  showUnwalkableNodes: 1
+  debugMode: 0
+  debugFloor: 0
+  debugRoof: 1
+  manualDebugFloorRoof: 0
+  showSearchTree: 0
+  unwalkableNodeDebugSize: 0.3
+  logPathResults: 1
+  maxNearestNodeDistance: 100
+  scanOnStartup: 1
+  fullGetNearestSearch: 0
+  prioritizeGraphs: 0
+  prioritizeGraphsLimit: 1
+  colorSettings:
+    _SolidColor: {r: 0.11764706, g: 0.4, b: 0.7882353, a: 0.9}
+    _UnwalkableNode: {r: 1, g: 0, b: 0, a: 0.5}
+    _BoundsHandles: {r: 0.29, g: 0.454, b: 0.741, a: 0.9}
+    _ConnectionLowLerp: {r: 0, g: 1, b: 0, a: 0.5}
+    _ConnectionHighLerp: {r: 1, g: 0, b: 0, a: 0.5}
+    _MeshEdgeColor: {r: 0, g: 0, b: 0, a: 0.5}
+    _AreaColors: []
+  tagNames: []
+  heuristic: 2
+  heuristicScale: 1
+  threadCount: 1
+  maxFrameTime: 10
+  batchGraphUpdates: 0
+  graphUpdateBatchingInterval: 0.2
+  euclideanEmbedding:
+    mode: 0
+    seed: 0
+    pivotPointRoot: {fileID: 0}
+    spreadOutCount: 1
+  showGraphs: 1
