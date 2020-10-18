@@ -212,7 +212,7 @@ namespace DarknessMinion
 				int index = LeastRequestedAttackTarget();
 				if (darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 				{
-					Darkness.NavigationTarget nT;
+					//Darkness.NavigationTarget nT;
 					if (index != -1)
 					{
 						AttackPoints[index].ClaimTarget(darkID);

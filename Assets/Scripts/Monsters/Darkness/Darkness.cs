@@ -11,7 +11,7 @@ using System;
 
 namespace DarknessMinion
 {
-	public class Darkness : MonoBehaviour
+	public class Darkness : MonoBehaviour, IDarkDebug
 	{
 
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
@@ -28,6 +28,11 @@ namespace DarknessMinion
 		[HideInInspector]
 		public Seeker sekr;
 		public Collider darkHitBox;
+
+		[HideInInspector]
+		public string debugMessage {get; set;}
+
+		public TextMesh textMesh;
 
 		public GameObject deathFX;
 		public DarkState deathState;
@@ -60,6 +65,7 @@ namespace DarknessMinion
 
 		void Start()
 		{
+			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			pather = GetComponent<AIPath>();
 			sekr = GetComponent<Seeker>();
@@ -196,6 +202,27 @@ namespace DarknessMinion
 			{
 				//Debug.LogWarning("Darkness collided with Player");
 			}
+		}
+
+		public void UpdateDebugMessage()
+		{
+			if(navTarget != null)
+			{
+				debugMessage = String.Format(
+				"<b>NavTarget:</b> Tag = {0} Position = {1} \n" +
+				"<b>Current State:</b> {2} \n" +
+				"<b>Previous State:</b> {3} \n" +
+				"<b>Player Distance:</b> {4} \n" +
+				"<b>NavTarget Distance:</b> {5}",
+				navTarget.navTargetTag, navTarget.navPosition, currentState.name, previousState.name, playerDist, navTargetDist);
+
+				textMesh.text = debugMessage;
+			}
+		}
+
+		public void ToggleDebugMessage(bool active)
+		{
+			textMesh.gameObject.SetActive(active);
 		}
 
         private void OnDrawGizmos()
