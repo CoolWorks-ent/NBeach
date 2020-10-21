@@ -106,7 +106,7 @@ namespace DarknessMinion
 						dark.Value.DistanceEvaluation(player.position);
 					}
 					SortTheGoons();
-					yield return new WaitForSeconds(calculationTime / 3);
+					//yield return new WaitForSeconds(calculationTime / 3);
 					UpdateDarknessAggresion();
 					yield return new WaitForSeconds(calculationTime);
 					DarkEventManager.OnUpdateDarkness();
@@ -149,16 +149,16 @@ namespace DarknessMinion
 
 		#region NavTargetHandling
 
-		///<summary>Returns index of the attack Navigation Target with the lowest weight</summary>
-		public int LeastRequestedAttackTarget() //TODO Create checking for if all targets are at capacity
+		///<summary>Returns index of unclaimed attack Navigation Target</summary>
+		public int LeastRequestedAttackTarget() 
 		{
 			int lowest = 0;
-			List<int> evenCount = new List<int>(); //In case there are entries at the same levels
+			List<int> evenCount = new List<int>(); 
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
-				if (AttackPoints[i].navTargetClaimed)//(AttackPoints[i].navTargetWeight < AttackPoints[lowest].navTargetWeight)
+				if (AttackPoints[i].navTargetClaimed)
 					continue;
-				else evenCount.Add(i); //if (AttackPoints[i].navTargetWeight == AttackPoints[lowest].navTargetWeight)
+				else evenCount.Add(i); 
 			}
 
 			if (evenCount.Count >= 2)
@@ -183,13 +183,6 @@ namespace DarknessMinion
 			else return -1;
 		}
 
-		/*private Darkness.NavigationTarget PointNearPlayer(Darkness dark)
-		{
-			Vector3 dir = (player.position - dark.transform.position).normalized;
-			Vector3 offset = player.position - dir * 8; //Find a lattitude x offset away from the player 
-			return new Darkness.NavigationTarget(player.position, offset, oceanPlane.position.y, Darkness.NavTargetTag.AttackStandby);
-		}*/
-
 		///<summary>Check the Darkness for current NavTarget. If the target is an attack Target the target will be set to the starting NavTarget.</summary>
 		private void RemoveFromNavTargets(int darkID)
 		{
@@ -208,18 +201,15 @@ namespace DarknessMinion
 		{
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))
-			{
-				int index = LeastRequestedAttackTarget();
+			{	
 				if (darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
 				{
-					//Darkness.NavigationTarget nT;
+					int index = LeastRequestedAttackTarget();
 					if (index != -1)
 					{
 						AttackPoints[index].ClaimTarget(darkID);
-						darkness.navTarget = AttackPoints[index]; //nT
+						darkness.navTarget = AttackPoints[index]; 
 					}
-					//else nT = PointNearPlayer(darkness); //If the attackers are full start navigating near the player
-					//darkness.navTarget = nT;
 				}
 				else 
 				{

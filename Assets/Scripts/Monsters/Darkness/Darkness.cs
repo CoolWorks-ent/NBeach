@@ -211,10 +211,11 @@ namespace DarknessMinion
 				debugMessage = String.Format(
 				"<b>NavTarget:</b> Tag = {0} Position = {1} \n" +
 				"<b>Current State:</b> {2} \n" +
-				"<b>Previous State:</b> {3} \n" +
+				"Previous State: {3} \n" +
 				"<b>Player Distance:</b> {4} \n" +
-				"<b>NavTarget Distance:</b> {5}",
-				navTarget.navTargetTag, navTarget.navPosition, currentState.name, previousState.name, playerDist, navTargetDist);
+				"<b>NavTarget Distance:</b> {5} \n" +
+				"<b>Darkness Position:</b> {6}",
+				navTarget.navTargetTag, navTarget.navPosition, currentState.name, previousState.name, playerDist, navTargetDist, this.transform.position);
 
 				textMesh.text = debugMessage;
 			}

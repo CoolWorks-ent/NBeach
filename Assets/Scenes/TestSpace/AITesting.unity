@@ -790,7 +790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   darknessPrefab: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
     type: 2}
-  showDebugInfo: 0
+  showDebugInfo: 1
 --- !u!1 &1698327601
 GameObject:
   m_ObjectHideFlags: 0
