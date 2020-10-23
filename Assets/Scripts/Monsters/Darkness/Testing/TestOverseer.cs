@@ -1,69 +1,70 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
-using DarknessMinion;
-public class TestOverseer : MonoBehaviour 
+
+namespace DarknessMinion
 {
-	public Darkness darknessPrefab;
-	public static TestOverseer Instance { get; private set; }
-
-	public bool showDebugInfo;
-
-	void Awake()
+	public class TestOverseer : MonoBehaviour 
 	{
-		Instance = this;
-		//showDebugInfo = false;
-	}
+		public Darkness darknessPrefab;
+		public static TestOverseer Instance { get; private set; }
 
-	public void SpawnDarkness()
-	{
-		if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
+		public bool showDebugInfo;
+
+		void Awake()
 		{
-			//Vector3 sLoc = Random.insideUnitCircle * 5;
-			Darkness enemy = Instantiate(darknessPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.oceanPlane.position.y+0.5f, Random.Range(0, 10)), darknessPrefab.transform.rotation);
+			Instance = this;
+			//showDebugInfo = false;
 		}
-	}
 
-	public void KillDarkness()
-	{
-		if(DarknessManager.Instance.ActiveDarkness.Count > 0)
+		public void SpawnDarkness()
 		{
-			Darkness d;
-			d = DarknessManager.Instance.ActiveDarkness.Values.LastOrDefault();
-			if(d != null)
-				d.ChangeState(d.deathState);
+			if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
+			{
+				//Vector3 sLoc = Random.insideUnitCircle * 5;
+				Darkness enemy = Instantiate(darknessPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.oceanPlane.position.y+0.5f, Random.Range(0, 10)), darknessPrefab.transform.rotation);
+			}
 		}
-	}
 
-	void LateUpdate()
-	{
-		foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+		public void KillDarkness()
 		{
-			dark.UpdateDebugMessage();
+			if(DarknessManager.Instance.ActiveDarkness.Count > 0)
+			{
+				Darkness d;
+				d = DarknessManager.Instance.ActiveDarkness.Values.LastOrDefault();
+				if(d != null)
+					d.ChangeState(d.deathState);
+			}
 		}
-	}
 
-	public void DisplayDebugInfo()
-	{
-		foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+		void LateUpdate()
 		{
-			dark.ToggleDebugMessage(true);
+			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			{
+				dark.UpdateDebugMessage();
+			}
 		}
-	}
 
-	public void DeactivateDebugInfo()
-	{
-		foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+		public void DisplayDebugInfo()
 		{
-			dark.ToggleDebugMessage(false);
+			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			{
+				dark.ToggleDebugMessage(true);
+			}
 		}
-	}
 
-	public void MovePlayerObject(Vector3 direction)
-	{
-		Transform player = DarknessManager.Instance.player;
+		public void DeactivateDebugInfo()
+		{
+			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			{
+				dark.ToggleDebugMessage(false);
+			}
+		}
 
-		player.position += direction;
+		public void MovePlayerObject(Vector3 direction)
+		{
+			Transform player = DarknessManager.Instance.player;
+
+			player.position += direction;
+		}
 	}
 }

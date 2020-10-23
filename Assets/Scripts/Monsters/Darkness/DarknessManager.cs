@@ -14,17 +14,15 @@ namespace DarknessMinion
 
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;
-		public int maxEnemyCount, minEnemyCount, darkAttackCount, darkStandbyCount;
+		public int maxEnemyCount, minEnemyCount;
 
 		private float calculationTime, attackOffset;
 		private bool paused;
-
+		
 		[SerializeField]
-		private DarkState[] darkStates;
+		private NavigationTarget[] AttackPoints;
 		[SerializeField]
-		private Darkness.NavigationTarget[] AttackPoints;
-		[SerializeField]
-		private Darkness.NavigationTarget PlayerPoint; //StartPoint,
+		private NavigationTarget PlayerPoint; //StartPoint,
 
 		public List<int> attackApprovalPriority;
 
@@ -33,9 +31,9 @@ namespace DarknessMinion
 		void Awake()
 		{
 			Instance = this;
-			darkStates = Resources.LoadAll<DarkState>("States");
+			
 			darknessConcurrentAttackLimit = 2;
-			darknessIDCounter = darkAttackCount = darkStandbyCount = 0;
+			darknessIDCounter = 0;
 			maxEnemyCount = 6;
 			minEnemyCount = 1;
 			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
@@ -52,18 +50,14 @@ namespace DarknessMinion
 			paused = false;
 			calculationTime = 0.5f;
 			attackOffset = 3.5f;
-			AttackPoints = new Darkness.NavigationTarget[4];
+			AttackPoints = new NavigationTarget[4];
 			StartCoroutine(ManagedDarknessUpdate());
-			foreach (DarkState d in darkStates)
-			{
-				d.Startup();
-			}
 		}
 
 		void Start()
 		{
 			//StartPoint = new Darkness.NavigationTarget(this.transform.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Neutral);
-			PlayerPoint = new Darkness.NavigationTarget(player.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Attack);
+			PlayerPoint = new NavigationTarget(player.position, Vector3.zero, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
 			List<Vector3> offsets = new List<Vector3>();
 			offsets.Add(new Vector3(attackOffset, 0, -2));
 			offsets.Add(new Vector3(-attackOffset, 0, -2));
@@ -71,7 +65,7 @@ namespace DarknessMinion
 			offsets.Add(new Vector3(attackOffset / 2, 0, 0));
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
-				AttackPoints[i] = new Darkness.NavigationTarget(player.transform.position, offsets[i], oceanPlane.position.y, Darkness.NavTargetTag.Attack);
+				AttackPoints[i] = new NavigationTarget(player.transform.position, offsets[i], oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
 				//Vector3 t = AttackPoints[i].position+offsets[i];
 				//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 			}
@@ -85,7 +79,7 @@ namespace DarknessMinion
 		void LateUpdate()
 		{
 			PlayerPoint.UpdateLocation(player.position);
-			foreach(Darkness.NavigationTarget point in AttackPoints)
+			foreach(NavigationTarget point in AttackPoints)
 			{
 				point.UpdateLocation(player.position);
 			}
@@ -122,14 +116,14 @@ namespace DarknessMinion
 		{
 			for (int i = 0; i < attackApprovalPriority.Count; i++)
 			{
-				if (i < darknessConcurrentAttackLimit)
+				if (i < darknessConcurrentAttackLimit-1)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
 				}
-				else if (i < darknessConcurrentAttackLimit + 2)
+				/*else if (i < darknessConcurrentAttackLimit + 2)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
-				}
+				}*/
 				else
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
@@ -189,7 +183,7 @@ namespace DarknessMinion
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))
 			{
-				if (darkness.navTarget.navTargetTag != Darkness.NavTargetTag.Neutral)
+				if (darkness.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Neutral)
 				{
 					darkness.navTarget.ReleaseTarget();
 				}
@@ -213,8 +207,11 @@ namespace DarknessMinion
 				}
 				else 
 				{
-					RemoveFromNavTargets(darkID);
-					darkness.navTarget = null;
+					if(darkness.navTarget.navTargetTag == NavigationTarget.NavTargetTag.Attack)
+					{
+						RemoveFromNavTargets(darkID);
+						darkness.CreateDummyNavTarget(oceanPlane.position.y);
+					}
 				}
 			}
 		}
@@ -231,6 +228,7 @@ namespace DarknessMinion
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);
+			updatedDarkness.CreateDummyNavTarget(oceanPlane.position.y);
 			//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 		}
 

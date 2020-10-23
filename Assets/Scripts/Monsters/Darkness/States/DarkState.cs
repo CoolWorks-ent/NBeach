@@ -33,8 +33,8 @@ namespace DarknessMinion
 		public virtual void Startup()
 		{
 			DarkEventManager.RemoveDarkness += RemoveDarkness;
-			if (referencedBy == null || referencedBy.Count < 1)
-				referencedBy = new List<DarkState>();
+			//if (referencedBy == null || referencedBy.Count < 1)
+			referencedBy = new List<DarkState>();
 			foreach (DarkTransition ai in transitions)
 			{
 				if (!ai.trueState.referencedBy.Contains(this))

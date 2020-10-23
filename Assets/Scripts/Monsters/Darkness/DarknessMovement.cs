@@ -4,6 +4,7 @@ using Pathfinding;
 
 namespace DarknessMinion
 {
+    [RequireComponent(typeof(Darkness))]
     public class DarknessMovement : MonoBehaviour
     {
         public Transform target;
@@ -15,6 +16,7 @@ namespace DarknessMinion
         private Path navPath;
         private Rigidbody rigidbod;
         private Blocker bProvider;
+        private MovementParams initialParameters, updatedParameters;
 
         void Awake()
         {
@@ -33,7 +35,7 @@ namespace DarknessMinion
             direction = new Vector3();
         }
 
-        void FixedUpdate()
+        public void MovementUpdate()
         {
             if (moving && navPath != null)
             {
@@ -47,6 +49,21 @@ namespace DarknessMinion
         {
             if (sekr.IsDone())
                 CreatePath(target);
+        }
+
+        public void UpdateMovementParams(MovementParams newParams)
+        {
+            updatedParameters = newParams;
+        }
+
+        public void DefaultMovmentParams()
+        {
+            updatedParameters = initialParameters;
+        }
+
+        public void RotateTowardsPlayer()
+        {
+
         }
 
         private void PathComplete(Path p)
@@ -97,7 +114,7 @@ namespace DarknessMinion
             moving = false;
         }
 
-        class Blocker : ITraversalProvider
+        private class Blocker : ITraversalProvider
         {
             public HashSet<GraphNode> blockedNodes = new HashSet<GraphNode>();
             public bool CanTraverse(Path path, GraphNode node)
@@ -108,6 +125,22 @@ namespace DarknessMinion
             public uint GetTraversalCost(Path path, GraphNode node)
             {
                 return DefaultITraversalProvider.GetTraversalCost(path, node);
+            }
+        }
+
+        public struct MovementParams
+        {
+            public float moveSpeed, turnSpeed, repathRate;
+
+            [Range(0,360)]
+            public float turnRadius;
+
+            MovementParams(float mSpeed, float tSpeed, float tRadius, float rpathRate)
+            {
+                turnRadius = tRadius;
+                moveSpeed = mSpeed;
+                turnSpeed = tSpeed;
+                repathRate = rpathRate;
             }
         }
     }

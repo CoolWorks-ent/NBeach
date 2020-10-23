@@ -1,7 +1,6 @@
 ﻿using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using DarknessMinion;
 
 [CustomEditor(typeof(TestOverseer))]
 public class DarknessTester : Editor 

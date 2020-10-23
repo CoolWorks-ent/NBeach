@@ -17,17 +17,17 @@ namespace DarknessMinion
 		public override void InitializeState(Darkness controller)
 		{
 			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
-			if (controller.navTarget != null && (controller.navTarget.navTargetTag != Darkness.NavTargetTag.Attack || controller.navTarget.navTargetTag != Darkness.NavTargetTag.AttackStandby))
+			if (controller.navTarget != null && controller.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
 				controller.navTarget.ReleaseTarget();
 				DarkEventManager.OnRequestNewTarget(controller.creationID);
 				//controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 			}
-			else if (controller.navTarget == null)
+			/*else if (controller.navTarget == null)
 			{
 				Debug.LogWarning(string.Format("nav target {0} not initialised for {1}", controller.navTarget, controller.creationID));
 				DarkEventManager.OnRequestNewTarget(controller.creationID);
-			}
+			}*/
 
 			controller.animeController.SetTrigger(controller.chaseHash);
 			controller.pather.destination = controller.navTarget.navPosition;

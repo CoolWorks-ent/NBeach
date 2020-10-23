@@ -223,10 +223,9 @@ GameObject:
   - component: {fileID: 114150173797437670}
   - component: {fileID: 114446345711301086}
   - component: {fileID: 114857173380954124}
-  - component: {fileID: 114648332704818778}
   - component: {fileID: 136796206659899728}
   m_Layer: 17
-  m_Name: darkness_enhanced
+  m_Name: darkness_cell
   m_TagString: Darkness
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -966,41 +965,6 @@ MonoBehaviour:
   swtichDist: 0
   navTargetDist: 0
   stopDistance: 0
---- !u!114 &114648332704818778
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6eb1402c17e84a9282a7f0f62eb584f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 2
-  radius: 1.25
-  height: 1.5
-  repathRate: 0.5
-  canSearch: 0
-  canMove: 0
-  maxSpeed: 1
-  gravity: {x: NaN, y: NaN, z: NaN}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  centerOffsetCompatibility: NaN
-  orientation: 0
-  enableRotation: 1
-  targetCompatibility: {fileID: 0}
-  maxAcceleration: -2.5
-  rotationSpeed: 180
-  slowdownDistance: 0.6
-  pickNextWaypointDist: 0.99
-  endReachedDistance: 0.5
-  alwaysDrawGizmos: 1
-  slowWhenNotFacingTarget: 1
-  whenCloseToDestination: 0
-  constrainInsideGraph: 1
 --- !u!114 &114857173380954124
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -769,6 +769,16 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 421585397}
+    - target: {fileID: 114894097869648208, guid: b47e4caffffe69c43bfcfe1850c2df3e,
+        type: 2}
+      propertyPath: logPathResults
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114894097869648208, guid: b47e4caffffe69c43bfcfe1850c2df3e,
+        type: 2}
+      propertyPath: showGraphs
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b47e4caffffe69c43bfcfe1850c2df3e, type: 2}
   m_IsPrefabParent: 0
