@@ -113,7 +113,7 @@ namespace DarknessMinion
 
 		void FixedUpdate()
 		{
-			if (currentState.stateType != DarkState.StateType.REMAIN)
+			if (currentState != null)
 				currentState.MovementUpdate(this);
 		}
 

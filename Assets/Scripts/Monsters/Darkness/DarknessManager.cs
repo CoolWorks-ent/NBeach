@@ -116,7 +116,7 @@ namespace DarknessMinion
 		{
 			for (int i = 0; i < attackApprovalPriority.Count; i++)
 			{
-				if (i < darknessConcurrentAttackLimit-1)
+				if (i < darknessConcurrentAttackLimit)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
 				}

@@ -8,30 +8,39 @@ namespace DarknessMinion
 
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IS_AGGRESSIVE, PAUSED_FOR_NEXT_COMMAND, WANDER_NEAR, IN_ATTACK_RANGE, PLAYER_OUT_OF_RANGE, ATTACK_SUCCESSFULL, NAV_TARGET_CLOSE, IDLE_COMPLETE }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackSuccessfull, NavTargetClose, IdleComplete }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
         {
             Decisions = new Dictionary<DecisionName, Func<Darkness, bool>>();
-            Decisions.Add(DecisionName.IS_AGGRESSIVE, AggresiveCheck);
-            Decisions.Add(DecisionName.PAUSED_FOR_NEXT_COMMAND, AwaitingNextCommand);
-            Decisions.Add(DecisionName.WANDER_NEAR, ShouldWanderNear);
-            Decisions.Add(DecisionName.PLAYER_OUT_OF_RANGE, PlayerDistCheck);
-            Decisions.Add(DecisionName.IN_ATTACK_RANGE, CommitToAttack);
-            Decisions.Add(DecisionName.ATTACK_SUCCESSFULL, AttackSuccessfull);
-            Decisions.Add(DecisionName.NAV_TARGET_CLOSE, TargetDistClose);
-            Decisions.Add(DecisionName.IDLE_COMPLETE, IdleOnCooldown);
+            Decisions.Add(DecisionName.IsAggressive, AggresiveCheck);
+            Decisions.Add(DecisionName.PausedForNextCommand, PausedNextCommandCheck);
+            Decisions.Add(DecisionName.IsWandering, WanderingCheck);
+            Decisions.Add(DecisionName.PlayerOutOfRange, PlayerOutOfRangeCheck);
+            Decisions.Add(DecisionName.InAttackRange, AttackRangeCheck);
+            Decisions.Add(DecisionName.AttackSuccessfull, AttackOnCooldownCheck);
+            Decisions.Add(DecisionName.NavTargetClose, NavTargetCloseCheck);
+            Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
+            Decisions.Add(DecisionName.IsIdling, IdlingCheck);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
         {
-            if (controller != null)
-                return Decisions[dName].Invoke(controller);
-            else return false;
+            try
+            {
+                if (controller != null)
+                    return Decisions[dName].Invoke(controller);
+                else return false;
+            }
+            catch(KeyNotFoundException k)
+            {
+                Debug.LogError("Key not found in DarknDecisionMaker: " + dName.ToString() + "Resulting in this error " + k);
+                return false;
+            }
         }
 
-        private bool IdleOnCooldown(Darkness controller)
+        private bool IdleOnCooldownCheck(Darkness controller)
         {
             return !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Idling);
         }
@@ -41,60 +50,57 @@ namespace DarknessMinion
            return controller.agRatingCurrent == Darkness.AggresionRating.Attacking;
         }
 
-        private bool CommitToAttack(Darkness controller)
+        private bool AttackRangeCheck(Darkness controller)
         {
             if (controller.playerDist < controller.swtichDist)
-            {
                 return true;
-            }
             else return false;
         }
 
-        private bool AttackSuccessfull(Darkness controller)
+        private bool AttackSuccessfullCheck(Darkness controller)
         {
             if (controller.attacked)
-            {
                 return true;
-            }
             else return false;
         }
 
-        private bool AttackOnCooldown(Darkness controller)
+        private bool AttackOnCooldownCheck(Darkness controller)
         {
             return controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking);
         }
 
-        private bool AwaitingNextCommand(Darkness controller)
+        private bool PausedNextCommandCheck(Darkness controller)
         {
             if (controller.agRatingCurrent == Darkness.AggresionRating.Idling)
-            {
                 return true;
-            }
             else return false;
         }
 
-        private bool ShouldWanderNear(Darkness controller)
+        private bool WanderingCheck(Darkness controller)
         {
             if (controller.agRatingCurrent == Darkness.AggresionRating.Wandering)
-            {
                 return true;
-            }
             else return false;
         }
 
-        private bool PlayerDistCheck(Darkness controller)
+        private bool IdlingCheck(Darkness controller)
+        {
+            if(controller.agRatingCurrent == Darkness.AggresionRating.Idling)
+                return true;
+            else return false;
+        }
+
+        private bool PlayerOutOfRangeCheck(Darkness controller)
         {
             if (controller.playerDist > controller.swtichDist)
                 return true;
             else return false;
         }
 
-        private bool TargetDistClose(Darkness controller)
+        private bool NavTargetCloseCheck(Darkness controller)
         {
             if (controller.navTargetDist < controller.swtichDist)
-            {
                 return true;
-            }
             else return false;
         }
     }

@@ -41,7 +41,9 @@ namespace DarknessMinion
 		public override void MovementUpdate(Darkness controller)
 		{
 			Vector3 pDir = DarknessManager.Instance.player.position - controller.transform.position;
-			Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+			Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+			controller.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+			//Quaternion.RotateTowards(controller.transform.rotation,  DarknessManager.Instance.player.rotation, )
 		}
 
 		public override void ExitState(Darkness controller)

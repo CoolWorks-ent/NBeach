@@ -8,15 +8,16 @@ namespace DarknessMinion
     public class DarknessMovement : MonoBehaviour
     {
         public Transform target;
-        public Vector3 wayPoint, pathPoint, direction;
-        public bool moving;
-        public bool reachedEndOfPath, wandering, targetMoved;
+        public Vector3 wayPoint, pathPoint, direction, velocity, targetDirection;
+        public bool moving, reachedEndOfPath, wandering, targetMoved;
 
         private Seeker sekr;
         private Path navPath;
         private Rigidbody rigidbod;
         private Blocker bProvider;
         private MovementParams initialParameters, updatedParameters;
+
+        private float maxSpeed, maxAccel;
 
         void Awake()
         {
@@ -42,6 +43,14 @@ namespace DarknessMinion
                 direction = Vector3.Normalize(navPath.vectorPath[1] - this.transform.position);
                 rigidbod.AddForce(direction); //* speed);
                                               //rigidbod.MovePosition(direction * speed * Time.deltaTime);
+                float maxSpeedChange = maxAccel * Time.deltaTime;
+                Vector2 desiredVelocity = targetDirection * maxSpeed;
+                velocity = rigidbod.velocity;
+
+                velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+                velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.y, maxSpeedChange);
+
+                rigidbod.velocity = velocity;
             }
         }
 
