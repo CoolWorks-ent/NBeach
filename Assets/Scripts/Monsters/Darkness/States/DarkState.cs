@@ -39,8 +39,8 @@ namespace DarknessMinion
 			{
 				if (!ai.trueState.referencedBy.Contains(this))
 					ai.trueState.referencedBy.Add(this);
-				if (!ai.falseState.referencedBy.Contains(this))
-					ai.falseState.referencedBy.Add(this);
+				//if (!ai.falseState.referencedBy.Contains(this))
+				//	ai.falseState.referencedBy.Add(this);
 			}
 		}
 
@@ -64,14 +64,14 @@ namespace DarknessMinion
 				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, controller);
 				if (decisionResult)
 				{
-					if (darkTran.trueState.stateType != StateType.REMAIN)
-						controller.ChangeState(darkTran.trueState);
+					//if (darkTran.trueState.stateType != StateType.REMAIN)
+					controller.ChangeState(darkTran.trueState);
 				}
-				else 
+				/*else 
 				{
 					if (darkTran.falseState.stateType != StateType.REMAIN) 
 						controller.ChangeState(darkTran.falseState);
-				}
+				}*/
 			}
 		}
 

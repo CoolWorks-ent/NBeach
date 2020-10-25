@@ -13,6 +13,6 @@ namespace DarknessMinion
 
         public DarkDecisionMaker.DecisionName decisionChoice;
         public DarkState trueState;
-        public DarkState falseState;
+        //public DarkState falseState;
     }
 }

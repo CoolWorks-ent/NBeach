@@ -19,11 +19,6 @@ namespace DarknessMinion
 			stateType = StateType.WANDER;
 		}
 
-		public override void Startup()
-		{
-			base.Startup();
-		}
-
 		public override void InitializeState(Darkness controller)
 		{
 			base.InitializeState(controller);
