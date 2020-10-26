@@ -43,13 +43,12 @@ namespace DarknessMinion
 		public override void UpdateState(Darkness controller)
 		{
 			//controller.aIMovement.UpdatePath(controller.Target.position);
-			controller.pather.destination = controller.navTarget.navPosition;
 			CheckTransitions(controller);
 		}
 
 		public override void MovementUpdate(Darkness controller)
 		{
-
+			controller.pather.destination = controller.navTarget.navPosition;
 		}
 
 		protected override void CooldownCallback(Darkness controller)
@@ -60,8 +59,9 @@ namespace DarknessMinion
 
 		public override void ExitState(Darkness controller)
 		{
+			controller.navTarget.ReleaseTarget();
 			//controller.aIMovement.EndMovement();
-			//controller.pather.canMove = false;
+			controller.pather.canMove = false;
 			//controller.pather.canSearch = false;
 			//controller.pather.pickNextWaypointDist -= 0.5f;
 			//controller.pather.endReachedDistance -= 1.0f;

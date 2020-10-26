@@ -12,8 +12,8 @@ namespace DarknessMinion
         [Range(0, 5)]
         public float attackCooldown;
 
-        [Range(0, 3)]
-        public float attackInitiationRange;
+        [Range(0, 10)]
+        public float attackInitiationRange, attackSwitchTargetDistance;
 
 
         protected override void FirstTimeSetup()
@@ -32,33 +32,35 @@ namespace DarknessMinion
                 controller.pather.canMove = true;
             else controller.pather.canMove = false;
             controller.pather.canSearch = true;
+            
         }
 
         public override void UpdateState(Darkness controller)
         {
             //TODO check if the darkness is facing the player. if not start rotating towards the player
-            controller.pather.destination = controller.navTarget.navPosition;
-            if (controller.playerDist < attackInitiationRange && !controller.attacked)
+            
+            if (controller.playerDist < attackInitiationRange && !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))//&& !controller.attacked)
             {
                 //controller.attacked = true;
-                controller.animeController.SetTrigger(controller.attackHash);
                 controller.pather.canMove = false;
+                controller.animeController.SetTrigger(controller.attackHash);
+                
                 controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
                 controller.darkHitBox.enabled = true;
                 controller.attacked = true;
                 //if(controller.animeController.animation.)
                 //controller.StartCoroutine(controller.AttackCooldown(attackCooldown, controller.idleHash));
             }
-            /*else 
-            {
-                controller.pather.canMove = true;
-            }*/
+            //else controller.pather.canMove = true;
+
             CheckTransitions(controller);
         }
 
         public override void MovementUpdate(Darkness controller)
         {
-
+            if(controller.playerDist > attackSwitchTargetDistance)
+                controller.pather.destination = controller.navTarget.navPosition;
+            else controller.pather.destination = controller.navTarget.srcPosition;
         }
 
         public override void ExitState(Darkness controller)
@@ -68,16 +70,12 @@ namespace DarknessMinion
             //controller.animeController.SetBool(controller.attackAfterHash, true);
         }
 
-        private void AttackInitiated(Darkness controller)
-        {
-
-        }
-
         protected override void CooldownCallback(Darkness controller)
         {
             //animeController.SetTrigger(animationID);
             controller.attacked = false;
             controller.darkHitBox.enabled = false;
+            controller.pather.canMove = true;
         }
     }
 }

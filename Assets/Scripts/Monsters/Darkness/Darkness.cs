@@ -74,7 +74,7 @@ namespace DarknessMinion
 			//aIMovement = GetComponent<AI_Movement>();
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
-			pather.repathRate = 1.25f;
+			pather.repathRate = 0.85f;
 
 			//aIMovement.target = Target;
 		}

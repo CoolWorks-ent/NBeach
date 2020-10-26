@@ -8,7 +8,7 @@ namespace DarknessMinion
 
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackSuccessfull, NavTargetClose, IdleComplete }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
@@ -19,7 +19,7 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.IsWandering, WanderingCheck);
             Decisions.Add(DecisionName.PlayerOutOfRange, PlayerOutOfRangeCheck);
             Decisions.Add(DecisionName.InAttackRange, AttackRangeCheck);
-            Decisions.Add(DecisionName.AttackSuccessfull, AttackOnCooldownCheck);
+            Decisions.Add(DecisionName.AttackOnCooldown, AttackOnCooldownCheck);
             Decisions.Add(DecisionName.NavTargetClose, NavTargetCloseCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
