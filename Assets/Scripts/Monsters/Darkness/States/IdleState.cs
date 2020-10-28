@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace DarknessMinion
 {
-
-
+	
 	[CreateAssetMenu(menuName = "AI/Darkness/State/IdleState")]
 	public class IdleState : DarkState
 	{
@@ -22,7 +21,7 @@ namespace DarknessMinion
 			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			//controller.aIMovement.EndMovement();
 			if(controller.navTarget != null)
-				controller.navTarget.ReleaseTarget();
+				DarkEventManager.OnRequestNewTarget(controller.creationID);
 			controller.pather.canMove = false;
 			controller.animeController.SetTrigger(controller.idleHash);
 			controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));

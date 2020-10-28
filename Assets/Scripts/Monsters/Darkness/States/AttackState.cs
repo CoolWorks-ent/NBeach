@@ -39,13 +39,14 @@ namespace DarknessMinion
         {
             //TODO check if the darkness is facing the player. if not start rotating towards the player
             
-            if (controller.playerDist < attackInitiationRange && !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))//&& !controller.attacked)
+            if (controller.playerDist < attackInitiationRange && !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
             {
                 //controller.attacked = true;
                 controller.pather.canMove = false;
                 controller.animeController.SetTrigger(controller.attackHash);
                 
                 controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
+                controller.AddCooldown(new CooldownInfo(attackCooldown/4, CooldownStatus.Idling, IdleAnimation));
                 controller.darkHitBox.enabled = true;
                 controller.attacked = true;
                 //if(controller.animeController.animation.)
@@ -68,6 +69,11 @@ namespace DarknessMinion
             controller.pather.endReachedDistance -= 1.0f;
             //controller.attacked = false;
             //controller.animeController.SetBool(controller.attackAfterHash, true);
+        }
+
+        private void IdleAnimation(Darkness controller)
+        {
+            controller.animeController.SetTrigger(controller.idleHash);
         }
 
         protected override void CooldownCallback(Darkness controller)

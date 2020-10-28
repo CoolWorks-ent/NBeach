@@ -145,7 +145,6 @@ namespace DarknessMinion
 			agRatingCurrent = agR;
 		}
 
-
 		public bool CheckActionsOnCooldown(DarkState.CooldownStatus actType)
 		{
 			if (stateActionsOnCooldown.Count > 0)

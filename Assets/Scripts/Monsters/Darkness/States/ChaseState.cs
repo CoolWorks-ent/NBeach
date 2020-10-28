@@ -59,6 +59,7 @@ namespace DarknessMinion
 
 		public override void ExitState(Darkness controller)
 		{
+			base.ExitState(controller);
 			controller.navTarget.ReleaseTarget();
 			//controller.aIMovement.EndMovement();
 			controller.pather.canMove = false;
