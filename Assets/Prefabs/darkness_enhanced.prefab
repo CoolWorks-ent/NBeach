@@ -926,7 +926,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   penalty: 1000
-  randomStep: 5
+  randomStep: 10
 --- !u!114 &114511842479999518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -946,6 +946,7 @@ MonoBehaviour:
     claimed: 0
     position: {x: 0, y: 0, z: 0}
     positionOffset: {x: 0, y: 0, z: 0}
+    positionCloseToSource: {x: 0, y: 0, z: 0}
   patrolPoints: []
   pather: {fileID: 0}
   sekr: {fileID: 0}
@@ -966,6 +967,9 @@ MonoBehaviour:
   swtichDist: 0
   navTargetDist: 0
   stopDistance: 0
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &114648332704818778
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -996,10 +1000,10 @@ MonoBehaviour:
   rotationSpeed: 180
   slowdownDistance: 0.6
   pickNextWaypointDist: 0.99
-  endReachedDistance: 2
+  endReachedDistance: 0
   alwaysDrawGizmos: 1
   slowWhenNotFacingTarget: 1
-  whenCloseToDestination: 0
+  whenCloseToDestination: 1
   constrainInsideGraph: 1
 --- !u!114 &114857173380954124
 MonoBehaviour:

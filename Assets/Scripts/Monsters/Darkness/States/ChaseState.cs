@@ -9,6 +9,9 @@ namespace DarknessMinion
 	{
 		[Range(0.25f, 5)]
 		public float pathUpdateRate;
+		[Range(0, 10)]
+		public float switchToAttackDist;
+
 		protected override void FirstTimeSetup()
 		{
 			stateType = StateType.CHASING;
@@ -16,7 +19,7 @@ namespace DarknessMinion
 
 		public override void InitializeState(Darkness controller)
 		{
-			Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
+			//Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			if (controller.navTarget != null && controller.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
 				controller.navTarget.ReleaseTarget();
@@ -33,6 +36,7 @@ namespace DarknessMinion
 			controller.pather.destination = controller.navTarget.navPosition;
 			controller.pather.canMove = true;
 			controller.pather.canSearch = true;
+			controller.swtichDist = switchToAttackDist;
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
 			controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);

@@ -46,6 +46,7 @@ namespace DarknessMinion
 		public bool updateStates, attacked;
 		public int creationID;
 		public float playerDist, swtichDist, navTargetDist, stopDistance;
+		public LayerMask mask;
 
 		private Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo> stateActionsOnCooldown;
 
@@ -75,7 +76,7 @@ namespace DarknessMinion
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
 			pather.repathRate = 0.85f;
-
+			mask = LayerMask.GetMask("Darkness");
 			//aIMovement.target = Target;
 		}
 
@@ -205,7 +206,7 @@ namespace DarknessMinion
 		public void CreateDummyNavTarget(float elavation)
 		{
 			Vector3 randloc = new Vector3(UnityEngine.Random.Range(-10,10) + transform.position.x, elavation, UnityEngine.Random.Range(-5,5));
-			navTarget = new NavigationTarget(randloc, Vector3.zero, elavation, NavigationTarget.NavTargetTag.Neutral);
+			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
 		}
 
 		public void UpdateDebugMessage()
@@ -232,7 +233,8 @@ namespace DarknessMinion
 
         private void OnDrawGizmos()
         {
-			if(navTarget != null)
+			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, Color.red, 0.01f);
+			/*if(navTarget != null)
             {
 				switch (navTarget.navTargetTag)
 				{
@@ -256,7 +258,7 @@ namespace DarknessMinion
 						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
 						break;
 				}
-			}
+			}*/
         }
 
 	}

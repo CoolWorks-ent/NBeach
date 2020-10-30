@@ -15,15 +15,9 @@ namespace DarknessMinion
 
         public override void InitializeState(Darkness controller)
         {
-            Debug.LogWarning("Darkness entered death state");
+            //Debug.LogWarning("Darkness entered death state");
             //controller.aIRichPath.canMove = false;
-            controller.animeController.SetTrigger(controller.deathHash);
-
-            GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
-            //gameObject.GetComponent<MeshRenderer>().material.SetColor(Color.white);
-
-            //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-            controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
+            
             controller.StartCoroutine(deathRoutine(controller));
             //controller.aIMovement.EndMovement();
         }
@@ -38,10 +32,21 @@ namespace DarknessMinion
         }
 
         public override void MovementUpdate(Darkness controller) { }
-        protected override void CooldownCallback(Darkness controller) { }
+        protected override void CooldownCallback(Darkness controller) 
+        { 
+
+        }
 
         IEnumerator deathRoutine(Darkness controller)
         {
+            controller.animeController.SetTrigger(controller.deathHash);
+
+            GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
+            newFX.transform.SetParent(DarknessManager.Instance.transform);
+            
+            //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
+            controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
+
             float fxTime = 1;
             //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
             int maxPower = 10;
@@ -63,6 +68,7 @@ namespace DarknessMinion
             DarkEventManager.OnDarknessRemoved(controller);
             Destroy(controller.animeController);
             Destroy(controller.gameObject);
+            Destroy(newFX, 3.1f);
             yield return 0;
         }
     }
