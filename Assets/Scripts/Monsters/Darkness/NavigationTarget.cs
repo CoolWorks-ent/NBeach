@@ -13,7 +13,7 @@ namespace DarknessMinion
 		[SerializeField]
 		private bool claimed;
 		[SerializeField]
-		private Vector3 position, positionOffset;
+		private Vector3 position, positionOffset, positionCloseToSource;
 
 		private int claimedID;
 		private float groundElavation;
@@ -23,23 +23,31 @@ namespace DarknessMinion
 		public bool navTargetClaimed {  get { return claimed; } }
 		public NavTargetTag navTargetTag { get { return targetTag; } }
 		public Vector3 navPosition { get { return position + positionOffset; } }
-
+		public Vector3 closeToSrcPosition { get { return position + positionCloseToSource; } }
 		public Vector3 srcPosition { get { return position; } }
 
 		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
 		///<param name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
-		public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)//, bool act)
+		public NavigationTarget(Vector3 loc, Vector3 offset, Vector3 srcOffset, float elavation, NavTargetTag ntTag)//, bool act)
 		{
 			position = loc;
 			groundElavation = elavation;
-			//if(parent != null)
-			//	transform.parent = parent;
 			positionOffset = offset;
+			positionCloseToSource = srcOffset;
 			targetTag = ntTag;
 			claimed = false;
 			claimedID = 0;
-			//active = false;
-			//assignedDarknessIDs = new int[assignmentLimit];
+		}
+
+		public NavigationTarget(Vector3 loc, float elavation, NavTargetTag ntTag)
+		{
+			position = loc;
+			groundElavation = elavation;
+			positionOffset = Vector3.zero;
+			positionCloseToSource = Vector3.zero;
+			targetTag = ntTag;
+			claimed = false;
+			claimedID = 0;
 		}
 
 		public void ClaimTarget(int cID)

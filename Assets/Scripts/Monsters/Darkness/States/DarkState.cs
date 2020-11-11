@@ -46,7 +46,10 @@ namespace DarknessMinion
 
 		public abstract void InitializeState(Darkness controller);
 		public abstract void UpdateState(Darkness controller);
-		public abstract void ExitState(Darkness controller);
+		public virtual void ExitState(Darkness controller)
+		{
+			Debug.Log("Exiting this state: " + this.name);
+		}
 		public abstract void MovementUpdate(Darkness controller);
 		protected abstract void CooldownCallback(Darkness controller);
 

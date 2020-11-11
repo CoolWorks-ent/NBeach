@@ -9,37 +9,39 @@ public class DarknessTester : Editor
     {
         base.OnInspectorGUI();
 
-		if(GUILayout.Button("Spawn Darkness"))
+		if(EditorApplication.isPlaying)
 		{
-			TestOverseer.Instance.SpawnDarkness();
-		}
-
-		if(GUILayout.Button("Delete Darkness"))
-		{
-			TestOverseer.Instance.KillDarkness();
-		}
-
-		EditorGUILayout.BeginHorizontal();
-
-		if(GUILayout.Button("Move player Left"))
-		{
-			TestOverseer.Instance.MovePlayerObject(Vector3.left*5);
-		}
-
-		if(GUILayout.Button("Move player Right"))
-		{
-			TestOverseer.Instance.MovePlayerObject(Vector3.right*5);
-		}
-		EditorGUILayout.EndHorizontal();
-
-		if(TestOverseer.Instance != null)
-		{
-			if(TestOverseer.Instance.showDebugInfo)
+			if(GUILayout.Button("Spawn Darkness"))
 			{
-				TestOverseer.Instance.DisplayDebugInfo();
+				TestOverseer.Instance.SpawnDarkness();
 			}
-			else TestOverseer.Instance.DeactivateDebugInfo();
+
+			if(GUILayout.Button("Delete Darkness"))
+			{
+				TestOverseer.Instance.KillDarkness();
+			}
+
+			EditorGUILayout.BeginHorizontal();
+
+			if(GUILayout.Button("Move player Left"))
+			{
+				TestOverseer.Instance.MovePlayerObject(Vector3.left*5);
+			}
+
+			if(GUILayout.Button("Move player Right"))
+			{
+				TestOverseer.Instance.MovePlayerObject(Vector3.right*5);
+			}
+			EditorGUILayout.EndHorizontal();
+
+			if(TestOverseer.Instance != null)
+			{
+				if(TestOverseer.Instance.showDebugInfo)
+				{
+					TestOverseer.Instance.DisplayDebugInfo();
+				}
+				else TestOverseer.Instance.DeactivateDebugInfo();
+			}
 		}
     }
-
 }

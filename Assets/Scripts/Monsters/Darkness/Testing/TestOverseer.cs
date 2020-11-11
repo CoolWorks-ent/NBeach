@@ -18,6 +18,7 @@ namespace DarknessMinion
 
 		public void SpawnDarkness()
 		{
+			
 			if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
 			{
 				//Vector3 sLoc = Random.insideUnitCircle * 5;
