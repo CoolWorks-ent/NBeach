@@ -59,20 +59,20 @@ namespace DarknessMinion
 			//StartPoint = new Darkness.NavigationTarget(this.transform.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Neutral);
 			PlayerPoint = new NavigationTarget(player.position, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
 			List<Vector3> offsets = new List<Vector3>();
-			offsets.Add(new Vector3(attackOffset, 0, 1.8f));
-			offsets.Add(new Vector3(-attackOffset, 0, 1.8f));
-			offsets.Add(new Vector3(-attackOffset + 1.3f, 0, 2.5f));
-			offsets.Add(new Vector3(attackOffset - 1.3f, 0, 2.5f));
-			offsets.Add(new Vector3(0, 0, 2.25f));
+			offsets.Add(new Vector3(attackOffset, 0, -1.8f));
+			offsets.Add(new Vector3(-attackOffset, 0, -1.8f));
+			offsets.Add(new Vector3(-attackOffset + 1.3f, 0, -2.5f));
+			offsets.Add(new Vector3(attackOffset - 1.3f, 0, -2.5f));
+			offsets.Add(new Vector3(0, 0, -2.25f));
 
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
 				Vector3 vector;
 				if(offsets[i].x < 0)
-					vector = offsets[i] + new Vector3(1.5f, 0, -1.75f);
+					vector = offsets[i] + new Vector3(1.5f, 0, 1.75f);
 				else if(offsets[i].x > 0) 
-					vector = offsets[i] - new Vector3(1.5f, 0, 1.75f);
-				else vector = offsets[i] - new Vector3(0, 0, 1.65f);
+					vector = offsets[i] - new Vector3(1.5f, 0, -1.75f);
+				else vector = offsets[i] - new Vector3(0, 0, -1.65f);
 				AttackPoints[i] = new NavigationTarget(player.transform.position, offsets[i], vector, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
 				//Vector3 t = AttackPoints[i].position+offsets[i];
 				//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));

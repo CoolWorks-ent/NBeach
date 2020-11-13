@@ -76,7 +76,7 @@ namespace DarknessMinion
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
 			pather.repathRate = 0.85f;
-			mask = LayerMask.GetMask("Darkness");
+			mask = LayerMask.GetMask("Player");
 			//aIMovement.target = Target;
 		}
 

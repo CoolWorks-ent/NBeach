@@ -15,9 +15,6 @@ namespace DarknessMinion
         [Range(0, 10)]
         public float attackInitiationRange, attackSwitchTargetDistance;
 
-        // = 
-
-
         protected override void FirstTimeSetup()
         {
             stateType = StateType.ATTACK;
@@ -50,19 +47,22 @@ namespace DarknessMinion
             else 
             {
                 controller.pather.destination = controller.navTarget.closeToSrcPosition;
-
-                if(Physics.Raycast(controller.transform.position, controller.transform.forward*attackInitiationRange, attackInitiationRange, ~controller.mask)) //controller.playerDist < attackInitiationRange && 
+                RaycastHit info;
+                if(Physics.Raycast(controller.transform.position, controller.transform.forward*attackInitiationRange, out info, attackInitiationRange, controller.mask)) //controller.playerDist < attackInitiationRange && 
                 {
-                    //Debug.Log("Hit player");
-                    if(!controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
+                    Debug.Log("Hit collider: " + info.collider.name);
+                    if(info.collider.name == "Player")
                     {
-                    controller.pather.canMove = false;
-                    controller.animeController.SetTrigger(controller.attackHash);
-                    
-                    controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
-                    controller.AddCooldown(new CooldownInfo(attackCooldown/4, CooldownStatus.Idling, IdleAnimation));
-                    controller.darkHitBox.enabled = true;
-                    controller.attacked = true;
+                        if(!controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
+                        {
+                        controller.pather.canMove = false;
+                        controller.animeController.SetTrigger(controller.attackHash);
+                        
+                        controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
+                        controller.AddCooldown(new CooldownInfo(attackCooldown/4, CooldownStatus.Idling, IdleAnimation));
+                        controller.darkHitBox.enabled = true;
+                        controller.attacked = true;
+                        }
                     }
                 }
                 else if(controller.pather.reachedEndOfPath)
