@@ -34,8 +34,6 @@ namespace DarknessMinion
 			
 			darknessConcurrentAttackLimit = 2;
 			darknessIDCounter = 0;
-			maxEnemyCount = 6;
-			minEnemyCount = 1;
 			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
 			{
 				Debug.LogError("Instance of AI Manager already exist in this scene");

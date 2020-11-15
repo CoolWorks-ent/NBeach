@@ -60987,6 +60987,35 @@ GameObject:
   m_PrefabParentObject: {fileID: 1006897838119362, guid: 3f932d904fd1a0b4e9af1ec3f9dde9c6,
     type: 2}
   m_PrefabInternal: {fileID: 1840511982}
+--- !u!114 &991136311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 991136310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efee954c69f0d421086729bb8df1137f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  uniqueID: 8902354001617818975
+  points: []
+  convex: 1
+  minBoundsHeight: 1
+  penaltyDelta: 0
+  modifyWalkability: 0
+  setWalkability: 0
+  applyOnStart: 1
+  applyOnScan: 1
+  updatePhysics: 0
+  resetPenaltyOnPhysics: 1
+  updateErosion: 1
+  modifyTag: 1
+  setTag: 1
+  legacyMode: 0
+  serializedVersion: 1
+  legacyUseWorldSpace: 0
 --- !u!1 &1013247045
 GameObject:
   m_ObjectHideFlags: 0
@@ -85079,7 +85108,7 @@ Prefab:
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: tagNames.Array.size
-      value: 0
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
@@ -85131,7 +85160,7 @@ Prefab:
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: showGraphs
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
@@ -85146,12 +85175,12 @@ Prefab:
     - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: maxEnemyCount
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: data.dataString
-      value: UEsDBBQAAAgIAACAn+t5FNGhWwIAAAUFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQF1VMty4jAQ/BVK5w1l8zBhb7tAyB4IVMhWLr4Ia4xVyJJLj/Aq/n0lWWBwak92zXTPdM+MfUaUqwoyLeRcUrIQBNDPDnLv6EenSb7CAW8FX9MTXDGflOjCgbDHvGNNhY3HjqZECVrS7BffMgeObNBwmgtZzsgWJkJpZcM5ZgpsSgrt2NyGzh10CIRjeJ7cs3OxbxlwDbJBxeNed9gL0EHU7cVx0h8mgZOMPMnwjOGyAuLEN9z+YBCIvXHigdwaCxiXygRjVAVVSB8r73pdFSDB2SYUW5NejvNcAN0W2pW75y7zXIEORiQ+Tqm0s6qLot+iHmCJ1a4W9oWZcW2erTOvqa66+AZ4GsSjxJr1oFyK8vXaPo5cK13QbPeOjxlWLqilgVZ0+ijf8D1mO7xh8FkAfxNzKQwnDdUo6E3vVnZzOCkg2zW4WnAraKrvm42bzV78DA4TRsuNy3STfh1ZM+GnPnYkkHY/f6xifyoqlLJRp+Kvgg+8vb+pkHihUmmbCh25k7cRRjoomvmZOTdGT4TkIO8rVMAx08eVraPbq2zl/s96we7zCd1D7vpVtCg+3OCjqJVaif1tXaoQ+wWoYmk0oxyaUbvEmx3URHBeX5p6TDrW2sgcZ/cStoaSxwtDhGzGyfB5NMAbiONR/LSJcL+fQBTFg3yc533kj49y6xOzVS00jMeujTdtub2061+lM5e48ldPJN7P6akUdwIpz8U6kwB8WVe46lMgbRP7cZIZoXZAa9Cacr9wdE4RE9kOSHorlHqrs4OWOG2qpKiiX0K7SIom/l+Sogu6/ANQSwMEFAAACAgAAICf6yEFXbFsAAAAdwAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPSs9BRUEovSizIKAYKGII4pZkpIHa0UkpKkqWZqYW5SWJSqqGhuaFukkGisbFZqoGBoUmaZVqasVIsUH1JZUGqX2JuKkRPQGJJRlpmXkpmXrqee1FmijvIaKXYWgBQSwECLQAUAAAICAAAgJ/reRTRoVsCAAAFBQAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rIQVdsWwAAAB3AAAACQAkAAAAAAAAAAAAAACoAgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAF8DAAAAAA==
+      value: UEsDBBQAAAgIAACAn+uTTyg9WgIAAAgFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVE1z4jAM/SuMz1smAUphb7uB0j30Y8ru9JKLiRXiwbEz/ijQDv99ZcdAmp6Skd6T3pOUfBIuTQOFVXqlOXtUDMjPAfHv5MfgmnyAA90queYfcMa8cWYrD6IB80otVxhPPc2oGqzmxS+5FR6cYNBJXipdL9kWMmWswXBJhQFMaWU9W2Loc0AOkXCMzw//HJzwrQBpQV9R6Xw0vB1F6CQZjtJ0Or6dRs5sPJzNA8/JQtC6Aeb1d+jJuc20rS/RWoT4qoUSgpuoi9hjE3xntDEOXSGAcYo+gyJvuwK+rWyf/FyWBmz0oulxwTWOq61Kfqt2hjU1u1bYOxXO95mhuSCqrfr4DXAzSe+m6DeASq3qh3P71peteLF7pceCGtuZdTe8+KrfyT0VO7oR8FaBfFIrrZxkmLTaeaozMFp0Sl0sZhUUuyuuVdwLuub7dtPrdk9hCIdM8HrjI8NJG1gLFcY+9xzQuKA/KDhci4mVMOpF/DPwl267ZxUT91wbi6nYUHp1G+W0h5JlmJk342ymtIQQjpobkFTY4wuWsf1N9nKdtr3MPfUfUGwec+fvokcJ4Ss+SXqpF7W/LMtUav8Ipnp2VnDZLeYzTzioTEnZXlrH0pm2drqkRZe2dZx9vTDC2GY+vZ3dTegG0vQuvdkkdDyeQpKkk3JelmMSjo9LNErFS6s0zgfXJq9tJR7a+ccyWGnahKtnmu5X/KNWHYFclmpdaAD53Fa42AKNTfDrZEvGcUJrsJbLsHDymROhih2w/FIoD1aXB6tpfq2Sk4a/K+sjOcnC7yQnJ3L6D1BLAwQUAAAICAAAgJ/rIQVdsWwAAAB3AAAACQAkAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAatWKkstKs7Mz1OyUjDRM9Kz0FFQSi9KLMgoBgoYgjilmSkgdrRSSkqSpZmphblJYlKqoaG5oW6SQaKxsVmqgYGhSZplWpqxUixQfUllQapfYm4qRE9AYklGWmZeSmZeup57UWaKO8hopdhaAFBLAQItABQAAAgIAACAn+uTTyg9WgIAAAgFAAALACQAAAAAAAAAAAAAAAAAAABncmFwaDAuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLAQItABQAAAgIAACAn+shBV2xbAAAAHcAAAAJACQAAAAAAAAAAAAAAKcCAABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwUGAAAAAAIAAgC4AAAAXgMAAAAA
       objectReference: {fileID: 0}
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
@@ -85196,6 +85225,41 @@ Prefab:
     - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: heuristic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: showSearchTree
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: debugFloor
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: showUnwalkableNodes
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: manualDebugFloorRoof
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: tagNames.Array.data[12]
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: tagNames.Array.data[1]
+      value: Obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: minEnemyCount
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -91411,9 +91475,9 @@ MonoBehaviour:
   applyOnScan: 1
   updatePhysics: 0
   resetPenaltyOnPhysics: 1
-  updateErosion: 1
+  updateErosion: 0
   modifyTag: 0
-  setTag: 0
+  setTag: 1
   legacyMode: 0
   serializedVersion: 1
   legacyUseWorldSpace: 0
