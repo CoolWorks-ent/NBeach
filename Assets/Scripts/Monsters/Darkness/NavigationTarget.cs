@@ -17,14 +17,13 @@ namespace DarknessMinion
 
 		private int claimedID;
 		private float groundElavation;
-		private readonly NavTargetTag targetTag;
 		
-
+		public Transform objectTransform { get; private set; }
 		public bool navTargetClaimed {  get { return claimed; } }
-		public NavTargetTag navTargetTag { get { return targetTag; } }
+		public NavTargetTag navTargetTag { get; private set; }
 		public Vector3 navPosition { get { return position + positionOffset; } }
 		public Vector3 closeToSrcPosition { get { return position + positionCloseToSource; } }
-		public Vector3 srcPosition { get { return position; } }
+		public Vector3 transformPosition { get { return objectTransform.position; } }
 
 		///<param name="iD">Used in AI_Manager to keep track of the Attack points. Arbitrary for the Patrol points.</param>
 		///<param name="offset">Only used on targets that will be used for attacking. If non-attack point set to Vector3.Zero</param>
@@ -34,9 +33,15 @@ namespace DarknessMinion
 			groundElavation = elavation;
 			positionOffset = offset;
 			positionCloseToSource = srcOffset;
-			targetTag = ntTag;
+			navTargetTag = ntTag;
 			claimed = false;
 			claimedID = 0;
+		}
+
+		public NavigationTarget(Transform transform, NavTargetTag ntTag)
+		{
+			objectTransform = transform;
+			navTargetTag = ntTag;
 		}
 
 		public NavigationTarget(Vector3 loc, float elavation, NavTargetTag ntTag)
@@ -45,7 +50,7 @@ namespace DarknessMinion
 			groundElavation = elavation;
 			positionOffset = Vector3.zero;
 			positionCloseToSource = Vector3.zero;
-			targetTag = ntTag;
+			navTargetTag = ntTag;
 			claimed = false;
 			claimedID = 0;
 		}

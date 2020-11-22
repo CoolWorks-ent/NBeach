@@ -33,7 +33,7 @@ namespace DarknessMinion
 			}*/
 
 			controller.animeController.SetTrigger(controller.chaseHash);
-			controller.pather.destination = controller.navTarget.navPosition;
+			controller.pather.destination = controller.navTarget.transformPosition;
 			controller.pather.canMove = true;
 			controller.pather.canSearch = true;
 			controller.swtichDist = switchToAttackDist;
@@ -52,12 +52,12 @@ namespace DarknessMinion
 
 		public override void MovementUpdate(Darkness controller)
 		{
-			controller.pather.destination = controller.navTarget.navPosition;
+			controller.pather.destination = controller.navTarget.transformPosition;
 		}
 
 		protected override void CooldownCallback(Darkness controller)
 		{
-			controller.pather.destination = controller.navTarget.navPosition;
+			controller.pather.destination = controller.navTarget.transformPosition;
 			controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 		}
 

@@ -8,7 +8,7 @@ namespace DarknessMinion
 	public class DarknessManager : MonoBehaviour
 	{
 
-		public Transform player;
+		public Transform player, attackPointHolder;
 		public Transform oceanPlane;
 		public Dictionary<int, Darkness> ActiveDarkness;
 
@@ -22,7 +22,7 @@ namespace DarknessMinion
 		[SerializeField]
 		private NavigationTarget[] AttackPoints;
 		[SerializeField]
-		private NavigationTarget PlayerPoint; //StartPoint,
+		//private NavigationTarget PlayerPoint; //StartPoint,
 
 		public List<int> attackApprovalPriority;
 
@@ -48,23 +48,35 @@ namespace DarknessMinion
 			paused = false;
 			calculationTime = 0.5f;
 			attackOffset = 2.75f;
-			AttackPoints = new NavigationTarget[5];
+			
 			StartCoroutine(ManagedDarknessUpdate());
 		}
 
 		void Start()
 		{
 			//StartPoint = new Darkness.NavigationTarget(this.transform.position, Vector3.zero, oceanPlane.position.y, Darkness.NavTargetTag.Neutral);
-			PlayerPoint = new NavigationTarget(player.position, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
+			List<Transform> playerAttackPoints = new List<Transform>();
+			
+
+			foreach(Transform t in attackPointHolder.GetComponentsInChildren<Transform>())
+			{
+				if(!t.gameObject.CompareTag("Attack Points"))
+					playerAttackPoints.Add(t);
+			}
+			AttackPoints = new NavigationTarget[playerAttackPoints.Count];
+			/*PlayerPoint = new NavigationTarget(player.position, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
 			List<Vector3> offsets = new List<Vector3>();
 			offsets.Add(new Vector3(attackOffset, 0, -1.8f));
 			offsets.Add(new Vector3(-attackOffset, 0, -1.8f));
 			offsets.Add(new Vector3(-attackOffset + 1.3f, 0, -2.5f));
 			offsets.Add(new Vector3(attackOffset - 1.3f, 0, -2.5f));
-			offsets.Add(new Vector3(0, 0, -2.25f));
+			offsets.Add(new Vector3(0, 0, -2.25f));*/
 
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
+				AttackPoints[i] = new NavigationTarget(playerAttackPoints[i], NavigationTarget.NavTargetTag.Attack);
+				//Debug.Log("Attack point locaiton " + AttackPoints[i].objectTransform.position);
+				/*
 				Vector3 vector;
 				if(offsets[i].x < 0)
 					vector = offsets[i] + new Vector3(1.5f, 0, 1.75f);
@@ -72,23 +84,19 @@ namespace DarknessMinion
 					vector = offsets[i] - new Vector3(1.5f, 0, -1.75f);
 				else vector = offsets[i] - new Vector3(0, 0, -1.65f);
 				AttackPoints[i] = new NavigationTarget(player.transform.position, offsets[i], vector, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
+				*/
 				//Vector3 t = AttackPoints[i].position+offsets[i];
 				//Debug.LogWarning(string.Format("Attack point location AttackPoint[{0}]" + t, i));
 			}
-
-			//AttackPoints[0].position = new Vector3(player.position.x + attackOffset, player.position.y-0.5f, player.position.z);//right of player
-			//AttackPoints[1].position = new Vector3(player.position.x - attackOffset, player.position.y-0.5f, player.position.z);//left of player
-			//AttackPoints[2].position = new Vector3(player.position.x - attackOffset/2, player.position.y-0.5f, player.position.z);
-			//AttackPoints[3].position = new Vector3(player.position.x + attackOffset/2, player.position.y-0.5f, player.position.z);
 		}
 
 		void LateUpdate()
 		{
-			PlayerPoint.UpdateLocation(player.position);
-			foreach(NavigationTarget point in AttackPoints)
+			//PlayerPoint.UpdateLocation(player.position);
+			/*foreach(NavigationTarget point in AttackPoints)
 			{
 				point.UpdateLocation(player.position);
-			}
+			}*/
 		}
 
 		#region DarknessUpdateLoop
@@ -270,9 +278,9 @@ namespace DarknessMinion
 					Gizmos.color = Color.red;
 				}
 				else Gizmos.color = Color.yellow;
-				Gizmos.DrawSphere(n.navPosition, 1);
-				Gizmos.color = Color.green;
-				Gizmos.DrawSphere(n.closeToSrcPosition, 0.5f);
+				Gizmos.DrawSphere(n.objectTransform.position, 1);
+				//Gizmos.color = Color.green;
+				//Gizmos.DrawSphere(n.closeToSrcPosition, 0.5f);
 			}
         }
 	}
