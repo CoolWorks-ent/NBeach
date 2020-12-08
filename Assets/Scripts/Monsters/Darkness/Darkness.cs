@@ -46,6 +46,7 @@ namespace DarknessMinion
 		private Animator animeController;
 
 		private Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo> stateActionsOnCooldown;
+		private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
 		private int stateAnimID;
 
@@ -58,6 +59,7 @@ namespace DarknessMinion
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			attacked = false;
 			stateActionsOnCooldown = new Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo>();
+			stateCache = new List<GameObject>();
 		}
 
 		void Start()
@@ -183,6 +185,27 @@ namespace DarknessMinion
 				stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
 				stateActionsOnCooldown.Remove(cdStatus);
 			}
+		}
+
+		public void AddToStateCache(GameObject obj)
+		{
+			stateCache.Add(obj);
+		}
+
+		public GameObject GetLastObjectFromCache()
+		{
+			return stateCache[stateCache.Count-1];
+		}
+
+		public void RemoveFromStateCache(GameObject obj)
+		{
+			if(stateCache.Contains(obj))
+				stateCache.Remove(obj);
+		}
+
+		public void ClearStateCache()
+		{
+			stateCache.Clear();
 		}
 
 		private void OnTriggerEnter(Collider col)

@@ -6,10 +6,15 @@ namespace DarknessMinion
     public class SpawnState : DarkState
     {
 		public GameObject spawnFX;
+		[Range(0, 10)]
+		public float spawnAnimTime;
 		//public SpawnState(Darkness dControl) : base(dControl){ }
 		public override void InitializeState(Darkness darkController)
 		{
-			darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Spawn, CooldownCallback));
+			GameObject newFX = Instantiate(spawnFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
+            newFX.transform.SetParent(darkController.transform);
+			darkController.AddToStateCache(newFX);
+			darkController.AddCooldown(new CooldownInfo(spawnAnimTime, CooldownStatus.Spawn, CooldownCallback)); //darkController.CurrentAnimationLength()
 		}
 
 		public override void UpdateState(Darkness darkController)
@@ -29,7 +34,9 @@ namespace DarknessMinion
 		protected override void CooldownCallback(Darkness darkController)
         {
             //Destroy particles that were spawned
+			//Destroy(darkController.GetLastObjectFromCache());
 			CheckTransitions(darkController);
+			darkController.ClearStateCache();
         }
     }
 }
