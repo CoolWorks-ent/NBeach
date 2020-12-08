@@ -957,7 +957,7 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 0
-  deathState: {fileID: 11400000, guid: 82e41e67b07d12d4c804f43a0b55aef5, type: 2}
+  deathState: {fileID: 11400000, guid: 32b5dd3e54201bf4aaa09778b5367071, type: 2}
   spawnState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114648332704818778
