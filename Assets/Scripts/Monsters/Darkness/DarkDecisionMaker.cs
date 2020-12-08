@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace DarknessMinion
 {
-
     public class DarkDecisionMaker
     {
         public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete }
@@ -35,7 +34,7 @@ namespace DarknessMinion
             }
             catch(KeyNotFoundException k)
             {
-                Debug.LogError("Key not found in DarknDecisionMaker: " + dName.ToString() + "Resulting in this error " + k);
+                Debug.LogError("Key not found in DarkDecisionMaker: " + dName.ToString() + "Resulting in this error " + k);
                 return false;
             }
         }

@@ -9,7 +9,6 @@ namespace DarknessMinion
 	{
 
 		public Transform player, attackPointHolder;
-		public Transform oceanPlane;
 		public Dictionary<int, Darkness> ActiveDarkness;
 
 		[SerializeField]
@@ -25,6 +24,8 @@ namespace DarknessMinion
 		//private NavigationTarget PlayerPoint; //StartPoint,
 
 		public List<int> attackApprovalPriority;
+
+		public float groundLevel {get { return player.position.y; }}
 
 		public static DarknessManager Instance { get; private set; }
 
@@ -64,13 +65,6 @@ namespace DarknessMinion
 					playerAttackPoints.Add(t);
 			}
 			AttackPoints = new NavigationTarget[playerAttackPoints.Count];
-			/*PlayerPoint = new NavigationTarget(player.position, oceanPlane.position.y, NavigationTarget.NavTargetTag.Attack);
-			List<Vector3> offsets = new List<Vector3>();
-			offsets.Add(new Vector3(attackOffset, 0, -1.8f));
-			offsets.Add(new Vector3(-attackOffset, 0, -1.8f));
-			offsets.Add(new Vector3(-attackOffset + 1.3f, 0, -2.5f));
-			offsets.Add(new Vector3(attackOffset - 1.3f, 0, -2.5f));
-			offsets.Add(new Vector3(0, 0, -2.25f));*/
 
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
@@ -98,6 +92,12 @@ namespace DarknessMinion
 				point.UpdateLocation(player.position);
 			}*/
 		}
+		#region Helpers
+		public Vector3 PlayerToDirection(Vector3 start)
+		{
+			return player.position - start;
+		}
+		#endregion
 
 		#region DarknessUpdateLoop
 
@@ -109,17 +109,18 @@ namespace DarknessMinion
 				if (attackApprovalPriority.Count > 0)
 				{
 					//ActiveDarkness.Values.CopyTo(closestDarkness,0);
-					foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
+					/*foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
 					{
 						dark.Value.DistanceEvaluation(player.position);
-					}
+					}*/
+					DarkEventManager.OnUpdateDarknessDistance(player.position);
 					SortTheGoons();
 					//yield return new WaitForSeconds(calculationTime / 3);
 					UpdateDarknessAggresion();
 					yield return new WaitForSeconds(calculationTime);
-					DarkEventManager.OnUpdateDarkness();
+					DarkEventManager.OnUpdateDarknessStates();
 				}
-				else yield return new WaitForSeconds(0.5f);
+				else yield return new WaitForSeconds(calculationTime);
 			}
 			yield return null;
 		}
@@ -132,7 +133,7 @@ namespace DarknessMinion
 			{
 				if (i < darknessConcurrentAttackLimit)
 				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Attacking);
+					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Attacking);
 				}
 				/*else if (i < darknessConcurrentAttackLimit + 2)
 				{
@@ -140,7 +141,7 @@ namespace DarknessMinion
 				}*/
 				else
 				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Idling);
+					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Idling);
 				}
 			}
 		}
@@ -173,18 +174,6 @@ namespace DarknessMinion
 			{
 				lowest = evenCount[Random.Range(0, evenCount.Count - 1)];
 				return lowest;
-				/*int t = 0;
-				for (int x = 0; x <= 5; x++)
-				{
-					t = evenCount[Random.Range(0, evenCount.Count - 1)];
-					if (t == lowest)
-						continue;
-					else
-					{
-						lowest = t;
-						break;
-					}
-				}*/
 			}
 			else if (evenCount.Count < 2 && evenCount.Count > 0)
 				return evenCount[0];
@@ -224,7 +213,7 @@ namespace DarknessMinion
 					if(darkness.navTarget.navTargetTag == NavigationTarget.NavTargetTag.Attack)
 					{
 						RemoveFromNavTargets(darkID);
-						darkness.CreateDummyNavTarget(oceanPlane.position.y);
+						darkness.CreateDummyNavTarget(player.position.y);
 					}
 				}
 			}
@@ -237,12 +226,11 @@ namespace DarknessMinion
 		{
 			updatedDarkness.transform.SetParent(Instance.transform);
 			darknessIDCounter++;
-			updatedDarkness.creationID = darknessIDCounter;
-			updatedDarkness.navTarget = null;
+			
+			updatedDarkness.Spawn(darknessIDCounter, groundLevel);
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);
-			updatedDarkness.CreateDummyNavTarget(oceanPlane.position.y);
 			Vector3 pDir = player.position - updatedDarkness.transform.position;
 			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
 			//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
@@ -256,21 +244,26 @@ namespace DarknessMinion
 			ActiveDarkness.Remove(updatedDarkness.creationID);
 		}
 
+		[ContextMenu("Test KillAllDarkness")]
 		public void KillAllDarkness()
 		{
 			Debug.Log("[AI] All Darkness AI kill call");
 			foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
 			{
-				dark.Value.ChangeState(dark.Value.deathState);
+				dark.Value.KillDarkness();
 				RemoveFromDarknessList(dark.Value);
 				ActiveDarkness.Remove(dark.Key);
 			}
+		}
+
+		public bool CheckIfSpawnFull()
+		{
+			return ActiveDarkness.Count > maxEnemyCount;
 		}
 		#endregion
 
 		private void OnDrawGizmos()
         {
-			
 			foreach(NavigationTarget n in AttackPoints)
 			{
 				if(n.navTargetClaimed)
@@ -284,6 +277,4 @@ namespace DarknessMinion
 			}
         }
 	}
-
-
 }

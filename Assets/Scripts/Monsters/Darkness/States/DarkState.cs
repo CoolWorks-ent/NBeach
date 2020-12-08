@@ -5,88 +5,59 @@ using System.Linq;
 
 namespace DarknessMinion
 {
-
 	public abstract class DarkState : ScriptableObject
 	{
-		public enum StateType { CHASING, IDLE, ATTACK, DEATH, REMAIN, WANDER }
-		public enum CooldownStatus { Attacking, Patrolling, Idling, Moving }
-
-		//public enum TargetType { DIRECT_PLAYER, FLANK_PLAYER, PATROL }
-		public StateType stateType;
+		//protected readonly Darkness darkController;
+		public enum CooldownStatus { Attacking, Patrolling, Idling, Moving, Spawn}
 		public DarkTransition[] transitions;
 		public List<DarkState> referencedBy;
-		//protected Lookup<AI_Transition.Transition_Priority, AI_Transition> priorityTransitions;
-		//[SerializeField, Range(0, 3)]
-		//public float speedModifier;
+		protected Lookup<DarkTransition.TransitionPriority, DarkTransition> priorityTransitions;
 
-		//[SerializeField, Range(0, 15)]
-		//protected float stopDist;
-
-		//[SerializeField, Range(0,360)]
-		//protected int rotationSpeed;
-
-		//[SerializeField, Range(0, 5)]
-		//protected float pathUpdateRate;
-
-
-
-		public virtual void Startup()
+		public void SortTransitionsByPriority()
 		{
-			DarkEventManager.RemoveDarkness += RemoveDarkness;
-			//if (referencedBy == null || referencedBy.Count < 1)
+			//DarkEventManager.RemoveDarkness += RemoveDarkness;
+			if(transitions != null || transitions.Count() > 0)
+				Array.Sort(transitions, ((t, p) => {return t.priorityLevel.CompareTo(p.priorityLevel);}));
+		}
+
+		public void UpdateReferences()
+		{
 			referencedBy = new List<DarkState>();
-			foreach (DarkTransition ai in transitions)
+			foreach (DarkTransition t in transitions)
 			{
-				if (!ai.trueState.referencedBy.Contains(this))
-					ai.trueState.referencedBy.Add(this);
-				//if (!ai.falseState.referencedBy.Contains(this))
-				//	ai.falseState.referencedBy.Add(this);
+				if(t.trueState != null)
+				{
+					//if (!t.trueState.referencedBy.Contains(this))
+					t.trueState.referencedBy.Add(this);
+				}
 			}
 		}
 
-		public abstract void InitializeState(Darkness controller);
-		public abstract void UpdateState(Darkness controller);
-		public virtual void ExitState(Darkness controller)
+		public abstract void InitializeState(Darkness darkController);
+		public abstract void UpdateState(Darkness darkController);
+		public virtual void ExitState(Darkness darkController)
 		{
-			Debug.Log("Exiting this state: " + this.name);
+			darkController.ClearCooldowns();
 		}
-		public abstract void MovementUpdate(Darkness controller);
-		protected abstract void CooldownCallback(Darkness controller);
-
-
-
-		protected virtual void FirstTimeSetup()
-		{
-			stateType = StateType.REMAIN;
-		}
-
-		protected void CheckTransitions(Darkness controller)
+		public virtual void MovementUpdate(Darkness darkController){}
+		protected abstract void CooldownCallback(Darkness darkController);
+		protected void CheckTransitions(Darkness darkController)
 		{
 			foreach (DarkTransition darkTran in transitions)
 			{
-				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, controller);
+				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, darkController);
 				if (decisionResult)
 				{
-					//if (darkTran.trueState.stateType != StateType.REMAIN)
-					controller.ChangeState(darkTran.trueState);
+					darkController.ChangeState(darkTran.trueState);
 				}
-				/*else 
-				{
-					if (darkTran.falseState.stateType != StateType.REMAIN) 
-						controller.ChangeState(darkTran.falseState);
-				}*/
 			}
 		}
 
-		protected void RemoveDarkness(Darkness controller)
+		/*protected void RemoveDarkness()
 		{
-			if (stateType != DarkState.StateType.DEATH)
-			{
-				this.ExitState(controller);
-				controller.updateStates = false;
-				//controller.ChangeState(controller.DeathState);
-			}
-		}
+			this.ExitState(); //fire this if not in the Death state already
+			darkController.updateStates = false;
+		}*/
 
 		public class CooldownInfo
 		{
@@ -104,9 +75,12 @@ namespace DarknessMinion
 				Callback = cback;
 			}
 
-			public void UpdateTime(float time)
+			public bool UpdateTime(float time)
 			{
 				remainingTime = Mathf.Max(remainingTime - time, 0);
+				if(remainingTime == 0)
+					return false;
+				else return true;
 			}
 
 			public bool CheckTimerComplete()

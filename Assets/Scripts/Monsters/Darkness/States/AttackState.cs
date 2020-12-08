@@ -4,96 +4,87 @@ using System.Collections;
 namespace DarknessMinion
 {
 
-    [CreateAssetMenu(menuName = "AI/Darkness/State/AttackState")]
+    [CreateAssetMenu(menuName = "Darkness/AttackState")]
     public class AttackState : DarkState
     {
-        [Range(1, 3)]
-        public int attackSpeedModifier;
         [Range(0, 5)]
         public float attackCooldown;
 
-        [Range(0, 10)]
-        public float attackInitiationRange, attackSwitchTargetDistance;
+        //[Range(0, 10)]
+        //public float attackInitiationRange, attackSwitchTargetDistance;
 
-        protected override void FirstTimeSetup()
-        {
-            stateType = StateType.ATTACK;
-        }
+        //public AttackState(Darkness dControl) : base(dControl){ }
 
-        public override void InitializeState(Darkness controller)
-        {
-            //Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
-            //base.InitializeState(controller);
-            //DarkEventManager.OnRequestNewTarget(controller.creationID);
-            
+        public override void InitializeState(Darkness darkController)
+        {   
             //controller.pather.destination = controller.navTarget.srcPosition;
-            if (controller.playerDist > attackInitiationRange)
-                controller.pather.canMove = true;
-            else controller.pather.canMove = false;
-            controller.pather.canSearch = true;
-            controller.pather.endReachedDistance = attackInitiationRange;
+            /*if (darkController.playerDist > attackInitiationRange)
+                darkController.pather.canMove = true;
+            else darkController.pather.canMove = false;*/
+            //darkController.pather.canSearch = false;
+            darkController.pather.canMove = false;
+            //darkController.pather.endReachedDistance = attackInitiationRange;
         }
 
-        public override void UpdateState(Darkness controller)
+        public override void UpdateState(Darkness darkController)
         {
             //TODO check if the darkness is facing the player. if not start rotating towards the player
-            CheckTransitions(controller);
+            CheckTransitions(darkController);
         }
 
-        public override void MovementUpdate(Darkness controller) //TODO figure out how I should stop and rotate towards the player. Where should these checks happen?
+        public override void MovementUpdate(Darkness darkController) //TODO figure out how I should stop and rotate towards the player. Where should these checks happen?
         {
-            if(controller.playerDist > attackSwitchTargetDistance)//if(!controller.pather.reachedEndOfPath)
-                controller.pather.destination = controller.navTarget.navPosition;
-            else 
+            darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
+            RaycastHit info;
+            if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out info, 5, darkController.mask)) //controller.playerDist < attackInitiationRange && 
             {
-                controller.pather.destination = controller.navTarget.closeToSrcPosition;
-                RaycastHit info;
-                if(Physics.Raycast(controller.transform.position, controller.transform.forward*attackInitiationRange, out info, attackInitiationRange, controller.mask)) //controller.playerDist < attackInitiationRange && 
+                Debug.Log("Hit collider: " + info.collider.name);
+                if(info.collider.name == "Player")
                 {
-                    Debug.Log("Hit collider: " + info.collider.name);
-                    if(info.collider.name == "Player")
+                    if(!darkController.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
                     {
-                        if(!controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
-                        {
-                        controller.pather.canMove = false;
-                        controller.animeController.SetTrigger(controller.attackHash);
+                        darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
+                        //controller.animeController.SetTrigger(controller.attackTrigHash);
                         
-                        controller.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
-                        controller.AddCooldown(new CooldownInfo(attackCooldown/4, CooldownStatus.Idling, IdleAnimation));
-                        controller.darkHitBox.enabled = true;
-                        controller.attacked = true;
-                        }
+                        darkController.AddCooldown(new CooldownInfo(attackCooldown, CooldownStatus.Attacking, CooldownCallback));
+                        darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
+                        darkController.darkHitBox.enabled = true;
+                        darkController.attacked = true;
                     }
                 }
-                else if(controller.pather.reachedEndOfPath)
-                {
-                    //controller.pather.canMove = false;
-                    controller.animeController.SetTrigger(controller.idleHash);
-                    Vector3 pDir = DarknessManager.Instance.player.position - controller.transform.position;
-                    Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
-                    controller.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
-                }
+            }
+            else
+            {
+                //controller.pather.canMove = false;
+                //controller.animeController.SetTrigger(controller.idleTrigHash);
+                if(darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
+                    darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+                Vector3 pDir = DarknessManager.Instance.PlayerToDirection(darkController.transform.position);
+                Vector3 dir = Vector3.RotateTowards(darkController.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+                darkController.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
             }
         }
 
-        public override void ExitState(Darkness controller)
+        public override void ExitState(Darkness darkController)
         {
-            controller.pather.endReachedDistance -= 1.0f;
+            darkController.pather.endReachedDistance -= 1.0f;
+            base.ExitState(darkController);
             //controller.attacked = false;
             //controller.animeController.SetBool(controller.attackAfterHash, true);
         }
 
-        private void IdleAnimation(Darkness controller)
+        private void IdleAnimation(Darkness darkController)
         {
-            controller.animeController.SetTrigger(controller.idleHash);
+            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+            //controller.animeController.SetTrigger(controller.idleTrigHash);
         }
 
-        protected override void CooldownCallback(Darkness controller)
+        protected override void CooldownCallback(Darkness darkController)
         {
-            controller.darkHitBox.enabled = false;
+            darkController.darkHitBox.enabled = false;
             //animeController.SetTrigger(animationID);
-            controller.attacked = false;
-            controller.pather.canMove = true;
+            darkController.attacked = false;
+            darkController.pather.canMove = true;
         }
     }
 }

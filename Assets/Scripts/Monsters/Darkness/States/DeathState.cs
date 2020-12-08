@@ -1,56 +1,49 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace DarknessMinion
 {
-
-    [CreateAssetMenu(menuName = "AI/Darkness/State/DeathState")]
+    [CreateAssetMenu(menuName = "Darkness/DeathState")]
     public class DeathState : DarkState
     {
-        protected override void FirstTimeSetup()
-        {
-            stateType = StateType.DEATH;
-        }
+        //public DeathState(Darkness dControl) : base(dControl){ }
 
-        public override void InitializeState(Darkness controller)
-        {
-            //Debug.LogWarning("Darkness entered death state");
-            //controller.aIRichPath.canMove = false;
-            
-            controller.StartCoroutine(deathRoutine(controller));
+        public GameObject deathFX;
+
+        public override void InitializeState(Darkness darkController)
+        {   
+            darkController.StartCoroutine(DeathRoutine(darkController));
             //controller.aIMovement.EndMovement();
         }
 
-        public override void UpdateState(Darkness controller)
-        {
+        public override void UpdateState(Darkness darkController){ }
+
+        public override void ExitState(Darkness darkController)
+        { 
+            base.ExitState(darkController);
         }
 
-        public override void ExitState(Darkness controller)
-        {
-            //AI_Manager.OnDarknessRemoved(controller);
-        }
-
-        public override void MovementUpdate(Darkness controller) { }
-        protected override void CooldownCallback(Darkness controller) 
+        public override void MovementUpdate(Darkness darkController) { }
+        protected override void CooldownCallback(Darkness darkController) 
         { 
 
         }
 
-        IEnumerator deathRoutine(Darkness controller)
+        public IEnumerator DeathRoutine(Darkness darkController)
         {
-            controller.animeController.SetTrigger(controller.deathHash);
+            //controller.animeController.SetTrigger(controller.deathTrigHash);
+            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Death);
 
-            GameObject newFX = Instantiate(controller.deathFX.gameObject, controller.transform.position, Quaternion.identity) as GameObject;
+            GameObject newFX = Instantiate(deathFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             newFX.transform.SetParent(DarknessManager.Instance.transform);
             
             //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
-            controller.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
+            darkController.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
 
             float fxTime = 1;
             //Slowly increase texture power over the FX lifetime to show the Darkness "Glowing" and explode!
             int maxPower = 10;
-            SkinnedMeshRenderer renderer = controller.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer renderer = darkController.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
             float curPower = renderer.material.GetFloat("_MainTexturePower");
             float curTime = 0;
             while (curTime < fxTime)
@@ -63,11 +56,11 @@ namespace DarknessMinion
 
             //yield return new WaitForSeconds(fxTime);
             //AI_Manager.Instance.RemoveFromDarknessList(controller);
-            controller.gameObject.SetActive(false);
-            controller.navTarget.ReleaseTarget();
-            DarkEventManager.OnDarknessRemoved(controller);
-            Destroy(controller.animeController);
-            Destroy(controller.gameObject);
+            darkController.gameObject.SetActive(false);
+            darkController.navTarget.ReleaseTarget();
+            DarkEventManager.OnDarknessRemoved(darkController);
+            //Destroy(controller.animeController);
+            Destroy(darkController.gameObject);
             Destroy(newFX, 3.1f);
             yield return 0;
         }

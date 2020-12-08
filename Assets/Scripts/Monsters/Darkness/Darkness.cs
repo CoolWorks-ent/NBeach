@@ -11,50 +11,47 @@ using System;
 
 namespace DarknessMinion
 {
-	public class Darkness : MonoBehaviour, IDarkDebug
+	public class Darkness : MonoBehaviour
 	{
-
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
+
+		public enum DarkAnimationStates {Spawn, Idle, Chase, Attack, Death}
+
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		public DarkState previousState, currentState;
 		public NavigationTarget navTarget;
-		public NavigationTarget[] patrolPoints;
+
+		//public NavigationTarget[] patrolPoints;
 
 		[HideInInspector]
 		public AIPath pather;
 
 		[HideInInspector]
 		public Seeker sekr;
+
+		[HideInInspector]
 		public Collider darkHitBox;
 
 		[HideInInspector]
-		public string debugMessage {get; set;}
-
 		public TextMesh textMesh;
-
-		public GameObject deathFX;
-		public DarkState deathState;
-		public Animator animeController;
-
-		[HideInInspector]
-		public int attackHash = Animator.StringToHash("Attack"),
-					attackAfterHash = Animator.StringToHash("AfterAttack"),
-					chaseHash = Animator.StringToHash("Chase"),
-					idleHash = Animator.StringToHash("Idle"),
-					deathHash = Animator.StringToHash("Death");
 		public bool updateStates, attacked;
-		public int creationID;
-		public float playerDist, swtichDist, navTargetDist, stopDistance;
+		public float playerDist, swtichDist, navTargetDist;
 		public LayerMask mask;
+		public int creationID { get; private set;}
+
+		[SerializeField] //Tooltip("Assign in Editor"),
+		private DarkState deathState, spawnState, currentState;
+		private DarkState previousState;
+
+		private Animator animeController;
 
 		private Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo> stateActionsOnCooldown;
+		private string debugMessage {get; set;}
+		private int stateAnimID;
 
 		void Awake()
 		{
-			//attackInitiationRange = 2.5f;
-			stopDistance = 3;
-			swtichDist = 4.6f; //attackInitiationRange*1.85f;
+			swtichDist = 4.6f; 
 			creationID = 0;
 			navTargetDist = -1;
 			updateStates = true;
@@ -70,46 +67,18 @@ namespace DarknessMinion
 			pather = GetComponent<AIPath>();
 			sekr = GetComponent<Seeker>();
 			darkHitBox = GetComponent<CapsuleCollider>();
-			DarkEventManager.OnDarknessAdded(this);
-			DarkEventManager.UpdateDarkness += UpdateStates;
 			//aIMovement = GetComponent<AI_Movement>();
+			currentState = spawnState;
 			currentState.InitializeState(this);
 			darkHitBox.enabled = false;
 			pather.repathRate = 0.85f;
 			mask = LayerMask.GetMask("Player");
+			stateAnimID = Animator.StringToHash("StateID");
+			DarkEventManager.OnDarknessAdded(this);
+			DarkEventManager.UpdateDarknessStates += UpdateStates;
+			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
 			//aIMovement.target = Target;
-		}
-
-		/*public IEnumerator StateTransition(Dark_State nextState)
-		{
-			//if(nextState.stateType != currentState.stateType)
-			if(nextState != currentState)
-			{
-				previousState = currentState;
-				currentState = nextState;
-				yield return new WaitForSeconds(previousState.transitionTime);
-				previousState.ExitState(this);            
-				currentState.InitializeState(this);
-			}
-			yield return null;
-		}*/
-
-		public void ChangeState(DarkState nextState)
-		{
-			previousState = currentState;
-			currentState = nextState;
-			previousState.ExitState(this);
-			currentState.InitializeState(this);
-			/*if(nextState.stateType == Dark_State.StateType.DEATH)
-			{
-				previousState = currentState;
-				currentState.ExitState(this);
-				currentState = nextState;
-				currentState.InitializeState(this);
-			} 
-			//else if (nextState.stateType == Dark_State.StateType.ATTACK && currentState.stateType == Dark_State.StateType.CHASING)
-			else StartCoroutine(StateTransition(nextState));*/
-
+			//ChangeAnimation(DarkAnimationStates.Spawn);
 		}
 
 		void FixedUpdate()
@@ -124,11 +93,43 @@ namespace DarknessMinion
 				UpdateCooldownTimers();
 		}
 
+		public void ChangeState(DarkState nextState)
+		{
+			previousState = currentState;
+			currentState = nextState;
+			previousState.ExitState(this);
+			currentState.InitializeState(this);
+		}
+
+		public void Spawn(int createID, float spawnHeight)
+		{
+			creationID = createID;
+			CreateDummyNavTarget(spawnHeight);
+		}
+
 		public void UpdateStates()
 		{
 			currentState.UpdateState(this);
 		}
 
+		public void ChangeAnimation(DarkAnimationStates anim)
+		{
+			//animeController.SetInteger(stateAnimID, playID);
+			animeController.Play(anim.ToString());
+		}
+
+		public float CurrentAnimationLength()
+		{
+			return animeController.GetCurrentAnimatorStateInfo(0).length;
+		}
+
+		public bool IsAnimationPlaying(DarkAnimationStates anim)
+		{
+			Debug.LogWarning("Animator is playing: " + animeController.GetCurrentAnimatorClipInfo(0)[0].clip.name);
+			return animeController.GetCurrentAnimatorStateInfo(0).IsName(anim.ToString());
+		}
+
+		#region Frequently Ran 
 		public void DistanceEvaluation(Vector3 location)
 		{
 			playerDist = Vector3.Distance(transform.position, location);
@@ -139,7 +140,7 @@ namespace DarknessMinion
 			else navTargetDist = -1;
 		}
 
-		public void AggressionChanged(AggresionRating agR)
+		public void AggressionRatingUpdate(AggresionRating agR)
 		{
 			if (agR != agRatingCurrent)
 				agRatingPrevious = agRatingCurrent;
@@ -152,6 +153,7 @@ namespace DarknessMinion
 				return stateActionsOnCooldown.ContainsKey(actType);
 			return false;
 		}
+		#endregion
 
 		public void AddCooldown(DarkState.CooldownInfo actionCooldownInfo)
 		{
@@ -162,17 +164,18 @@ namespace DarknessMinion
 			}
 		}
 
+		public void ClearCooldowns()
+		{
+			stateActionsOnCooldown.Clear();
+		}
+
 		private void UpdateCooldownTimers()
 		{
 			List<DarkState.CooldownStatus> deletedEntries = new List<DarkState.CooldownStatus>();
 			foreach (KeyValuePair<DarkState.CooldownStatus, DarkState.CooldownInfo> info in stateActionsOnCooldown)
 			{
-				info.Value.UpdateTime(Time.deltaTime);
-				if (info.Value.CheckTimerComplete())
-				{
-					Debug.LogWarning("Executing callback using: " + info.Value.acType);
+				if(info.Value.UpdateTime(Time.deltaTime))
 					deletedEntries.Add(info.Key);
-				}
 			}
 
 			foreach (DarkState.CooldownStatus cdStatus in deletedEntries)
@@ -180,11 +183,6 @@ namespace DarknessMinion
 				stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
 				stateActionsOnCooldown.Remove(cdStatus);
 			}
-		}
-
-		public void ResetCooldowns()
-		{
-			stateActionsOnCooldown.Clear();
 		}
 
 		private void OnTriggerEnter(Collider col)
@@ -201,6 +199,11 @@ namespace DarknessMinion
 			{
 				//Debug.LogWarning("Darkness collided with Player");
 			}
+		}
+		
+		public void KillDarkness()
+		{
+			ChangeState(deathState);
 		}
 
 		public void CreateDummyNavTarget(float elavation)
@@ -220,7 +223,7 @@ namespace DarknessMinion
 				"<b>Player Distance:</b> {4} \n" +
 				"<b>NavTarget Distance:</b> {5} \n" +
 				"<b>Darkness Position:</b> {6}",
-				navTarget.navTargetTag, navTarget.navPosition, currentState.name, previousState.name, playerDist, navTargetDist, this.transform.position);
+				navTarget.navTargetTag, navTarget.navPosition, currentState.ToString(), previousState.ToString(), playerDist, navTargetDist, this.transform.position);
 
 				textMesh.text = debugMessage;
 			}

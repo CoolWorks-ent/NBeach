@@ -1,18 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace DarknessMinion
+﻿namespace DarknessMinion
 { 
     [System.Serializable]
     public class DarkTransition
     {
-        //public enum TransitionPriority { LOW = 1, MEDIUM = 3, HIGH = 5 }
-        //public Transition_Priority priority;
+        public enum TransitionPriority {High, Medium, Low}
         public DarkDecisionMaker decision = new DarkDecisionMaker();
-
         public DarkDecisionMaker.DecisionName decisionChoice;
+        public TransitionPriority priorityLevel;
         public DarkState trueState;
-        //public DarkState falseState;
+        
     }
 }

@@ -1,62 +1,61 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace DarknessMinion
 {
 	
-	[CreateAssetMenu(menuName = "AI/Darkness/State/IdleState")]
+	[CreateAssetMenu(menuName = "Darkness/IdleState")]
 	public class IdleState : DarkState
 	{
-		[Range(0, 5)]
-		public float idleTime;
+		[SerializeField, Range(0, 5)]
+		private float idleTime;
 
-		protected override void FirstTimeSetup()
-		{
-			stateType = StateType.IDLE;
-		}
+		//public IdleState(Darkness dControl) : base(dControl){ }
 
-		public override void InitializeState(Darkness controller)
+		public override void InitializeState(Darkness darkController)
 		{
 			//Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			//controller.aIMovement.EndMovement();
-			if(controller.navTarget != null)
-				controller.CreateDummyNavTarget(DarknessManager.Instance.oceanPlane.position.y);
-			controller.pather.canMove = false;
-			controller.animeController.SetTrigger(controller.idleHash);
-			controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
-			controller.sekr.CancelCurrentPathRequest();
+			darkController.pather.canMove = false;
+			if(darkController.navTarget != null)
+			{
+				darkController.CreateDummyNavTarget(DarknessManager.Instance.groundLevel);
+				//darkController.sekr.CancelCurrentPathRequest();
+			}
+			//controller.animeController.SetTrigger(controller.idleTrigHash);
+
+			//if(!controller.IsAnimationPlaying(Darkness.DarkAnimationStates.Spawn))
+			//	controller.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+
+			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
+			
 			//base.InitializeState(controller);
 		}
 
-		public override void UpdateState(Darkness controller)
+		public override void UpdateState(Darkness darkController)
 		{
-			// controller.transform.rotation = Quaternion.LookRotation(dir);
-			//CheckTransitions(controller);
-			//if (controller.CheckActionsOnCooldown(CooldownStatus.Idling))
-			//CheckTransitions(controller);
+
 		}
 
-		public override void MovementUpdate(Darkness controller)
+		public override void MovementUpdate(Darkness darkController)
 		{
-			Vector3 pDir = DarknessManager.Instance.player.position - controller.transform.position;
-			Vector3 dir = Vector3.RotateTowards(controller.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
-			controller.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+			Vector3 pDir = DarknessManager.Instance.PlayerToDirection(darkController.transform.position);
+			Vector3 dir = Vector3.RotateTowards(darkController.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+			darkController.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 			//Quaternion.RotateTowards(controller.transform.rotation,  DarknessManager.Instance.player.rotation, )
 		}
 
-		public override void ExitState(Darkness controller)
+		public override void ExitState(Darkness darkController)
 		{
 			//AI_Manager.Instance.StopCoroutine(IdleTime(controller, idleTime));
-			if (controller.animeController != null)
-				controller.animeController.ResetTrigger(controller.idleHash);
-			controller.ResetCooldowns();
+			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+				//controller.animeController.ResetTrigger(controller.idleTrigHash);
+			base.ExitState(darkController);
 		}
 
-		protected override void CooldownCallback(Darkness controller)
+		protected override void CooldownCallback(Darkness darkController)
 		{
-			CheckTransitions(controller);
-			controller.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
+			CheckTransitions(darkController);
+			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
 		}

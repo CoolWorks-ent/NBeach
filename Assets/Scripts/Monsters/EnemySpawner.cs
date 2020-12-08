@@ -44,7 +44,7 @@ public class EnemySpawner : MonoBehaviour
         {
             if (pauseSpawning == false)
             {
-                if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
+                if (!DarknessManager.Instance.CheckIfSpawnFull())
                 {
                     if (spawnWait >= spawnRate)
                     {
@@ -52,9 +52,7 @@ public class EnemySpawner : MonoBehaviour
                         Darkness enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
-                        //add enemy to management list
-                        //AI_Manager.OnDarknessAdded(enemy);
-                        Debug.Log("darkness spawned");
+                        //Debug.Log("darkness spawned");
                     }
 
                 }
@@ -78,7 +76,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                if (DarknessManager.Instance.ActiveDarkness.Count <= DarknessManager.Instance.minEnemyCount)
+                if (DarknessManager.Instance.CheckIfSpawnFull())
                 {
                     //resume spawning of enemies
                     pauseSpawning = false;

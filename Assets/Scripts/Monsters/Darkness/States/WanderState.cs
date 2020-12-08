@@ -14,24 +14,20 @@ namespace DarknessMinion
 		public int wanderRadius;
 		[Range(0, 10)]
 		public float timeToPickNextPoint;
-		protected override void FirstTimeSetup()
-		{
-			stateType = StateType.WANDER;
-		}
 
-		public override void InitializeState(Darkness controller)
+		public override void InitializeState(Darkness darkController)
 		{
-			base.InitializeState(controller);
+			base.InitializeState(darkController);
 			//AI_Manager.OnRequestNewTarget(controller.creationID);
-			controller.navTarget.ReleaseTarget();
-			PopulatePatrolPoints(5, controller);
-			controller.animeController.SetTrigger(controller.chaseHash);
+			darkController.navTarget.ReleaseTarget();
+			//PopulatePatrolPoints(5, darkController);
+			//darkController.animeController.SetTrigger(darkController.chaseHash);
 			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
-			controller.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
-			controller.pather.destination = controller.navTarget.navPosition;
-			controller.pather.canMove = true;
-			controller.pather.canSearch = true;
-			controller.pather.pickNextWaypointDist = 0.95f;
+			darkController.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
+			darkController.pather.destination = darkController.navTarget.navPosition;
+			darkController.pather.canMove = true;
+			darkController.pather.canSearch = true;
+			darkController.pather.pickNextWaypointDist = 0.95f;
 			//controller.pather.repathRate = timeToPickNextPoint;
 			//controller.aIMovement.wandering = true;
 			//ChooseNewPatrolPoints(controller);
@@ -68,10 +64,10 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness controller)
 		{
-			controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
+			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
 		}
 
-		private NavigationTarget ChooseNewPatrolPoint(float radius)
+		/*private NavigationTarget ChooseNewPatrolPoint(float radius)
 		{
 			NavigationTarget navTarget = new NavigationTarget(Vector3.zero, DarknessManager.Instance.oceanPlane.position.y, NavigationTarget.NavTargetTag.Patrol);
 			Vector3 t = Random.insideUnitSphere * wanderRadius; //subtract the player position from Darkness position. Add some offset to get a starting point a bit ahead of the player
@@ -79,9 +75,9 @@ namespace DarknessMinion
 			navTarget.UpdateLocation(t);
 
 			return navTarget;
-		}
+		}*/
 
-		public void PopulatePatrolPoints(int size, Darkness controller)
+		/*public void PopulatePatrolPoints(int size, Darkness controller)
 		{
 			controller.patrolPoints = new NavigationTarget[size];
 			for (int i = 0; i < controller.patrolPoints.Length; i++)
@@ -95,7 +91,7 @@ namespace DarknessMinion
 				controller.patrolPoints[i] = new NavigationTarget(controller.transform.position, offset, Vector3.zero, DarknessManager.Instance.oceanPlane.position.y, NavigationTarget.NavTargetTag.Patrol);
 				//PatrolPoints[i].targetID = i;
 			}
-		}
+		}*/
 
 		/*private void ChooseNewPatrolPoints(Darkness controller)
 		{
@@ -117,15 +113,15 @@ namespace DarknessMinion
 		}
 		*/
 
-		public override void ExitState(Darkness controller)
+		public override void ExitState(Darkness darkController)
 		{
 			//controller.aIMovement.EndMovement();
 			//controller.aIMovement.wandering = false;
-			controller.pather.canMove = false;
-			controller.pather.canSearch = false;
-			controller.sekr.CancelCurrentPathRequest();
-			controller.ResetCooldowns();
-			controller.animeController.ResetTrigger(controller.chaseHash);
+			darkController.pather.canMove = false;
+			darkController.pather.canSearch = false;
+			darkController.sekr.CancelCurrentPathRequest();
+			//controller.animeController.ResetTrigger(controller.chaseHash);
+			base.ExitState(darkController);
 		}
 	}
 }
