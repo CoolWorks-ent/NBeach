@@ -121,6 +121,7 @@ namespace DarknessMinion
 					DarkEventManager.OnUpdateDarknessStates();
 				}
 				else yield return new WaitForSeconds(calculationTime);
+				maxEnemyCount = 4; //TODO removve once done testing
 			}
 			yield return null;
 		}

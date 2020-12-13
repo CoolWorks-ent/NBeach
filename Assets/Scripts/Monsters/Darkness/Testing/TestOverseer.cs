@@ -8,7 +8,15 @@ namespace DarknessMinion
 		public Darkness darknessPrefab;
 		public static TestOverseer Instance { get; private set; }
 
+		[Header("Show Info")]
 		public bool showDebugInfo;
+
+		[Header("Debug Info to Show")]
+		public bool targetInfo;
+		public bool agroRating;
+		public bool stateInfo;
+		public bool locationInfo;
+		public bool cooldownInfo;
 
 		void Awake()
 		{
@@ -41,7 +49,7 @@ namespace DarknessMinion
 		{
 			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
 			{
-				dark.UpdateDebugMessage();
+				dark.UpdateDebugMessage(targetInfo, agroRating, stateInfo, locationInfo, cooldownInfo);
 			}
 		}
 

@@ -35,9 +35,13 @@ namespace DarknessMinion
 		[HideInInspector]
 		public TextMesh textMesh;
 		public bool updateStates, attacked;
-		public float playerDist, swtichDist, navTargetDist;
+		public float playerDist, attackDist, navTargetDist;
 		public LayerMask mask;
+		[HideInInspector]
+		public RaycastHit rayHitInfo;
 		public int creationID { get; private set;}
+
+		
 
 		[SerializeField] //Tooltip("Assign in Editor"),
 		private DarkState deathState, spawnState, currentState;
@@ -50,9 +54,11 @@ namespace DarknessMinion
 		private string debugMessage {get; set;}
 		private int stateAnimID;
 
+		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
+
 		void Awake()
 		{
-			swtichDist = 4.6f; 
+			//swtichDist = 4.6f; 
 			creationID = 0;
 			navTargetDist = -1;
 			updateStates = true;
@@ -66,12 +72,17 @@ namespace DarknessMinion
 		{
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
+			animTriggerAttack =	Animator.StringToHash("Attack");
+			animTriggerChase = Animator.StringToHash("Chase");
+			animTriggerIdle = Animator.StringToHash("Idle");
+			animTriggerDeath = Animator.StringToHash("Death");
 			pather = GetComponent<AIPath>();
 			sekr = GetComponent<Seeker>();
 			darkHitBox = GetComponent<CapsuleCollider>();
 			//aIMovement = GetComponent<AI_Movement>();
 			currentState = spawnState;
 			currentState.InitializeState(this);
+			previousState  = currentState;
 			darkHitBox.enabled = false;
 			pather.repathRate = 0.85f;
 			mask = LayerMask.GetMask("Player");
@@ -117,7 +128,22 @@ namespace DarknessMinion
 		public void ChangeAnimation(DarkAnimationStates anim)
 		{
 			//animeController.SetInteger(stateAnimID, playID);
-			animeController.Play(anim.ToString());
+			switch(anim)
+			{
+				case DarkAnimationStates.Attack:
+					animeController.SetTrigger(animTriggerAttack);
+					return;
+				case DarkAnimationStates.Chase:
+					animeController.SetTrigger(animTriggerChase);
+					return;
+				case DarkAnimationStates.Idle:
+					animeController.SetTrigger(animTriggerIdle);
+					return;
+				case DarkAnimationStates.Death:
+					animeController.SetTrigger(animTriggerDeath);
+					return;
+			}
+			//animeController.Play(anim.ToString());
 		}
 
 		public float CurrentAnimationLength()
@@ -235,21 +261,20 @@ namespace DarknessMinion
 			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
 		}
 
-		public void UpdateDebugMessage()
+		public void UpdateDebugMessage(bool showTargetData, bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
 		{
-			if(navTarget != null)
-			{
-				debugMessage = String.Format(
-				"<b>NavTarget:</b> Tag = {0} Position = {1} \n" +
-				"<b>Current State:</b> {2} \n" +
-				"Previous State: {3} \n" +
-				"<b>Player Distance:</b> {4} \n" +
-				"<b>NavTarget Distance:</b> {5} \n" +
-				"<b>Darkness Position:</b> {6}",
-				navTarget.navTargetTag, navTarget.navPosition, currentState.ToString(), previousState.ToString(), playerDist, navTargetDist, this.transform.position);
-
-				textMesh.text = debugMessage;
-			}
+			debugMessage = "";
+			if(showTargetData && navTarget != null)
+				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", navTarget.navTargetTag, navTarget.navPosition);
+			if(showAggresionRating)
+				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
+			if(showStateInfo)
+				debugMessage += String.Format("\n <b>Current State:</b> {0} \n" + "Previous State: {1} \n", currentState.ToString(), previousState.ToString());
+			if(showLocationInfo)	
+				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>NavTarget Distance:</b> {1} \n" + "<b>Darkness Position:</b> {2}", playerDist, navTargetDist, this.transform.position);
+			if(showCooldownInfo)
+				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
+			textMesh.text = debugMessage;
 		}
 
 		public void ToggleDebugMessage(bool active)

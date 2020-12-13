@@ -9,6 +9,8 @@ namespace DarknessMinion
 		[SerializeField, Range(0, 5)]
 		private float idleTime;
 
+		public bool waitFullIdleTime;
+
 		//public IdleState(Darkness dControl) : base(dControl){ }
 
 		public override void InitializeState(Darkness darkController)
@@ -33,7 +35,8 @@ namespace DarknessMinion
 
 		public override void UpdateState(Darkness darkController)
 		{
-
+			if(!waitFullIdleTime)
+				CheckTransitions(darkController);
 		}
 
 		public override void MovementUpdate(Darkness darkController)

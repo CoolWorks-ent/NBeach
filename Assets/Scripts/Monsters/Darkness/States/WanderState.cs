@@ -47,7 +47,7 @@ namespace DarknessMinion
 			//     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
 			// }
 			//controller.aIMovement.UpdatePath(controller.Target.position);
-			if (controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.swtichDist)
+			if (controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.attackDist)
 			{
 				//AI_Manager.OnRequestNewTarget(controller.creationID);
 				controller.pather.destination = controller.navTarget.navPosition;
