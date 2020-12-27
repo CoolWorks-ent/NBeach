@@ -24,7 +24,7 @@ namespace DarknessMinion
 			//darkController.animeController.SetTrigger(darkController.chaseHash);
 			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
 			darkController.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
-			darkController.pather.destination = darkController.navTarget.navPosition;
+			darkController.pather.destination = darkController.navTarget.GetPosition();
 			darkController.pather.canMove = true;
 			darkController.pather.canSearch = true;
 			darkController.pather.pickNextWaypointDist = 0.95f;
@@ -50,7 +50,7 @@ namespace DarknessMinion
 			if (controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.attackDist)
 			{
 				//AI_Manager.OnRequestNewTarget(controller.creationID);
-				controller.pather.destination = controller.navTarget.navPosition;
+				controller.pather.destination = controller.navTarget.GetPosition();
 			}
 			if (controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
 				controller.pather.rotationSpeed = 400;

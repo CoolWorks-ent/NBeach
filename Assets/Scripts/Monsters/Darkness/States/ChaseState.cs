@@ -8,34 +8,21 @@ namespace DarknessMinion
 	{
 		[Range(0.25f, 5)]
 		public float pathUpdateRate;
-		//[Range(0, 10)]
-		//public float switchToAttackDist;
 
-		//public ChaseState(Darkness dControl) : base(dControl){ }
 
 		public override void InitializeState(Darkness darkController)
 		{
-			//Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			if (darkController.navTarget != null && darkController.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
 				darkController.navTarget.ReleaseTarget();
 				DarkEventManager.OnRequestNewTarget(darkController.creationID);
-				//controller.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 			}
-			/*else if (controller.navTarget == null)
-			{
-				Debug.LogWarning(string.Format("nav target {0} not initialised for {1}", controller.navTarget, controller.creationID));
-				DarkEventManager.OnRequestNewTarget(controller.creationID);
-			}*/
-
-			//controller.animeController.SetTrigger(controller.chaseTrigHash);
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.pather.destination = darkController.navTarget.transformPosition;
+			darkController.pather.destination = darkController.navTarget.GetPosition();
 			darkController.pather.canMove = true;
-			//darkController.pather.canSearch = true;
-			darkController.pather.repathRate = 0;
-			CooldownCallback(darkController);
-			//darkController.swtichDist = switchToAttackDist;
+			darkController.pather.canSearch = true;
+			darkController.pather.repathRate = 1f;
+			//CooldownCallback(darkController);
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
 			controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -51,12 +38,12 @@ namespace DarknessMinion
 
 		public override void MovementUpdate(Darkness darkController)
 		{
-			darkController.pather.destination = darkController.navTarget.transformPosition;
+			darkController.pather.destination = darkController.navTarget.GetPosition();
 		}
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			darkController.pather.destination = darkController.navTarget.transformPosition;
+			darkController.pather.destination = darkController.navTarget.GetPosition();
 			darkController.sekr.StartPath(darkController.transform.position, darkController.pather.destination);
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 		}
@@ -65,6 +52,7 @@ namespace DarknessMinion
 		{
 			darkController.navTarget.ReleaseTarget();
 			darkController.pather.canMove = false;
+			darkController.pather.canSearch = false;
 			darkController.sekr.CancelCurrentPathRequest();
 			base.ExitState(darkController);
 			//controller.aIMovement.EndMovement();

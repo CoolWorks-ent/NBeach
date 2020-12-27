@@ -7,7 +7,7 @@ namespace DarknessMinion
 {
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete, ReachedDestination }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
@@ -22,6 +22,7 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.NavTargetClose, NavTargetCloseCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
+            Decisions.Add(DecisionName.ReachedDestination, ReachedDestination);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -37,6 +38,11 @@ namespace DarknessMinion
                 Debug.LogError("Key not found in DarkDecisionMaker: " + dName.ToString() + "Resulting in this error " + k);
                 return false;
             }
+        }
+
+        private bool ReachedDestination(Darkness controller)
+        {
+            return controller.pather.reachedDestination;
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)

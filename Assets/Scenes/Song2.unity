@@ -7553,7 +7553,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 267464683}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0.1}
+  m_LocalPosition: {x: 0.35, y: 0, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 652888667}
@@ -59036,6 +59036,7 @@ Transform:
   - {fileID: 978398929}
   - {fileID: 267464684}
   - {fileID: 1591601431}
+  - {fileID: 1804496893}
   m_Father: {fileID: 1275722337}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -60998,7 +60999,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 978398928}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: 0, z: 0.1}
+  m_LocalPosition: {x: -0.35, y: 0, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 652888667}
@@ -85451,7 +85452,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1591601430}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalPosition: {x: 0.2, y: 0, z: 0.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 652888667}
@@ -87054,6 +87055,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 53
   m_LocalEulerAnglesHint: {x: 0, y: 31.182001, z: 0}
+--- !u!1 &1804496892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1804496893}
+  m_Layer: 0
+  m_Name: ATK Point4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1804496893
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1804496892}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.2, y: 0, z: 0.35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 652888667}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1813744414
 Prefab:
   m_ObjectHideFlags: 0
@@ -91201,6 +91230,11 @@ MonoBehaviour:
   darknessPrefab: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
     type: 2}
   showDebugInfo: 1
+  targetInfo: 0
+  agroRating: 0
+  stateInfo: 0
+  locationInfo: 0
+  cooldownInfo: 0
 --- !u!1001 &2043849533
 Prefab:
   m_ObjectHideFlags: 0

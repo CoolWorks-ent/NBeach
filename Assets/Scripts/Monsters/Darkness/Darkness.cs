@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using System.Linq;
@@ -163,7 +162,7 @@ namespace DarknessMinion
 			playerDist = Vector3.Distance(transform.position, location);
 			if (navTarget != null)
 			{
-				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
+				navTargetDist = Vector3.Distance(transform.position, navTarget.GetPosition());
 			}
 			else navTargetDist = -1;
 		}
@@ -265,7 +264,7 @@ namespace DarknessMinion
 		{
 			debugMessage = "";
 			if(showTargetData && navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", navTarget.navTargetTag, navTarget.navPosition);
+				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", navTarget.navTargetTag, navTarget.GetPosition());
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)

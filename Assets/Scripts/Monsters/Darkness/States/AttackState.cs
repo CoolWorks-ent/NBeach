@@ -34,7 +34,7 @@ namespace DarknessMinion
 
         public override void MovementUpdate(Darkness darkController) //TODO figure out how I should stop and rotate towards the player. Where should these checks happen?
         {
-            darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
+            //darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
             
             if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
             {
