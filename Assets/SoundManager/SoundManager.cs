@@ -12,7 +12,9 @@ public class SoundManager : MonoBehaviour {
 	
 	//for instantiating foley sounds
 	public GameObject newSound;
-	
+
+    //
+    public AudioClip[] BGMusicList;
 	
 	private int playCount = 0;
 	private int[] soundSeq;
@@ -29,7 +31,7 @@ public class SoundManager : MonoBehaviour {
 	//private int[] results = new int[] {15, 1645, 135, 567};
 	
 	//Music
-	private string[] music = new string[] {"NB!2", "Cooly2","Cooly2_edit", "Forest", "Lake", "LakeFight", "Volcano", "FinalBossFight", "IntroHappy", "IntroSceneTense", "LoseScene", "WinMusic", "Credits"};
+	private string[] music = new string[] {"NB!2", "Cooly2","Cooly2_edit"};
 	
 	//Foley sounds
 	private string[] foleySounds = new string[] {"wavesIncoming", "wavesCrashing"};
@@ -59,16 +61,34 @@ public class SoundManager : MonoBehaviour {
 		voxPlayer = transform.Find ("VoxPlayer").gameObject;
 		voxMaster = transform.Find ("VoxMaster").gameObject;
 		voxDarkWizard = transform.Find ("VoxDarkWizard").gameObject;
+
+        //BGMusicList = Resources.LoadAll("Resources/Sounds/BGMusic") as AudioClip;
 	}
 	void Start () 
 	{
 
 	}
+
+    public void LoadMusic()
+    {
+        BGMusicList = new AudioClip[3];
+        BGMusicList[0] = Resources.Load("Sounds/BGMusic/NB!2") as AudioClip;
+        BGMusicList[1] = Resources.Load("Sounds/BGMusic/Cooly2") as AudioClip;
+        BGMusicList[2] = Resources.Load("Sounds/BGMusic/Cooly2_edit") as AudioClip;
+    }
 	
 	public void PlayMusic(int num)
 	{
-		AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath,music[num]), typeof(AudioClip));
-		BGMusic.GetComponent<AudioSource> ().clip = newClip;
+        AudioClip newClip;
+        if (BGMusicList[num] != null)
+        {
+            newClip = BGMusicList[num];
+        }
+        else
+        {
+            newClip = (AudioClip)Resources.Load(string.Concat(musicPath, music[num]), typeof(AudioClip));
+        }
+        BGMusic.GetComponent<AudioSource> ().clip = newClip;
 		BGMusic.GetComponent<AudioSource> ().Play ();
 	}
 	
@@ -318,7 +338,14 @@ public class SoundManager : MonoBehaviour {
 
     public void FadeInMusic(int num)
     {
-        AudioClip newClip = (AudioClip)Resources.Load(string.Concat(musicPath, music[num]), typeof(AudioClip));
+        AudioClip newClip;
+        if (BGMusicList[num] != null)
+        {
+            newClip = BGMusicList[num];
+        }
+        else {
+            newClip = (AudioClip)Resources.Load(string.Concat(musicPath, music[num]), typeof(AudioClip)); }
+
         BGMusic.GetComponent<AudioSource>().clip = newClip;
         StartCoroutine(FadeIn(BGMusic));
     }

@@ -75,8 +75,8 @@ public class DarknessBoss : MonoBehaviour {
 
         status = BossStatus.none;
         sm = GameObject.FindGameObjectWithTag("SoundManager").GetComponent<SoundManager>();
-        sm.PlayMusic(6);
-        sm.PlayDarkWizardVox(0);
+        //sm.PlayMusic(6);
+        //sm.PlayDarkWizardVox(0);
 
         ballMoveSpeed = 20f;
     }

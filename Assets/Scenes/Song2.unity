@@ -61104,6 +61104,19 @@ MonoBehaviour:
   legacyMode: 0
   serializedVersion: 1
   legacyUseWorldSpace: 0
+--- !u!1 &1009643475 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1295509950170444, guid: ab4b23574890f2749801c9d80d9313b0,
+    type: 2}
+  m_PrefabInternal: {fileID: 2045182312}
+--- !u!45 &1009643476
+Skybox:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1009643475}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: b6ada823d3cae7f47bfef3aecb827e8c, type: 2}
 --- !u!1 &1013247045
 GameObject:
   m_ObjectHideFlags: 0

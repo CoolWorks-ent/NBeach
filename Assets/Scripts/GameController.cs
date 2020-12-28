@@ -104,6 +104,7 @@ public class GameController : MonoBehaviour {
          * LOAD RESOURCES on AWAKE
          * load different resources based upon the Scene loaded
          */
+        soundManager.LoadMusic();
          
         EventManager.StartListening("Player_Stop", ResetPlayer);
         EventManager.StartListening("PauseWorld", OnWorldPaused);
