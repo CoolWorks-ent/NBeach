@@ -8,10 +8,9 @@ namespace DarknessMinion
 	public abstract class DarkState : ScriptableObject
 	{
 		//protected readonly Darkness darkController;
-		public enum CooldownStatus { Attacking, Patrolling, Idling, Moving, Spawn}
 		public DarkTransition[] transitions;
 		public List<DarkState> referencedBy;
-		protected Lookup<DarkTransition.TransitionPriority, DarkTransition> priorityTransitions;
+		//protected Lookup<DarkTransition.TransitionPriority, DarkTransition> priorityTransitions;
 
 		public void SortTransitionsByPriority()
 		{
@@ -58,37 +57,5 @@ namespace DarknessMinion
 			this.ExitState(); //fire this if not in the Death state already
 			darkController.updateStates = false;
 		}*/
-
-		public class CooldownInfo
-		{
-			public CooldownStatus acType { get; private set; }
-			private float remainingTime;
-			//public float coolDownTime;
-			public Action<Darkness> Callback;
-			//public Coroutine durationRoutine;
-
-			public CooldownInfo(float cdTime, CooldownStatus acT, Action<Darkness> cback)
-			{
-				remainingTime = cdTime;
-				//coolDownTime = cdTime;
-				acType = acT;
-				Callback = cback;
-			}
-
-			public bool UpdateTime(float time)
-			{
-				remainingTime = Mathf.Max(remainingTime - time, 0);
-				if(remainingTime == 0)
-					return false;
-				else return true;
-			}
-
-			public bool CheckTimerComplete()
-			{
-				if (remainingTime == 0)
-					return true;
-				else return false;
-			}
-		}
 	}
 }

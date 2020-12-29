@@ -17,18 +17,19 @@ namespace DarknessMinion
 		{
 			//Debug.LogWarning(string.Format("Darkness {0} has entered {1} State at {2}", controller.creationID, this.name, Time.deltaTime));
 			//controller.aIMovement.EndMovement();
-			darkController.pather.canMove = false;
-			if(darkController.navTarget != null)
+			darkController.movement.StopMovement();
+			if(darkController.movement.navTarget != null)
 			{
-				darkController.CreateDummyNavTarget(DarknessManager.Instance.groundLevel);
+				darkController.movement.CreateDummyNavTarget(DarknessManager.Instance.groundLevel);
 				//darkController.sekr.CancelCurrentPathRequest();
 			}
+			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
 			//controller.animeController.SetTrigger(controller.idleTrigHash);
 
 			//if(!controller.IsAnimationPlaying(Darkness.DarkAnimationStates.Spawn))
 			//	controller.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
 
-			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
+			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
 			
 			//base.InitializeState(controller);
 		}
@@ -41,9 +42,7 @@ namespace DarknessMinion
 
 		public override void MovementUpdate(Darkness darkController)
 		{
-			Vector3 pDir = DarknessManager.Instance.PlayerToDirection(darkController.transform.position);
-			Vector3 dir = Vector3.RotateTowards(darkController.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
-			darkController.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+			darkController.movement.RotateTowardsPlayer();
 			//Quaternion.RotateTowards(controller.transform.rotation,  DarknessManager.Instance.player.rotation, )
 		}
 
@@ -58,7 +57,7 @@ namespace DarknessMinion
 		protected override void CooldownCallback(Darkness darkController)
 		{
 			CheckTransitions(darkController);
-			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownStatus.Idling, CooldownCallback));
+			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller,idleTime));
 			//AI_Manager.Instance.StartCoroutine(IdleTime(controller, idleTime));
 		}

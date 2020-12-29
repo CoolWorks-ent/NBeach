@@ -4,53 +4,51 @@ using Pathfinding;
 
 namespace DarknessMinion
 {
-    [RequireComponent(typeof(Darkness))]
-    public class DarknessMovement : MonoBehaviour
+    
+    public class DarknessMovement 
     {
-        public Transform target;
-        public Vector3 wayPoint, pathPoint, direction, velocity, targetDirection;
-        public bool moving, reachedEndOfPath, wandering, targetMoved;
+        public Vector3 direction, velocity, targetDirection;
+        public bool moving; //reachedEndOfPath, wandering targetMoved;
+        public NavigationTarget navTarget;
 
         private Seeker sekr;
         private Path navPath;
-        private Rigidbody rigidbod;
+        private Rigidbody rgdBod;
         private Blocker bProvider;
-        private MovementParams initialParameters, updatedParameters;
 
         private float maxSpeed, maxAccel;
+        private AIPath pather;
+        private Transform transform;
+        private GraphUpdateScene graphUpdateScene;
 
-        void Awake()
+        public DarknessMovement(Rigidbody rigidBody, Seeker seeker, AIPath path, Transform tform)
         {
             //speed = 2;
             moving = false;
-            wandering = targetMoved = reachedEndOfPath = false;
-            sekr = GetComponent<Seeker>();
-            rigidbod = gameObject.GetComponentInChildren<Rigidbody>();
-        }
-
-        void Start()
-        {
-
+            sekr = seeker;
+            rgdBod = rigidBody;
+            pather = path;
             sekr.pathCallback += PathComplete;
             bProvider = new Blocker();
             direction = new Vector3();
+            transform = tform;
         }
 
-        public void MovementUpdate()
+        public void MoveDarkness()
         {
             if (moving && navPath != null)
             {
-                direction = Vector3.Normalize(navPath.vectorPath[1] - this.transform.position);
-                rigidbod.AddForce(direction); //* speed);
+                direction = Vector3.Normalize(navPath.vectorPath[1] - transform.position);
+                rgdBod.AddForce(direction); //* speed);
                                               //rigidbod.MovePosition(direction * speed * Time.deltaTime);
                 float maxSpeedChange = maxAccel * Time.deltaTime;
                 Vector2 desiredVelocity = targetDirection * maxSpeed;
-                velocity = rigidbod.velocity;
+                velocity = rgdBod.velocity;
 
                 velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
                 velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.y, maxSpeedChange);
 
-                rigidbod.velocity = velocity;
+                rgdBod.velocity = velocity;
             }
         }
 
@@ -60,20 +58,46 @@ namespace DarknessMinion
                 CreatePath(target);
         }
 
-        public void UpdateMovementParams(MovementParams newParams)
-        {
-            updatedParameters = newParams;
-        }
-
-        public void DefaultMovmentParams()
-        {
-            updatedParameters = initialParameters;
-        }
-
         public void RotateTowardsPlayer()
         {
-
+            Vector3 pDir = DarknessManager.Instance.PlayerToDirection(transform.position);
+			Vector3 dir = Vector3.RotateTowards(transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+            //Debug.Log("Currently the rotatation direction is at: " + dir + " or " + Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z)).eulerAngles);
+			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
         }
+
+        public void StopMovement()
+        {
+            if (!sekr.IsDone())
+                sekr.CancelCurrentPathRequest();
+            moving = false;
+            pather.canSearch = false;
+            pather.canMove = false;
+        }
+
+        public void StartMovement()
+        {
+            pather.canMove = true;
+			pather.canSearch = true;
+        }
+
+        public bool AtDestination()
+        {
+            return pather.reachedDestination;
+        }
+
+        public void UpdateDestinationPath(bool attacking)
+        {
+            if(attacking)
+                pather.destination = navTarget.GetAttackPosition();
+            else pather.destination = navTarget.GetNavPosition();
+        }
+
+        public void CreateDummyNavTarget(float elavation)
+		{
+			Vector3 randloc = new Vector3(UnityEngine.Random.Range(-10,10) + transform.position.x, elavation, UnityEngine.Random.Range(-5,5));
+			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
+		}
 
         private void PathComplete(Path p)
         {
@@ -91,11 +115,6 @@ namespace DarknessMinion
                 p.Release(this);
                 Debug.LogError("Path failed calculation for " + this + " because " + p.errorLog);
             }
-        }
-
-        private void PathTargetUpdated(bool b)
-        {
-            targetMoved = b;
         }
 
         private void BlockPathNodes(Path p)
@@ -116,13 +135,6 @@ namespace DarknessMinion
             p.BlockUntilCalculated();
         }
 
-        public void EndMovement()
-        {
-            if (!sekr.IsDone())
-                sekr.CancelCurrentPathRequest();
-            moving = false;
-        }
-
         private class Blocker : ITraversalProvider
         {
             public HashSet<GraphNode> blockedNodes = new HashSet<GraphNode>();
@@ -134,22 +146,6 @@ namespace DarknessMinion
             public uint GetTraversalCost(Path path, GraphNode node)
             {
                 return DefaultITraversalProvider.GetTraversalCost(path, node);
-            }
-        }
-
-        public struct MovementParams
-        {
-            public float moveSpeed, turnSpeed, repathRate;
-
-            [Range(0,360)]
-            public float turnRadius;
-
-            MovementParams(float mSpeed, float tSpeed, float tRadius, float rpathRate)
-            {
-                turnRadius = tRadius;
-                moveSpeed = mSpeed;
-                turnSpeed = tSpeed;
-                repathRate = rpathRate;
             }
         }
     }

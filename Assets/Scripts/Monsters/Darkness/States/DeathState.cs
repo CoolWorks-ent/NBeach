@@ -57,7 +57,7 @@ namespace DarknessMinion
             //yield return new WaitForSeconds(fxTime);
             //AI_Manager.Instance.RemoveFromDarknessList(controller);
             darkController.gameObject.SetActive(false);
-            darkController.navTarget.ReleaseTarget();
+            darkController.movement.navTarget.ReleaseTarget();
             DarkEventManager.OnDarknessRemoved(darkController);
             //Destroy(controller.animeController);
             Destroy(darkController.gameObject);

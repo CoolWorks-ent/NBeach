@@ -18,15 +18,9 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		public NavigationTarget navTarget;
-
+		
 		//public NavigationTarget[] patrolPoints;
-
-		[HideInInspector]
-		public AIPath pather;
-
-		[HideInInspector]
-		public Seeker sekr;
+		public DarknessMovement movement;
 
 		[HideInInspector]
 		public Collider darkHitBox;
@@ -48,7 +42,7 @@ namespace DarknessMinion
 
 		private Animator animeController;
 
-		private Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo> stateActionsOnCooldown;
+		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
 		private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
 		private int stateAnimID;
@@ -63,33 +57,29 @@ namespace DarknessMinion
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			attacked = false;
-			stateActionsOnCooldown = new Dictionary<DarkState.CooldownStatus, DarkState.CooldownInfo>();
+			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
 			stateCache = new List<GameObject>();
 		}
 
 		void Start()
 		{
+			movement = new DarknessMovement(GetComponent<Rigidbody>(), GetComponent<Seeker>(), GetComponent<AIPath>(), this.transform);
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			animTriggerAttack =	Animator.StringToHash("Attack");
 			animTriggerChase = Animator.StringToHash("Chase");
 			animTriggerIdle = Animator.StringToHash("Idle");
 			animTriggerDeath = Animator.StringToHash("Death");
-			pather = GetComponent<AIPath>();
-			sekr = GetComponent<Seeker>();
 			darkHitBox = GetComponent<CapsuleCollider>();
-			//aIMovement = GetComponent<AI_Movement>();
 			currentState = spawnState;
 			currentState.InitializeState(this);
 			previousState  = currentState;
 			darkHitBox.enabled = false;
-			pather.repathRate = 0.85f;
 			mask = LayerMask.GetMask("Player");
 			stateAnimID = Animator.StringToHash("StateID");
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-			//aIMovement.target = Target;
 			//ChangeAnimation(DarkAnimationStates.Spawn);
 		}
 
@@ -116,7 +106,7 @@ namespace DarknessMinion
 		public void Spawn(int createID, float spawnHeight)
 		{
 			creationID = createID;
-			CreateDummyNavTarget(spawnHeight);
+			movement.CreateDummyNavTarget(spawnHeight);
 		}
 
 		public void UpdateStates()
@@ -147,6 +137,7 @@ namespace DarknessMinion
 
 		public float CurrentAnimationLength()
 		{
+			//Debug.Log("Animation length: " + animeController.GetCurrentAnimatorStateInfo(0).length);
 			return animeController.GetCurrentAnimatorStateInfo(0).length;
 		}
 
@@ -159,12 +150,17 @@ namespace DarknessMinion
 		#region Frequently Ran 
 		public void DistanceEvaluation(Vector3 location)
 		{
-			playerDist = Vector3.Distance(transform.position, location);
-			if (navTarget != null)
+			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(location));
+			if (movement.navTarget != null)
 			{
-				navTargetDist = Vector3.Distance(transform.position, navTarget.GetPosition());
+				navTargetDist = Vector3.Distance(transform.position, movement.navTarget.GetNavPosition());
 			}
 			else navTargetDist = -1;
+		}
+
+		private Vector2 ConvertToVec2(Vector3 vector)
+		{
+			return new Vector2(vector.x, vector.z);
 		}
 
 		public void AggressionRatingUpdate(AggresionRating agR)
@@ -174,7 +170,7 @@ namespace DarknessMinion
 			agRatingCurrent = agR;
 		}
 
-		public bool CheckActionsOnCooldown(DarkState.CooldownStatus actType)
+		public bool CheckActionsOnCooldown(CooldownInfo.CooldownStatus actType)
 		{
 			if (stateActionsOnCooldown.Count > 0)
 				return stateActionsOnCooldown.ContainsKey(actType);
@@ -182,7 +178,7 @@ namespace DarknessMinion
 		}
 		#endregion
 
-		public void AddCooldown(DarkState.CooldownInfo actionCooldownInfo)
+		public void AddCooldown(CooldownInfo actionCooldownInfo)
 		{
 			if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
 			{
@@ -198,23 +194,18 @@ namespace DarknessMinion
 
 		private void UpdateCooldownTimers()
 		{
-			List<DarkState.CooldownStatus> deletedEntries = new List<DarkState.CooldownStatus>();
-			foreach (KeyValuePair<DarkState.CooldownStatus, DarkState.CooldownInfo> info in stateActionsOnCooldown)
+			List<CooldownInfo.CooldownStatus> deletedEntries = new List<CooldownInfo.CooldownStatus>();
+			foreach (KeyValuePair<CooldownInfo.CooldownStatus, CooldownInfo> info in stateActionsOnCooldown)
 			{
-				if(info.Value.UpdateTime(Time.deltaTime))
+				if(!info.Value.TimeRemaining(Time.deltaTime))
 					deletedEntries.Add(info.Key);
 			}
 
-			foreach (DarkState.CooldownStatus cdStatus in deletedEntries)
+			foreach (CooldownInfo.CooldownStatus cdStatus in deletedEntries)
 			{
 				stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
 				stateActionsOnCooldown.Remove(cdStatus);
 			}
-		}
-
-		public void AddToStateCache(GameObject obj)
-		{
-			stateCache.Add(obj);
 		}
 
 		public GameObject GetLastObjectFromCache()
@@ -254,17 +245,18 @@ namespace DarknessMinion
 			ChangeState(deathState);
 		}
 
-		public void CreateDummyNavTarget(float elavation)
+		private void OnDestroy()
 		{
-			Vector3 randloc = new Vector3(UnityEngine.Random.Range(-10,10) + transform.position.x, elavation, UnityEngine.Random.Range(-5,5));
-			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
+			DarkEventManager.UpdateDarknessStates -= UpdateStates;
+			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
 		}
+
 
 		public void UpdateDebugMessage(bool showTargetData, bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
 		{
 			debugMessage = "";
-			if(showTargetData && navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", navTarget.navTargetTag, navTarget.GetPosition());
+			if(showTargetData && movement.navTarget != null)
+				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.GetNavPosition());
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)
@@ -310,6 +302,5 @@ namespace DarknessMinion
 				}
 			}*/
         }
-
 	}
 }

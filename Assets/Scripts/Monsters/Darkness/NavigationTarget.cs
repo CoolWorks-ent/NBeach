@@ -17,9 +17,10 @@ namespace DarknessMinion
 		private int claimedID;
 		private float groundElavation;
 		
-		public Transform objectTransform { get; private set; }
+		public Transform navTransform { get; private set; }
 		public bool navTargetClaimed {  get { return claimed; } }
 		public NavTargetTag navTargetTag { get; private set; }
+		public Transform attackTransform { get; private set; } //TODO make private probably
 		//public Vector3 navPosition { get { return position + positionOffset; } } 
 		//public Vector3 closeToSrcPosition { get { return position + positionCloseToSource; } }
 		//public Vector3 transformPosition { get { return objectTransform.position; } }
@@ -37,11 +38,12 @@ namespace DarknessMinion
 			claimedID = 0;
 		}*/
 
-		public NavigationTarget(Transform transform, NavTargetTag ntTag)
+		public NavigationTarget(Transform nTransform, Transform aTransform, NavTargetTag ntTag)
 		{
-			objectTransform = transform;
+			navTransform = nTransform;
+			attackTransform = aTransform;
 			navTargetTag = ntTag;
-			position = objectTransform.position;
+            position = this.navTransform.position;
 		}
 
 		public NavigationTarget(Vector3 loc, float elavation, NavTargetTag ntTag)
@@ -55,11 +57,16 @@ namespace DarknessMinion
 			claimedID = 0;
 		}
 
-		public Vector3 GetPosition()
+		public Vector3 GetNavPosition()
 		{
-			if(objectTransform != null)
-				return objectTransform.position; 
+			if(navTransform != null)
+				return navTransform.position; 
 			else return position + positionOffset; 
+		}
+
+		public Vector3 GetAttackPosition()
+		{
+			return attackTransform.position;
 		}
 
 		public void ClaimTarget(int cID)

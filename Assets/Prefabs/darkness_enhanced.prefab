@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 114857173380954124}
   - component: {fileID: 114648332704818778}
   - component: {fileID: 136796206659899728}
+  - component: {fileID: 114915333190766522}
   m_Layer: 17
   m_Name: darkness_enhanced
   m_TagString: Darkness
@@ -713,7 +714,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.46211633, y: -0.0000020584746, z: -18.267738}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4693482682022224}
@@ -909,8 +910,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags: -1
-  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  traversableTags: -3
+  tagPenalties: 00000000e8030000f40100000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
 --- !u!114 &114446345711301086
@@ -940,13 +941,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agRatingCurrent: 0
   agRatingPrevious: 0
-  navTarget:
-    claimed: 0
-    position: {x: 0, y: 0, z: 0}
-    positionOffset: {x: 0, y: 0, z: 0}
-    positionCloseToSource: {x: 0, y: 0, z: 0}
-  pather: {fileID: 0}
-  sekr: {fileID: 0}
   darkHitBox: {fileID: 0}
   textMesh: {fileID: 102784145251410432}
   updateStates: 0
@@ -1016,6 +1010,35 @@ MonoBehaviour:
   bezierTangentLength: 0.4
   offset: 0.12
   factor: 0.4
+--- !u!114 &114915333190766522
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efee954c69f0d421086729bb8df1137f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  uniqueID: 5243396792338100367
+  points: []
+  convex: 1
+  minBoundsHeight: 1
+  penaltyDelta: 500
+  modifyWalkability: 0
+  setWalkability: 0
+  applyOnStart: 1
+  applyOnScan: 1
+  updatePhysics: 1
+  resetPenaltyOnPhysics: 1
+  updateErosion: 1
+  modifyTag: 1
+  setTag: 2
+  legacyMode: 0
+  serializedVersion: 1
+  legacyUseWorldSpace: 0
 --- !u!136 &136796206659899728
 CapsuleCollider:
   m_ObjectHideFlags: 1

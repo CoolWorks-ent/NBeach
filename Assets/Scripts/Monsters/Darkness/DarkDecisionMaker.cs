@@ -42,12 +42,12 @@ namespace DarknessMinion
 
         private bool ReachedDestination(Darkness controller)
         {
-            return controller.pather.reachedDestination;
+            return controller.movement.AtDestination();
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)
         {
-            return !controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Idling);
+            return !controller.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Idling);
         }
 
         private bool AggresiveCheck(Darkness controller)
@@ -71,7 +71,7 @@ namespace DarknessMinion
 
         private bool AttackOnCooldownCheck(Darkness controller)
         {
-            return controller.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking);
+            return controller.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking);
         }
 
         private bool PausedNextCommandCheck(Darkness controller)

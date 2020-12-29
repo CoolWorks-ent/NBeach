@@ -22,8 +22,9 @@ namespace DarknessMinion
                 darkController.pather.canMove = true;
             else darkController.pather.canMove = false;*/
             //darkController.pather.canSearch = false;
-            darkController.pather.canMove = false;
+            //darkController.pather.canMove = false;
             //darkController.pather.endReachedDistance = attackInitiationRange;
+            darkController.movement.StopMovement();
         }
 
         public override void UpdateState(Darkness darkController)
@@ -38,37 +39,29 @@ namespace DarknessMinion
             
             if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
             {
-                
                 if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out darkController.rayHitInfo, 5, darkController.mask)) //controller.playerDist < attackInitiationRange && 
                 {
                     Debug.Log("Hit collider: " + darkController.rayHitInfo.collider.name);
                     if(darkController.rayHitInfo.collider.name == "Player")
                     {
-                        if(!darkController.CheckActionsOnCooldown(DarkState.CooldownStatus.Attacking))
+                        if(!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                         {
                             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
                             //controller.animeController.SetTrigger(controller.attackTrigHash);
                             
-                            darkController.AddCooldown(new CooldownInfo(2f, CooldownStatus.Attacking, CooldownCallback));
+                            darkController.AddCooldown(new CooldownInfo(2f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
                             //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
                             darkController.darkHitBox.enabled = true;
                             darkController.attacked = true;
                         }
                     }
                 }
-                else
-                {
-                        //darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
-                    Vector3 pDir = DarknessManager.Instance.PlayerToDirection(darkController.transform.position);
-                    Vector3 dir = Vector3.RotateTowards(darkController.transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
-                    darkController.transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
-                }
+                else darkController.movement.RotateTowardsPlayer();
             }
         }
 
         public override void ExitState(Darkness darkController)
         {
-            darkController.pather.endReachedDistance -= 1.0f;
             base.ExitState(darkController);
             //controller.attacked = false;
             //controller.animeController.SetBool(controller.attackAfterHash, true);
@@ -85,7 +78,7 @@ namespace DarknessMinion
             darkController.darkHitBox.enabled = false;
             //animeController.SetTrigger(animationID);
             darkController.attacked = false;
-            darkController.pather.canMove = true;
+            darkController.movement.StopMovement();
         }
     }
 }

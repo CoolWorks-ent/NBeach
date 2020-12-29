@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4400177786202110}
   - component: {fileID: 114595640382436030}
   - component: {fileID: 114964895663174236}
+  - component: {fileID: 114270159059498466}
   m_Layer: 0
   m_Name: AI Manager
   m_TagString: AI Manager
@@ -35,12 +36,31 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1087406834434032}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 178.78412, y: 43.62, z: 77.06829}
+  m_LocalPosition: {x: 178.78412, y: 43.57, z: 77.06829}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114270159059498466
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1087406834434032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11af13498ae4e36499000c19a9222ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  darknessPrefab: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
+    type: 2}
+  showDebugInfo: 1
+  targetInfo: 0
+  agroRating: 0
+  stateInfo: 0
+  locationInfo: 0
+  cooldownInfo: 0
 --- !u!114 &114595640382436030
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -54,17 +74,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   data:
-    dataString: UEsDBBQAAAgIAACAn+s6dDEHVgIAAP4EAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVMty4jAQ/BVK503KBsJjb7sOIXvIo8Ju5eKLsMZYhSy59AgQin/fkSywQ06Ynp6Z7pmxj4RL00BhlV5qzp4UA/JzQPwz+THogo+wpxslV/wTzpx3zmzlSTRw3qjlCvHUpxlVg9W8+CU3wpMTBJ3kpdL1gm0gU8YahEsqDGBIK+uzJULHAdnHhEP8/fS/gxM+FSAt6I6Vzoe3d8NITce3o8ieTAPdyULQugHmZXdZ83PxWVtVoqHI8OILJQQ3UQ2xhya4zWhjHHpBAuMU3QUdnl8B31QW/wz7yS9lacBGB5oe7rnGIbVVyW/VTq6mZtvq+qDC+T4ztBREtVWfvhFuxul0kk5GgVRqVT+e26eJb2UrXmzf6KGgxvYm3Ifvv+p3ckfFlq4FvFcgn9VSKycZBq12PtUZGN73Sl0sZhUU247XKr4CXfN9p2m301MYwj4TvF575HbcAiuhwtjDqkDjgv6g4HAjJlZC1Iv4Z+Av3fSPKQYeuDYWQ7Gh9OrWymlPJYswM2/G2UxpCQGOmhuQVNjDK5ax15u8ivXaXkUeqH9tYvMYO78NVykB7vhJchV6VbvLskyldk9gqhdnBZf9Yj7yjIPKlJTtpfUsndNWTpe06KdtHGdfL4wwtp5P7mbTMV1Dmk7Tm3VCR6MJJEk6LudlOSLh+LhEo1S8tkrjfHBtsmsr8dDOn5PBUtMmXD3TdLfkn7XqCeSyVKtCA8iXtsLFFmhsgm8nWzCOE1qBtVyGhZNjToQqtsDyS6E8WF3sraZ5VyUnDf9Q1iM5ycJHJCcncvoPUEsDBBQAAAgIAACAn+shBV2xbAAAAHcAAAAJACQAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0Bq1YqSy0qzszPU7JSMNEz0rPQUVBKL0osyCgGChiCOKWZKSB2tFJKSpKlmamFuUliUqqhobmhbpJBorGxWaqBgaFJmmVamrFSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAICf6zp0MQdWAgAA/gQAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAICf6yEFXbFsAAAAdwAAAAkAJAAAAAAAAAAAAAAAowIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAABaAwAAAAA=
+    dataString: UEsDBBQAAAgIAACAn+vOb8nMWwIAAAcFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVE1z4jAM/SuMz1smAUphb7uB0j30Y8ru9JKLiRXiwdgZfxRoh/++smNImp6Skd6T3pOUfBIuTQ2FVXqlOXtUDMjPAfHv5MegTT7AkW6VXPMPuGDeOLOVB9GAeaWWK4ynnmbUHqzmxS+5FR6cYNBJXiq9X7ItZMpYg+GSCgOY0sp6tsTQ54AcI+EUnx/+OTjjWwHSgm5R6Xw0vB1F6CQZjtJ0Or6dRs5sPJzNA8/JQtB9Dczr79CTS5tpU1+itQjxVQslBDdRF7GnOvjOaG0cukIA4xR9BkXedgV8W9k++bksDdjoRdPTgmscV1OV/FbNDPfU7Bph71Q432eG5oKopurjN8DNJL2bot8AKrXaP1zaN75sxYvdKz0V1NjOrLvhxVf9Th6o2NGNgLcK5JNaaeUkw6TVzlOdgdGiU+pqMaug2LW4RnEv6Orv203b7Z7DEI6Z4PuNjwwnTWAtVBj73HNA44L+oOBwLSZWwqgX8c/AX7rtnlVM3HNtLKZiQ+nVbZTTHkqWYWbejLOZ0hJCOGquQVJhTy9YxvY32ct12vYy99R/QLF5zF2+ix4lhFt8kvRSL+pwXZap1OERTPXsrOASWtE+8YRzypSUzaF1Z3KhrZ0uadGhbR1nXw+MMLaZT29ndxO6gTS9S282CR2Pp5Ak6aScl+WYhNvjEn1S8dIIjePBrcm2uMQ7u/xXBitN63D0TNPDin/sVWfkXJZqXWgA+dxUuAoHjU3w42RLxnFAa7CWy7Bv8pkToYodsPxaKA9Ol0erad5WyUnN35X1kZxk4W+SkzM5/wdQSwMEFAAACAgAAICf6yEFXbFsAAAAdwAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPSs9BRUEovSizIKAYKGII4pZkpIHa0UkpKkqWZqYW5SWJSqqGhuaFukkGisbFZqoGBoUmaZVqasVIsUH1JZUGqX2JuKkRPQGJJRlpmXkpmXrqee1FmijvIaKXYWgBQSwECLQAUAAAICAAAgJ/rzm/JzFsCAAAHBQAACwAkAAAAAAAAAAAAAAAAAAAAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwECLQAUAAAICAAAgJ/rIQVdsWwAAAB3AAAACQAkAAAAAAAAAAAAAACoAgAAbWV0YS5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsFBgAAAAACAAIAuAAAAF8DAAAAAA==
     upgradeData: 
     file_cachedStartup: {fileID: 4900000, guid: 21f303a13747b394aac2cb72b2113fdd,
       type: 3}
     data_cachedStartup: 
     cacheStartup: 1
   showNavGraphs: 1
-  showUnwalkableNodes: 1
-  debugMode: 0
+  showUnwalkableNodes: 0
+  debugMode: 4
   debugFloor: 0
-  debugRoof: 1
+  debugRoof: 1000
   manualDebugFloorRoof: 0
   showSearchTree: 0
   unwalkableNodeDebugSize: 0.3
@@ -84,8 +104,8 @@ MonoBehaviour:
     _AreaColors: []
   tagNames:
   - Basic Ground
-  - 1
-  - 2
+  - Obstacle
+  - Darkness
   - 3
   - 4
   - 5
@@ -95,7 +115,7 @@ MonoBehaviour:
   - 9
   - 10
   - 11
-  - Darkness
+  - 12
   - 13
   - 14
   - 15
@@ -115,18 +135,18 @@ MonoBehaviour:
   - 29
   - 30
   - 31
-  heuristic: 2
+  heuristic: 1
   heuristicScale: 1
-  threadCount: 2
+  threadCount: 1
   maxFrameTime: 10
   batchGraphUpdates: 1
-  graphUpdateBatchingInterval: 0.75
+  graphUpdateBatchingInterval: 0.5
   euclideanEmbedding:
     mode: 0
     seed: 0
     pivotPointRoot: {fileID: 0}
     spreadOutCount: 1
-  showGraphs: 0
+  showGraphs: 1
 --- !u!114 &114964895663174236
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -142,7 +162,7 @@ MonoBehaviour:
   attackPointHolder: {fileID: 0}
   darknessIDCounter: 0
   darknessConcurrentAttackLimit: 0
-  maxEnemyCount: 0
-  minEnemyCount: 0
+  maxEnemyCount: 6
+  minEnemyCount: 1
   AttackPoints: []
   attackApprovalPriority: 

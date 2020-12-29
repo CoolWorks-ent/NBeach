@@ -19,15 +19,15 @@ namespace DarknessMinion
 		{
 			base.InitializeState(darkController);
 			//AI_Manager.OnRequestNewTarget(controller.creationID);
-			darkController.navTarget.ReleaseTarget();
+			//darkController.navTarget.ReleaseTarget();
 			//PopulatePatrolPoints(5, darkController);
 			//darkController.animeController.SetTrigger(darkController.chaseHash);
 			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
-			darkController.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
-			darkController.pather.destination = darkController.navTarget.GetPosition();
-			darkController.pather.canMove = true;
-			darkController.pather.canSearch = true;
-			darkController.pather.pickNextWaypointDist = 0.95f;
+			//darkController.AddCooldown(new CooldownInfo(timeToPickNextPoint, CooldownStatus.Patrolling, CooldownCallback));
+			//darkController.pather.destination = darkController.navTarget.GetPosition();
+			//darkController.pather.canMove = true;
+			//darkController.pather.canSearch = true;
+			//darkController.pather.pickNextWaypointDist = 0.95f;
 			//controller.pather.repathRate = timeToPickNextPoint;
 			//controller.aIMovement.wandering = true;
 			//ChooseNewPatrolPoints(controller);
@@ -47,14 +47,14 @@ namespace DarknessMinion
 			//     controller.aIMovement.wayPoint = ChoosePatrolPoint(controller);
 			// }
 			//controller.aIMovement.UpdatePath(controller.Target.position);
-			if (controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.attackDist)
+			/*if (controller.pather.reachedEndOfPath || controller.navTargetDist <= controller.attackDist)
 			{
 				//AI_Manager.OnRequestNewTarget(controller.creationID);
 				controller.pather.destination = controller.navTarget.GetPosition();
 			}
 			if (controller.playerDist < 3 && controller.pather.rotationSpeed < 360)
 				controller.pather.rotationSpeed = 400;
-			CheckTransitions(controller);
+			CheckTransitions(controller);*/
 		}
 
 		public override void MovementUpdate(Darkness controller)
@@ -117,9 +117,9 @@ namespace DarknessMinion
 		{
 			//controller.aIMovement.EndMovement();
 			//controller.aIMovement.wandering = false;
-			darkController.pather.canMove = false;
-			darkController.pather.canSearch = false;
-			darkController.sekr.CancelCurrentPathRequest();
+			//darkController.pather.canMove = false;
+			//darkController.pather.canSearch = false;
+			//darkController.sekr.CancelCurrentPathRequest();
 			//controller.animeController.ResetTrigger(controller.chaseHash);
 			base.ExitState(darkController);
 		}

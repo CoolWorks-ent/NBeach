@@ -68,7 +68,7 @@ namespace DarknessMinion
 
 			for (int i = 0; i < AttackPoints.Length; i++)
 			{
-				AttackPoints[i] = new NavigationTarget(playerAttackPoints[i], NavigationTarget.NavTargetTag.Attack);
+				AttackPoints[i] = new NavigationTarget(playerAttackPoints[i], player, NavigationTarget.NavTargetTag.Attack);
 				//Debug.Log("Attack point locaiton " + AttackPoints[i].objectTransform.position);
 				/*
 				Vector3 vector;
@@ -187,9 +187,9 @@ namespace DarknessMinion
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))
 			{
-				if (darkness.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Neutral)
+				if (darkness.movement.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Neutral)
 				{
-					darkness.navTarget.ReleaseTarget();
+					darkness.movement.navTarget.ReleaseTarget();
 				}
 			}
 		}
@@ -200,23 +200,24 @@ namespace DarknessMinion
 			Darkness darkness;
 			if (ActiveDarkness.TryGetValue(darkID, out darkness))
 			{	
-				if (darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)
+				int index = LeastRequestedAttackTarget();
+				if (index != -1)
 				{
-					int index = LeastRequestedAttackTarget();
-					if (index != -1)
-					{
-						AttackPoints[index].ClaimTarget(darkID);
-						darkness.navTarget = AttackPoints[index]; 
-					}
+					AttackPoints[index].ClaimTarget(darkID);
+					darkness.movement.navTarget = AttackPoints[index]; 
 				}
-				else 
+				//if (darkness.agRatingCurrent == Darkness.AggresionRating.Attacking)//TODO check if Darkness is above the cutoff is above the limit
+				//{
+					
+				//}
+				/*else 
 				{
-					if(darkness.navTarget.navTargetTag == NavigationTarget.NavTargetTag.Attack)
+					if(darkness.movement.navTarget.navTargetTag == NavigationTarget.NavTargetTag.Attack)
 					{
 						RemoveFromNavTargets(darkID);
-						darkness.CreateDummyNavTarget(player.position.y);
+						darkness.movement.CreateDummyNavTarget(player.position.y);
 					}
-				}
+				}*/
 			}
 		}
 		#endregion
@@ -262,20 +263,5 @@ namespace DarknessMinion
 			return ActiveDarkness.Count > maxEnemyCount;
 		}
 		#endregion
-
-		private void OnDrawGizmos()
-        {
-			foreach(NavigationTarget n in AttackPoints)
-			{
-				if(n.navTargetClaimed)
-				{
-					Gizmos.color = Color.red;
-				}
-				else Gizmos.color = Color.yellow;
-				Gizmos.DrawSphere(n.objectTransform.position, 1);
-				//Gizmos.color = Color.green;
-				//Gizmos.DrawSphere(n.closeToSrcPosition, 0.5f);
-			}
-        }
 	}
 }

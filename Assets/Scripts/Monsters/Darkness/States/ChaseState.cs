@@ -8,20 +8,20 @@ namespace DarknessMinion
 	{
 		[Range(0.25f, 5)]
 		public float pathUpdateRate;
-
+		[Range(0, 10)]
+		public int switchTargetDistance;
 
 		public override void InitializeState(Darkness darkController)
 		{
-			if (darkController.navTarget != null && darkController.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
+			if (darkController.movement.navTarget != null && darkController.movement.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
-				darkController.navTarget.ReleaseTarget();
+				darkController.movement.navTarget.ReleaseTarget();
 				DarkEventManager.OnRequestNewTarget(darkController.creationID);
 			}
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.pather.destination = darkController.navTarget.GetPosition();
-			darkController.pather.canMove = true;
-			darkController.pather.canSearch = true;
-			darkController.pather.repathRate = 1f;
+
+			darkController.movement.StartMovement();
+			darkController.movement.UpdateDestinationPath(false);
 			//CooldownCallback(darkController);
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
@@ -37,23 +37,22 @@ namespace DarknessMinion
 		}
 
 		public override void MovementUpdate(Darkness darkController)
-		{
-			darkController.pather.destination = darkController.navTarget.GetPosition();
+		{	
+			if(darkController.playerDist <= switchTargetDistance)
+				darkController.movement.UpdateDestinationPath(true);
+			else darkController.movement.UpdateDestinationPath(false);
 		}
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			darkController.pather.destination = darkController.navTarget.GetPosition();
-			darkController.sekr.StartPath(darkController.transform.position, darkController.pather.destination);
-			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
+			//darkController.movement.UpdateDestinationPath(false);
+			//darkController.sekr.StartPath(darkController.transform.position, darkController.pather.destination);
+			//darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 		}
 
 		public override void ExitState(Darkness darkController)
 		{
-			darkController.navTarget.ReleaseTarget();
-			darkController.pather.canMove = false;
-			darkController.pather.canSearch = false;
-			darkController.sekr.CancelCurrentPathRequest();
+			darkController.movement.StopMovement();
 			base.ExitState(darkController);
 			//controller.aIMovement.EndMovement();
 			//controller.pather.canSearch = false;
