@@ -737,6 +737,7 @@ public class song2_lvl : Level {
             t += Time.deltaTime;
             yield return null;
         }
+
         //start the dark boss' attack sequence
         darkBoss.stage = DarknessBoss.BossStage.stage1;
         darkBoss.status = DarknessBoss.BossStatus.start;
