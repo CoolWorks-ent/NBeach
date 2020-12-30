@@ -7,7 +7,7 @@ namespace DarknessMinion
 {
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete, ReachedDestination }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete, CloseToDestination }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
@@ -22,7 +22,7 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.NavTargetClose, NavTargetCloseCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
-            Decisions.Add(DecisionName.ReachedDestination, ReachedDestination);
+            Decisions.Add(DecisionName.CloseToDestination, CloseToDestination);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -40,9 +40,9 @@ namespace DarknessMinion
             }
         }
 
-        private bool ReachedDestination(Darkness controller)
+        private bool CloseToDestination(Darkness controller)
         {
-            return controller.movement.AtDestination();
+            return controller.movement.EndOrCloseToDestination();
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)
@@ -62,12 +62,12 @@ namespace DarknessMinion
             else return false;
         }
 
-        private bool AttackSuccessfullCheck(Darkness controller)
+        /*private bool AttackSuccessfullCheck(Darkness controller)
         {
             if (controller.attacked)
                 return true;
             else return false;
-        }
+        }*/
 
         private bool AttackOnCooldownCheck(Darkness controller)
         {

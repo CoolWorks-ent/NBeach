@@ -221,7 +221,6 @@ GameObject:
   - component: {fileID: 54991120590850454}
   - component: {fileID: 114511842479999518}
   - component: {fileID: 114150173797437670}
-  - component: {fileID: 114446345711301086}
   - component: {fileID: 114857173380954124}
   - component: {fileID: 114648332704818778}
   - component: {fileID: 136796206659899728}
@@ -911,23 +910,9 @@ MonoBehaviour:
       m_Bits: 4294967295
     useGraphRaycasting: 0
   traversableTags: -3
-  tagPenalties: 00000000e8030000f40100000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  tagPenalties: 00000000dc050000e80300000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
---- !u!114 &114446345711301086
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  penalty: 1000
-  randomStep: 10
 --- !u!114 &114511842479999518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -946,13 +931,11 @@ MonoBehaviour:
   updateStates: 0
   attacked: 0
   playerDist: 0
-  attackDist: 2
   navTargetDist: 0
   mask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
-  spawnState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114648332704818778
 MonoBehaviour:
@@ -968,8 +951,8 @@ MonoBehaviour:
   version: 2
   radius: 1.25
   height: 1.5
-  repathRate: 0.5
-  canSearch: 0
+  repathRate: 1
+  canSearch: 1
   canMove: 0
   maxSpeed: 1
   gravity: {x: NaN, y: NaN, z: NaN}
@@ -982,10 +965,10 @@ MonoBehaviour:
   targetCompatibility: {fileID: 0}
   maxAcceleration: -2.5
   rotationSpeed: 180
-  slowdownDistance: 0.6
-  pickNextWaypointDist: 0.99
+  slowdownDistance: 1
+  pickNextWaypointDist: 1
   endReachedDistance: 0
-  alwaysDrawGizmos: 1
+  alwaysDrawGizmos: 0
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 1
   constrainInsideGraph: 1
@@ -1026,11 +1009,11 @@ MonoBehaviour:
   points: []
   convex: 1
   minBoundsHeight: 1
-  penaltyDelta: 500
+  penaltyDelta: 1000
   modifyWalkability: 0
   setWalkability: 0
-  applyOnStart: 1
-  applyOnScan: 1
+  applyOnStart: 0
+  applyOnScan: 0
   updatePhysics: 1
   resetPenaltyOnPhysics: 1
   updateErosion: 1

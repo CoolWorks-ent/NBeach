@@ -19,7 +19,7 @@ namespace DarknessMinion
 				DarkEventManager.OnRequestNewTarget(darkController.creationID);
 			}
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-
+			darkController.movement.ChangeSwitchDistance(switchTargetDistance);
 			darkController.movement.StartMovement();
 			darkController.movement.UpdateDestinationPath(false);
 			//CooldownCallback(darkController);

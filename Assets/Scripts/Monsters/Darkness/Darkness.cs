@@ -27,23 +27,23 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public TextMesh textMesh;
-		public bool updateStates, attacked;
-		public float playerDist, attackDist, navTargetDist;
+		public bool updateStates;//, attacked;
+		public float playerDist, navTargetDist;
+
 		public LayerMask mask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
 		public int creationID { get; private set;}
-
-		
+		public float attackDist { get; private set; }
 
 		[SerializeField] //Tooltip("Assign in Editor"),
-		private DarkState deathState, spawnState, currentState;
+		private DarkState deathState, currentState;
 		private DarkState previousState;
 
 		private Animator animeController;
 
 		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
-		private List<GameObject> stateCache;
+		//private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
 		private int stateAnimID;
 
@@ -56,9 +56,9 @@ namespace DarknessMinion
 			navTargetDist = -1;
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-			attacked = false;
+			//attacked = false;
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
-			stateCache = new List<GameObject>();
+			//stateCache = new List<GameObject>();
 		}
 
 		void Start()
@@ -71,7 +71,6 @@ namespace DarknessMinion
 			animTriggerIdle = Animator.StringToHash("Idle");
 			animTriggerDeath = Animator.StringToHash("Death");
 			darkHitBox = GetComponent<CapsuleCollider>();
-			currentState = spawnState;
 			currentState.InitializeState(this);
 			previousState  = currentState;
 			darkHitBox.enabled = false;
@@ -192,6 +191,11 @@ namespace DarknessMinion
 			stateActionsOnCooldown.Clear();
 		}
 
+		public void SetAttackDistance(float atkValue)
+		{
+			attackDist = atkValue;
+		}
+
 		private void UpdateCooldownTimers()
 		{
 			List<CooldownInfo.CooldownStatus> deletedEntries = new List<CooldownInfo.CooldownStatus>();
@@ -208,7 +212,7 @@ namespace DarknessMinion
 			}
 		}
 
-		public GameObject GetLastObjectFromCache()
+		/*public GameObject GetLastObjectFromCache()
 		{
 			return stateCache[stateCache.Count-1];
 		}
@@ -222,7 +226,7 @@ namespace DarknessMinion
 		public void ClearStateCache()
 		{
 			stateCache.Clear();
-		}
+		}*/
 
 		private void OnTriggerEnter(Collider col)
 		{

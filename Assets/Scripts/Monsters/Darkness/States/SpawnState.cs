@@ -11,7 +11,7 @@ namespace DarknessMinion
 		//public SpawnState(Darkness dControl) : base(dControl){ }
 		public override void InitializeState(Darkness darkController)
 		{
-			//Debug.Break();
+			darkController.movement.StopMovement();
 			GameObject newFX = Instantiate(spawnFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             newFX.transform.SetParent(darkController.transform);
 			Destroy(newFX, 3);

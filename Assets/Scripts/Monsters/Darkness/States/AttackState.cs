@@ -10,8 +10,8 @@ namespace DarknessMinion
         //[Range(0, 5)]
         //public float attackCooldown;
 
-        //[Range(0, 10)]
-        //public float attackInitiationRange, attackSwitchTargetDistance;
+        [Range(0, 10)]
+        public float attackInitiationRange;
 
         //public AttackState(Darkness dControl) : base(dControl){ }
 
@@ -25,6 +25,8 @@ namespace DarknessMinion
             //darkController.pather.canMove = false;
             //darkController.pather.endReachedDistance = attackInitiationRange;
             darkController.movement.StopMovement();
+            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+            darkController.SetAttackDistance(attackInitiationRange);
         }
 
         public override void UpdateState(Darkness darkController)
@@ -52,7 +54,7 @@ namespace DarknessMinion
                             darkController.AddCooldown(new CooldownInfo(2f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
                             //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
                             darkController.darkHitBox.enabled = true;
-                            darkController.attacked = true;
+                            //darkController.attacked = true;
                         }
                     }
                 }
@@ -77,7 +79,7 @@ namespace DarknessMinion
         {
             darkController.darkHitBox.enabled = false;
             //animeController.SetTrigger(animationID);
-            darkController.attacked = false;
+            //darkController.attacked = false;
             darkController.movement.StopMovement();
         }
     }

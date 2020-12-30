@@ -16,7 +16,7 @@ namespace DarknessMinion
         private Rigidbody rgdBod;
         private Blocker bProvider;
 
-        private float maxSpeed, maxAccel;
+        private float maxSpeed, maxAccel, switchTargetDistance;
         private AIPath pather;
         private Transform transform;
         private GraphUpdateScene graphUpdateScene;
@@ -81,9 +81,16 @@ namespace DarknessMinion
 			pather.canSearch = true;
         }
 
-        public bool AtDestination()
+        public void ChangeSwitchDistance(float changeValue)
         {
-            return pather.reachedDestination;
+            switchTargetDistance = changeValue;
+        }
+
+        public bool EndOrCloseToDestination()
+        {
+            if(pather.remainingDistance <= switchTargetDistance || pather.reachedDestination)
+                return true;
+            else return false;
         }
 
         public void UpdateDestinationPath(bool attacking)
