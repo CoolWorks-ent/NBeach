@@ -51,8 +51,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 221f3ffb7d2d95e429d6c222733f894f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelNum: 0
+  pathControl: {fileID: 0}
   enemySpawners: {fileID: 0}
-  gController: {fileID: 0}
   pickupShells:
   - {fileID: 114646188040674006, guid: f168e21438ba1e64a8432fe73eabfe00, type: 2}
   - {fileID: 114475835282828238, guid: 18f76585dd385644d9a1dad30a8859a4, type: 2}
@@ -66,6 +67,16 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  stage1StartTime: 45
+  stage2StartTime: 60
+  stage3StartTime: 90
+  stage3EndTime: 110
+  finalStageEndTime: 130
+  darkSpawnRate_Stage0: 6
+  darkSpawnRate_Stage0_1: 5
+  darkSpawnRate_Stage1: 4
+  darkSpawnRate_Stage2: 2
+  darkSpawnRate_Stage3: 1
   speedBoostPowerUp: {fileID: 114224871758845490, guid: 16fd1532217bf4948859d0c6f64062fa,
     type: 2}
   coverRocks:
@@ -73,11 +84,39 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   darkBoss: {fileID: 0}
+  lightningBolts:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   RainFX: {fileID: 0}
+  RainFX_2: {fileID: 0}
+  RainFX_3: {fileID: 0}
+  RainFX_Wide: {fileID: 0}
   dirtImpactFX: {fileID: 1414711669276664, guid: 101a0171c018ff54783935b1976a015b,
     type: 2}
   enemyStageObj: {fileID: 0}
   playerStageObj: {fileID: 0}
   pathControl_EndScene: {fileID: 0}
+  eyelidAnimator2D: {fileID: 0}
+  bossAttackSpeed_stage1: 4
+  bossAttackSpeed_stage2: 5
+  bossAttackSpeed_stage3: 6
+  bossTimeBtwAttacks_stage1: 1
+  bossTimeBtwAttacks_stage2: 1.5
+  bossTimeBtwAttacks_stage3: 1.5
+  darkBossEndPos: {fileID: 0}
+  rockMaterial: {fileID: 2100000, guid: f6c03cae42b441a4bb4716186ba80d44, type: 2}
+  rockMaterial_2: {fileID: 2100000, guid: 51445bf23eef08347b3c48c2b2bf0945, type: 2}
+  cloudMaterial: {fileID: 2100000, guid: e81b514c12ba0664fbc57ec69d79721d, type: 2}
+  nightSkybox: {fileID: 0}
+  titleText: {fileID: 0}
   blackOverlay: {fileID: 0}
   stageNum: 0

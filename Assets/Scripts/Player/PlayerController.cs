@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     public SimpleAnimator2D animator_EyeBlink;
     [SerializeField]
+    public Image DmgOverlay;
+    [SerializeField]
+    public Image BlackOverlay;
 
     public Camera mainCamera;
     public Camera UICamera;

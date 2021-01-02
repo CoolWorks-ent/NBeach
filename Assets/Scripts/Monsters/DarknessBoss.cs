@@ -66,7 +66,7 @@ public class DarknessBoss : MonoBehaviour {
         //Screen.showCursor = false;
         animationControl = GetComponent<Animator>();
         stage = BossStage.stage0;
-        target = GameObject.FindGameObjectWithTag("Player");
+        target = GameController.instance.playerControl.gameObject; //GameObject.FindGameObjectWithTag("Player");
 
         doAttackHit.Add("BALL", BossAttackType.Ball);
         doAttackHit.Add("SMASH", BossAttackType.Smash);

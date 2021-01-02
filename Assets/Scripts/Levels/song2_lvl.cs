@@ -62,7 +62,7 @@ public class song2_lvl : Level {
     [SerializeField]
     CameraPathAnimator pathControl_EndScene;
     [SerializeField]
-    SimpleAnimator2D animator2D;
+    SimpleAnimator2D eyelidAnimator2D;
     [SerializeField]
     int bossAttackSpeed_stage1 = 4, bossAttackSpeed_stage2 = 5, bossAttackSpeed_stage3 = 6;
     [SerializeField]
@@ -613,7 +613,7 @@ public class song2_lvl : Level {
 
         yield return new WaitForSeconds(5);
         //display eye-blink overrlay and block the change of the skybox
-        animator2D.Play("eyeClose");
+        eyelidAnimator2D.Play("eyeClose");
         yield return new WaitForSeconds(0.1f);
         blackOverlay.gameObject.SetActive(true);
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
@@ -632,7 +632,7 @@ public class song2_lvl : Level {
         yield return new WaitForSeconds(0.3f);
 
         //Display eye-open animation and show world. disable black overlay too
-        animator2D.Play("eyeOpen");
+        eyelidAnimator2D.Play("eyeOpen");
         blackOverlay.gameObject.SetActive(false);
         yield return new WaitForSeconds(1);
 
@@ -1096,7 +1096,7 @@ public class song2_lvl : Level {
         if (blackOverlay != null)
         {
                 //display eye-blink overrlay
-                animator2D.Play("eyeClose");
+                eyelidAnimator2D.Play("eyeClose");
                 yield return new WaitForSeconds(0.1f);
                 blackOverlay.gameObject.SetActive(true);
                 blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
