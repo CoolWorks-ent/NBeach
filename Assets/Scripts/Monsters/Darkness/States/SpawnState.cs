@@ -10,12 +10,12 @@ namespace DarknessMinion
 		public float spawnDelay;
 		//public SpawnState(Darkness dControl) : base(dControl){ }
 		public override void InitializeState(Darkness darkController)
-		{
-			darkController.movement.StopMovement();
+		{	
 			GameObject newFX = Instantiate(spawnFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             newFX.transform.SetParent(darkController.transform);
 			Destroy(newFX, 3);
-			darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownInfo.CooldownStatus.Spawn, CooldownCallback)); 
+			darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownInfo.CooldownStatus.Spawn, CooldownCallback));
+			//darkController.movement.StopMovement();
 			//Debug.Log(this.name + " cooldown added at: " + Time.time);
 		}
 

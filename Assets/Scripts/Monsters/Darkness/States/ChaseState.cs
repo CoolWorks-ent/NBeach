@@ -8,8 +8,6 @@ namespace DarknessMinion
 	{
 		[Range(0.25f, 5)]
 		public float pathUpdateRate;
-		[Range(0, 10)]
-		public int switchTargetDistance;
 
 		public override void InitializeState(Darkness darkController)
 		{
@@ -19,9 +17,10 @@ namespace DarknessMinion
 				DarkEventManager.OnRequestNewTarget(darkController.creationID);
 			}
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.movement.ChangeSwitchDistance(switchTargetDistance);
+			//darkController.movement.ChangeSwitchDistance(switchTargetDistance);
 			darkController.movement.StartMovement();
 			darkController.movement.UpdateDestinationPath(false);
+			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 			//CooldownCallback(darkController);
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
@@ -38,13 +37,16 @@ namespace DarknessMinion
 
 		public override void MovementUpdate(Darkness darkController)
 		{	
-			if(darkController.playerDist <= switchTargetDistance)
-				darkController.movement.UpdateDestinationPath(true);
-			else darkController.movement.UpdateDestinationPath(false);
+			darkController.movement.MoveDarkness();
 		}
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
+			if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
+				darkController.movement.UpdateDestinationPath(true);
+			else darkController.movement.UpdateDestinationPath(false);
+
+			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 			//darkController.movement.UpdateDestinationPath(false);
 			//darkController.sekr.StartPath(darkController.transform.position, darkController.pather.destination);
 			//darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));

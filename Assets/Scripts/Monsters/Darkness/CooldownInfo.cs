@@ -7,14 +7,11 @@ namespace DarknessMinion
         public enum CooldownStatus { Attacking, Patrolling, Idling, Moving, Spawn}
         public CooldownStatus acType { get; private set; }
         private float remainingTime;
-        //public float coolDownTime;
         public Action<Darkness> Callback;
-        //public Coroutine durationRoutine;
 
         public CooldownInfo(float cdTime, CooldownStatus acT, Action<Darkness> cback)
         {
             remainingTime = cdTime;
-            //coolDownTime = cdTime;
             acType = acT;
             Callback = cback;
         }

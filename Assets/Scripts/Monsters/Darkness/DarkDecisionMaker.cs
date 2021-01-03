@@ -42,7 +42,9 @@ namespace DarknessMinion
 
         private bool CloseToDestination(Darkness controller)
         {
-            return controller.movement.EndOrCloseToDestination();
+            if (controller.movement.remainingDistance <= controller.movement.switchTargetDistance)
+                return true;
+            else return false;
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)
@@ -57,7 +59,7 @@ namespace DarknessMinion
 
         private bool AttackRangeCheck(Darkness controller)
         {
-            if (controller.playerDist < controller.attackDist)
+            if (controller.movement.playerDist < controller.attackDist)
                 return true;
             else return false;
         }
@@ -97,14 +99,14 @@ namespace DarknessMinion
 
         private bool PlayerOutOfRangeCheck(Darkness controller)
         {
-            if (controller.playerDist > controller.attackDist)
+            if (controller.movement.playerDist > controller.attackDist)
                 return true;
             else return false;
         }
 
         private bool NavTargetCloseCheck(Darkness controller)
         {
-            if (controller.navTargetDist < controller.attackDist)
+            if (controller.movement.navTargetDist < controller.attackDist)
                 return true;
             else return false;
         }

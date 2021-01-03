@@ -152,7 +152,7 @@ namespace DarknessMinion
 		{
 			attackApprovalPriority.Sort(delegate (int a, int b)
 			{
-				return ActiveDarkness[a].playerDist.CompareTo(ActiveDarkness[b].playerDist);
+				return ActiveDarkness[a].movement.playerDist.CompareTo(ActiveDarkness[b].movement.playerDist);
 			});
 		}
 		#endregion

@@ -10,6 +10,7 @@ using System;
 
 namespace DarknessMinion
 {
+	[RequireComponent(typeof(DarknessMovement))]
 	public class Darkness : MonoBehaviour
 	{
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
@@ -28,15 +29,15 @@ namespace DarknessMinion
 		[HideInInspector]
 		public TextMesh textMesh;
 		public bool updateStates;//, attacked;
-		public float playerDist, navTargetDist;
 
+		[HideInInspector]
 		public LayerMask mask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
 		public int creationID { get; private set;}
 		public float attackDist { get; private set; }
 
-		[SerializeField] //Tooltip("Assign in Editor"),
+		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
 		private DarkState previousState;
 
@@ -53,7 +54,6 @@ namespace DarknessMinion
 		{
 			//swtichDist = 4.6f; 
 			creationID = 0;
-			navTargetDist = -1;
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			//attacked = false;
@@ -63,7 +63,8 @@ namespace DarknessMinion
 
 		void Start()
 		{
-			movement = new DarknessMovement(GetComponent<Rigidbody>(), GetComponent<Seeker>(), GetComponent<AIPath>(), this.transform);
+			//movement = new DarknessMovement(GetComponent<Rigidbody>(), GetComponent<Seeker>(), this.transform);
+			movement = GetComponent<DarknessMovement>();
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			animTriggerAttack =	Animator.StringToHash("Attack");
@@ -71,14 +72,13 @@ namespace DarknessMinion
 			animTriggerIdle = Animator.StringToHash("Idle");
 			animTriggerDeath = Animator.StringToHash("Death");
 			darkHitBox = GetComponent<CapsuleCollider>();
-			currentState.InitializeState(this);
 			previousState  = currentState;
 			darkHitBox.enabled = false;
 			mask = LayerMask.GetMask("Player");
 			stateAnimID = Animator.StringToHash("StateID");
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
-			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
+			currentState.InitializeState(this);
 			//ChangeAnimation(DarkAnimationStates.Spawn);
 		}
 
@@ -147,20 +147,6 @@ namespace DarknessMinion
 		}
 
 		#region Frequently Ran 
-		public void DistanceEvaluation(Vector3 location)
-		{
-			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(location));
-			if (movement.navTarget != null)
-			{
-				navTargetDist = Vector3.Distance(transform.position, movement.navTarget.GetNavPosition());
-			}
-			else navTargetDist = -1;
-		}
-
-		private Vector2 ConvertToVec2(Vector3 vector)
-		{
-			return new Vector2(vector.x, vector.z);
-		}
 
 		public void AggressionRatingUpdate(AggresionRating agR)
 		{
@@ -252,7 +238,6 @@ namespace DarknessMinion
 		private void OnDestroy()
 		{
 			DarkEventManager.UpdateDarknessStates -= UpdateStates;
-			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
 		}
 
 
@@ -266,7 +251,7 @@ namespace DarknessMinion
 			if(showStateInfo)
 				debugMessage += String.Format("\n <b>Current State:</b> {0} \n" + "Previous State: {1} \n", currentState.ToString(), previousState.ToString());
 			if(showLocationInfo)	
-				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>NavTarget Distance:</b> {1} \n" + "<b>Darkness Position:</b> {2}", playerDist, navTargetDist, this.transform.position);
+				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>NavTarget Distance:</b> {1} \n" + "<b>Darkness Position:</b> {2}", movement.playerDist, movement.navTargetDist, this.transform.position);
 			if(showCooldownInfo)
 				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
 			textMesh.text = debugMessage;

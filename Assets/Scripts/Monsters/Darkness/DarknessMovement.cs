@@ -4,11 +4,18 @@ using Pathfinding;
 
 namespace DarknessMinion
 {
-    
-    public class DarknessMovement 
+    public class DarknessMovement : MonoBehaviour
     {
-        public Vector3 direction, velocity, targetDirection;
-        public bool moving; //reachedEndOfPath, wandering targetMoved;
+        public Vector3 direction { get; private set; } 
+        public Vector3 velocity { get; private set; }
+        public Vector3 targetDirection{ get; private set; }
+        public Vector3 position { get { return transform.position; } }
+
+        public Vector3[] directions;
+        public float remainingDistance { get; private set; }
+
+        public bool moving, attackPosition;
+        public float rotationSpeed, switchTargetDistance, playerDist, navTargetDist;
         public NavigationTarget navTarget;
 
         private Seeker sekr;
@@ -16,22 +23,38 @@ namespace DarknessMinion
         private Rigidbody rgdBod;
         private Blocker bProvider;
 
-        private float maxSpeed, maxAccel, switchTargetDistance;
-        private AIPath pather;
-        private Transform transform;
+        private float maxSpeed, maxAccel;
         private GraphUpdateScene graphUpdateScene;
+        private DarknessSteering steering;
 
-        public DarknessMovement(Rigidbody rigidBody, Seeker seeker, AIPath path, Transform tform)
+        void Awake()
         {
-            //speed = 2;
+            steering = new DarknessSteering();
+            sekr = GetComponent<Seeker>();
+            rgdBod = GetComponent<Rigidbody>();
+        }
+
+        void Start()
+        {
             moving = false;
-            sekr = seeker;
-            rgdBod = rigidBody;
-            pather = path;
-            sekr.pathCallback += PathComplete;
+            //sekr.pathCallback += PathComplete;
             bProvider = new Blocker();
             direction = new Vector3();
-            transform = tform;
+            DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
+        }
+        public void DistanceEvaluation(Vector3 location)
+        {
+            playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(location));
+            if (navTarget != null)
+            {
+                navTargetDist = Vector3.Distance(transform.position, navTarget.GetNavPosition());
+            }
+            else navTargetDist = -1;
+        }
+
+        private Vector2 ConvertToVec2(Vector3 vector)
+        {
+            return new Vector2(vector.x, vector.z);
         }
 
         public void MoveDarkness()
@@ -39,65 +62,56 @@ namespace DarknessMinion
             if (moving && navPath != null)
             {
                 direction = Vector3.Normalize(navPath.vectorPath[1] - transform.position);
-                rgdBod.AddForce(direction); //* speed);
-                                              //rigidbod.MovePosition(direction * speed * Time.deltaTime);
+                //rgdBod.AddForce(direction); 
+                                              
                 float maxSpeedChange = maxAccel * Time.deltaTime;
                 Vector2 desiredVelocity = targetDirection * maxSpeed;
-                velocity = rgdBod.velocity;
+                //velocity = rgdBod.velocity;
 
-                velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-                velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.y, maxSpeedChange);
+                velocity = new Vector3(Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange), 0,
+                    Mathf.MoveTowards(velocity.z, desiredVelocity.y, maxSpeedChange));
 
                 rgdBod.velocity = velocity;
             }
-        }
-
-        public void UpdatePath(Vector3 target)
-        {
-            if (sekr.IsDone())
-                CreatePath(target);
         }
 
         public void RotateTowardsPlayer()
         {
             Vector3 pDir = DarknessManager.Instance.PlayerToDirection(transform.position);
 			Vector3 dir = Vector3.RotateTowards(transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
-            //Debug.Log("Currently the rotatation direction is at: " + dir + " or " + Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z)).eulerAngles);
 			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+        }
+
+        public void RotateTowardsDirection()
+        {
+            Vector3 dir = Vector3.RotateTowards(transform.forward, direction, rotationSpeed * Time.deltaTime, 0.1f);
+            transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
         }
 
         public void StopMovement()
         {
-            if (!sekr.IsDone())
-                sekr.CancelCurrentPathRequest();
-            moving = false;
-            pather.canSearch = false;
-            pather.canMove = false;
+            if(sekr != null)
+            {
+                if (!sekr.IsDone())
+                    sekr.CancelCurrentPathRequest();
+                moving = false;
+            }
+            //pather.canSearch = false;
+            //pather.canMove = false;
         }
 
         public void StartMovement()
         {
-            pather.canMove = true;
-			pather.canSearch = true;
-        }
-
-        public void ChangeSwitchDistance(float changeValue)
-        {
-            switchTargetDistance = changeValue;
-        }
-
-        public bool EndOrCloseToDestination()
-        {
-            if(pather.remainingDistance <= switchTargetDistance || pather.reachedDestination)
-                return true;
-            else return false;
+            moving = true;
+            //pather.canMove = true;
+			//pather.canSearch = true;
         }
 
         public void UpdateDestinationPath(bool attacking)
         {
             if(attacking)
-                pather.destination = navTarget.GetAttackPosition();
-            else pather.destination = navTarget.GetNavPosition();
+                 CreatePath(navTarget.GetAttackPosition());
+            else CreatePath(navTarget.GetNavPosition());
         }
 
         public void CreateDummyNavTarget(float elavation)
@@ -106,11 +120,20 @@ namespace DarknessMinion
 			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
 		}
 
+        public void CreatePath(Vector3 endPoint)
+        {
+            //bProvider.blockedNodes.Clear();
+            //Path p = ABPath.Construct(transform.position, endPoint);
+            //p.traversalProvider = bProvider;
+            sekr.StartPath(position, endPoint, PathComplete);
+            //p.BlockUntilCalculated();
+        }
+
         private void PathComplete(Path p)
         {
-            Debug.LogWarning("path callback complete");
+            //Debug.LogWarning("path callback complete");
             p.Claim(this);
-            BlockPathNodes(p);
+            //BlockPathNodes(p);
             if (!p.error)
             {
                 if (navPath != null)
@@ -130,16 +153,6 @@ namespace DarknessMinion
             {
                 bProvider.blockedNodes.Add(n);
             }
-            //Debug.Break();
-        }
-
-        public void CreatePath(Vector3 endPoint)
-        {
-            bProvider.blockedNodes.Clear();
-            Path p = ABPath.Construct(transform.position, endPoint);
-            p.traversalProvider = bProvider;
-            sekr.StartPath(p, null);
-            p.BlockUntilCalculated();
         }
 
         private class Blocker : ITraversalProvider
@@ -154,6 +167,12 @@ namespace DarknessMinion
             {
                 return DefaultITraversalProvider.GetTraversalCost(path, node);
             }
+        }
+
+
+        void OnDestroy()
+        {
+            DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
         }
     }
 }
