@@ -147,7 +147,6 @@ namespace DarknessMinion
 		}
 
 		#region Frequently Ran 
-
 		public void AggressionRatingUpdate(AggresionRating agR)
 		{
 			if (agR != agRatingCurrent)

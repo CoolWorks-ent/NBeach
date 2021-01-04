@@ -7004,6 +7004,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: f6c03cae42b441a4bb4716186ba80d44, type: 2}
+    - target: {fileID: 1006897838119362, guid: 3f932d904fd1a0b4e9af1ec3f9dde9c6, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3f932d904fd1a0b4e9af1ec3f9dde9c6, type: 2}
   m_IsPrefabParent: 0
@@ -60199,7 +60203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6ebef78d6927241b99983bf31b06af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  darknessEnemy: {fileID: 114511842479999518, guid: 8b7fc8043cc42c94797b7ca168061631,
+  darknessEnemy: {fileID: 114511842479999518, guid: dc628364e3d2c884783040d81df6ae2f,
     type: 2}
   spawnRate: 3
   spawnLocs:
@@ -85198,6 +85202,11 @@ Prefab:
       propertyPath: attackPointHolder
       value: 
       objectReference: {fileID: 652888667}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: debugRoof
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
