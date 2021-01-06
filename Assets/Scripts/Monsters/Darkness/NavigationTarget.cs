@@ -14,7 +14,7 @@ namespace DarknessMinion
 		[SerializeField]
 		private Vector3 position, positionOffset, positionCloseToSource;
 
-		private int claimedID;
+		//private int claimedID;
 		private float groundElavation;
 		
 		public Transform navTransform { get; private set; }
@@ -54,7 +54,7 @@ namespace DarknessMinion
 			positionCloseToSource = Vector3.zero;
 			navTargetTag = ntTag;
 			claimed = false;
-			claimedID = 0;
+			//claimedID = 0;
 		}
 
 		public Vector3 GetNavPosition()
@@ -71,13 +71,13 @@ namespace DarknessMinion
 
 		public void ClaimTarget(int cID)
 		{
-			claimedID = cID;
+			//claimedID = cID;
 			claimed = true;
 		}
 
 		public void ReleaseTarget()
 		{
-			claimedID = -1;
+			//claimedID = -1;
 			claimed = false;
 		}
 

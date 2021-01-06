@@ -46,7 +46,6 @@ namespace DarknessMinion
 		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
 		//private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
-		private int stateAnimID;
 
 		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
 
@@ -75,7 +74,6 @@ namespace DarknessMinion
 			previousState  = currentState;
 			darkHitBox.enabled = false;
 			mask = LayerMask.GetMask("Player");
-			stateAnimID = Animator.StringToHash("StateID");
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);

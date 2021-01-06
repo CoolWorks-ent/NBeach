@@ -42,7 +42,7 @@ namespace DarknessMinion
 
         private bool CloseToDestination(Darkness controller)
         {
-            if (controller.movement.remainingDistance <= controller.movement.switchTargetDistance)
+            if (controller.movement.navTargetDist <= controller.movement.switchTargetDistance)
                 return true;
             else return false;
         }
