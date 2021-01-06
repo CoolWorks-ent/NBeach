@@ -951,11 +951,10 @@ MonoBehaviour:
   reachEndOfPath: 0
   rotationSpeed: 140
   switchTargetDistance: 5
-  maxSpeed: 15
-  maxAccel: 10
+  maxSpeed: 10
+  maxAccel: 12
+  breakDistance: 2
   waypointLookAheadRange: 3.33
-  playerDist: 0
-  navTargetDist: 0
   navTarget:
     claimed: 0
     position: {x: 0, y: 0, z: 0}

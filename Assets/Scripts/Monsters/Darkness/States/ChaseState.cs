@@ -33,6 +33,11 @@ namespace DarknessMinion
 		{
 			//controller.aIMovement.UpdatePath(controller.Target.position);
 			CheckTransitions(darkController);
+			if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
+				darkController.movement.UpdateDestinationPath(true);
+			else darkController.movement.UpdateDestinationPath(false);
+
+
 		}
 
 		public override void MovementUpdate(Darkness darkController)
@@ -42,12 +47,12 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
+			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
 			else darkController.movement.UpdateDestinationPath(false);
 
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
-			//darkController.movement.UpdateDestinationPath(false);
+			//darkController.movement.UpdateDestinationPath(false);*/
 			//darkController.sekr.StartPath(darkController.transform.position, darkController.pather.destination);
 			//darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownStatus.Moving, CooldownCallback));
 		}

@@ -19,6 +19,8 @@ namespace DarknessMinion
 		public float switchTargetDistance;
 		public float maxSpeed; 
 		public float maxAccel;
+		[Tooltip("Distance at which the agent starts to decelerate")]
+		public float breakDistance;
 		
 		[Range(0, 5)]
 		public float waypointLookAheadRange;
@@ -79,38 +81,31 @@ namespace DarknessMinion
 		{
 			if (moving && navPath != null)
 			{
-				while(true)
-				{
-					waypointDistance = Vector3.Distance(position, navPath.vectorPath[waypointIndex]);
-
-					if (waypointDistance < waypointLookAheadRange)
-					{
-						if (waypointIndex + 1 < navPath.vectorPath.Count)
-							waypointIndex++;
-						else
-						{
-							reachEndOfPath = true;
-							break;
-						}
-					}
-					else break;
-				}
-				waypointDirection = Vector3.Normalize(navPath.vectorPath[waypointIndex] - transform.position);
 				//this would be where I run the direction through the steering behaviors to get the seek and flee combined direction
 				//then I can assign this calculated direction to the movementDirection;
 
 				movementDirection = waypointDirection;
-											  
+
 				float maxSpeedChange = maxAccel * Time.deltaTime;
 				desiredVelocity = movementDirection * maxSpeed;
 				appliedVelocity = rgdBod.velocity;
-
-				appliedVelocity.x = Mathf.MoveTowards(appliedVelocity.x, desiredVelocity.x, maxSpeedChange);
-				appliedVelocity.z = Mathf.MoveTowards(appliedVelocity.z, desiredVelocity.z, maxSpeedChange);
-
-				RotateTowardsDirection();
+				
+				//if the Darkness has gotten close to it's navigation reduce speed 
+				//should be the reverse process for accelerating
+				if(navTargetDist <= breakDistance)
+				{
+					appliedVelocity.x = Mathf.MoveTowards(appliedVelocity.x, 0, maxSpeedChange/2);
+					appliedVelocity.z = Mathf.MoveTowards(appliedVelocity.z, 0, maxSpeedChange/2);
+				}
+				else
+				{
+					appliedVelocity.x = Mathf.MoveTowards(appliedVelocity.x, desiredVelocity.x, maxSpeedChange);
+					appliedVelocity.z = Mathf.MoveTowards(appliedVelocity.z, desiredVelocity.z, maxSpeedChange);
+				}
 
 				rgdBod.velocity = appliedVelocity;
+
+				RotateTowardsDirection();
 			}
 		}
 
@@ -151,6 +146,29 @@ namespace DarknessMinion
 			if(attacking)
 				 CreatePath(navTarget.GetAttackPosition());
 			else CreatePath(navTarget.GetNavPosition());
+
+			if (!reachEndOfPath && navPath != null)
+			{
+				while (true)
+				{
+					waypointDistance = Vector3.Distance(position, navPath.vectorPath[waypointIndex]);
+
+					if (waypointDistance < waypointLookAheadRange)
+					{
+						if (waypointIndex + 1 < navPath.vectorPath.Count)
+							waypointIndex++;
+						else
+						{
+							reachEndOfPath = true;
+							break;
+						}
+					}
+					else break;
+				}
+				waypointDirection = Vector3.Normalize(navPath.vectorPath[waypointIndex] - transform.position);
+			}
+
+			
 		}
 
 		public void CreateDummyNavTarget(float elavation)
