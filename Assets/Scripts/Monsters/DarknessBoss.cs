@@ -316,6 +316,7 @@ public class DarknessBoss : MonoBehaviour {
         int index = -1;
         //value determines the chance of a certain attack
         float value = Random.Range(0f, 100f);
+
         if (doRockSmash == true)
             value = 101;
        // do
@@ -348,6 +349,7 @@ public class DarknessBoss : MonoBehaviour {
         int index = -1;
         //value determines the chance of a certain attack
         float value = Random.Range(0f, 100f);
+        
         if (doRockSmash == true)
             value = 101;
         do
@@ -393,8 +395,11 @@ public class DarknessBoss : MonoBehaviour {
     {
         string path = "";
         Vector3 offset = Vector3.zero;
+        Vector3 attackPos = new Vector3(MagicPos.transform.position.x, MagicPos.transform.position.y, MagicPos.transform.position.z);
+
         //RESET attackTime for boss
         attackTimer = 0;
+
         if (attacks.Count < maxAttacks || overRide == true)
         {
             switch (attackState)
@@ -442,41 +447,54 @@ public class DarknessBoss : MonoBehaviour {
             }
             else if(attackState == BossAttackType.Smash)
             {
-                
+
                 //Ball1
-                newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, false) as GameObject;
+                
+                //newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, true) as GameObject;
+                newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform.position, new Quaternion(0,0,0,0)) as GameObject;
+                newGb.transform.position = attackPos;
+                newGb.transform.SetParent(null, false);
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "Smash";
                 newGb.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
 
                 //Ball2
-                newGb_ball2 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, false) as GameObject;
+                // newGb_ball2 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, true) as GameObject;
+                newGb_ball2 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform.position, new Quaternion(0, 0, 0, 0)) as GameObject;
+                newGb_ball2.transform.SetParent(null, false);
                 newGb_ball2.GetComponent<DarkBossAttack>().Target = target;
                 newGb_ball2.GetComponent<DarkBossAttack>().attackType = "Smash";
                 newGb_ball2.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
 
                 //Ball3
-                newGb_ball3 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, false) as GameObject;
+                //newGb_ball3 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, true) as GameObject;
+                newGb_ball3 = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform.position, new Quaternion(0, 0, 0, 0)) as GameObject;
+                newGb_ball3.transform.SetParent(null, false);
                 newGb_ball3.GetComponent<DarkBossAttack>().Target = target;
                 newGb_ball3.GetComponent<DarkBossAttack>().attackType = "Smash";
                 newGb_ball3.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
             }
             else
             {
-                newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, false) as GameObject;
+                //newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform, true) as GameObject;
+                newGb = Instantiate(Resources.Load<GameObject>(path), MagicPos.transform.position, new Quaternion(0, 0, 0, 0)) as GameObject;
+                newGb.transform.position = attackPos;
+                newGb.transform.SetParent(null);
                 newGb.GetComponent<DarkBossAttack>().Target = target;
                 newGb.GetComponent<DarkBossAttack>().attackType = "Ball";
                 newGb.GetComponent<DarkBossAttack>().attackSpeed = ballMoveSpeed;
             }
 
             Debug.Log("[Dark Boss] Attack: " + attackState);
-            newGb.transform.parent = transf;
+           // newGb.transform.parent = transf;
             attacks.Add(newGb);
             attacksInProgress.Add(newGb);
+
+            //Triple Ball Smash Attack transforms
             if(newGb_ball2 != null)
             {
-                newGb_ball2.transform.parent = transf;
-                newGb_ball3.transform.parent = transf;
+                //newGb_ball2.transform.parent = transf;
+                //newGb_ball3.transform.parent = transf;
 
                 attacks.Add(newGb_ball2);
                 attacksInProgress.Add(newGb_ball2);
@@ -608,17 +626,20 @@ public class DarknessBoss : MonoBehaviour {
             //projectile attack will move after the animation 
             if (attack.GetComponent<DarkBossAttack>().attackType == "Ball")
             {
-                attack.GetComponent<DarkBossAttack>().moveAttack(Vector3.zero);
+                Vector3 basePos = attack.GetComponent<DarkBossAttack>().Target.transform.position;
+                attack.GetComponent<DarkBossAttack>().moveAttack(basePos);
                 attacks.Remove(attack);
             }
+            //Set targets for Tripple Ball Smash Attack
             else if (attack.GetComponent<DarkBossAttack>().attackType == "Smash")
             {
 
                 Vector3 basePos = attack.GetComponent<DarkBossAttack>().Target.transform.position; //GameObject.FindGameObjectWithTag("PlayerContainer").transform.position;
                 //Vector3 targetPosLocal = attack.GetComponent<DarkBossAttack>().Target.transform.localPosition;
                 //Vector3 offsetVector = new Vector3(targetPosLocal.x + 7, targetPosLocal.y, targetPosLocal.z);
-                Vector3 targetPos = attack.GetComponent<DarkBossAttack>().Target.transform.TransformPoint(new Vector3(7, 0, 0));
-                Vector3 targetPos2 = attack.GetComponent<DarkBossAttack>().Target.transform.TransformPoint(new Vector3(-7, 0, 0));
+                //change target position from local to world space for attack movement (left and right of center target)
+                Vector3 targetPos = attack.GetComponent<DarkBossAttack>().Target.transform.TransformPoint(new Vector3(2, 0, 0));
+                Vector3 targetPos2 = attack.GetComponent<DarkBossAttack>().Target.transform.TransformPoint(new Vector3(-2, 0, 0));
                 //Vector3 targetPos = new Vector3(basePos.x + 7, basePos.y, basePos.z);
 
                 //Vector3 targetPos2 = new Vector3(basePos.x - 7, basePos.y, basePos.z);
@@ -628,7 +649,7 @@ public class DarknessBoss : MonoBehaviour {
                 attack2 = attacksInProgress[0];
                 attack3 = attacksInProgress[1];
 
-                attack.GetComponent<DarkBossAttack>().moveAttack(Vector3.zero);
+                attack.GetComponent<DarkBossAttack>().moveAttack(basePos);
                 attack2.GetComponent<DarkBossAttack>().moveAttack(targetPos);
                 attack3.GetComponent<DarkBossAttack>().moveAttack(targetPos2);
                 

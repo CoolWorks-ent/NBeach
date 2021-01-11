@@ -25,6 +25,8 @@ public class DarkBossAttack : MonoBehaviour {
 	void Start () {
         move = false;
         targetPos = Target.transform.position;
+        //if(attackType != "RockSmash")
+          //  transform.SetParent(null);
 
     }
 	
