@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DarknessMinion;
 
 /*
  * Class to manage enemies in the scene & the spawning of enemies
@@ -9,7 +10,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    Darkness.DarknessMinion darknessEnemy;
+    Darkness darknessEnemy;
     [SerializeField]
     public float spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
@@ -32,7 +33,7 @@ public class EnemySpawner : MonoBehaviour
     void DarknessDeath(string enemyName)
     {
         //remove enemy from the list
-        Darkness.DarknessMinion enemyObj = GameObject.Find(enemyName).GetComponent<Darkness.DarknessMinion>();
+        Darkness enemyObj = GameObject.Find(enemyName).GetComponent<Darkness>();
         Destroy(enemyObj.gameObject);
     }
 
@@ -43,17 +44,15 @@ public class EnemySpawner : MonoBehaviour
         {
             if (pauseSpawning == false)
             {
-                if (Darkness.Darkness_Manager.Instance.activeDarknessCount < Darkness.Darkness_Manager.Instance.maxEnemyCount)
+                if (!DarknessManager.Instance.CheckIfSpawnFull())
                 {
                     if (spawnWait >= spawnRate)
                     {
                         Vector3 randomloc = Random.insideUnitCircle * 5;
-                        Darkness.DarknessMinion enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
+                        Darkness enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
-                        //add enemy to management list
-                        //AI_Manager.OnDarknessAdded(enemy);
-                        Debug.Log("darkness spawned");
+                        //Debug.Log("darkness spawned");
                     }
 
                 }
@@ -77,7 +76,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                if (Darkness.Darkness_Manager.Instance.activeDarknessCount <= Darkness.Darkness_Manager.Instance.minEnemyCount)
+                if (DarknessManager.Instance.CheckIfSpawnFull())
                 {
                     //resume spawning of enemies
                     pauseSpawning = false;

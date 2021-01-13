@@ -62,7 +62,7 @@ Material:
     - _GerstnerIntensity: 0.62
     - _HeightDisplacement: 2.3370318
     - _NormalsDisplacement: 72.72728
-    - _Shininess: 349.13794
+    - _Shininess: 156
     m_Colors:
     - _AnimationDirection: {r: 2, g: 1, b: -1, a: 1}
     - _AnimationTiling: {r: 0.4, g: 0.39099997, b: 0.56, a: 0.7}

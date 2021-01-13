@@ -57,12 +57,14 @@ public class NFPSController : PlayerController {
         [SerializeField]
         private Text healthText;
         
+        
         [SerializeField]
         public GameObject playerStage;
         [SerializeField]
         bool invincibleState = false;
 
-        public GameController gController;
+
+    public GameController gController;
         int playerHealth;
         int playerHealthMax = 100;
         int playerRechargeAmt = 0;

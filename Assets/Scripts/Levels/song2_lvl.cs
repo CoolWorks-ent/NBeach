@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Darkness;
+using DarknessMinion;
 
 public class song2_lvl : Level {
 
@@ -62,7 +62,7 @@ public class song2_lvl : Level {
     [SerializeField]
     CameraPathAnimator pathControl_EndScene;
     [SerializeField]
-    SimpleAnimator2D animator2D;
+    SimpleAnimator2D eyelidAnimator2D;
     [SerializeField]
     int bossAttackSpeed_stage1 = 4, bossAttackSpeed_stage2 = 5, bossAttackSpeed_stage3 = 6;
     [SerializeField]
@@ -75,6 +75,8 @@ public class song2_lvl : Level {
     Material rockMaterial_2;
     [SerializeField]
     Material cloudMaterial;
+    [SerializeField]
+    Material nightSkybox;
     [SerializeField]
     SpriteRenderer titleText;
 
@@ -94,9 +96,11 @@ public class song2_lvl : Level {
     List<ShellPickup> shellArray;
     int rainEmissionRateDefault = 8;
     int rainEmissionRateMax = 40;
-    Material nightSkybox;
+    Material backupSkybox;
     Material daySkybox;
+    Skybox cameraSkybox;
     GameObject oceanWater;
+    bool changeSkyboxToNight = false;
 
     bool stagePlaying = true;
 
@@ -121,12 +125,16 @@ public class song2_lvl : Level {
 
         gController = GameController.instance;
         pathControl.topSpeed = 4;
-
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 0);
         blackOverlay.gameObject.SetActive(false);
-        nightSkybox = (Material)Resources.Load("Skyboxes/Night 01B", typeof(Material));
+        cameraSkybox = Camera.main.GetComponent<Skybox>();
+        //nightSkybox = (Material)Resources.Load("Skyboxes/Night 01B", typeof(Material));
         daySkybox = (Material)Resources.Load("Skyboxes/Sunny 01A", typeof(Material));
+        backupSkybox = RenderSettings.skybox;
         oceanWater = GameObject.FindGameObjectWithTag("Water");
+
+        //Load Resources
+        gController.soundManager.LoadMusic();
 
         //start Intro First
         darkBoss.gameObject.SetActive(false);
@@ -140,7 +148,7 @@ public class song2_lvl : Level {
         gController.playerControl.playerStatus = PLAYER_STATUS.ALIVE;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
         //Reset the stage to original form
-        StageReset();
+        //StageReset_Day();
 
         //Start Stage0 of battle
         Stage0();
@@ -179,6 +187,12 @@ public class song2_lvl : Level {
         {
             DebugFunc("Song2_Stage3");
             gController.SceneSkip("Song2_Stage3", stage3StartTime);
+        }
+
+        if(changeSkyboxToNight == true)
+        {
+            StageReset_Night();
+            changeSkyboxToNight = false;            
         }
     }
 
@@ -443,7 +457,7 @@ public class song2_lvl : Level {
         //gController.playerControl.Reset();
     }
 
-    void StageReset()
+    void StageReset_Day()
     {
         //change skybox & lighting to night
         Color lightingColor_Night;
@@ -464,6 +478,30 @@ public class song2_lvl : Level {
         rockMaterial.SetFloat("_LMPower", dayColor_rocks);
         rockMaterial_2.SetFloat("_LMPower", dayColor_rocks);
         cloudMaterial.SetFloat("_LMPower", dayColor_clouds);
+    }
+
+    void StageReset_Night()
+    {
+        //change skybox & lighting to night
+        Color lightingColor_Night;
+        ColorUtility.TryParseHtmlString("#56577A", out lightingColor_Night);
+
+        print("night sky");
+        //RenderSettings.skybox = nightSkybox;
+
+        //Use camera skybox component instead of render settings becuase not easily able to change at runtime.
+        cameraSkybox.material = nightSkybox;
+        
+        RenderSettings.ambientLight = lightingColor_Night;
+        oceanWater.GetComponent<Renderer>().material = oceanWater.GetComponent<WaterSurface>().nighttimeWaterMat;
+        DynamicGI.UpdateEnvironment();
+        
+        //change lighting on rocks and environment objects
+        float nightColor_rocks = 0.6f;
+        float nightColor_clouds = 2f;
+        rockMaterial.SetFloat("_LMPower", nightColor_rocks);
+        rockMaterial_2.SetFloat("_LMPower", nightColor_rocks);
+        cloudMaterial.SetFloat("_LMPower", nightColor_clouds);
     }
 
     void Scene2Events(string evt)
@@ -510,10 +548,6 @@ public class song2_lvl : Level {
         blackOverlay.gameObject.SetActive(true);
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
         yield return new WaitForSeconds(0.1f);
-
-        //change skybox to night
-        print("night sky");
-        RenderSettings.skybox = nightSkybox;
 
         yield return new WaitForSeconds(0.1f);
         blackOverlay.gameObject.SetActive(false);
@@ -564,6 +598,7 @@ public class song2_lvl : Level {
         yield return 0;
 
     }
+
     IEnumerator Stage0Routine()
     {
         Debug.Log("Stage 0 Start");
@@ -578,46 +613,36 @@ public class song2_lvl : Level {
 
         yield return new WaitForSeconds(5);
         //display eye-blink overrlay and block the change of the skybox
-        animator2D.Play("eyeClose");
+        eyelidAnimator2D.Play("eyeClose");
         yield return new WaitForSeconds(0.1f);
         blackOverlay.gameObject.SetActive(true);
         blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
         yield return new WaitForSeconds(0.1f);
 
         //---------- Night Lighting & Materials!---------------
-        //change skybox & lighting & water to night
-        
-        Color lightingColor_Night;
-        Color lightingColor_Day;  //"B0B0B0"
-        float dayColor_rocks = 0f;
-        float nightColor_rocks = 0.6f;
-        float dayColor_clouds = 0f;
-        float nightColor_clouds = 2f;
-        ColorUtility.TryParseHtmlString("#56577A", out lightingColor_Night);
-        ColorUtility.TryParseHtmlString("#B0B0B0", out lightingColor_Day);
 
-        print("night sky");
-        RenderSettings.skybox = nightSkybox;
-        RenderSettings.ambientLight = lightingColor_Night;
-        oceanWater.GetComponent<Renderer>().material = oceanWater.GetComponent<WaterSurface>().nighttimeWaterMat;
+        //Change Skybox to Night
+        StageReset_Night();
 
-        //change lighting on rocks and environment objects
-        rockMaterial.SetFloat("_LMPower", nightColor_rocks);
-        rockMaterial_2.SetFloat("_LMPower", nightColor_rocks);
-        cloudMaterial.SetFloat("_LMPower", nightColor_clouds);
+        //RenderSettings.skybox = nightSkybox;        
+        //DynamicGI.UpdateEnvironment();
+
+        //Skybox skybox = Camera.main.GetComponent<Skybox>();
 
         yield return new WaitForSeconds(0.3f);
 
         //Display eye-open animation and show world. disable black overlay too
-        animator2D.Play("eyeOpen");
+        eyelidAnimator2D.Play("eyeOpen");
         blackOverlay.gameObject.SetActive(false);
         yield return new WaitForSeconds(1);
 
-        foreach (GameObject bolt in lightningBolts)
+        /*
+         * foreach (GameObject bolt in lightningBolts)
         {
             bolt.SetActive(true);
             bolt.GetComponent<LightningBoltScript>().Trigger();
         }
+        */
         
         //TEST LIGHTNING FLASH
         GameObject flashSphere = GameObject.Find("FlashSphere");
@@ -701,7 +726,7 @@ public class song2_lvl : Level {
         /*
          * [PLAY BG MUSIC] start playing bg song
          */
-        gController.soundManager.FadeInMusic(2);
+        gController.soundManager.FadeInMusic(1);
         //BG song now playing, set startTime
         songStartTime = Time.time;
 
@@ -712,6 +737,7 @@ public class song2_lvl : Level {
             t += Time.deltaTime;
             yield return null;
         }
+
         //start the dark boss' attack sequence
         darkBoss.stage = DarknessBoss.BossStage.stage1;
         darkBoss.status = DarknessBoss.BossStatus.start;
@@ -757,7 +783,7 @@ public class song2_lvl : Level {
         */
         print("Enemy Wave 2");
         enemySpawners.spawnRate = darkSpawnRate_Stage0_1;
-        Darkness_Manager.Instance.maxEnemyCount = 7;
+        DarknessManager.Instance.maxEnemyCount = 7;
 
         Debug.Log("time till next stage = " + (waitTime * (.5f)));
         //yield return new WaitForSeconds(waitTime * .5f);
@@ -823,7 +849,7 @@ public class song2_lvl : Level {
 
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         
-        Darkness_Manager.Instance.maxEnemyCount = 15;
+        DarknessManager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
         darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage1;
         //Increase speed of dark ball attack
@@ -882,7 +908,7 @@ public class song2_lvl : Level {
 
         //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
-        Darkness_Manager.Instance.maxEnemyCount = 15;
+        DarknessManager.Instance.maxEnemyCount = 15;
         //Decrease Time between attacks
         darkBoss.maxAttackTimer = darkBoss.baseMaxAttackTimer - bossTimeBtwAttacks_stage2;
         //Increase speed of dark ball attack
@@ -960,7 +986,7 @@ public class song2_lvl : Level {
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
-        Darkness_Manager.Instance.maxEnemyCount = 20;
+        DarknessManager.Instance.maxEnemyCount = 20;
         StartCoroutine(AdjustRainAmt(RainFX_3, rainEmissionRate_stage3End));
 
         //Decrease Time between attacks
@@ -1070,7 +1096,7 @@ public class song2_lvl : Level {
         if (blackOverlay != null)
         {
                 //display eye-blink overrlay
-                animator2D.Play("eyeClose");
+                eyelidAnimator2D.Play("eyeClose");
                 yield return new WaitForSeconds(0.1f);
                 blackOverlay.gameObject.SetActive(true);
                 blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);

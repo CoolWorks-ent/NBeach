@@ -104,6 +104,7 @@ public class GameController : MonoBehaviour {
          * LOAD RESOURCES on AWAKE
          * load different resources based upon the Scene loaded
          */
+        soundManager.LoadMusic();
          
         EventManager.StartListening("Player_Stop", ResetPlayer);
         EventManager.StartListening("PauseWorld", OnWorldPaused);
@@ -201,8 +202,8 @@ public class GameController : MonoBehaviour {
         else if (SceneManager.GetActiveScene().name == "Song2")
         {
 
-            dmgOverlay = GameObject.Find("DmgOverlay").GetComponent<Image>();
-            blackOverlay = GameObject.Find("BlackOverlay").GetComponent<Image>();
+            dmgOverlay = playerControl.DmgOverlay; //GameObject.Find("DmgOverlay").GetComponent<Image>();
+            blackOverlay = playerControl.BlackOverlay; //GameObject.Find("BlackOverlay").GetComponent<Image>();
 
             song2_lvl lvl2 = GameObject.Find("Song2_LevelObj").GetComponent<song2_lvl>();
             //song2_lvl lvl2 = (song2_lvl)lvlManager.levelList[0];

@@ -25,6 +25,8 @@ public class DarkBossAttack : MonoBehaviour {
 	void Start () {
         move = false;
         targetPos = Target.transform.position;
+        //if(attackType != "RockSmash")
+          //  transform.SetParent(null);
 
     }
 	
@@ -37,12 +39,13 @@ public class DarkBossAttack : MonoBehaviour {
                 if (curTime < ballMoveTime)
                 {
                     //move attack towards player's last known position
-                    transform.LookAt(targetPos);
+                    //transform.LookAt(targetPos);
                     //transform.position = Vector3.MoveTowards(transform.position, targetPos, ballMoveTime * Time.deltaTime * attackSpeed);
                     Vector3 normalizeDirection = (targetPos - transform.position).normalized;
                     //normalizeDirection = new Vector3(normalizeDirection.x, normalizeDirection.y-.2f, normalizeDirection.z+2).normalized;
                     //transform.position += (normalizeDirection * Time.deltaTime) * attackSpeed;
-                    transform.Translate((Vector3.forward * Time.deltaTime) * attackSpeed, Space.Self);
+                    //transform.Translate((transform.forward * Time.deltaTime) * attackSpeed);
+                    transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * attackSpeed);
                     curTime += Time.deltaTime;
                 }
                 else
@@ -64,7 +67,11 @@ public class DarkBossAttack : MonoBehaviour {
         {
             //Vector3 tempPos = new Vector3(Target.transform.position.x, Target.transform.position.y, Target.transform.position.z + 20);
             targetPos = Target.transform.position;
+            Debug.Log("player pos: " + Target.transform.position);
         }
+        //Rotate attack towards player's last known position
+        //transform.LookAt(targetPos);
+
         move = true;
     }
 
