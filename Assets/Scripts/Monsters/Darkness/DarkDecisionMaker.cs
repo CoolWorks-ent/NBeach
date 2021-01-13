@@ -7,7 +7,7 @@ namespace DarknessMinion
 {
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete, CloseToDestination }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, NavTargetClose, IdleComplete, CloseToPlayer }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
@@ -22,7 +22,7 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.NavTargetClose, NavTargetCloseCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
-            Decisions.Add(DecisionName.CloseToDestination, CloseToDestination);
+            Decisions.Add(DecisionName.CloseToPlayer, CloseToPlayer);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -40,11 +40,9 @@ namespace DarknessMinion
             }
         }
 
-        private bool CloseToDestination(Darkness controller)
+        private bool CloseToPlayer(Darkness controller)
         {
-            if (controller.movement.navTargetDist <= controller.movement.switchTargetDistance)
-                return true;
-            else return false;
+            return controller.movement.closeToPlayer;
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Pathfinding;
 using System.Linq;
 using System;
 
@@ -19,8 +18,6 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		
-		//public NavigationTarget[] patrolPoints;
 		public DarknessMovement movement;
 
 		[HideInInspector]
@@ -44,25 +41,20 @@ namespace DarknessMinion
 		private Animator animeController;
 
 		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
-		//private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
 
 		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
 
 		void Awake()
 		{
-			//swtichDist = 4.6f; 
 			creationID = 0;
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-			//attacked = false;
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
-			//stateCache = new List<GameObject>();
 		}
 
 		void Start()
 		{
-			//movement = new DarknessMovement(GetComponent<Rigidbody>(), GetComponent<Seeker>(), this.transform);
 			movement = GetComponent<DarknessMovement>();
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
@@ -77,7 +69,6 @@ namespace DarknessMinion
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);
-			//ChangeAnimation(DarkAnimationStates.Spawn);
 		}
 
 		void FixedUpdate()
@@ -100,10 +91,9 @@ namespace DarknessMinion
 			currentState.InitializeState(this);
 		}
 
-		public void Spawn(int createID, float spawnHeight)
+		public void Spawn(int createID)
 		{
 			creationID = createID;
-			movement.CreateDummyNavTarget(spawnHeight);
 		}
 
 		public void UpdateStates()
@@ -242,7 +232,7 @@ namespace DarknessMinion
 		{
 			debugMessage = "";
 			if(showTargetData && movement.navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.GetNavPosition());
+				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.navPosition);
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)

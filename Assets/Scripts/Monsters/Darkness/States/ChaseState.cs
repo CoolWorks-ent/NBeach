@@ -13,13 +13,12 @@ namespace DarknessMinion
 		{
 			if (darkController.movement.navTarget != null && darkController.movement.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
-				darkController.movement.navTarget.ReleaseTarget();
-				DarkEventManager.OnRequestNewTarget(darkController.creationID);
+				//TODO check target zone instead of requesting a new point
 			}
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
 			//darkController.movement.ChangeSwitchDistance(switchTargetDistance);
 			darkController.movement.StartMovement();
-			darkController.movement.UpdateDestinationPath(false);
+			//darkController.movement.UpdateDestinationPath(false);
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 			//CooldownCallback(darkController);
 			/*controller.aIMovement.CreatePath(controller.Target.position);
@@ -33,16 +32,14 @@ namespace DarknessMinion
 		{
 			//controller.aIMovement.UpdatePath(controller.Target.position);
 			CheckTransitions(darkController);
-			if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
+			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
-			else darkController.movement.UpdateDestinationPath(false);
-
-
+			else darkController.movement.UpdateDestinationPath(false);*/
 		}
 
 		public override void MovementUpdate(Darkness darkController)
 		{	
-			darkController.movement.MoveDarkness();
+			//darkController.movement.MoveDarkness();
 		}
 
 		protected override void CooldownCallback(Darkness darkController)
