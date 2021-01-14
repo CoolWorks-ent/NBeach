@@ -25,11 +25,17 @@ namespace DarknessMinion
 
 		private DarknessSteering steering;
 
+		private Vector3[] seekMap, avoidMap, calculationMap;
+
 		void Awake()
 		{
 			steering = new DarknessSteering();
 			sekr = GetComponent<Seeker>();
 			pather = GetComponent<AIPath>();
+
+			calculationMap = new Vector3[8];
+			seekMap = new Vector3[calculationMap.Length];
+			avoidMap = new Vector3[calculationMap.Length];
 		}
 
 		void Start()
@@ -72,6 +78,50 @@ namespace DarknessMinion
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
+
+		/*Add functions for applying steering behaviors
+		* Choose several points in a circle that would be the starting candidates for movement
+		* Vectors closer towards the direction of the player get some positive weight
+		* Vectors close to the directions of other Darkness get some negative weight
+		* Somehow we'll have a direction that is weighted most favorable and we move in that direction
+		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
+		*/
+
+		public void PathChooser()
+        {
+
+        }
+
+		private void PathsGenerator()
+        {
+			//Generate vectors in several directions in a circle around the Darkness
+			//I want points at certain angles all around the Darkness and I want to save those to an array
+        }
+
+		private void SeekLayer()
+        {
+			//Apply a positive weight to each direction in the seekMap
+			//The weights should be added positively to directions that are most aligned to the player direction
+			//For example: if the player is (0.1, 0, 0.9) and the closest direction is (0, 0, 0.5) this direction gets the highest weight
+			//Use the dot product to figure out how aligned the seek vector is to the player direction
+			//Set falloff rates for each of the vectors
+				//Vectors with dot values of 1 - 0.8 are +1 weight
+				//Vectors with dot values of 0.7 - 0.4 are +0.5 weight
+				//Vectors with dot values below 0.4 are +0.1 weight
+        }
+
+		private void AvoidLayer()
+        {
+			//Apply a negative weight to each direction in the avoidMap
+			//Should do some kind of detection in this section to figure out if a direction is headed toward a Darkness or obstacle
+			//I can put a trigger on the Darkness and apply negative values to anything not the player in the avoidanceMap
+			//Get the directions of objects to avoid
+			//Apply the dot product to direction I want to go towards and the obstacle direction
+			//Set falloff for each of the vectors
+				//Vectors with dot values of 1 - 0.6 are -1 weight	
+				//Vectors with dot values of 0.6 - 0 are -0.5 weight
+				//Vectors with dot values of 0 or below are not given a weight
+        }
 
 		/*private void PathComplete(Path p)
 		{

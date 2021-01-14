@@ -185,22 +185,6 @@ namespace DarknessMinion
 			}
 		}
 
-		/*public GameObject GetLastObjectFromCache()
-		{
-			return stateCache[stateCache.Count-1];
-		}
-
-		public void RemoveFromStateCache(GameObject obj)
-		{
-			if(stateCache.Contains(obj))
-				stateCache.Remove(obj);
-		}
-
-		public void ClearStateCache()
-		{
-			stateCache.Clear();
-		}*/
-
 		private void OnTriggerEnter(Collider col)
 		{
 			if (col.gameObject.CompareTag("Projectile"))
@@ -210,10 +194,6 @@ namespace DarknessMinion
 					Debug.LogWarning("Darkness Destroyed");
 					ChangeState(deathState);
 				}
-			}
-			else if (col.gameObject.CompareTag("Player"))
-			{
-				//Debug.LogWarning("Darkness collided with Player");
 			}
 		}
 		
