@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 114150173797437670}
   - component: {fileID: 114857173380954124}
   - component: {fileID: 136796206659899728}
+  - component: {fileID: 114774764668895200}
   m_Layer: 17
   m_Name: darkness_enhanced_v2
   m_TagString: Darkness
@@ -946,20 +947,45 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steeringMap: []
-  moving: 0
-  attackPosition: 0
-  reachEndOfPath: 0
-  rotationSpeed: 140
-  switchTargetDistance: 5
-  maxSpeed: 10
-  maxAccel: 12
-  breakDistance: 2
-  waypointLookAheadRange: 3.33
+  playerCloseRange: 0
   navTarget:
-    claimed: 0
     position: {x: 0, y: 0, z: 0}
     positionOffset: {x: 0, y: 0, z: 0}
-    positionCloseToSource: {x: 0, y: 0, z: 0}
+--- !u!114 &114774764668895200
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6eb1402c17e84a9282a7f0f62eb584f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 2
+  radius: 0.5
+  height: 0.01
+  repathRate: 0.5
+  canSearch: 1
+  canMove: 1
+  maxSpeed: 1
+  gravity: {x: NaN, y: NaN, z: NaN}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  centerOffsetCompatibility: NaN
+  orientation: 0
+  enableRotation: 1
+  targetCompatibility: {fileID: 0}
+  maxAcceleration: -2.5
+  rotationSpeed: 360
+  slowdownDistance: 0.6
+  pickNextWaypointDist: 2
+  endReachedDistance: 0.2
+  alwaysDrawGizmos: 0
+  slowWhenNotFacingTarget: 1
+  whenCloseToDestination: 0
+  constrainInsideGraph: 0
 --- !u!114 &114857173380954124
 MonoBehaviour:
   m_ObjectHideFlags: 1

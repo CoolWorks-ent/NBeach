@@ -26,6 +26,7 @@ namespace DarknessMinion
 		private DarknessSteering steering;
 
 		private Vector3[] seekMap, avoidMap, calculationMap;
+		private float[] angleMap;
 
 		void Awake()
 		{
@@ -36,6 +37,16 @@ namespace DarknessMinion
 			calculationMap = new Vector3[8];
 			seekMap = new Vector3[calculationMap.Length];
 			avoidMap = new Vector3[calculationMap.Length];
+			angleMap = new float[calculationMap.Length];
+
+			angleMap[0] = 0;
+			angleMap[1] = 20 * Mathf.Deg2Rad;
+			angleMap[2] = 40 * Mathf.Deg2Rad;
+			angleMap[3] = 60 * Mathf.Deg2Rad;
+			angleMap[4] = 340 * Mathf.Deg2Rad;
+			angleMap[5] = 320 * Mathf.Deg2Rad;
+			angleMap[6] = 300 * Mathf.Deg2Rad;
+			angleMap[7] = 180 * Mathf.Deg2Rad;
 		}
 
 		void Start()
@@ -44,6 +55,11 @@ namespace DarknessMinion
 			//bProvider = new Blocker();
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
 		}
+
+		void Update() //for testing only
+        {
+			GenerateVectorsatAngles();
+        }
 
 		public void DistanceEvaluation(Vector3 location)
 		{
@@ -86,6 +102,14 @@ namespace DarknessMinion
 		* Somehow we'll have a direction that is weighted most favorable and we move in that direction
 		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
 		*/
+
+		public void GenerateVectorsatAngles()
+        {
+			for(int i = 0; i < calculationMap.Length; i++)
+            {
+				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), this.transform.position.y, Mathf.Sin(angleMap[i]));
+            }
+        }
 
 		public void PathChooser()
         {
@@ -164,6 +188,14 @@ namespace DarknessMinion
 				return DefaultITraversalProvider.GetTraversalCost(path, node);
 			}
 		}*/
+
+		void OnDrawGizmos()
+        {
+			foreach(Vector3 vec in calculationMap)
+            {
+				Debug.DrawLine(this.transform.position, vec, Color.green);
+            }
+        }
 
 		void OnDestroy()
 		{
