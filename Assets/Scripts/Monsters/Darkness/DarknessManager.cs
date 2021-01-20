@@ -144,6 +144,7 @@ namespace DarknessMinion
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);
+			updatedDarkness.movement.player = player;
 			Vector3 pDir = player.position - updatedDarkness.transform.position;
 			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
 			//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());

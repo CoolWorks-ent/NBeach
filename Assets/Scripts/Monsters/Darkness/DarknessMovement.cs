@@ -19,6 +19,8 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public NavigationTarget navTarget;
+		[HideInInspector]
+		public Transform player;
 
 		private Seeker sekr;
 		private AIPath pather;
@@ -27,7 +29,7 @@ namespace DarknessMinion
 
 		private Vector3[] seekMap, avoidMap, calculationMap;
 		private float[] angleMap;
-
+		
 		void Awake()
 		{
 			steering = new DarknessSteering();
@@ -39,14 +41,14 @@ namespace DarknessMinion
 			avoidMap = new Vector3[calculationMap.Length];
 			angleMap = new float[calculationMap.Length];
 
-			angleMap[0] = 0;
-			angleMap[1] = 20 * Mathf.Deg2Rad;
-			angleMap[2] = 40 * Mathf.Deg2Rad;
-			angleMap[3] = 60 * Mathf.Deg2Rad;
-			angleMap[4] = 340 * Mathf.Deg2Rad;
-			angleMap[5] = 320 * Mathf.Deg2Rad;
-			angleMap[6] = 300 * Mathf.Deg2Rad;
-			angleMap[7] = 180 * Mathf.Deg2Rad;
+			angleMap[0] = 90 * Mathf.Deg2Rad;
+			angleMap[1] = 120 * Mathf.Deg2Rad;
+			angleMap[2] = 140 * Mathf.Deg2Rad;
+			angleMap[3] = 160 * Mathf.Deg2Rad;
+			angleMap[4] = 70 * Mathf.Deg2Rad;
+			angleMap[5] = 50 * Mathf.Deg2Rad;
+			angleMap[6] = 30 * Mathf.Deg2Rad;
+			angleMap[7] = 270 * Mathf.Deg2Rad;
 		}
 
 		void Start()
@@ -56,7 +58,7 @@ namespace DarknessMinion
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
 		}
 
-		void Update() //for testing only
+		void LateUpdate() //for testing only
         {
 			GenerateVectorsatAngles();
         }
@@ -107,7 +109,7 @@ namespace DarknessMinion
         {
 			for(int i = 0; i < calculationMap.Length; i++)
             {
-				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), this.transform.position.y, Mathf.Sin(angleMap[i]));
+				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), 0.1f, Mathf.Sin(angleMap[i]));
             }
         }
 
@@ -193,7 +195,7 @@ namespace DarknessMinion
         {
 			foreach(Vector3 vec in calculationMap)
             {
-				Debug.DrawLine(this.transform.position, vec, Color.green);
+				Debug.DrawLine(this.transform.position, vec + this.transform.position, Color.green);
             }
         }
 
