@@ -11,10 +11,10 @@ namespace DarknessMinion
 
 		public override void InitializeState(Darkness darkController)
 		{
-			if (darkController.movement.navTarget != null && darkController.movement.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
+			/*if (darkController.movement.navTarget != null && darkController.movement.navTarget.navTargetTag != NavigationTarget.NavTargetTag.Attack)
 			{
 				//TODO check target zone instead of requesting a new point
-			}
+			}*/
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
 			//darkController.movement.ChangeSwitchDistance(switchTargetDistance);
 			darkController.movement.StartMovement();
@@ -35,6 +35,7 @@ namespace DarknessMinion
 			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
 			else darkController.movement.UpdateDestinationPath(false);*/
+			darkController.movement.PathChooser();
 		}
 
 		public override void MovementUpdate(Darkness darkController)
