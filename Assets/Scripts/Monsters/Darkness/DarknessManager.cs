@@ -7,22 +7,25 @@ namespace DarknessMinion
 {
 	public class DarknessManager : MonoBehaviour
 	{
-
-		public Transform player, attackPointHolder;
+		public Transform playerTransform { get { return player; } }
+		public Vector3 playerVector { get { return player.position; } }
 		public Dictionary<int, Darkness> ActiveDarkness;
-
-		[SerializeField]
-		private int darknessIDCounter, darknessConcurrentAttackLimit;
-		public int maxEnemyCount, minEnemyCount;
-
-		private float calculationTime, attackOffset;
-		private bool paused;
 
 		public List<int> attackApprovalPriority;
 
-		public float groundLevel {get { return player.position.y; }}
+		public float groundLevel { get { return player.position.y; } }
 
 		public static DarknessManager Instance { get; private set; }
+
+		[SerializeField]
+		private int darknessIDCounter, darknessConcurrentAttackLimit;
+
+		private float calculationTime;
+		private bool paused;
+
+		[SerializeField, Header("Assign in Inspector")]
+		private Transform player;
+		public int maxEnemyCount, minEnemyCount;
 
 		void Awake()
 		{
@@ -42,7 +45,7 @@ namespace DarknessMinion
 			DarkEventManager.RemoveDarkness += RemoveFromDarknessList;
 			paused = false;
 			calculationTime = 0.5f;
-			attackOffset = 2.75f;
+			//attackOffset = 2.75f;
 			
 			StartCoroutine(ManagedDarknessUpdate());
 		}
@@ -50,13 +53,11 @@ namespace DarknessMinion
 		void Start()
 		{
 			List<Transform> playerAttackPoints = new List<Transform>();
-			
-
-			foreach(Transform t in attackPointHolder.GetComponentsInChildren<Transform>())
+			/*foreach(Transform t in attackPointHolder.GetComponentsInChildren<Transform>())
 			{
 				if(!t.gameObject.CompareTag("Attack Points"))
 					playerAttackPoints.Add(t);
-			}
+			}*/
 		}
 
 		void LateUpdate()
@@ -89,7 +90,7 @@ namespace DarknessMinion
 					{
 						dark.Value.DistanceEvaluation(player.position);
 					}*/
-					DarkEventManager.OnUpdateDarknessDistance(player.position);
+					DarkEventManager.OnUpdateDarknessDistance();
 					SortTheGoons();
 					//yield return new WaitForSeconds(calculationTime / 3);
 					UpdateDarknessAggresion();

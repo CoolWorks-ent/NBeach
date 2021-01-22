@@ -10,7 +10,7 @@ namespace DarknessMinion
 		public delegate void DarkEvent<T>(T obj);
 		public static event DarkEvent<Darkness> AddDarkness;
 		public static event DarkEvent<Darkness> RemoveDarkness;
-		public static event DarkEvent<Vector3> UpdateDarknessDistance;
+		public static event DarkEvent UpdateDarknessDistance;
 		public static event DarkEvent UpdateDarknessStates;
 
 		public static void OnDarknessAdded(Darkness d)
@@ -25,10 +25,10 @@ namespace DarknessMinion
 				RemoveDarkness(d);
 		}
 
-		public static void OnUpdateDarknessDistance(Vector3 pos)
+		public static void OnUpdateDarknessDistance()
 		{
 			if (UpdateDarknessDistance != null)
-				UpdateDarknessDistance(pos);
+				UpdateDarknessDistance();
 		}
 
 		public static void OnUpdateDarknessStates()

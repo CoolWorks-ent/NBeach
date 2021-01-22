@@ -58,14 +58,9 @@ namespace DarknessMinion
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
 		}
 
-		void LateUpdate() //for testing only
-        {
-			GenerateVectorsatAngles();
-        }
-
-		public void DistanceEvaluation(Vector3 location)
+		public void DistanceEvaluation()
 		{
-			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(location));
+			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
 			if (navTarget != null)
 			{
 				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
@@ -105,24 +100,25 @@ namespace DarknessMinion
 		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
 		*/
 
-		public void GenerateVectorsatAngles()
-        {
-			for(int i = 0; i < calculationMap.Length; i++)
-            {
-				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), 0.1f, Mathf.Sin(angleMap[i]));
-            }
-        }
-
 		public void PathChooser()
         {
+			GenerateVectorPaths();
+			SeekLayer();
+			AvoidLayer();
 
+			//Once the layers are calulated with weights narrow down the path that leads closer to the player
+			//Once the direction is chosen set the navtarget to a point along the direction vector
         }
 
-		private void PathsGenerator()
+		private void GenerateVectorPaths()
         {
 			//Generate vectors in several directions in a circle around the Darkness
 			//I want points at certain angles all around the Darkness and I want to save those to an array
-        }
+			for (int i = 0; i < calculationMap.Length; i++)
+			{
+				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), 0.1f, Mathf.Sin(angleMap[i]));
+			}
+		}
 
 		private void SeekLayer()
         {
@@ -148,6 +144,7 @@ namespace DarknessMinion
 				//Vectors with dot values of 0.6 - 0 are -0.5 weight
 				//Vectors with dot values of 0 or below are not given a weight
         }
+
 
 		/*private void PathComplete(Path p)
 		{
