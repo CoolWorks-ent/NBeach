@@ -16,11 +16,8 @@ namespace DarknessMinion
 				//TODO check target zone instead of requesting a new point
 			}*/
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			//darkController.movement.ChangeSwitchDistance(switchTargetDistance);
 			darkController.movement.StartMovement();
-			//darkController.movement.UpdateDestinationPath(false);
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
-			//CooldownCallback(darkController);
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);
 			controller.aIMovement.maxSpeed = Random.Range(minSpeedRange, maxSpeedRange);
@@ -35,7 +32,6 @@ namespace DarknessMinion
 			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
 			else darkController.movement.UpdateDestinationPath(false);*/
-			darkController.movement.PathChooser();
 		}
 
 		public override void MovementUpdate(Darkness darkController)
@@ -45,6 +41,7 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
+			darkController.movement.PathChooser();
 			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
 			else darkController.movement.UpdateDestinationPath(false);

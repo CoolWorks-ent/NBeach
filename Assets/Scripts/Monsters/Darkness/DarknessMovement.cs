@@ -13,6 +13,9 @@ namespace DarknessMinion
 		[Range(0, 5)]
 		public float playerCloseRange;
 
+		[Range(0, 10)]
+		public int lookAheadDistance;
+
 		[HideInInspector]
 		public float playerDist { get; private set; }
 		public float navTargetDist { get; private set; }
@@ -25,30 +28,24 @@ namespace DarknessMinion
 		private Seeker sekr;
 		private AIPath pather;
 
-		private DarknessSteering steering;
+		private DirectionNode[] directionNodes;
 
-		private Vector3[] seekMap, avoidMap, calculationMap;
-		private float[] angleMap;
-		
+		private LayerMask avoidLayerMask;
+
 		void Awake()
 		{
-			steering = new DarknessSteering();
 			sekr = GetComponent<Seeker>();
 			pather = GetComponent<AIPath>();
 
-			calculationMap = new Vector3[8];
-			seekMap = new Vector3[calculationMap.Length];
-			avoidMap = new Vector3[calculationMap.Length];
-			angleMap = new float[calculationMap.Length];
-
-			angleMap[0] = 90 * Mathf.Deg2Rad;
-			angleMap[1] = 120 * Mathf.Deg2Rad;
-			angleMap[2] = 140 * Mathf.Deg2Rad;
-			angleMap[3] = 160 * Mathf.Deg2Rad;
-			angleMap[4] = 70 * Mathf.Deg2Rad;
-			angleMap[5] = 50 * Mathf.Deg2Rad;
-			angleMap[6] = 30 * Mathf.Deg2Rad;
-			angleMap[7] = 270 * Mathf.Deg2Rad;
+			directionNodes = new DirectionNode[8];
+			directionNodes[0] = new DirectionNode(90 * Mathf.Deg2Rad);
+			directionNodes[1] = new DirectionNode(120 * Mathf.Deg2Rad);
+			directionNodes[2] = new DirectionNode(140 * Mathf.Deg2Rad);
+			directionNodes[3] = new DirectionNode(160 * Mathf.Deg2Rad);
+			directionNodes[4] = new DirectionNode(70 * Mathf.Deg2Rad);
+			directionNodes[5] = new DirectionNode(50 * Mathf.Deg2Rad);
+			directionNodes[6] = new DirectionNode(30 * Mathf.Deg2Rad);
+			directionNodes[7] = new DirectionNode(270* Mathf.Deg2Rad);
 		}
 
 		void Start()
@@ -56,6 +53,7 @@ namespace DarknessMinion
 			//sekr.pathCallback += PathComplete;
 			//bProvider = new Blocker();
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
+			avoidLayerMask = LayerMask.GetMask("Darkness", "Environment");
 		}
 
 		public void DistanceEvaluation()
@@ -114,9 +112,9 @@ namespace DarknessMinion
         {
 			//Generate vectors in several directions in a circle around the Darkness
 			//I want points at certain angles all around the Darkness and I want to save those to an array
-			for (int i = 0; i < calculationMap.Length; i++)
+			for (int i = 0; i < directionNodes.Length; i++)
 			{
-				calculationMap[i] = new Vector3(Mathf.Cos(angleMap[i]), 0.1f, Mathf.Sin(angleMap[i]));
+				directionNodes[i].SetDirection(new Vector3(Mathf.Cos(directionNodes[i].angle), 0.1f, Mathf.Sin(directionNodes[i].angle)));
 			}
 		}
 
@@ -127,9 +125,22 @@ namespace DarknessMinion
 			//For example: if the player is (0.1, 0, 0.9) and the closest direction is (0, 0, 0.5) this direction gets the highest weight
 			//Use the dot product to figure out how aligned the seek vector is to the player direction
 			//Set falloff rates for each of the vectors
-				//Vectors with dot values of 1 - 0.8 are +1 weight
-				//Vectors with dot values of 0.7 - 0.4 are +0.5 weight
-				//Vectors with dot values below 0.4 are +0.1 weight
+			//Vectors with dot values of 1 - 0.8 are +1 weight
+			//Vectors with dot values of 0.7 - 0.4 are +0.5 weight
+			//Vectors with dot values below 0.4 are +0.1 weight
+
+			Vector3 playerDirection = (player.position - transform.position).normalized;
+			float dotValue = 0;
+
+			foreach(DirectionNode dNode in directionNodes)
+            {
+				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection);
+				if (dotValue >= 0.8f)
+					dNode.seekWeight = 1;
+				else if (dotValue <= 0.8f && dotValue >= 0.4f)
+					dNode.seekWeight = 0.5f;
+				else dNode.seekWeight = 0.1f;
+            }
         }
 
 		private void AvoidLayer()
@@ -140,11 +151,27 @@ namespace DarknessMinion
 			//Get the directions of objects to avoid
 			//Apply the dot product to direction I want to go towards and the obstacle direction
 			//Set falloff for each of the vectors
-				//Vectors with dot values of 1 - 0.6 are -1 weight	
-				//Vectors with dot values of 0.6 - 0 are -0.5 weight
-				//Vectors with dot values of 0 or below are not given a weight
-        }
+			//Vectors with dot values of 1 - 0.6 are -1 weight	
+			//Vectors with dot values of 0.6 - 0 are -0.5 weight
+			//Vectors with dot values of 0 or below are not given a weight
 
+			RaycastHit rayHit;
+			float dotValue = 0;
+
+			foreach(DirectionNode dNode in directionNodes)
+            {
+				if (Physics.SphereCast(transform.position, 2, dNode.directionAtAngle * lookAheadDistance, out rayHit, avoidLayerMask))
+				{
+					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
+					if (dotValue >= 0.6f)
+						dNode.avoidWeight = -1;
+					else if (dotValue <= 0.6f && dotValue >= 0)
+						dNode.avoidWeight = -0.5f;
+					else dNode.avoidWeight = 0;
+				}
+				else dNode.avoidWeight = 0;
+            }
+        }
 
 		/*private void PathComplete(Path p)
 		{
@@ -190,9 +217,9 @@ namespace DarknessMinion
 
 		void OnDrawGizmos()
         {
-			foreach(Vector3 vec in calculationMap)
+			foreach(DirectionNode dir in directionNodes)
             {
-				Debug.DrawLine(this.transform.position, vec + this.transform.position, Color.green);
+				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, Color.green);
             }
         }
 
@@ -200,5 +227,27 @@ namespace DarknessMinion
 		{
 			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
 		}
+
+		private class DirectionNode
+        {
+			public float angle { get; private set; }
+			public float avoidWeight, seekWeight;
+			public float combinedWeight { get { return avoidWeight + seekWeight; } }
+
+			public Vector3 directionAtAngle { get; private set; }
+
+			public DirectionNode(float dAngle)
+            {
+				angle = dAngle;
+				avoidWeight = 0;
+				seekWeight = 0;
+				directionAtAngle = Vector3.zero;
+            }
+
+			public void SetDirection(Vector3 v)
+            {
+				directionAtAngle = v;
+            }
+        }
 	}
 }
