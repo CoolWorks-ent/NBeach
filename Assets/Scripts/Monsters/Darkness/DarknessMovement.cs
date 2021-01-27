@@ -119,7 +119,7 @@ namespace DarknessMinion
 				}
             }
 
-			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * 5;
+			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * (lookAheadDistance + 2) + this.transform.position;
         }
 
 
@@ -145,19 +145,18 @@ namespace DarknessMinion
 			//Vectors with dot values below 0.4 are +0.1 weight
 
 			Vector3 playerDirection = (player.position - transform.position).normalized;
-			//float dotValue = 0;
+			float dotValue = 0;
 
 			foreach(DirectionNode dNode in directionNodes)
             {
-				dNode.seekWeight = Vector3.Dot(dNode.directionAtAngle, playerDirection) * 2;
-				/*dotValue 
+				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection) * 2;
 				if (dotValue >= 0.8f)
-					dNode.seekWeight = 0.8f;
-				else if (dotValue <= 0.8f && dotValue >= 0.4f)
+					dNode.seekWeight = 1f;
+				else if (dotValue < 0.8f && dotValue >= 0.4f)
 					dNode.seekWeight = 0.5f;
-				else dNode.seekWeight = 0.1f;*/
-            }
-        }
+				else dNode.seekWeight = 0.1f;
+			}
+		}
 
 		private void AvoidLayer()
         {
@@ -172,19 +171,19 @@ namespace DarknessMinion
 			//Vectors with dot values of 0 or below are not given a weight
 
 			RaycastHit rayHit;
-			//float dotValue = 0;
+			float dotValue = 0;
 
 			foreach(DirectionNode dNode in directionNodes)
             {
-				if (Physics.SphereCast(transform.position, 2, dNode.directionAtAngle * lookAheadDistance, out rayHit, avoidLayerMask))
+				if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * lookAheadDistance * 1.5f, out rayHit, lookAheadDistance+2, avoidLayerMask, QueryTriggerInteraction.Collide ))
 				{
-					dNode.avoidWeight = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position) * 2;
-					/*dotValue 
+					//dNode.avoidWeight 
+					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
 					if (dotValue >= 0.6f)
 						dNode.avoidWeight = -1;
 					else if (dotValue <= 0.6f && dotValue >= 0)
 						dNode.avoidWeight = -0.5f;
-					else dNode.avoidWeight = 0;*/
+					else dNode.avoidWeight = 0;
 				}
 				else dNode.avoidWeight = 0;
             }
@@ -239,7 +238,7 @@ namespace DarknessMinion
 				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, Color.green);
             }
 
-			Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5, 2);
+			Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
         }
 
 		void OnDestroy()
@@ -250,7 +249,7 @@ namespace DarknessMinion
 		private class DirectionNode
         {
 			public float angle { get; private set; }
-			public float avoidWeight, seekWeight;
+			public float avoidWeight, seekWeight, baseWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
 			public Vector3 directionAtAngle { get; private set; }
@@ -264,9 +263,9 @@ namespace DarknessMinion
             }
 
 			public void SetDirection(Vector3 v)
-            {
-				directionAtAngle = v;
-            }
+			{ 
+				directionAtAngle = v; 
+			}
         }
 	}
 }

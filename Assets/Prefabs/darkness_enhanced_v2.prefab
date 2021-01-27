@@ -947,10 +947,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steeringMap: []
-  playerCloseRange: 0
+  playerCloseRange: 2.75
+  lookAheadDistance: 4
   navTarget:
     position: {x: 0, y: 0, z: 0}
     positionOffset: {x: 0, y: 0, z: 0}
+  player: {fileID: 0}
 --- !u!114 &114774764668895200
 MonoBehaviour:
   m_ObjectHideFlags: 1

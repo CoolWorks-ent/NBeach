@@ -17,6 +17,7 @@ namespace DarknessMinion
 			}*/
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
 			darkController.movement.StartMovement();
+			darkController.movement.UpdatePathDestination();
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 			/*controller.aIMovement.CreatePath(controller.Target.position);
 			controller.aIMovement.repathRate = Random.Range(minRepathRate, maxRepathRate);

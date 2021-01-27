@@ -96,7 +96,7 @@ namespace DarknessMinion
 			creationID = createID;
 		}
 
-		public void UpdateStates()
+		private void UpdateStates()
 		{
 			currentState.UpdateState(this);
 		}
