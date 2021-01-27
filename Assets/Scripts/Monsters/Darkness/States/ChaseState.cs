@@ -41,7 +41,7 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			darkController.movement.PathChooser();
+			darkController.movement.UpdatePathDestination();
 			/*if (darkController.movement.playerDist <= darkController.movement.switchTargetDistance)
 				darkController.movement.UpdateDestinationPath(true);
 			else darkController.movement.UpdateDestinationPath(false);

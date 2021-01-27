@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pathfinding;
+using System.Collections.Generic;
 
 namespace DarknessMinion
 {
@@ -29,6 +30,7 @@ namespace DarknessMinion
 		private AIPath pather;
 
 		private DirectionNode[] directionNodes;
+		private int bestDirectionIndex;
 
 		private LayerMask avoidLayerMask;
 
@@ -46,6 +48,7 @@ namespace DarknessMinion
 			directionNodes[5] = new DirectionNode(50 * Mathf.Deg2Rad);
 			directionNodes[6] = new DirectionNode(30 * Mathf.Deg2Rad);
 			directionNodes[7] = new DirectionNode(270* Mathf.Deg2Rad);
+			bestDirectionIndex = 0;
 		}
 
 		void Start()
@@ -98,7 +101,7 @@ namespace DarknessMinion
 		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
 		*/
 
-		public void PathChooser()
+		public void UpdatePathDestination()
         {
 			GenerateVectorPaths();
 			SeekLayer();
@@ -106,7 +109,19 @@ namespace DarknessMinion
 
 			//Once the layers are calulated with weights narrow down the path that leads closer to the player
 			//Once the direction is chosen set the navtarget to a point along the direction vector
+			bestDirectionIndex = 0;
+			for (int i = 0; i < directionNodes.Length; i++)
+            {
+				if(i+1 <= directionNodes.Length-1)
+                {
+					if(directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
+						bestDirectionIndex = i;
+				}
+            }
+
+			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * 5;
         }
+
 
 		private void GenerateVectorPaths()
         {
@@ -130,16 +145,17 @@ namespace DarknessMinion
 			//Vectors with dot values below 0.4 are +0.1 weight
 
 			Vector3 playerDirection = (player.position - transform.position).normalized;
-			float dotValue = 0;
+			//float dotValue = 0;
 
 			foreach(DirectionNode dNode in directionNodes)
             {
-				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection);
+				dNode.seekWeight = Vector3.Dot(dNode.directionAtAngle, playerDirection) * 2;
+				/*dotValue 
 				if (dotValue >= 0.8f)
-					dNode.seekWeight = 1;
+					dNode.seekWeight = 0.8f;
 				else if (dotValue <= 0.8f && dotValue >= 0.4f)
 					dNode.seekWeight = 0.5f;
-				else dNode.seekWeight = 0.1f;
+				else dNode.seekWeight = 0.1f;*/
             }
         }
 
@@ -156,18 +172,19 @@ namespace DarknessMinion
 			//Vectors with dot values of 0 or below are not given a weight
 
 			RaycastHit rayHit;
-			float dotValue = 0;
+			//float dotValue = 0;
 
 			foreach(DirectionNode dNode in directionNodes)
             {
 				if (Physics.SphereCast(transform.position, 2, dNode.directionAtAngle * lookAheadDistance, out rayHit, avoidLayerMask))
 				{
-					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
+					dNode.avoidWeight = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position) * 2;
+					/*dotValue 
 					if (dotValue >= 0.6f)
 						dNode.avoidWeight = -1;
 					else if (dotValue <= 0.6f && dotValue >= 0)
 						dNode.avoidWeight = -0.5f;
-					else dNode.avoidWeight = 0;
+					else dNode.avoidWeight = 0;*/
 				}
 				else dNode.avoidWeight = 0;
             }
@@ -221,6 +238,8 @@ namespace DarknessMinion
             {
 				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, Color.green);
             }
+
+			Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5, 2);
         }
 
 		void OnDestroy()
