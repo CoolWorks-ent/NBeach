@@ -104,8 +104,7 @@ namespace DarknessMinion
 		public void UpdatePathDestination()
         {
 			GenerateVectorPaths();
-			SeekLayer();
-			AvoidLayer();
+			CalculateSeekAvoidLayers();
 
 			//Once the layers are calulated with weights narrow down the path that leads closer to the player
 			//Once the direction is chosen set the navtarget to a point along the direction vector
@@ -130,6 +129,35 @@ namespace DarknessMinion
 			for (int i = 0; i < directionNodes.Length; i++)
 			{
 				directionNodes[i].SetDirection(new Vector3(Mathf.Cos(directionNodes[i].angle), 0.1f, Mathf.Sin(directionNodes[i].angle)));
+			}
+		}
+
+		private void CalculateSeekAvoidLayers()
+        {
+			Vector3 playerDirection = (player.position - transform.position).normalized;
+			float dotValue = 0;
+			RaycastHit rayHit;
+
+			foreach (DirectionNode dNode in directionNodes)
+			{
+				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection);
+				if (dotValue >= 0.8f)
+					dNode.seekWeight = 1f;
+				else if (dotValue < 0.8f && dotValue >= 0.4f)
+					dNode.seekWeight = 0.5f;
+				else dNode.seekWeight = 0.1f;
+
+				if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * lookAheadDistance * 1.5f, out rayHit, lookAheadDistance + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+				{
+					//dNode.avoidWeight 
+					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
+					if (dotValue >= 0.6f)
+						dNode.avoidWeight = -1;
+					else if (dotValue <= 0.6f && dotValue >= 0)
+						dNode.avoidWeight = -0.5f;
+					else dNode.avoidWeight = 0;
+				}
+				else dNode.avoidWeight = 0;
 			}
 		}
 
@@ -158,6 +186,8 @@ namespace DarknessMinion
 			}
 		}
 
+
+
 		private void AvoidLayer()
         {
 			//Apply a negative weight to each direction in the avoidMap
@@ -170,8 +200,8 @@ namespace DarknessMinion
 			//Vectors with dot values of 0.6 - 0 are -0.5 weight
 			//Vectors with dot values of 0 or below are not given a weight
 
-			RaycastHit rayHit;
 			float dotValue = 0;
+			RaycastHit rayHit;
 
 			foreach(DirectionNode dNode in directionNodes)
             {
@@ -233,9 +263,18 @@ namespace DarknessMinion
 
 		void OnDrawGizmos()
         {
+			Color col = Color.red;
+
 			foreach(DirectionNode dir in directionNodes)
             {
-				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, Color.green);
+				if (dir.combinedWeight > 0.8f)
+					col = Color.green;
+				else if (dir.combinedWeight > 0.8f && dir.combinedWeight < 0.5f)
+					col = Color.yellow;
+				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
+					col = Color.magenta;
+				else col = Color.white;
+				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, col);
             }
 
 			Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);

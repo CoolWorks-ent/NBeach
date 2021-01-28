@@ -9,10 +9,6 @@ namespace DarknessMinion
     {
         //[Range(0, 5)]
         //public float attackCooldown;
-
-        [Range(0, 10)]
-        public float attackInitiationRange;
-
         //public AttackState(Darkness dControl) : base(dControl){ }
 
         public override void InitializeState(Darkness darkController)
@@ -26,7 +22,6 @@ namespace DarknessMinion
             //darkController.pather.endReachedDistance = attackInitiationRange;
             darkController.movement.StopMovement();
             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
-            darkController.SetAttackDistance(attackInitiationRange);
         }
 
         public override void UpdateState(Darkness darkController)

@@ -32,7 +32,10 @@ namespace DarknessMinion
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
 		public int creationID { get; private set;}
-		public float attackDist { get; private set; }
+		public float attackSwitchRange { get { return attackRange; } }
+
+		[SerializeField, Range(0, 5)]
+		private float attackRange;
 
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
@@ -166,7 +169,7 @@ namespace DarknessMinion
 
 		public void SetAttackDistance(float atkValue)
 		{
-			attackDist = atkValue;
+			attackRange = atkValue;
 		}
 
 		private void UpdateCooldownTimers()

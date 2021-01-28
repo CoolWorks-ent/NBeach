@@ -57,7 +57,7 @@ namespace DarknessMinion
 
         private bool AttackRangeCheck(Darkness controller)
         {
-            if (controller.movement.playerDist < controller.attackDist)
+            if (controller.movement.playerDist < controller.attackSwitchRange)
                 return true;
             else return false;
         }
@@ -97,14 +97,14 @@ namespace DarknessMinion
 
         private bool PlayerOutOfRangeCheck(Darkness controller)
         {
-            if (controller.movement.playerDist > controller.attackDist)
+            if (controller.movement.playerDist > controller.attackSwitchRange)
                 return true;
             else return false;
         }
 
         private bool NavTargetCloseCheck(Darkness controller)
         {
-            if (controller.movement.navTargetDist < controller.attackDist)
+            if (controller.movement.navTargetDist < controller.attackSwitchRange)
                 return true;
             else return false;
         }
