@@ -3,7 +3,7 @@ using UnityEngine;
 namespace DarknessMinion
 {
 
-	[CreateAssetMenu(menuName = "Darkness/ChaseState")]
+    [CreateAssetMenu(menuName = "Darkness/ChaseState")]
 	public class ChaseState : DarkState
 	{
 		[Range(0.25f, 5)]

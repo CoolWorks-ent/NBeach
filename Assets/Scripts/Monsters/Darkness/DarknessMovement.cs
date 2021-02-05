@@ -39,15 +39,17 @@ namespace DarknessMinion
 			sekr = GetComponent<Seeker>();
 			pather = GetComponent<AIPath>();
 
-			directionNodes = new DirectionNode[8];
+			directionNodes = new DirectionNode[10];
 			directionNodes[0] = new DirectionNode(90 * Mathf.Deg2Rad);
 			directionNodes[1] = new DirectionNode(120 * Mathf.Deg2Rad);
-			directionNodes[2] = new DirectionNode(140 * Mathf.Deg2Rad);
-			directionNodes[3] = new DirectionNode(160 * Mathf.Deg2Rad);
-			directionNodes[4] = new DirectionNode(70 * Mathf.Deg2Rad);
-			directionNodes[5] = new DirectionNode(50 * Mathf.Deg2Rad);
-			directionNodes[6] = new DirectionNode(30 * Mathf.Deg2Rad);
-			directionNodes[7] = new DirectionNode(270* Mathf.Deg2Rad);
+			directionNodes[2] = new DirectionNode(150 * Mathf.Deg2Rad);
+			directionNodes[3] = new DirectionNode(180 * Mathf.Deg2Rad);
+			directionNodes[4] = new DirectionNode(60 * Mathf.Deg2Rad);
+			directionNodes[5] = new DirectionNode(30 * Mathf.Deg2Rad);
+			directionNodes[6] = new DirectionNode(0 * Mathf.Deg2Rad);
+			directionNodes[7] = new DirectionNode(225 * Mathf.Deg2Rad);
+			directionNodes[8] = new DirectionNode(315 * Mathf.Deg2Rad);
+			directionNodes[9] = new DirectionNode(270 * Mathf.Deg2Rad);
 			bestDirectionIndex = 0;
 		}
 
@@ -141,9 +143,11 @@ namespace DarknessMinion
 			foreach (DirectionNode dNode in directionNodes)
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection);
-				if (dotValue >= 0.8f)
+				if (dotValue > 0.9f)
 					dNode.seekWeight = 1f;
-				else if (dotValue < 0.8f && dotValue >= 0.4f)
+				else if (dotValue < 0.9f && dotValue >= 0.7f)
+					dNode.seekWeight = 0.7f;
+				else if (dotValue < 0.7f && dotValue >= 0.4f)
 					dNode.seekWeight = 0.5f;
 				else dNode.seekWeight = 0.1f;
 
@@ -267,9 +271,11 @@ namespace DarknessMinion
 
 			foreach(DirectionNode dir in directionNodes)
             {
-				if (dir.combinedWeight > 0.8f)
+				if (dir.combinedWeight > 0.9f)
 					col = Color.green;
-				else if (dir.combinedWeight > 0.8f && dir.combinedWeight < 0.5f)
+				else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
+					col = Color.cyan;
+				else if (dir.combinedWeight < 0.7f && dir.combinedWeight > 0.5f)
 					col = Color.yellow;
 				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					col = Color.magenta;

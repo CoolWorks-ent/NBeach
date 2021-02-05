@@ -60,13 +60,14 @@ namespace DarknessMinion
 			}*/
 		}
 
-		void LateUpdate()
+		void Update()
 		{
 			//PlayerPoint.UpdateLocation(player.position);
 			/*foreach(NavigationTarget point in AttackPoints)
 			{
 				point.UpdateLocation(player.position);
 			}*/
+			maxEnemyCount = 1;
 		}
 
 
@@ -98,7 +99,7 @@ namespace DarknessMinion
 					DarkEventManager.OnUpdateDarknessStates();
 				}
 				else yield return new WaitForSeconds(calculationTime);
-				//maxEnemyCount = 1; //TODO remove once done testing
+				 //TODO remove once done testing
 			}
 			yield return null;
 		}
