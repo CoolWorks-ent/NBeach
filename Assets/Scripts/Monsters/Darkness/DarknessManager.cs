@@ -67,7 +67,7 @@ namespace DarknessMinion
 			{
 				point.UpdateLocation(player.position);
 			}*/
-			maxEnemyCount = 1;
+			//maxEnemyCount = 1; //for testing only
 		}
 
 

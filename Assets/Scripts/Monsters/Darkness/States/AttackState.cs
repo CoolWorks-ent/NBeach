@@ -36,9 +36,9 @@ namespace DarknessMinion
             
             if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
             {
-                if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out darkController.rayHitInfo, 5, darkController.mask)) //controller.playerDist < attackInitiationRange && 
+                if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out darkController.rayHitInfo, 5, darkController.playerMask)) //controller.playerDist < attackInitiationRange && 
                 {
-                    Debug.Log("Hit collider: " + darkController.rayHitInfo.collider.name);
+                    //Debug.LogWarning("Hit collider: " + darkController.rayHitInfo.collider.name);
                     if(darkController.rayHitInfo.collider.name == "Player")
                     {
                         if(!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
@@ -52,14 +52,14 @@ namespace DarknessMinion
                             //darkController.attacked = true;
                         }
                     }
+                    else darkController.movement.RotateTowardsPlayer();
                 }
-                else darkController.movement.RotateTowardsPlayer();
             }
         }
 
         public override void ExitState(Darkness darkController)
         {
-            base.ExitState(darkController);
+            //base.ExitState(darkController);
             //controller.attacked = false;
             //controller.animeController.SetBool(controller.attackAfterHash, true);
         }

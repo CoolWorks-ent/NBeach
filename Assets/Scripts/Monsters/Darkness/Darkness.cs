@@ -27,8 +27,7 @@ namespace DarknessMinion
 		public TextMesh textMesh;
 		public bool updateStates;//, attacked;
 
-		[HideInInspector]
-		public LayerMask mask;
+		public LayerMask playerMask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
 		public int creationID { get; private set;}
@@ -68,7 +67,6 @@ namespace DarknessMinion
 			darkHitBox = GetComponent<CapsuleCollider>();
 			previousState  = currentState;
 			darkHitBox.enabled = false;
-			mask = LayerMask.GetMask("Player");
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);

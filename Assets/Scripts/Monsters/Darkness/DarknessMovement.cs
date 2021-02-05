@@ -10,9 +10,6 @@ namespace DarknessMinion
 		public Vector3[] steeringMap;
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
-		
-		[Range(0, 5)]
-		public float playerCloseRange;
 
 		[Range(0, 10)]
 		public int lookAheadDistance;
@@ -32,6 +29,7 @@ namespace DarknessMinion
 		private DirectionNode[] directionNodes;
 		private int bestDirectionIndex;
 
+		[SerializeField]
 		private LayerMask avoidLayerMask;
 
 		void Awake()
@@ -58,7 +56,7 @@ namespace DarknessMinion
 			//sekr.pathCallback += PathComplete;
 			//bProvider = new Blocker();
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-			avoidLayerMask = LayerMask.GetMask("Darkness", "Environment");
+			//avoidLayerMask = LayerMask.GetMask("Darkness", "Environment");
 		}
 
 		public void DistanceEvaluation()
@@ -157,7 +155,7 @@ namespace DarknessMinion
 					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
 					if (dotValue >= 0.6f)
 						dNode.avoidWeight = -1;
-					else if (dotValue <= 0.6f && dotValue >= 0)
+					else if (dotValue <= 0.6f && dotValue > 0)
 						dNode.avoidWeight = -0.5f;
 					else dNode.avoidWeight = 0;
 				}
