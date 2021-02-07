@@ -81,6 +81,19 @@ namespace DarknessMinion
 			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 		}
 
+		public bool IsFacingPlayer(float minimumValue)
+        {
+			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
+			if (closeness >= minimumValue)
+				return true;
+			else return false;
+        }
+
+		public Vector3 PlayerDirection()
+        {
+			return (player.position - transform.position).normalized;
+		}
+
 		public void StopMovement()
 		{
 			pather.canSearch = false;
@@ -134,13 +147,12 @@ namespace DarknessMinion
 
 		private void CalculateSeekAvoidLayers()
         {
-			Vector3 playerDirection = (player.position - transform.position).normalized;
 			float dotValue = 0;
 			RaycastHit rayHit;
 
 			foreach (DirectionNode dNode in directionNodes)
 			{
-				dotValue = Vector3.Dot(dNode.directionAtAngle, playerDirection);
+				dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
 				if (dotValue > 0.9f)
 					dNode.seekWeight = 1f;
 				else if (dotValue < 0.9f && dotValue >= 0.7f)

@@ -34,26 +34,30 @@ namespace DarknessMinion
         {
             //darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
             
-            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
+            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) //TODO check if this actually works
             {
-                if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out darkController.rayHitInfo, 5, darkController.playerMask)) //controller.playerDist < attackInitiationRange && 
+                if(darkController.movement.IsFacingPlayer(0.8f))
                 {
-                    //Debug.LogWarning("Hit collider: " + darkController.rayHitInfo.collider.name);
-                    if(darkController.rayHitInfo.collider.name == "Player")
+                    if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
-                        if(!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
-                        {
-                            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
-                            //controller.animeController.SetTrigger(controller.attackTrigHash);
-                            
-                            darkController.AddCooldown(new CooldownInfo(2f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
-                            //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
-                            darkController.darkHitBox.enabled = true;
-                            //darkController.attacked = true;
-                        }
+                        darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
+                        //controller.animeController.SetTrigger(controller.attackTrigHash);
+
+                        darkController.AddCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
+                        //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
+                        darkController.darkHitBox.enabled = true;
+                        //darkController.attacked = true;
                     }
-                    else darkController.movement.RotateTowardsPlayer();
+                    /*if (Physics.Raycast(darkController.transform.position, darkController.transform.forward * 5, out darkController.rayHitInfo, 5, darkController.playerMask)) //controller.playerDist < attackInitiationRange && 
+                    {
+                        //Debug.LogWarning("Hit collider: " + darkController.rayHitInfo.collider.name);
+                        if (darkController.rayHitInfo.collider.name == "Player")
+                        {
+                            
+                        }
+                    }*/
                 }
+                else darkController.movement.RotateTowardsPlayer();
             }
         }
 
