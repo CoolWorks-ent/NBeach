@@ -1428,6 +1428,14 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_GenerateMotionCurves: 0
   m_Events:
+  - time: 1.15
+    functionName: OnSmashAttackStart
+    data: 
+    objectReferenceParameter: {fileID: 11500000, guid: 221f3ffb7d2d95e429d6c222733f894f,
+      type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.0833333
     functionName: OnSmashAttackEnd
     data: 

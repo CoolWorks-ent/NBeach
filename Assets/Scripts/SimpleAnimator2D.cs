@@ -76,10 +76,11 @@ public class SimpleAnimator2D : MonoBehaviour {
     {
         imageRenderer = GetComponentInChildren<Image>();
         //spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        if (spriteRenderer == null)
+        /*if (spriteRenderer == null)
         {
             Debug.Log(gameObject.name + ": Couldn't find SpriteRenderer");
         }
+        */
 
         //if (animations.Count > 0) PlayByIndex(0);
     }

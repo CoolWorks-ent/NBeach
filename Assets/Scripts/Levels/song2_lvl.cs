@@ -104,6 +104,8 @@ public class song2_lvl : Level {
 
     bool stagePlaying = true;
 
+    bool finalSmashAttackStarted = false;
+
     // Use this for initialization
     void Start() {
         
@@ -120,6 +122,7 @@ public class song2_lvl : Level {
         EventManager.StartListening("Scene2Event", Scene2Events);
         EventManager.StartListening("Player_Cover_Destroyed", Scene2Events);
         EventManager.StartListening("Song2_End_Cutscene_Start", delegate { StartCoroutine(Song2_EndCutscene()); }); //this cutscene is called when player is hit by Dark Boss Smash in stage3
+        EventManager.StartListening("OnSmashAttackStart", OnSmashAttackStart);
         EventManager.StartListening("OnPlayerHitIsland", OnPlayerHitIsland);
         EventManager.StartListening("PauseWorld", OnStagePaused);
 
@@ -844,8 +847,22 @@ public class song2_lvl : Level {
         //Reset Dark Boss rotation
         darkBossObj.transform.rotation = new Quaternion(0, 0, 0, 0);
 
-        //snap player transform to face dark boss after reaching the new stage position
-        playerStageObj.transform.LookAt(darkBoss.transform);
+        //rotate player transform to face dark boss after reaching the new stage position
+        //playerStageObj.transform.LookAt(darkBoss.transform);
+
+        rotateTime = 1f;
+        curTime = 0;
+        while (curTime <= rotateTime)
+        {
+            //find the vector pointing from our position to the target
+            Vector3 direction = (enemyStageObj.transform.position - playerStageObj.transform.position).normalized;
+            Quaternion lookDirection = Quaternion.LookRotation(direction);
+
+            //rotate us over time according to speed until we are in the required rotation
+            playerStageObj.transform.rotation = Quaternion.Slerp(playerStageObj.transform.rotation, lookDirection, Time.deltaTime * rotateTime);
+            curTime += Time.deltaTime;
+            yield return null;
+        }
 
         enemySpawners.spawnRate = darkSpawnRate_Stage1;
         
@@ -1005,8 +1022,8 @@ public class song2_lvl : Level {
 
         darkBoss.DoRockSmash_Interrupt(gController.playerControl.gameObject);
         //yield return new WaitForSeconds(4f);
-        yield return new WaitUntil(() => darkBoss.GetComponent<Animator>().GetBool("DoRockSmashAttack") == true);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitUntil(() => finalSmashAttackStarted == true);//darkBoss.GetComponent<Animator>().GetBool("DoRockSmashAttack") == true);
+        //yield return new WaitForSeconds(1f);
         gController.timeManager.DoSlowMo(15f);
         yield return new WaitUntil(() => gController.timeManager.slowMoOn == false);
 
@@ -1035,6 +1052,14 @@ public class song2_lvl : Level {
         gController.playerControl.CanMove = false;
         gController.playerControl.playerState = PlayerState.MOVING;
         yield return 0;
+    }
+
+    //Called from Animation Event to DarknessBoss Script Event Trigger
+    void OnSmashAttackStart(string evt)
+    {
+        //EventManager.TriggerEvent("OnSmashAttackStart", "OnSmashAttackStart");
+        if(stageNum == 3)
+            finalSmashAttackStarted = true;
     }
 
     void OnPlayerHitIsland(string evt)

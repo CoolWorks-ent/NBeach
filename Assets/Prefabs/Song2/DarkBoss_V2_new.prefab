@@ -585,7 +585,7 @@ GameObject:
   - component: {fileID: 4758033573233560}
   m_Layer: 17
   m_Name: HandPivot
-  m_TagString: Untagged
+  m_TagString: DarkBossAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1331,7 +1331,7 @@ GameObject:
   - component: {fileID: 65277858736637210}
   m_Layer: 0
   m_Name: Armature.003
-  m_TagString: Untagged
+  m_TagString: DarkBossAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
