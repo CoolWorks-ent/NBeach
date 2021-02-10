@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 114857173380954124}
   - component: {fileID: 136796206659899728}
   - component: {fileID: 114774764668895200}
+  - component: {fileID: 114074823609324606}
   m_Layer: 17
   m_Name: darkness_enhanced_v2
   m_TagString: Darkness
@@ -886,6 +887,20 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4294967295
+--- !u!114 &114074823609324606
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1558497094199476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  penalty: 1000
+  randomStep: 7
 --- !u!114 &114150173797437670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -970,7 +985,7 @@ MonoBehaviour:
   version: 2
   radius: 0.5
   height: 0.01
-  repathRate: 0.5
+  repathRate: 1
   canSearch: 1
   canMove: 1
   maxSpeed: 1

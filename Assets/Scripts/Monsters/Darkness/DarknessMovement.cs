@@ -23,18 +23,18 @@ namespace DarknessMinion
 		[HideInInspector]
 		public Transform player;
 
-		private Seeker sekr;
 		private AIPath pather;
 
 		private DirectionNode[] directionNodes;
 		private int bestDirectionIndex;
+
+		private Vector3 pointToHighlyAvoid;
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
 
 		void Awake()
 		{
-			sekr = GetComponent<Seeker>();
 			pather = GetComponent<AIPath>();
 
 			directionNodes = new DirectionNode[10];
@@ -49,6 +49,7 @@ namespace DarknessMinion
 			directionNodes[8] = new DirectionNode(315 * Mathf.Deg2Rad);
 			directionNodes[9] = new DirectionNode(270 * Mathf.Deg2Rad);
 			bestDirectionIndex = 0;
+			pointToHighlyAvoid = new Vector3();
 		}
 
 		void Start()
@@ -105,6 +106,11 @@ namespace DarknessMinion
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
+
+		public void UpdateHighAvoidancePoint(Vector3 point)
+        {
+			pointToHighlyAvoid = point;
+        }
 
 		/*Add functions for applying steering behaviors
 		* Choose several points in a circle that would be the starting candidates for movement

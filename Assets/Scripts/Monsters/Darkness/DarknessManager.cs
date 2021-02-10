@@ -25,7 +25,7 @@ namespace DarknessMinion
 
 		[SerializeField, Header("Assign in Inspector")]
 		private Transform player;
-		public int maxEnemyCount, minEnemyCount;
+		public int maxEnemyCount;
 
 		void Awake()
 		{
