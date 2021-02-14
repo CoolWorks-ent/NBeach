@@ -126,7 +126,11 @@ namespace DarknessMinion
 		public void UpdatePathDestination()
         {
 			GenerateVectorPaths();
-			CalculateSeekAvoidLayers();
+			foreach (DirectionNode dNode in directionNodes)
+			{
+				SeekLayer(dNode);
+				AvoidLayer(dNode);
+			}
 
 			//Once the layers are calulated with weights narrow down the path that leads closer to the player
 			//Once the direction is chosen set the navtarget to a point along the direction vector
@@ -154,33 +158,38 @@ namespace DarknessMinion
 			}
 		}
 
-		private void CalculateSeekAvoidLayers()
+		private void SeekLayer(DirectionNode dNode)
         {
-			float dotValue = 0;
+			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
+			if (dotValue > 0.9f)
+				dNode.seekWeight = 1f;
+			else if (dotValue < 0.9f && dotValue >= 0.7f)
+				dNode.seekWeight = 0.7f;
+			else if (dotValue < 0.7f && dotValue >= 0.4f)
+				dNode.seekWeight = 0.5f;
+			else dNode.seekWeight = 0.1f;
+		}
+
+		private void AvoidLayer(DirectionNode dNode)
+        {
+			dNode.avoidWeight = 0;
 			RaycastHit rayHit;
+			float dotValue;
 
-			foreach (DirectionNode dNode in directionNodes)
+			/*if (pointToHighlyAvoid != Vector3.zero)
 			{
-				dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
-				if (dotValue > 0.9f)
-					dNode.seekWeight = 1f;
-				else if (dotValue < 0.9f && dotValue >= 0.7f)
-					dNode.seekWeight = 0.7f;
-				else if (dotValue < 0.7f && dotValue >= 0.4f)
-					dNode.seekWeight = 0.5f;
-				else dNode.seekWeight = 0.1f;
+				float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
+				if (localAvoidanceDotValue >= 0.6f)
+					dNode.avoidWeight += -2;
+			}*/
 
-				if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance() * 1.5f, out rayHit, calculationDistance() + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
-				{
-					//dNode.avoidWeight 
-					dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
-					if (dotValue >= 0.6f)
-						dNode.avoidWeight = -1;
-					else if (dotValue <= 0.6f && dotValue > 0)
-						dNode.avoidWeight = -0.5f;
-					else dNode.avoidWeight = 0;
-				}
-				else dNode.avoidWeight = 0;
+			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance() * 1.5f, out rayHit, calculationDistance() + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+			{
+				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
+				if (dotValue >= 0.6f)
+					dNode.avoidWeight += -1;
+				else if (dotValue <= 0.6f && dotValue > 0)
+					dNode.avoidWeight += -0.5f;
 			}
 		}
 
@@ -189,6 +198,11 @@ namespace DarknessMinion
 			if (playerDist <= movementPrecisionDistance)
 				return lookAheadDistance / 2;
 			else return lookAheadDistance;
+        }
+
+		private float LocalAvoidanceDotValue(Vector3 direction)
+        {
+			return Vector3.Dot(direction, pointToHighlyAvoid);
         }
 
 		/*private void PathComplete(Path p)
