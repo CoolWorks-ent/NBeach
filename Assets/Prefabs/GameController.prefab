@@ -109,7 +109,7 @@ MonoBehaviour:
   uiManager: {fileID: 114739550497427106}
   debugMenuPrefab: {fileID: 0}
   pathControl: {fileID: 0}
-  timeManager: {fileID: 0}
+  timeManager: {fileID: 114223188232798436}
   blackOverlay: {fileID: 0}
   dmgOverlay: {fileID: 0}
 --- !u!114 &114963904690349220

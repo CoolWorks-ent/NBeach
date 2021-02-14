@@ -703,6 +703,11 @@ public class DarknessBoss : MonoBehaviour {
         animationControl.SetTrigger("SmashEnd");
     }
 
+    public void OnSmashAttackStart()
+    {
+        EventManager.TriggerEvent("OnSmashAttackStart", "OnSmashAttackStart");
+    }
+
     IEnumerator FlashSpellIcon()
     {
         if (attackState != BossAttackType.none)

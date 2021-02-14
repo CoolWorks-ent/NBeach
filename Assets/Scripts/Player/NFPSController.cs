@@ -756,6 +756,10 @@ public class NFPSController : PlayerController {
     {
         Image dmgOverlay = gController.dmgOverlay;
 
+        ScreenShake camShake = new ScreenShake();
+        //camShake.Play(.7f, 1);
+        StartCoroutine(camShake.Shake(.1f, .2f));
+
         if (dmgOverlay != null)
         {
             float time = 0;

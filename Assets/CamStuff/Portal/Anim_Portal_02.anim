@@ -20,12 +20,12 @@ AnimationClip:
         time: 0
         value: {x: 0, y: 0, z: 179.99998}
         inSlope: {x: 0, y: -692.4839, z: 0}
-        outSlope: {x: 0, y: -180, z: 0}
+        outSlope: {x: 0, y: 180, z: 0}
         tangentMode: 0
       - serializedVersion: 2
         time: 2
-        value: {x: 0, y: -360, z: 179.99998}
-        inSlope: {x: 0, y: -180, z: 0}
+        value: {x: 0, y: 360, z: 179.99998}
+        inSlope: {x: 0, y: 180, z: 0}
         outSlope: {x: 0, y: 169.42319, z: 0}
         tangentMode: 0
       m_PreInfinity: 2
@@ -101,12 +101,12 @@ AnimationClip:
         time: 0
         value: 0
         inSlope: -692.4839
-        outSlope: -180
+        outSlope: 180
         tangentMode: 65
       - serializedVersion: 2
         time: 2
-        value: -360
-        inSlope: -180
+        value: 360
+        inSlope: 180
         outSlope: 169.42319
         tangentMode: 69
       m_PreInfinity: 2
