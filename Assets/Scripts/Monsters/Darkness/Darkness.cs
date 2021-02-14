@@ -30,7 +30,7 @@ namespace DarknessMinion
 		public LayerMask playerMask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
-		public int creationID { get; private set;}
+		public int creationID { get; private set; }
 		public float attackSwitchRange { get { return attackRange; } }
 
 		[SerializeField, Range(0, 5)]

@@ -25,12 +25,12 @@ public class DarknessTester : Editor
 
 			if(GUILayout.Button("Move player Left"))
 			{
-				TestOverseer.Instance.MovePlayerObject(Vector3.left*5);
+				TestOverseer.Instance.MovePlayerObject(Vector3.right*5);
 			}
 
 			if(GUILayout.Button("Move player Right"))
 			{
-				TestOverseer.Instance.MovePlayerObject(Vector3.right*5);
+				TestOverseer.Instance.MovePlayerObject(Vector3.left*5);
 			}
 			EditorGUILayout.EndHorizontal();
 

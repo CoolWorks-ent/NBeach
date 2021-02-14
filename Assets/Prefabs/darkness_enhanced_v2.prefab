@@ -963,11 +963,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steeringMap: []
-  lookAheadDistance: 4
   navTarget:
     position: {x: 0, y: 0, z: 0}
     positionOffset: {x: 0, y: 0, z: 0}
   player: {fileID: 0}
+  lookAheadDistance: 4
+  movementPrecisionDistance: 6
   avoidLayerMask:
     serializedVersion: 2
     m_Bits: 139264
