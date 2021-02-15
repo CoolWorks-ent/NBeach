@@ -92,8 +92,8 @@ namespace DarknessMinion
 				if (i < darknessConcurrentAttackLimit)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Attacking);
-					//if (i + 1 <= attackApprovalPriority.Count - 1)
-						//ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
+					if (i + 1 <= attackApprovalPriority.Count - 1)
+						ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
 				}
 				/*else if (i < darknessConcurrentAttackLimit + 2)
 				{
@@ -102,7 +102,7 @@ namespace DarknessMinion
 				else
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Idling);
-					//ActiveDarkness[attackApprovalPriority[i]].movement.UpdateHighAvoidancePoint(Vector3.zero);
+					ActiveDarkness[attackApprovalPriority[i]].movement.UpdateHighAvoidancePoint(Vector3.zero);
 				}
 			}
 		}

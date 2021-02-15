@@ -144,7 +144,7 @@ namespace DarknessMinion
 				}
             }
 
-			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * calculationDistance() + this.transform.position;
+			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * calculationDistance(playerDist) + this.transform.position;
         }
 
 
@@ -176,14 +176,18 @@ namespace DarknessMinion
 			RaycastHit rayHit;
 			float dotValue;
 
-			/*if (pointToHighlyAvoid != Vector3.zero)
+			if (pointToHighlyAvoid != Vector3.zero)
 			{
-				float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
-				if (localAvoidanceDotValue >= 0.6f)
-					dNode.avoidWeight += -2;
-			}*/
+				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
+				if (avoidancePointDistance <= calculationDistance(avoidancePointDistance))
+				{
+					float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
+					if (localAvoidanceDotValue >= 0.8f)
+						dNode.avoidWeight += -0.5f;
+				}
+			}
 
-			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance() * 1.5f, out rayHit, calculationDistance() + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance(playerDist) * 1.5f, out rayHit, calculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
 				if (dotValue >= 0.6f)
@@ -193,16 +197,16 @@ namespace DarknessMinion
 			}
 		}
 
-		private float calculationDistance()
+		private float calculationDistance(float distance)
         {
-			if (playerDist <= movementPrecisionDistance)
+			if (distance <= movementPrecisionDistance)
 				return lookAheadDistance / 2;
 			else return lookAheadDistance;
         }
 
 		private float LocalAvoidanceDotValue(Vector3 direction)
         {
-			return Vector3.Dot(direction, pointToHighlyAvoid);
+			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
         }
 
 		/*private void PathComplete(Path p)
