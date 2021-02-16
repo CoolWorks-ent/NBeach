@@ -18,7 +18,7 @@ namespace DarknessMinion
 		[HideInInspector]
 		public NavigationTarget navTarget;
 		[HideInInspector]
-		public Transform player;
+		public Transform player, playerRoot;
 
 		private AIPath pather;
 
@@ -57,10 +57,10 @@ namespace DarknessMinion
 
 		void Start()
 		{
-			//sekr.pathCallback += PathComplete;
-			//bProvider = new Blocker();
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-			//avoidLayerMask = LayerMask.GetMask("Darkness", "Environment");
+			if (player)
+				playerRoot = player.root; //TODO do something with this
+
 		}
 
 		public void DistanceEvaluation()
@@ -161,9 +161,11 @@ namespace DarknessMinion
 		private void SeekLayer(DirectionNode dNode)
         {
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
-			if (dotValue > 0.9f)
-				dNode.seekWeight = 1f;
-			else if (dotValue < 0.9f && dotValue >= 0.7f)
+			if (dotValue >= 0.9f)
+				dNode.seekWeight = 1.2f;
+			else if (dotValue >= 0.8f && dotValue < 0.9f)
+				dNode.seekWeight = 0.9f;
+			else if (dotValue < 0.8f && dotValue >= 0.7f)
 				dNode.seekWeight = 0.7f;
 			else if (dotValue < 0.7f && dotValue >= 0.4f)
 				dNode.seekWeight = 0.5f;
@@ -269,7 +271,7 @@ namespace DarknessMinion
 				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, col);
             }
 
-			Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
+			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
         }
 
 		void OnDestroy()

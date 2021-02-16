@@ -181,9 +181,12 @@ namespace DarknessMinion
 
 			foreach (CooldownInfo.CooldownStatus cdStatus in deletedEntries)
 			{
-				CooldownInfo deletedInfo = stateActionsOnCooldown[cdStatus];
-				stateActionsOnCooldown.Remove(cdStatus);
-				deletedInfo.Callback.Invoke(this);
+				CooldownInfo deletedInfo; // = stateActionsOnCooldown[cdStatus];
+				if(stateActionsOnCooldown.TryGetValue(cdStatus, out deletedInfo))
+                {
+					stateActionsOnCooldown.Remove(cdStatus);
+					deletedInfo.Callback.Invoke(this);
+				}
 			}
 		}
 
