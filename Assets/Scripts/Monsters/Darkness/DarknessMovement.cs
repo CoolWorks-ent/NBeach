@@ -191,6 +191,7 @@ namespace DarknessMinion
 
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance(playerDist) * 1.5f, out rayHit, calculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
+				Debug.Log(transform.position + " other transform " + rayHit.transform.position);
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
 				if (dotValue >= 0.6f)
 					dNode.avoidWeight += -1;
@@ -268,7 +269,7 @@ namespace DarknessMinion
 				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					col = Color.magenta;
 				else col = Color.white;
-				Debug.DrawLine(this.transform.position, dir.directionAtAngle + this.transform.position, col);
+				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
             }
 
 			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);

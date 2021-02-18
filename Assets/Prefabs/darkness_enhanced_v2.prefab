@@ -967,6 +967,7 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     positionOffset: {x: 0, y: 0, z: 0}
   player: {fileID: 0}
+  playerRoot: {fileID: 0}
   lookAheadDistance: 4
   movementPrecisionDistance: 6
   avoidLayerMask:
@@ -989,7 +990,7 @@ MonoBehaviour:
   repathRate: 1
   canSearch: 1
   canMove: 1
-  maxSpeed: 1
+  maxSpeed: 1.5
   gravity: {x: NaN, y: NaN, z: NaN}
   groundMask:
     serializedVersion: 2
