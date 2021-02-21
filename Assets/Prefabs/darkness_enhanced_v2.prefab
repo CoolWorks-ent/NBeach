@@ -968,7 +968,7 @@ MonoBehaviour:
     positionOffset: {x: 0, y: 0, z: 0}
   player: {fileID: 0}
   playerRoot: {fileID: 0}
-  lookAheadDistance: 4
+  lookAheadDistance: 7
   movementPrecisionDistance: 6
   avoidLayerMask:
     serializedVersion: 2

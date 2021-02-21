@@ -40,17 +40,12 @@ namespace DarknessMinion
 		{
 			pather = GetComponent<AIPath>();
 
-			directionNodes = new DirectionNode[10];
-			directionNodes[0] = new DirectionNode(90 * Mathf.Deg2Rad);
-			directionNodes[1] = new DirectionNode(120 * Mathf.Deg2Rad);
-			directionNodes[2] = new DirectionNode(150 * Mathf.Deg2Rad);
-			directionNodes[3] = new DirectionNode(180 * Mathf.Deg2Rad);
-			directionNodes[4] = new DirectionNode(60 * Mathf.Deg2Rad);
-			directionNodes[5] = new DirectionNode(30 * Mathf.Deg2Rad);
-			directionNodes[6] = new DirectionNode(0 * Mathf.Deg2Rad);
-			directionNodes[7] = new DirectionNode(225 * Mathf.Deg2Rad);
-			directionNodes[8] = new DirectionNode(315 * Mathf.Deg2Rad);
-			directionNodes[9] = new DirectionNode(270 * Mathf.Deg2Rad);
+			directionNodes = new DirectionNode[16];
+
+			for(int i = 1; i < directionNodes.Length+1; i++)
+            {
+				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
+            }
 			bestDirectionIndex = 0;
 			pointToHighlyAvoid = new Vector3();
 		}
@@ -144,7 +139,7 @@ namespace DarknessMinion
 				}
             }
 
-			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * calculationDistance(playerDist) + this.transform.position;
+			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * CalculationDistance(playerDist) + this.transform.position;
         }
 
 
@@ -161,15 +156,12 @@ namespace DarknessMinion
 		private void SeekLayer(DirectionNode dNode)
         {
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
-			if (dotValue >= 0.9f)
-				dNode.seekWeight = 1.2f;
-			else if (dotValue >= 0.8f && dotValue < 0.9f)
-				dNode.seekWeight = 0.9f;
-			else if (dotValue < 0.8f && dotValue >= 0.7f)
-				dNode.seekWeight = 0.7f;
-			else if (dotValue < 0.7f && dotValue >= 0.4f)
-				dNode.seekWeight = 0.5f;
-			else dNode.seekWeight = 0.1f;
+
+			if (dotValue > 0)
+				dNode.seekWeight = dotValue;
+			else if (dotValue == 0)
+				dNode.seekWeight = 0.1f;
+			else dNode.seekWeight = 0.05f;
 		}
 
 		private void AvoidLayer(DirectionNode dNode)
@@ -181,18 +173,17 @@ namespace DarknessMinion
 			if (pointToHighlyAvoid != Vector3.zero)
 			{
 				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
-				if (avoidancePointDistance <= calculationDistance(avoidancePointDistance))
+				if (avoidancePointDistance <= lookAheadDistance) //CalculationDistance(avoidancePointDistance))
 				{
 					float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
-					if (localAvoidanceDotValue >= 0.8f)
-						dNode.avoidWeight += -0.5f;
+					if (localAvoidanceDotValue >= 0.7f)
+						dNode.avoidWeight += -0.8f;
 				}
 			}
 
-			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * calculationDistance(playerDist) * 1.5f, out rayHit, calculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
-				Debug.Log(transform.position + " other transform " + rayHit.transform.position);
-				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position);
+				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
 				if (dotValue >= 0.6f)
 					dNode.avoidWeight += -1;
 				else if (dotValue <= 0.6f && dotValue > 0)
@@ -200,7 +191,7 @@ namespace DarknessMinion
 			}
 		}
 
-		private float calculationDistance(float distance)
+		private float CalculationDistance(float distance)
         {
 			if (distance <= movementPrecisionDistance)
 				return lookAheadDistance / 2;
