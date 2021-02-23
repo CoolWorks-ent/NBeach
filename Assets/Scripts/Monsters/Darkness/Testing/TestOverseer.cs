@@ -71,7 +71,7 @@ namespace DarknessMinion
 
 		public void MovePlayerObject(Vector3 direction)
 		{
-			Transform player = DarknessManager.Instance.player;
+			Transform player = DarknessManager.Instance.playerTransform;
 
 			player.position += direction;
 		}

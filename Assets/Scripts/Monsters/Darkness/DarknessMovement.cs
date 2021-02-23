@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Collections.Generic;
 using Pathfinding;
+using System.Collections.Generic;
 
 namespace DarknessMinion
 {
@@ -8,22 +8,8 @@ namespace DarknessMinion
 	{
 		[HideInInspector]
 		public Vector3[] steeringMap;
-		public Vector3 movementDirection { get; private set; } 
-		//public Vector3 targetDirection{ get; private set; }
-		public Vector3 position { get { return transform.position; } }
-
-		public bool moving, attackPosition, reachEndOfPath;
-
-		[Header("Assigned in Inspector")]
-		public float rotationSpeed;
-		public float switchTargetDistance;
-		public float maxSpeed; 
-		public float maxAccel;
-		[Tooltip("Distance at which the agent starts to decelerate")]
-		public float breakDistance;
-		
-		[Range(0, 5)]
-		public float waypointLookAheadRange;
+		public bool reachedEndofPath { get { return pather.reachedDestination; } }
+		public bool closeToPlayer { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
@@ -31,43 +17,53 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public NavigationTarget navTarget;
+		[HideInInspector]
+		public Transform player, playerRoot;
 
-		private Seeker sekr;
-		private Path navPath;
-		private Rigidbody rgdBod;
-		//private Blocker bProvider;
+		private AIPath pather;
 
-		private Vector3 waypointDirection, desiredVelocity, appliedVelocity;
-		private int waypointIndex;
-		private float waypointDistance;
-		private DarknessSteering steering;
+		private DirectionNode[] directionNodes;
+		private int bestDirectionIndex;
+
+		[SerializeField,Range(0, 10)]
+		private int lookAheadDistance;
+
+		[SerializeField, Range(0, 10)]
+		private float movementPrecisionDistance;
+
+		private Vector3 pointToHighlyAvoid;
+
+		[SerializeField]
+		private LayerMask avoidLayerMask;
 
 		void Awake()
 		{
-			steering = new DarknessSteering();
-			sekr = GetComponent<Seeker>();
-			rgdBod = GetComponent<Rigidbody>();
-			waypointIndex = 0;
-			waypointDistance = 0;
-			waypointDirection = new Vector3();
-			desiredVelocity = new Vector3();
+			pather = GetComponent<AIPath>();
+
+			directionNodes = new DirectionNode[16];
+
+			for(int i = 1; i < directionNodes.Length+1; i++)
+            {
+				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
+            }
+			bestDirectionIndex = 0;
+			pointToHighlyAvoid = new Vector3();
 		}
 
 		void Start()
 		{
-			moving = false;
-			//sekr.pathCallback += PathComplete;
-			//bProvider = new Blocker();
-			movementDirection = new Vector3();
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
+			if (player)
+				playerRoot = player.root; //TODO do something with this
+
 		}
 
-		public void DistanceEvaluation(Vector3 location)
+		public void DistanceEvaluation()
 		{
-			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(location));
+			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
 			if (navTarget != null)
 			{
-				navTargetDist = Vector3.Distance(transform.position, navTarget.GetNavPosition());
+				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
 			}
 			else navTargetDist = -1;
 		}
@@ -77,116 +73,137 @@ namespace DarknessMinion
 			return new Vector2(vector.x, vector.z);
 		}
 
-		public void MoveDarkness()
-		{
-			if (moving && navPath != null)
-			{
-				//this would be where I run the direction through the steering behaviors to get the seek and flee combined direction
-				//then I can assign this calculated direction to the movementDirection;
-
-				movementDirection = waypointDirection;
-
-				float maxSpeedChange = maxAccel * Time.deltaTime;
-				desiredVelocity = movementDirection * maxSpeed;
-				appliedVelocity = rgdBod.velocity;
-				
-				//if the Darkness has gotten close to it's navigation reduce speed 
-				//should be the reverse process for accelerating
-				if(navTargetDist <= breakDistance)
-				{
-					appliedVelocity.x = Mathf.MoveTowards(appliedVelocity.x, 0, maxSpeedChange/2);
-					appliedVelocity.z = Mathf.MoveTowards(appliedVelocity.z, 0, maxSpeedChange/2);
-				}
-				else
-				{
-					appliedVelocity.x = Mathf.MoveTowards(appliedVelocity.x, desiredVelocity.x, maxSpeedChange);
-					appliedVelocity.z = Mathf.MoveTowards(appliedVelocity.z, desiredVelocity.z, maxSpeedChange);
-				}
-
-				rgdBod.velocity = appliedVelocity;
-
-				RotateTowardsDirection();
-			}
-		}
-
 		public void RotateTowardsPlayer()
 		{
-			Vector3 pDir = DarknessManager.Instance.PlayerToDirection(transform.position);
+			Vector3 pDir = DarknessManager.Instance.DirectionToPlayer(transform.position);
 			Vector3 dir = Vector3.RotateTowards(transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
 			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 		}
 
-		public void RotateTowardsDirection()
-		{
-			Vector3 dir = Vector3.RotateTowards(transform.forward, movementDirection, rotationSpeed * Time.deltaTime, 0.1f);
-			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+		public bool IsFacingPlayer(float minimumValue)
+        {
+			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
+			if (closeness >= minimumValue)
+				return true;
+			else return false;
+        }
+
+		public Vector3 PlayerDirection()
+        {
+			return (player.position - transform.position).normalized;
 		}
 
 		public void StopMovement()
 		{
-			if(sekr != null)
-			{
-				if (!sekr.IsDone())
-					sekr.CancelCurrentPathRequest();
-				moving = false;
-			}
-			//pather.canSearch = false;
-			//pather.canMove = false;
+			pather.canSearch = false;
+			pather.canMove = false;
 		}
 
 		public void StartMovement()
 		{
-			moving = true;
-			//pather.canMove = true;
-			//pather.canSearch = true;
+			pather.canMove = true;
+			pather.canSearch = true;
 		}
 
-		public void UpdateDestinationPath(bool attacking)
-		{
-			if(attacking)
-				 CreatePath(navTarget.GetAttackPosition());
-			else CreatePath(navTarget.GetNavPosition());
+		public void UpdateHighAvoidancePoint(Vector3 point)
+        {
+			pointToHighlyAvoid = point;
+        }
 
-			if (!reachEndOfPath && navPath != null)
+		/*Add functions for applying steering behaviors
+		* Choose several points in a circle that would be the starting candidates for movement
+		* Vectors closer towards the direction of the player get some positive weight
+		* Vectors close to the directions of other Darkness get some negative weight
+		* Somehow we'll have a direction that is weighted most favorable and we move in that direction
+		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
+		*/
+
+		public void UpdatePathDestination()
+        {
+			GenerateVectorPaths();
+			foreach (DirectionNode dNode in directionNodes)
 			{
-				while (true)
-				{
-					waypointDistance = Vector3.Distance(position, navPath.vectorPath[waypointIndex]);
-
-					if (waypointDistance < waypointLookAheadRange)
-					{
-						if (waypointIndex + 1 < navPath.vectorPath.Count)
-							waypointIndex++;
-						else
-						{
-							reachEndOfPath = true;
-							break;
-						}
-					}
-					else break;
-				}
-				waypointDirection = Vector3.Normalize(navPath.vectorPath[waypointIndex] - transform.position);
+				SeekLayer(dNode);
+				AvoidLayer(dNode);
 			}
 
-			
+			//Once the layers are calulated with weights narrow down the path that leads closer to the player
+			//Once the direction is chosen set the navtarget to a point along the direction vector
+			bestDirectionIndex = 0;
+			for (int i = 0; i < directionNodes.Length; i++)
+            {
+				if(i+1 <= directionNodes.Length-1)
+                {
+					if(directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
+						bestDirectionIndex = i;
+				}
+            }
+
+			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * CalculationDistance(playerDist) + this.transform.position;
+        }
+
+
+		private void GenerateVectorPaths()
+        {
+			//Generate vectors in several directions in a circle around the Darkness
+			//I want points at certain angles all around the Darkness and I want to save those to an array
+			for (int i = 0; i < directionNodes.Length; i++)
+			{
+				directionNodes[i].SetDirection(new Vector3(Mathf.Cos(directionNodes[i].angle), 0.1f, Mathf.Sin(directionNodes[i].angle)));
+			}
 		}
 
-		public void CreateDummyNavTarget(float elavation)
-		{
-			Vector3 randloc = new Vector3(UnityEngine.Random.Range(-10,10) + transform.position.x, elavation, UnityEngine.Random.Range(-5,5));
-			navTarget = new NavigationTarget(randloc, elavation, NavigationTarget.NavTargetTag.Neutral);
+		private void SeekLayer(DirectionNode dNode)
+        {
+			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
+
+			if (dotValue > 0)
+				dNode.seekWeight = dotValue;
+			else if (dotValue == 0)
+				dNode.seekWeight = 0.1f;
+			else dNode.seekWeight = 0.05f;
 		}
 
-		public void CreatePath(Vector3 endPoint)
-		{
-			//bProvider.blockedNodes.Clear();
-			//Path p = ABPath.Construct(transform.position, endPoint);
-			//p.traversalProvider = bProvider;
-			sekr.StartPath(position, endPoint, PathComplete);
-			//p.BlockUntilCalculated();
+		private void AvoidLayer(DirectionNode dNode)
+        {
+			dNode.avoidWeight = 0;
+			RaycastHit rayHit;
+			float dotValue;
+
+			if (pointToHighlyAvoid != Vector3.zero)
+			{
+				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
+				if (avoidancePointDistance <= lookAheadDistance) //CalculationDistance(avoidancePointDistance))
+				{
+					float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
+					if (localAvoidanceDotValue >= 0.7f)
+						dNode.avoidWeight += -0.8f;
+				}
+			}
+
+			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+			{
+				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
+				if (dotValue >= 0.6f)
+					dNode.avoidWeight += -1;
+				else if (dotValue <= 0.6f && dotValue > 0)
+					dNode.avoidWeight += -0.5f;
+			}
 		}
 
-		private void PathComplete(Path p)
+		private float CalculationDistance(float distance)
+        {
+			if (distance <= movementPrecisionDistance)
+				return lookAheadDistance / 2;
+			else return lookAheadDistance;
+        }
+
+		private float LocalAvoidanceDotValue(Vector3 direction)
+        {
+			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
+        }
+
+		/*private void PathComplete(Path p)
 		{
 			//Debug.LogWarning("path callback complete");
 			p.Claim(this);
@@ -204,7 +221,7 @@ namespace DarknessMinion
 				p.Release(this);
 				Debug.LogError("Path failed calculation for " + this + " because " + p.errorLog);
 			}
-		}
+		}*/
 
 		/*private void BlockPathNodes(Path p)
 		{
@@ -228,9 +245,52 @@ namespace DarknessMinion
 			}
 		}*/
 
+		void OnDrawGizmos()
+        {
+			Color col = Color.red;
+
+			foreach(DirectionNode dir in directionNodes)
+            {
+				if (dir.combinedWeight > 0.9f)
+					col = Color.green;
+				else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
+					col = Color.cyan;
+				else if (dir.combinedWeight < 0.7f && dir.combinedWeight > 0.5f)
+					col = Color.yellow;
+				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
+					col = Color.magenta;
+				else col = Color.white;
+				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
+            }
+
+			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
+        }
+
 		void OnDestroy()
 		{
 			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
 		}
+
+		private class DirectionNode
+        {
+			public float angle { get; private set; }
+			public float avoidWeight, seekWeight, baseWeight;
+			public float combinedWeight { get { return avoidWeight + seekWeight; } }
+
+			public Vector3 directionAtAngle { get; private set; }
+
+			public DirectionNode(float dAngle)
+            {
+				angle = dAngle;
+				avoidWeight = 0;
+				seekWeight = 0;
+				directionAtAngle = Vector3.zero;
+            }
+
+			public void SetDirection(Vector3 v)
+			{ 
+				directionAtAngle = v; 
+			}
+        }
 	}
 }

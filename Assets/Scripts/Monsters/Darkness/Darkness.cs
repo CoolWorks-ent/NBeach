@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Pathfinding;
 using System.Linq;
 using System;
 
@@ -19,8 +18,6 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		
-		//public NavigationTarget[] patrolPoints;
 		public DarknessMovement movement;
 
 		[HideInInspector]
@@ -30,12 +27,14 @@ namespace DarknessMinion
 		public TextMesh textMesh;
 		public bool updateStates;//, attacked;
 
-		[HideInInspector]
-		public LayerMask mask;
+		public LayerMask playerMask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
-		public int creationID { get; private set;}
-		public float attackDist { get; private set; }
+		public int creationID { get; private set; }
+		public float attackSwitchRange { get { return attackRange; } }
+
+		[SerializeField, Range(0, 5)]
+		private float attackRange;
 
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
@@ -44,25 +43,20 @@ namespace DarknessMinion
 		private Animator animeController;
 
 		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
-		//private List<GameObject> stateCache;
 		private string debugMessage {get; set;}
 
 		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
 
 		void Awake()
 		{
-			//swtichDist = 4.6f; 
 			creationID = 0;
 			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-			//attacked = false;
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
-			//stateCache = new List<GameObject>();
 		}
 
 		void Start()
 		{
-			//movement = new DarknessMovement(GetComponent<Rigidbody>(), GetComponent<Seeker>(), this.transform);
 			movement = GetComponent<DarknessMovement>();
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
@@ -73,11 +67,9 @@ namespace DarknessMinion
 			darkHitBox = GetComponent<CapsuleCollider>();
 			previousState  = currentState;
 			darkHitBox.enabled = false;
-			mask = LayerMask.GetMask("Player");
 			DarkEventManager.OnDarknessAdded(this);
 			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);
-			//ChangeAnimation(DarkAnimationStates.Spawn);
 		}
 
 		void FixedUpdate()
@@ -100,13 +92,12 @@ namespace DarknessMinion
 			currentState.InitializeState(this);
 		}
 
-		public void Spawn(int createID, float spawnHeight)
+		public void Spawn(int createID)
 		{
 			creationID = createID;
-			movement.CreateDummyNavTarget(spawnHeight);
 		}
 
-		public void UpdateStates()
+		private void UpdateStates()
 		{
 			currentState.UpdateState(this);
 		}
@@ -176,7 +167,7 @@ namespace DarknessMinion
 
 		public void SetAttackDistance(float atkValue)
 		{
-			attackDist = atkValue;
+			attackRange = atkValue;
 		}
 
 		private void UpdateCooldownTimers()
@@ -190,26 +181,14 @@ namespace DarknessMinion
 
 			foreach (CooldownInfo.CooldownStatus cdStatus in deletedEntries)
 			{
-				stateActionsOnCooldown[cdStatus].Callback.Invoke(this);
-				stateActionsOnCooldown.Remove(cdStatus);
+				CooldownInfo deletedInfo; // = stateActionsOnCooldown[cdStatus];
+				if(stateActionsOnCooldown.TryGetValue(cdStatus, out deletedInfo))
+                {
+					stateActionsOnCooldown.Remove(cdStatus);
+					deletedInfo.Callback.Invoke(this);
+				}
 			}
 		}
-
-		/*public GameObject GetLastObjectFromCache()
-		{
-			return stateCache[stateCache.Count-1];
-		}
-
-		public void RemoveFromStateCache(GameObject obj)
-		{
-			if(stateCache.Contains(obj))
-				stateCache.Remove(obj);
-		}
-
-		public void ClearStateCache()
-		{
-			stateCache.Clear();
-		}*/
 
 		private void OnTriggerEnter(Collider col)
 		{
@@ -220,10 +199,6 @@ namespace DarknessMinion
 					Debug.LogWarning("Darkness Destroyed");
 					ChangeState(deathState);
 				}
-			}
-			else if (col.gameObject.CompareTag("Player"))
-			{
-				//Debug.LogWarning("Darkness collided with Player");
 			}
 		}
 		
@@ -242,7 +217,7 @@ namespace DarknessMinion
 		{
 			debugMessage = "";
 			if(showTargetData && movement.navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.GetNavPosition());
+				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.navPosition);
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)

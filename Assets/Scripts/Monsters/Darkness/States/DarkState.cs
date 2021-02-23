@@ -39,7 +39,7 @@ namespace DarknessMinion
 			darkController.ClearCooldowns();
 		}
 		public virtual void MovementUpdate(Darkness darkController){}
-		protected abstract void CooldownCallback(Darkness darkController);
+		protected virtual void CooldownCallback(Darkness darkController) { }
 		protected void CheckTransitions(Darkness darkController)
 		{
 			foreach (DarkTransition darkTran in transitions)

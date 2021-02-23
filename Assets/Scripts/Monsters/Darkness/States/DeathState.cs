@@ -24,10 +24,6 @@ namespace DarknessMinion
         }
 
         public override void MovementUpdate(Darkness darkController) { }
-        protected override void CooldownCallback(Darkness darkController) 
-        { 
-
-        }
 
         public IEnumerator DeathRoutine(Darkness darkController)
         {
@@ -57,7 +53,6 @@ namespace DarknessMinion
             //yield return new WaitForSeconds(fxTime);
             //AI_Manager.Instance.RemoveFromDarknessList(controller);
             darkController.gameObject.SetActive(false);
-            darkController.movement.navTarget.ReleaseTarget();
             DarkEventManager.OnDarknessRemoved(darkController);
             //Destroy(controller.animeController);
             Destroy(darkController.gameObject);

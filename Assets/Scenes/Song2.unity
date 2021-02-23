@@ -85315,6 +85315,11 @@ Prefab:
       propertyPath: debugRoof
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: maxEnemyCount
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0

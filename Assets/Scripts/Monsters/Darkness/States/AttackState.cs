@@ -9,10 +9,6 @@ namespace DarknessMinion
     {
         //[Range(0, 5)]
         //public float attackCooldown;
-
-        [Range(0, 10)]
-        public float attackInitiationRange;
-
         //public AttackState(Darkness dControl) : base(dControl){ }
 
         public override void InitializeState(Darkness darkController)
@@ -26,7 +22,6 @@ namespace DarknessMinion
             //darkController.pather.endReachedDistance = attackInitiationRange;
             darkController.movement.StopMovement();
             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
-            darkController.SetAttackDistance(attackInitiationRange);
         }
 
         public override void UpdateState(Darkness darkController)
@@ -39,24 +34,28 @@ namespace DarknessMinion
         {
             //darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
             
-            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack))
+            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) //TODO check if this actually works
             {
-                if(Physics.Raycast(darkController.transform.position, darkController.transform.forward*5, out darkController.rayHitInfo, 5, darkController.mask)) //controller.playerDist < attackInitiationRange && 
+                if(darkController.movement.IsFacingPlayer(0.8f))
                 {
-                    Debug.Log("Hit collider: " + darkController.rayHitInfo.collider.name);
-                    if(darkController.rayHitInfo.collider.name == "Player")
+                    if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
-                        if(!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
-                        {
-                            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
-                            //controller.animeController.SetTrigger(controller.attackTrigHash);
-                            
-                            darkController.AddCooldown(new CooldownInfo(2f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
-                            //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
-                            darkController.darkHitBox.enabled = true;
-                            //darkController.attacked = true;
-                        }
+                        darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
+                        //controller.animeController.SetTrigger(controller.attackTrigHash);
+
+                        darkController.AddCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
+                        //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
+                        darkController.darkHitBox.enabled = true;
+                        //darkController.attacked = true;
                     }
+                    /*if (Physics.Raycast(darkController.transform.position, darkController.transform.forward * 5, out darkController.rayHitInfo, 5, darkController.playerMask)) //controller.playerDist < attackInitiationRange && 
+                    {
+                        //Debug.LogWarning("Hit collider: " + darkController.rayHitInfo.collider.name);
+                        if (darkController.rayHitInfo.collider.name == "Player")
+                        {
+                            
+                        }
+                    }*/
                 }
                 else darkController.movement.RotateTowardsPlayer();
             }
@@ -64,7 +63,7 @@ namespace DarknessMinion
 
         public override void ExitState(Darkness darkController)
         {
-            base.ExitState(darkController);
+            //base.ExitState(darkController);
             //controller.attacked = false;
             //controller.animeController.SetBool(controller.attackAfterHash, true);
         }
