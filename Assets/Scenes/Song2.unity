@@ -85305,21 +85305,16 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 2059134424}
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
+    - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
-      propertyPath: attackPointHolder
+      propertyPath: playerRotationFacing
       value: 
-      objectReference: {fileID: 652888667}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+      objectReference: {fileID: 700382827}
+    - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
-      propertyPath: debugRoof
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: maxEnemyCount
-      value: 6
-      objectReference: {fileID: 0}
+      propertyPath: playerLocation
+      value: 
+      objectReference: {fileID: 957796667}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0

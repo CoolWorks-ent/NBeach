@@ -714,7 +714,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 217.15462, y: 44.859962, z: 87.835266}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4693482682022224}
@@ -948,7 +948,7 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
-  attackRange: 2.38
+  attackRange: 2.44
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114621632964799650
@@ -1041,7 +1041,7 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 1.6
   m_Direction: 1
-  m_Center: {x: 0, y: 1.15, z: 0.54}
+  m_Center: {x: 0, y: 1.37, z: 0.9}
 --- !u!137 &137808060623480506
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

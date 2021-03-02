@@ -31,7 +31,7 @@ namespace DarknessMinion
 		{
 			Instance = this;
 			
-			darknessConcurrentAttackLimit = 2;
+			//darknessConcurrentAttackLimit = 2;
 			darknessIDCounter = 0;
 			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
 			{
