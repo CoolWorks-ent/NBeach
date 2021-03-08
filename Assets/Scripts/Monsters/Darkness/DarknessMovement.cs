@@ -1,13 +1,10 @@
 using UnityEngine;
 using Pathfinding;
-using System.Collections.Generic;
 
 namespace DarknessMinion
 {
 	public class DarknessMovement : MonoBehaviour
 	{
-		[HideInInspector]
-		public Vector3[] steeringMap;
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
 
@@ -43,9 +40,9 @@ namespace DarknessMinion
 			directionNodes = new DirectionNode[16];
 
 			for(int i = 1; i < directionNodes.Length+1; i++)
-            {
+			{
 				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
-            }
+			}
 			bestDirectionIndex = 0;
 			pointToHighlyAvoid = new Vector3();
 		}
@@ -55,7 +52,6 @@ namespace DarknessMinion
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
 			if (player)
 				playerRoot = player.root; //TODO do something with this
-
 		}
 
 		public void DistanceEvaluation()
@@ -81,15 +77,15 @@ namespace DarknessMinion
 		}
 
 		public bool IsFacingPlayer(float minimumValue)
-        {
+		{
 			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
 			if (closeness >= minimumValue)
 				return true;
 			else return false;
-        }
+		}
 
 		public Vector3 PlayerDirection()
-        {
+		{
 			return (player.position - transform.position).normalized;
 		}
 
@@ -106,9 +102,9 @@ namespace DarknessMinion
 		}
 
 		public void UpdateHighAvoidancePoint(Vector3 point)
-        {
+		{
 			pointToHighlyAvoid = point;
-        }
+		}
 
 		/*Add functions for applying steering behaviors
 		* Choose several points in a circle that would be the starting candidates for movement
@@ -119,7 +115,7 @@ namespace DarknessMinion
 		*/
 
 		public void UpdatePathDestination()
-        {
+		{
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
 			{
@@ -131,20 +127,20 @@ namespace DarknessMinion
 			//Once the direction is chosen set the navtarget to a point along the direction vector
 			bestDirectionIndex = 0;
 			for (int i = 0; i < directionNodes.Length; i++)
-            {
+			{
 				if(i+1 <= directionNodes.Length-1)
-                {
+				{
 					if(directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
 						bestDirectionIndex = i;
 				}
-            }
+			}
 
 			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * CalculationDistance(playerDist) + this.transform.position;
-        }
+		}
 
 
 		private void GenerateVectorPaths()
-        {
+		{
 			//Generate vectors in several directions in a circle around the Darkness
 			//I want points at certain angles all around the Darkness and I want to save those to an array
 			for (int i = 0; i < directionNodes.Length; i++)
@@ -154,7 +150,7 @@ namespace DarknessMinion
 		}
 
 		private void SeekLayer(DirectionNode dNode)
-        {
+		{
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
 
 			if (dotValue > 0)
@@ -165,7 +161,7 @@ namespace DarknessMinion
 		}
 
 		private void AvoidLayer(DirectionNode dNode)
-        {
+		{
 			dNode.avoidWeight = 0;
 			RaycastHit rayHit;
 			float dotValue;
@@ -192,65 +188,23 @@ namespace DarknessMinion
 		}
 
 		private float CalculationDistance(float distance)
-        {
+		{
 			if (distance <= movementPrecisionDistance)
 				return lookAheadDistance / 2;
 			else return lookAheadDistance;
-        }
-
-		private float LocalAvoidanceDotValue(Vector3 direction)
-        {
-			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
-        }
-
-		/*private void PathComplete(Path p)
-		{
-			//Debug.LogWarning("path callback complete");
-			p.Claim(this);
-			//BlockPathNodes(p);
-			if (!p.error)
-			{
-				if (navPath != null)
-					navPath.Release(this);
-				navPath = p;
-				waypointIndex = 0;
-				//targetDirection = navPath.vectorPath[waypointIndex];
-			}
-			else
-			{
-				p.Release(this);
-				Debug.LogError("Path failed calculation for " + this + " because " + p.errorLog);
-			}
-		}*/
-
-		/*private void BlockPathNodes(Path p)
-		{
-			foreach (GraphNode n in p.path)
-			{
-				bProvider.blockedNodes.Add(n);
-			}
 		}
 
-		private class Blocker : ITraversalProvider
+		private float LocalAvoidanceDotValue(Vector3 direction)
 		{
-			public HashSet<GraphNode> blockedNodes = new HashSet<GraphNode>();
-			public bool CanTraverse(Path path, GraphNode node)
-			{
-				return DefaultITraversalProvider.CanTraverse(path, node) && !blockedNodes.Contains(node);
-			}
-
-			public uint GetTraversalCost(Path path, GraphNode node)
-			{
-				return DefaultITraversalProvider.GetTraversalCost(path, node);
-			}
-		}*/
+			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
+		}
 
 		void OnDrawGizmos()
-        {
+		{
 			Color col = Color.red;
 
 			foreach(DirectionNode dir in directionNodes)
-            {
+			{
 				if (dir.combinedWeight > 0.9f)
 					col = Color.green;
 				else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
@@ -261,10 +215,10 @@ namespace DarknessMinion
 					col = Color.magenta;
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
-            }
+			}
 
 			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
-        }
+		}
 
 		void OnDestroy()
 		{
@@ -272,7 +226,7 @@ namespace DarknessMinion
 		}
 
 		private class DirectionNode
-        {
+		{
 			public float angle { get; private set; }
 			public float avoidWeight, seekWeight, baseWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
@@ -280,17 +234,17 @@ namespace DarknessMinion
 			public Vector3 directionAtAngle { get; private set; }
 
 			public DirectionNode(float dAngle)
-            {
+			{
 				angle = dAngle;
 				avoidWeight = 0;
 				seekWeight = 0;
 				directionAtAngle = Vector3.zero;
-            }
+			}
 
 			public void SetDirection(Vector3 v)
 			{ 
 				directionAtAngle = v; 
 			}
-        }
+		}
 	}
 }
