@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 namespace DarknessMinion
 {
@@ -7,55 +6,31 @@ namespace DarknessMinion
     [CreateAssetMenu(menuName = "Darkness/AttackState")]
     public class AttackState : DarkState
     {
-        //[Range(0, 5)]
-        //public float attackCooldown;
-        //public AttackState(Darkness dControl) : base(dControl){ }
 
         public override void InitializeState(Darkness darkController)
         {   
-            //controller.pather.destination = controller.navTarget.srcPosition;
-            /*if (darkController.playerDist > attackInitiationRange)
-                darkController.pather.canMove = true;
-            else darkController.pather.canMove = false;*/
-            //darkController.pather.canSearch = false;
-            //darkController.pather.canMove = false;
-            //darkController.pather.endReachedDistance = attackInitiationRange;
             darkController.movement.StopMovement();
             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
         }
 
         public override void UpdateState(Darkness darkController)
         {
-            //TODO check if the darkness is facing the player. if not start rotating towards the player
             CheckTransitions(darkController);
         }
 
-        public override void MovementUpdate(Darkness darkController) //TODO figure out how I should stop and rotate towards the player. Where should these checks happen?
+        public override void MovementUpdate(Darkness darkController) 
         {
-            //darkController.pather.destination = darkController.navTarget.closeToSrcPosition;
-            
-            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) //TODO check if this actually works
+            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) 
             {
                 if(darkController.movement.IsFacingPlayer(0.8f))
                 {
                     if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
                         darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
-                        //controller.animeController.SetTrigger(controller.attackTrigHash);
 
                         darkController.AddCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
-                        //darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownStatus.Idling, IdleAnimation));
                         darkController.darkHitBox.enabled = true;
-                        //darkController.attacked = true;
                     }
-                    /*if (Physics.Raycast(darkController.transform.position, darkController.transform.forward * 5, out darkController.rayHitInfo, 5, darkController.playerMask)) //controller.playerDist < attackInitiationRange && 
-                    {
-                        //Debug.LogWarning("Hit collider: " + darkController.rayHitInfo.collider.name);
-                        if (darkController.rayHitInfo.collider.name == "Player")
-                        {
-                            
-                        }
-                    }*/
                 }
                 else darkController.movement.RotateTowardsPlayer();
             }
@@ -63,22 +38,12 @@ namespace DarknessMinion
 
         public override void ExitState(Darkness darkController)
         {
-            //base.ExitState(darkController);
-            //controller.attacked = false;
-            //controller.animeController.SetBool(controller.attackAfterHash, true);
-        }
 
-        /*private void IdleAnimation(Darkness darkController)
-        {
-            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
-            //controller.animeController.SetTrigger(controller.idleTrigHash);
-        }*/
+        }
 
         protected override void CooldownCallback(Darkness darkController)
         {
             darkController.darkHitBox.enabled = false;
-            //animeController.SetTrigger(animationID);
-            //darkController.attacked = false;
             darkController.movement.StopMovement();
         }
     }

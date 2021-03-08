@@ -65,20 +65,14 @@ namespace DarknessMinion
 			{
 				if (attackApprovalPriority.Count > 0)
 				{
-					//ActiveDarkness.Values.CopyTo(closestDarkness,0);
-					/*foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
-					{
-						dark.Value.DistanceEvaluation(player.position);
-					}*/
 					DarkEventManager.OnUpdateDarknessDistance();
 					SortTheGoons();
-					//yield return new WaitForSeconds(calculationTime / 3);
+
 					UpdateDarknessAggresion();
 					yield return new WaitForSeconds(calculationTime);
 					DarkEventManager.OnUpdateDarknessStates();
 				}
 				else yield return new WaitForSeconds(calculationTime);
-				 //TODO remove once done testing
 			}
 			yield return null;
 		}
@@ -95,10 +89,6 @@ namespace DarknessMinion
 					if (i + 1 <= attackApprovalPriority.Count - 1)
 						ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
 				}
-				/*else if (i < darknessConcurrentAttackLimit + 2)
-				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionChanged(Darkness.AggresionRating.Wandering);
-				}*/
 				else
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Idling);
@@ -131,13 +121,11 @@ namespace DarknessMinion
 			updatedDarkness.movement.player = player;
 			Vector3 pDir = player.position - updatedDarkness.transform.position;
 			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
-			//updatedDarkness.StartCoroutine(updatedDarkness.ExecuteCurrentState());
 		}
 
 		///<summary>Removes Darkness from attack list if present. Also removes Darkness from active list and stops any relevant running funcitons</summary>
 		public void RemoveFromDarknessList(Darkness updatedDarkness)
 		{
-			//updatedDarkness.StopCoroutine(updatedDarkness.ExecuteCurrentState());
 			attackApprovalPriority.Remove(updatedDarkness.creationID);
 			ActiveDarkness.Remove(updatedDarkness.creationID);
 		}

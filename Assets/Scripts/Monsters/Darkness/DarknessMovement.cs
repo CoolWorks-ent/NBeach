@@ -15,7 +15,7 @@ namespace DarknessMinion
 		[HideInInspector]
 		public NavigationTarget navTarget;
 		[HideInInspector]
-		public Transform player, playerRoot;
+		public Transform player;
 
 		private AIPath pather;
 
@@ -50,8 +50,6 @@ namespace DarknessMinion
 		void Start()
 		{
 			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-			if (player)
-				playerRoot = player.root; //TODO do something with this
 		}
 
 		public void DistanceEvaluation()
@@ -216,8 +214,6 @@ namespace DarknessMinion
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
 			}
-
-			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
 		}
 
 		void OnDestroy()

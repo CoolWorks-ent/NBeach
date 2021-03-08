@@ -6,8 +6,6 @@ namespace DarknessMinion
     [CreateAssetMenu(menuName = "Darkness/DeathState")]
     public class DeathState : DarkState
     {
-        //public DeathState(Darkness dControl) : base(dControl){ }
-
         public GameObject deathFX;
 
         public override void InitializeState(Darkness darkController)
@@ -16,14 +14,10 @@ namespace DarknessMinion
             //controller.aIMovement.EndMovement();
         }
 
-        public override void UpdateState(Darkness darkController){ }
-
         public override void ExitState(Darkness darkController)
         { 
             base.ExitState(darkController);
         }
-
-        public override void MovementUpdate(Darkness darkController) { }
 
         public IEnumerator DeathRoutine(Darkness darkController)
         {
