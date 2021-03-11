@@ -7,6 +7,7 @@ namespace DarknessMinion
 	{
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
+		public bool withinAttackZone { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }

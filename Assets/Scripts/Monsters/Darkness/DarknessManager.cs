@@ -17,6 +17,8 @@ namespace DarknessMinion
 
 		public static DarknessManager Instance { get; private set; }
 
+		public DarknessAttackZone darkAttackZone {get; private set;}
+
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;
 
@@ -49,6 +51,11 @@ namespace DarknessMinion
 
 			StartCoroutine(ManagedDarknessUpdate());
 		}
+
+		void Start()
+        {
+			darkAttackZone = GetComponent<DarknessAttackZone>();
+        }
 
 		public Vector3 DirectionToPlayer(Vector3 start)
 		{
