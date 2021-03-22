@@ -465,13 +465,16 @@ public class GameController : MonoBehaviour {
         switch (section)
         {
             case 1:
-                level.Stage1();
+                //level.Stage1();
+                level.stageNum = 0;
                 break;
             case 2:
-                level.Stage2();
+                //level.Stage2();
+                level.stageNum = 1;
                 break;
             case 3:
-                level.Stage3();
+                //level.Stage3();
+                level.stageNum = 2;
                 break;
         }
         yield return 0;
