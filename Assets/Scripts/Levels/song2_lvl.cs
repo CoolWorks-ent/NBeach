@@ -46,6 +46,8 @@ public class song2_lvl : Level {
     [SerializeField]
     GameObject[] lightningBolts;
     [SerializeField]
+    GameObject TornadoFX;
+    [SerializeField]
     ParticleSystem RainFX;
     [SerializeField]
     ParticleSystem RainFX_2;
@@ -79,6 +81,10 @@ public class song2_lvl : Level {
     Material nightSkybox;
     [SerializeField]
     SpriteRenderer titleText;
+    [SerializeField]
+    bool Debug_SkipStage1 = false;
+    [SerializeField]
+    bool Debug_SkipStage2 = false;
 
     GameObject darkBossObj; //use this variable for any movement related code for the darkBoss.  This is it's parent container
 
@@ -146,6 +152,7 @@ public class song2_lvl : Level {
         RainFX_2.Stop();
         RainFX_3.Stop();
         RainFX_Wide.Stop();
+        TornadoFX.SetActive(false);
 
         shellArray = new List<ShellPickup>();
         gController.playerControl.playerStatus = PLAYER_STATUS.ALIVE;
@@ -154,7 +161,12 @@ public class song2_lvl : Level {
         //StageReset_Day();
 
         //Start Stage0 of battle
-        Stage0();
+        if (Debug_SkipStage1 == true)
+            DebugStageSkip(2);
+        else if (Debug_SkipStage2 == true)
+            DebugStageSkip(3);
+        else
+            Stage0();
         //StartCoroutine(StageTestRoutine());
 
 
@@ -272,6 +284,23 @@ public class song2_lvl : Level {
         else
         {
             Debug.Log(evt);
+        }
+    }
+
+    /*
+     * To Use, You must select this option before Playing the Scene
+     */
+    private void DebugStageSkip(int stage)
+    {
+        if (stage == 2)
+        {
+            pathControl.startPercent = 44.4f;
+            Stage2();
+        }
+        if(stage == 3)
+        {
+            pathControl.startPercent = 100f;
+            Stage3();
         }
     }
 
@@ -396,8 +425,10 @@ public class song2_lvl : Level {
     {
         //slight delay after rock is destroyed  before player should run
         yield return new WaitForSeconds(.5f);
-        if (stageNum < 2) //only run to new rock if not on last stage of battle
+        if (stageNum == 2) //only run to new rock if not on last stage of battle
             StartCoroutine(RunToNewRock());
+        if (stageNum == 3)
+            stageNum = 4; //set stageNum to 4 to advance to final cutscene
         yield return 0;
     }
 
@@ -627,6 +658,9 @@ public class song2_lvl : Level {
         //Change Skybox to Night
         StageReset_Night();
 
+        //Turn On Tornado
+        TornadoFX.SetActive(true);
+
         //RenderSettings.skybox = nightSkybox;        
         //DynamicGI.UpdateEnvironment();
 
@@ -737,6 +771,20 @@ public class song2_lvl : Level {
         {
             //slowly move darkboss to above the water and begin its attack
             darkBossObj.transform.position = Vector3.Lerp(startPos, endPos, t / moveTime);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        yield return new WaitForSeconds(1);
+
+        //Turn off tornado FX
+        t = 0;
+        float scaleTime = 3;
+        Vector3 startScale = TornadoFX.transform.localScale;
+        Vector3 endScale = new Vector3(TornadoFX.transform.localScale.x, 0, TornadoFX.transform.localScale.z);
+        while (t <= scaleTime)
+        {
+            //slowly move darkboss to above the water and begin its attack
+           TornadoFX.transform.localScale = Vector3.Lerp(startScale, endScale, t / scaleTime);
             t += Time.deltaTime;
             yield return null;
         }
@@ -921,7 +969,20 @@ public class song2_lvl : Level {
         }
 
         //snap player transform to face dark boss after reaching the new stage position
-        playerStageObj.transform.LookAt(darkBoss.transform);
+        //playerStageObj.transform.LookAt(darkBoss.transform);
+        rotateTime = 1f;
+        curTime = 0;
+        while (curTime <= rotateTime)
+        {
+            //find the vector pointing from our position to the target
+            Vector3 direction = (enemyStageObj.transform.position - playerStageObj.transform.position).normalized;
+            Quaternion lookDirection = Quaternion.LookRotation(direction);
+
+            //rotate us over time according to speed until we are in the required rotation
+            playerStageObj.transform.rotation = Quaternion.Slerp(playerStageObj.transform.rotation, lookDirection, Time.deltaTime * rotateTime);
+            curTime += Time.deltaTime;
+            yield return null;
+        }
 
         //increase enemy count and enemy spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage2;
@@ -962,8 +1023,8 @@ public class song2_lvl : Level {
 
         //!!Dark Boss Grows larger...!!
 
-        stageNum += 1;
-        Debug.Log("Rock " + stageNum + " Reached.");
+        //stageNum += 1;
+        //Debug.Log("Rock " + stageNum + " Reached.");
         StartNextStage();
         //yield return new WaitForSeconds(10);
 
@@ -999,7 +1060,20 @@ public class song2_lvl : Level {
 
         //snap player transform to face dark boss after reaching the new stage position
         //playerStageObj.transform.LookAt(darkBoss.transform);
-        enemyStageObj.transform.LookAt(gController.playerControl.gameObject.transform);
+        //enemyStageObj.transform.LookAt(gController.playerControl.gameObject.transform);
+        rotateTime = 1f;
+        curTime = 0;
+        while (curTime <= rotateTime)
+        {
+            //find the vector pointing from our position to the target
+            Vector3 direction = (enemyStageObj.transform.position - playerStageObj.transform.position).normalized;
+            Quaternion lookDirection = Quaternion.LookRotation(direction);
+
+            //rotate us over time according to speed until we are in the required rotation
+            playerStageObj.transform.rotation = Quaternion.Slerp(playerStageObj.transform.rotation, lookDirection, Time.deltaTime * rotateTime);
+            curTime += Time.deltaTime;
+            yield return null;
+        }
 
         //The Darkness should overwhelm player in 20 seconds, increase spawn rate
         enemySpawners.spawnRate = darkSpawnRate_Stage3;
@@ -1047,6 +1121,7 @@ public class song2_lvl : Level {
 
         //begin spline
         pathControl_EndScene.Play();
+       
         SpeedBoost spdBoost = Instantiate(speedBoostPowerUp, playerPos.position, playerPos.rotation);
         //EventManager.TriggerEvent("Player_SpeedBoost", "Player_SpeedBoost");
         gController.playerControl.CanMove = false;
