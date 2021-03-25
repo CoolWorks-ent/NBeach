@@ -7,7 +7,6 @@ namespace DarknessMinion
 	{
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
-		public bool withinAttackZone { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
@@ -85,7 +84,7 @@ namespace DarknessMinion
 
 		public Vector3 PlayerDirection()
 		{
-			return (player.position - transform.position).normalized;
+			return (player.position - transform.position).normalized; //TODO change this to first direct towards the zone. If in the zone check against player direction
 		}
 
 		public void StopMovement()
@@ -216,6 +215,11 @@ namespace DarknessMinion
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
 			}
 		}
+
+		private bool WithinAttackZone()
+        {
+			return DarknessManager.Instance.darkAttackZone.InTheZone(ConvertToVec2(transform.position));
+        }
 
 		void OnDestroy()
 		{
