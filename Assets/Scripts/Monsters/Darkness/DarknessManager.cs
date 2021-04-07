@@ -33,7 +33,7 @@ namespace DarknessMinion
 		{
 			Instance = this;
 			
-			//darknessConcurrentAttackLimit = 2;
+			darknessConcurrentAttackLimit = 2;
 			darknessIDCounter = 0;
 			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
 			{
@@ -61,6 +61,16 @@ namespace DarknessMinion
 		{
 			return (player.position - start).normalized;
 		}
+
+		public bool AssignAttackZone(DarknessMovement movement)
+        {
+			if (darkAttackZone != null)
+			{
+				movement.darkAttackZone = darkAttackZone;
+				return true;
+			}
+			else return false;
+        }
 
 
 		#region DarknessUpdateLoop

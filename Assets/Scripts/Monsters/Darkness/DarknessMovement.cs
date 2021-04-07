@@ -17,6 +17,8 @@ namespace DarknessMinion
 		[HideInInspector]
 		public Transform player;
 
+		public DarknessAttackZone darkAttackZone;
+
 		private AIPath pather;
 
 		private DirectionNode[] directionNodes;
@@ -32,6 +34,7 @@ namespace DarknessMinion
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
+
 
 		void Awake()
 		{
@@ -84,6 +87,7 @@ namespace DarknessMinion
 
 		public Vector3 PlayerDirection()
 		{
+			//Create a point in the zone to path towards
 			return (player.position - transform.position).normalized; //TODO change this to first direct towards the zone. If in the zone check against player direction
 		}
 
@@ -95,6 +99,8 @@ namespace DarknessMinion
 
 		public void StartMovement()
 		{
+			if (!DarknessManager.Instance.AssignAttackZone(this))
+				Debug.LogError("You really couldn't find the Attack Zone eh?");
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
