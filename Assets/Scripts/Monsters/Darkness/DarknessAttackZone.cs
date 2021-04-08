@@ -6,7 +6,7 @@ namespace DarknessMinion
 {
 	public class DarknessAttackZone : MonoBehaviour
 	{
-		private Vector3 attackZoneCircle;
+		private Vector3 attackZoneOrigin;
 
 		[SerializeField, Range(0, 5)]
 		private float attackZoneRadius;
@@ -24,26 +24,31 @@ namespace DarknessMinion
 
 		void Start()
 		{
-			attackZoneCircle = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
+			attackZoneOrigin = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
 		}
 
 		void LateUpdate()
 		{
-			attackZoneCircle = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
+			attackZoneOrigin = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
 		}
 
 		public bool InTheZone(Vector2 location)
         {
-			if (Vector2.Distance(new Vector2(attackZoneCircle.x, attackZoneCircle.z), location) < attackZoneRadius)
+			if (Vector2.Distance(new Vector2(attackZoneOrigin.x, attackZoneOrigin.z), location) < attackZoneRadius)
 				return true;
 			return false;
+        }
+
+		public Vector2 RequestPointInsideZone()
+        {
+			return (Random.insideUnitSphere * attackZoneRadius) + attackZoneOrigin;
         }
 
 		#if UNITY_EDITOR
 		void OnDrawGizmos()
 		{
 			Handles.color = Color.green;
-			Handles.DrawWireDisc(attackZoneCircle, Vector3.up, attackZoneRadius);
+			Handles.DrawWireDisc(attackZoneOrigin, Vector3.up, attackZoneRadius);
 		}
 		#endif
 	}

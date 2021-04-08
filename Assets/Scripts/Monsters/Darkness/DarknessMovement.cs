@@ -7,6 +7,7 @@ namespace DarknessMinion
 	{
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
+		public bool inAttackZone { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
@@ -18,6 +19,8 @@ namespace DarknessMinion
 		public Transform player;
 
 		public DarknessAttackZone darkAttackZone;
+
+		private Vector3 darkAttackZonePoint;
 
 		private AIPath pather;
 
@@ -79,16 +82,17 @@ namespace DarknessMinion
 
 		public bool IsFacingPlayer(float minimumValue)
 		{
-			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
+			float closeness = Vector3.Dot(PlayerDirection(false), transform.forward);
 			if (closeness >= minimumValue)
 				return true;
 			else return false;
 		}
 
-		public Vector3 PlayerDirection()
-		{
-			//Create a point in the zone to path towards
-			return (player.position - transform.position).normalized; //TODO change this to first direct towards the zone. If in the zone check against player direction
+		public Vector3 PlayerDirection(bool moving)
+		{ 
+			if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)) && moving)
+				return (darkAttackZonePoint - transform.position).normalized;
+			else return (player.position - transform.position).normalized; 
 		}
 
 		public void StopMovement()
@@ -101,6 +105,8 @@ namespace DarknessMinion
 		{
 			if (!DarknessManager.Instance.AssignAttackZone(this))
 				Debug.LogError("You really couldn't find the Attack Zone eh?");
+			darkAttackZonePoint = darkAttackZone.RequestPointInsideZone();
+			darkAttackZonePoint.y = transform.position.y;
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
@@ -155,7 +161,7 @@ namespace DarknessMinion
 
 		private void SeekLayer(DirectionNode dNode)
 		{
-			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
+			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection(true));
 
 			if (dotValue > 0)
 				dNode.seekWeight = dotValue;
