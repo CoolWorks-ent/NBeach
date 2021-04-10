@@ -816,6 +816,7 @@ MonoBehaviour:
   attackState: 0
   attackTimer: 0
   maxAttackTimer: 4
+  baseMaxAttackTimer: 4
   ballMoveSpeed: 0
   isDead: 0
   spRenderer: {fileID: 0}
@@ -823,6 +824,7 @@ MonoBehaviour:
   WoodIcon: {fileID: 0}
   FireIcon: {fileID: 0}
   doRockSmash: 0
+  ProjectileAttack_Finish: 0
   DarkBallFX: {fileID: 198146219723438988}
 --- !u!114 &114938124969036502
 MonoBehaviour:

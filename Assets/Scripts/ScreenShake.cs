@@ -16,7 +16,7 @@ public class ScreenShake : MonoBehaviour {
     {
         shakeDuration = 0.6f;
         camObj = GameController.instance.playerControl.gameObject;
-        print(camObj);
+        //print(camObj);
     }
 
 	// Use this for initialization

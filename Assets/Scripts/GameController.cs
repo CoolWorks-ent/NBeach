@@ -470,11 +470,11 @@ public class GameController : MonoBehaviour {
                 break;
             case 2:
                 //level.Stage2();
-                level.stageNum = 1;
+                level.stageNum = 0;
                 break;
             case 3:
                 //level.Stage3();
-                level.stageNum = 2;
+                level.stageNum = 1;
                 break;
         }
         yield return 0;
