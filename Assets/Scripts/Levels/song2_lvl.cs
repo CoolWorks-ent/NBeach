@@ -44,6 +44,8 @@ public class song2_lvl : Level {
     [SerializeField]
     DarknessBoss darkBoss;
     [SerializeField]
+    GameObject darkBossFake;
+    [SerializeField]
     GameObject[] lightningBolts;
     [SerializeField]
     GameObject TornadoFX;
@@ -425,10 +427,11 @@ public class song2_lvl : Level {
     {
         //slight delay after rock is destroyed  before player should run
         yield return new WaitForSeconds(.5f);
-        if (stageNum == 2) //only run to new rock if not on last stage of battle
+        if (stageNum == 0 || stageNum == 1 ) //only run to new rock if not on last stage of battle
             StartCoroutine(RunToNewRock());
-        if (stageNum == 3)
-            stageNum = 4; //set stageNum to 4 to advance to final cutscene
+        if (stageNum == 2)
+            stageNum = 3; //set stageNum to 3 to advance to final cutscene
+            StartNextStage();
         yield return 0;
     }
 
@@ -1017,7 +1020,13 @@ public class song2_lvl : Level {
         //wait for an event for when the rock is destroyed by the dark boss.
         //tell boss to destroy the player's last cover rock
         darkBoss.DoRockSmash_Interrupt(coverRocks[2]);
-        yield return new WaitForSeconds(4);
+
+        /*REMAINING LOGIC
+         * TAKES PLACE 
+         * IN "Cover Destroyed" Function
+         */
+
+        //yield return new WaitForSeconds(4);
 
         //!Dark Boss moves closer!
 
@@ -1025,7 +1034,7 @@ public class song2_lvl : Level {
 
         //stageNum += 1;
         //Debug.Log("Rock " + stageNum + " Reached.");
-        StartNextStage();
+        //StartNextStage();
         //yield return new WaitForSeconds(10);
 
         //darkBoss.DoRockSmash_Interrupt(gController.playerControl.gameObject);
@@ -1114,6 +1123,9 @@ public class song2_lvl : Level {
      **/ 
     IEnumerator Song2_EndCutscene()
     {
+        //set stageNum to 4 to prevent any further Stage 3 logic from executing from other scripts
+        stageNum = 4;
+
         //player flies towards the beach
         Transform playerPos = GameObject.FindGameObjectWithTag("Player").transform;
         speedBoostPowerUp.boostAmt = 2f;
@@ -1162,12 +1174,14 @@ public class song2_lvl : Level {
          * MOVE Dark Boss to the Island and slowly creep into player's view
          */ 
         float tempSpeed = 3;
-        //Teleport Boss close to player's position
-        darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x-10, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-10);
+        //Teleport Fake version of Boss close to player's position
+        yield return new WaitForSeconds(1);
+        Instantiate(darkBossFake, darkBossEndPos.position, darkBossEndPos.rotation);
+        //darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-10);
  
         //rotate boss to face downwards and in player's view
-        Quaternion darkBossEndRot = Quaternion.Euler(23.365f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z);
-        darkBossObj.transform.rotation = darkBossEndRot;
+        //Quaternion darkBossEndRot = Quaternion.Euler(23.365f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z);
+        //darkBossObj.transform.rotation = darkBossEndRot;
         //darkBossObj.transform.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX;
 
         //slowly move boss towards player's position within their view
@@ -1176,10 +1190,10 @@ public class song2_lvl : Level {
         float moveTime = 3;
         while (t < moveTime)
         {
-            darkBossObj.transform.position = Vector3.MoveTowards(darkBossObj.transform.position, darkBossEndPos.transform.position, Time.deltaTime * tempSpeed);
+            darkBossFake.transform.position = Vector3.MoveTowards(darkBossFake.transform.position, pContainerBody.transform.position, Time.deltaTime * tempSpeed);
             //set boss to look in player's direction on the island
-            darkBossObj.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().transform);
-            darkBossObj.transform.rotation = Quaternion.Euler(40f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z); ;
+            darkBossFake.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().transform);
+            darkBossFake.transform.rotation = Quaternion.Euler(40f, darkBossFake.transform.rotation.eulerAngles.y, darkBossFake.transform.rotation.eulerAngles.z); ;
             yield return null;
         }
 

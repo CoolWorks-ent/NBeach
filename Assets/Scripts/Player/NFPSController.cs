@@ -703,7 +703,7 @@ public class NFPSController : PlayerController {
 
                         //if player hit with RockSmashAttack, trigger event to fly back and hit island
                         DarkBossAttack bossAttack = enemy.GetComponent<DarkBossAttack>();
-                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum >= 3)
+                        if (bossAttack.attackType == "RockSmash" && gController.lvlManager.currentLvl.GetComponent<song2_lvl>().stageNum == 3)
                         {
                             EventManager.TriggerEvent("Song2_End_Cutscene_Start", "Song2_End_Cutscene_Start");
                         }
