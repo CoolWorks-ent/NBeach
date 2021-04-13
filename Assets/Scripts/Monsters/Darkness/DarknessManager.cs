@@ -17,8 +17,6 @@ namespace DarknessMinion
 
 		public static DarknessManager Instance { get; private set; }
 
-		public DarknessAttackZone darkAttackZone {get; private set;}
-
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;
 
@@ -54,24 +52,13 @@ namespace DarknessMinion
 
 		void Start()
         {
-			darkAttackZone = GetComponent<DarknessAttackZone>();
+			
         }
 
 		public Vector3 DirectionToPlayer(Vector3 start)
 		{
 			return (player.position - start).normalized;
 		}
-
-		public bool AssignAttackZone(DarknessMovement movement)
-        {
-			if (darkAttackZone != null)
-			{
-				movement.darkAttackZone = darkAttackZone;
-				return true;
-			}
-			else return false;
-        }
-
 
 		#region DarknessUpdateLoop
 

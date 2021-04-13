@@ -89,9 +89,13 @@ namespace DarknessMinion
 		}
 
 		public Vector3 PlayerDirection(bool moving)
-		{ 
-			if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)) && moving)
-				return (darkAttackZonePoint - transform.position).normalized;
+		{
+			if (moving)
+			{
+				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
+					return (player.position - transform.position).normalized;
+				else return (darkAttackZonePoint - transform.position).normalized;
+			}
 			else return (player.position - transform.position).normalized; 
 		}
 
@@ -103,8 +107,7 @@ namespace DarknessMinion
 
 		public void StartMovement()
 		{
-			if (!DarknessManager.Instance.AssignAttackZone(this))
-				Debug.LogError("You really couldn't find the Attack Zone eh?");
+			darkAttackZone = DarknessAttackZone.Instance;
 			darkAttackZonePoint = darkAttackZone.RequestPointInsideZone();
 			darkAttackZonePoint.y = transform.position.y;
 			pather.canMove = true;
@@ -209,11 +212,13 @@ namespace DarknessMinion
 			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
 		}
 
+	#if UNITY_EDITOR
 		void OnDrawGizmos()
 		{
 			Color col = Color.red;
+			Gizmos.DrawCube(darkAttackZonePoint, Vector3.one*0.5f);
 
-			foreach(DirectionNode dir in directionNodes)
+			foreach (DirectionNode dir in directionNodes)
 			{
 				if (dir.combinedWeight > 0.9f)
 					col = Color.green;
@@ -227,10 +232,11 @@ namespace DarknessMinion
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
 			}
 		}
+	#endif
 
 		private bool WithinAttackZone()
         {
-			return DarknessManager.Instance.darkAttackZone.InTheZone(ConvertToVec2(transform.position));
+			return darkAttackZone.InTheZone(ConvertToVec2(transform.position));
         }
 
 		void OnDestroy()

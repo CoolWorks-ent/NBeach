@@ -16,11 +16,22 @@ namespace DarknessMinion
 		[SerializeField]
 		private Transform playerRotationFacing, playerLocation;
 
+		public static DarknessAttackZone Instance { get; private set; }
 
 
 		//Have a zone offset towards the front of the player.
 		//The center of the zone is x units in front of the player container's forward vector.
 		//This should rotate the attack zone based on what should be their ideal position
+
+		void Awake()
+        {
+			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
+			{
+				Debug.LogError("Instance of DarkAttackZone already exist in this scene");
+				//Destroy(instance.gameObject.GetComponent<AI_Manager>());
+			}
+			Instance = this;
+        }
 
 		void Start()
 		{
@@ -39,7 +50,7 @@ namespace DarknessMinion
 			return false;
         }
 
-		public Vector2 RequestPointInsideZone()
+		public Vector3 RequestPointInsideZone()
         {
 			return (Random.insideUnitSphere * attackZoneRadius) + attackZoneOrigin;
         }
