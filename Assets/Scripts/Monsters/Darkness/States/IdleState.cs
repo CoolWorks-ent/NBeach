@@ -15,8 +15,6 @@ namespace DarknessMinion
 		{
 
 			darkController.movement.StopMovement();
-			if(darkController.movement.navTarget != null)
-				darkController.movement.navTarget = null;
 	
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
 			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));

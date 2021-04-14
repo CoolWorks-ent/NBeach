@@ -213,7 +213,7 @@ namespace DarknessMinion
 		void OnDrawGizmos()
 		{
 			Color col = Color.red;
-			Gizmos.DrawCube(attackZoneNavTarget, Vector3.one*0.5f);
+			//Gizmos.DrawCube(attackZoneNavTarget, Vector3.one*0.5f);
 
 			foreach (DirectionNode dir in directionNodes)
 			{
