@@ -50,9 +50,14 @@ namespace DarknessMinion
 			return false;
         }
 
-		public Vector3 RequestPointInsideZone()
+		public NavigationTarget RequestPointInsideZone()
         {
-			return (Random.insideUnitSphere * attackZoneRadius) + attackZoneOrigin;
+			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, 0);
+        }
+
+		public void UpdateNavTarget(NavigationTarget navTarget)
+        {
+			//attackZoneOrigin;
         }
 
 		#if UNITY_EDITOR

@@ -213,17 +213,15 @@ namespace DarknessMinion
 		}
 
 
-		public void UpdateDebugMessage(bool showTargetData, bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
+		public void UpdateDebugMessage(bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
 		{
 			debugMessage = "";
-			if(showTargetData && movement.navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.navPosition);
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)
 				debugMessage += String.Format("\n <b>Current State:</b> {0} \n" + "Previous State: {1} \n", currentState.ToString(), previousState.ToString());
 			if(showLocationInfo)	
-				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>NavTarget Distance:</b> {1} \n" + "<b>Darkness Position:</b> {2}", movement.playerDist, movement.navTargetDist, this.transform.position);
+				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>Darkness Position:</b> {1}", movement.playerDist, this.transform.position);
 			if(showCooldownInfo)
 				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
 			textMesh.text = debugMessage;

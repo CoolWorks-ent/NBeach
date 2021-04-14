@@ -11,16 +11,13 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
-		public float navTargetDist { get; private set; }
 
-		[HideInInspector]
-		public NavigationTarget navTarget;
 		[HideInInspector]
 		public Transform player;
 
 		public DarknessAttackZone darkAttackZone;
 
-		private Vector3 darkAttackZonePoint;
+		private NavigationTarget attackZoneNavTarget;
 
 		private AIPath pather;
 
@@ -61,11 +58,6 @@ namespace DarknessMinion
 		public void DistanceEvaluation()
 		{
 			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
-			if (navTarget != null)
-			{
-				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
-			}
-			else navTargetDist = -1;
 		}
 
 		private Vector2 ConvertToVec2(Vector3 vector)
@@ -92,9 +84,11 @@ namespace DarknessMinion
 		{
 			if (moving)
 			{
+				//TODO: Fix this
+				//attackZoneNavTarget = darkAttackZone.UpdatePointInZone(attackZoneNavTarget.navPosition);
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
-				else return (darkAttackZonePoint - transform.position).normalized;
+				else return (attackZoneNavTarget.navPosition - transform.position).normalized;
 			}
 			else return (player.position - transform.position).normalized; 
 		}
@@ -108,8 +102,11 @@ namespace DarknessMinion
 		public void StartMovement()
 		{
 			darkAttackZone = DarknessAttackZone.Instance;
-			darkAttackZonePoint = darkAttackZone.RequestPointInsideZone();
-			darkAttackZonePoint.y = transform.position.y;
+
+			//TODO: update the navTarget somehow. Either update individual components or send the object to be updated inside attack zone
+			//attackZoneNavTarget = new NavigationTarget(darkAttackZone.RequestPointInsideZone(), )
+			//attackZoneNavTarget = darkAttackZone.RequestPointInsideZone();
+			//attackZoneNavTarget.y = transform.position.y;
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
@@ -216,7 +213,7 @@ namespace DarknessMinion
 		void OnDrawGizmos()
 		{
 			Color col = Color.red;
-			Gizmos.DrawCube(darkAttackZonePoint, Vector3.one*0.5f);
+			Gizmos.DrawCube(attackZoneNavTarget, Vector3.one*0.5f);
 
 			foreach (DirectionNode dir in directionNodes)
 			{

@@ -5,27 +5,26 @@ namespace DarknessMinion
 	[System.Serializable]
 	public class NavigationTarget  
 	{
-		public enum NavTargetTag { Attack, Patrol, Neutral, Null, AttackStandby}
-		
 		[SerializeField]
-		private Vector3 position, positionOffset;
+		private Vector3 origin, positionOffset;
 		private float groundElavation;
+		public Vector3 navPosition { get { return origin + positionOffset; } } 
 
-		public NavTargetTag navTargetTag { get; private set; }
-		public Vector3 navPosition { get { return position + positionOffset; } } 
-		public Vector3 navPositionSource { get { return position; } }
-
-		public NavigationTarget(Vector3 loc, Vector3 offset, float elavation, NavTargetTag ntTag)
+		public NavigationTarget(Vector3 start, Vector3 offset, float elavation)
 		{
-			position = loc;
+			origin = start;
 			groundElavation = elavation;
 			positionOffset = offset;
-			navTargetTag = ntTag;
 		}
 
-		public void UpdateLocation(Vector3 loc)
+		public void UpdateOriginLocation(Vector3 updatedloc)
 		{
-			position = new Vector3(loc.x, groundElavation, loc.z);
+			origin = new Vector3(updatedloc.x, groundElavation, updatedloc.z);
 		}
+
+		public void UpdateOffset(Vector3 updatedOff)
+        {
+			positionOffset = new Vector3(updatedOff.x, groundElavation, updatedOff.z);
+        }
 	}
 }
