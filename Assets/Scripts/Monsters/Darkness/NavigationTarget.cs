@@ -15,16 +15,17 @@ namespace DarknessMinion
 			origin = start;
 			groundElavation = elavation;
 			positionOffset = offset;
+			DarkEventManager.UpdateZoneLocation += UpdateOffsetLocation;
 		}
 
-		public void UpdateOriginLocation(Vector3 updatedloc)
+		~NavigationTarget()
 		{
-			origin = new Vector3(updatedloc.x, groundElavation, updatedloc.z);
+			DarkEventManager.UpdateZoneLocation -= UpdateOffsetLocation;
 		}
 
-		public void UpdateOffset(Vector3 updatedOff)
-        {
-			positionOffset = new Vector3(updatedOff.x, groundElavation, updatedOff.z);
-        }
+		private void UpdateOffsetLocation(Vector3 updatedloc)
+		{
+			positionOffset = new Vector3(updatedloc.x, groundElavation, updatedloc.z);
+		}
 	}
 }

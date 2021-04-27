@@ -41,6 +41,7 @@ namespace DarknessMinion
 		void LateUpdate()
 		{
 			attackZoneOrigin = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
+			DarkEventManager.OnUpdateZoneLocation(attackZoneOrigin);
 		}
 
 		public bool InTheZone(Vector2 location)
@@ -50,15 +51,11 @@ namespace DarknessMinion
 			return false;
         }
 
-		public NavigationTarget RequestPointInsideZone()
+		public NavigationTarget RequestPointInsideZone(float height)
         {
-			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, 0);
-        }
+			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);
+		}
 
-		public void UpdateNavTarget(NavigationTarget navTarget)
-        {
-			//attackZoneOrigin;
-        }
 
 		#if UNITY_EDITOR
 		void OnDrawGizmos()

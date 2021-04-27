@@ -30,7 +30,7 @@ namespace DarknessMinion
 		[SerializeField, Range(0, 10)]
 		private float movementPrecisionDistance;
 
-		private Vector3 pointToHighlyAvoid;
+		//private Vector3 pointToHighlyAvoid;
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
@@ -47,7 +47,7 @@ namespace DarknessMinion
 				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
 			}
 			bestDirectionIndex = 0;
-			pointToHighlyAvoid = new Vector3();
+			//pointToHighlyAvoid = new Vector3();
 		}
 
 		void Start()
@@ -84,7 +84,7 @@ namespace DarknessMinion
 		{
 			if (moving)
 			{
-				//TODO: Fix this
+				//TODO: Fix this, check if attackZoneNavTarget is valid
 				//attackZoneNavTarget = darkAttackZone.UpdatePointInZone(attackZoneNavTarget.navPosition);
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
@@ -103,18 +103,15 @@ namespace DarknessMinion
 		{
 			darkAttackZone = DarknessAttackZone.Instance;
 
-			//TODO: update the navTarget somehow. Either update individual components or send the object to be updated inside attack zone
-			//attackZoneNavTarget = new NavigationTarget(darkAttackZone.RequestPointInsideZone(), )
-			//attackZoneNavTarget = darkAttackZone.RequestPointInsideZone();
-			//attackZoneNavTarget.y = transform.position.y;
+			attackZoneNavTarget = darkAttackZone.RequestPointInsideZone(transform.position.y);
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
 
-		public void UpdateHighAvoidancePoint(Vector3 point)
+		/*public void UpdateHighAvoidancePoint(Vector3 point)
 		{
 			pointToHighlyAvoid = point;
-		}
+		}*/
 
 		/*Add functions for applying steering behaviors
 		* Choose several points in a circle that would be the starting candidates for movement
@@ -176,7 +173,7 @@ namespace DarknessMinion
 			RaycastHit rayHit;
 			float dotValue;
 
-			if (pointToHighlyAvoid != Vector3.zero)
+			/*if (pointToHighlyAvoid != Vector3.zero)
 			{
 				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
 				if (avoidancePointDistance <= lookAheadDistance) //CalculationDistance(avoidancePointDistance))
@@ -185,7 +182,7 @@ namespace DarknessMinion
 					if (localAvoidanceDotValue >= 0.7f)
 						dNode.avoidWeight += -0.8f;
 				}
-			}
+			}*/
 
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
@@ -204,10 +201,10 @@ namespace DarknessMinion
 			else return lookAheadDistance;
 		}
 
-		private float LocalAvoidanceDotValue(Vector3 direction)
+		/*private float LocalAvoidanceDotValue(Vector3 direction)
 		{
 			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
-		}
+		}*/
 
 	#if UNITY_EDITOR
 		void OnDrawGizmos()
