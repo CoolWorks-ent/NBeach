@@ -138,16 +138,6 @@ public class NFPSController : PlayerController {
             //m_VRInput.OnDown -= HandleDown;
         }
 
-    private void FixedUpdate()
-    {
-        if (playerStatus != PLAYER_STATUS.HURT)
-        {
-            //function to excute the player's dodge
-            PlayerDodge();
-        }
-
-    }
-
     //Prevent Player Damage durin Dark Boss "Rock Smash Attack"
     //Callback to manage player's invicibility via outside events
     private void PlayerInvicibilityChange(string val)
@@ -156,6 +146,16 @@ public class NFPSController : PlayerController {
             invincibleState = true;
         else if (val == "Off")
             invincibleState = false;
+    }
+
+    private void FixedUpdate()
+    {
+        if (playerStatus != PLAYER_STATUS.HURT || gController.gameState == GameState.IsCutscene)
+        {
+            //function to excute the player's dodge
+            PlayerDodge();
+        }
+
     }
 
     private void Update()
@@ -192,6 +192,10 @@ public class NFPSController : PlayerController {
                 //Turn Off TiltHint upon recovery
                 EventManager.TriggerEvent("Player_TiltHintOff", "Player_TiltHint");
             }
+        }
+        else if(gController.gameState == GameState.IsCutscene)
+        {
+            Debug.Log("Player Update Paused for Cutscene!");
         }
         else //If player is NOT HURT
         {

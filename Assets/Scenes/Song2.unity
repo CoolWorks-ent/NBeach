@@ -7417,7 +7417,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 37
+  m_RootOrder: 38
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &247206575
 GameObject:
@@ -7763,6 +7763,12 @@ Prefab:
       propertyPath: darkBossFake
       value: 
       objectReference: {fileID: 1732595202325790, guid: 3d18cf38bb9a20c4b9276c74be213e45,
+        type: 2}
+    - target: {fileID: 114795370930730580, guid: a79ac96491fac394db07f5a01b0827cc,
+        type: 2}
+      propertyPath: speedBoostPowerUp
+      value: 
+      objectReference: {fileID: 114224871758845490, guid: b008ecc2c18c96d48bc0993d6029fabe,
         type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a79ac96491fac394db07f5a01b0827cc, type: 2}
@@ -59650,6 +59656,31 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -18.232
       objectReference: {fileID: 0}
+    - target: {fileID: 198418332615605970, guid: 101a0171c018ff54783935b1976a015b,
+        type: 2}
+      propertyPath: randomSeed
+      value: -26509910
+      objectReference: {fileID: 0}
+    - target: {fileID: 198418332615605970, guid: 101a0171c018ff54783935b1976a015b,
+        type: 2}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 198418332615605970, guid: 101a0171c018ff54783935b1976a015b,
+        type: 2}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 198418332615605970, guid: 101a0171c018ff54783935b1976a015b,
+        type: 2}
+      propertyPath: InitialModule.startRotationX.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 198418332615605970, guid: 101a0171c018ff54783935b1976a015b,
+        type: 2}
+      propertyPath: InitialModule.startRotationY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 101a0171c018ff54783935b1976a015b, type: 2}
   m_IsPrefabParent: 0
@@ -60468,13 +60499,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 909828497}
-  m_LocalRotation: {x: 0.19697501, y: -0.15136793, z: 0.030796144, w: 0.9681633}
-  m_LocalPosition: {x: 158.71, y: 44.97, z: 96}
+  m_LocalRotation: {x: 0.3446003, y: -0.25629753, z: 0.048824456, w: 0.9017641}
+  m_LocalPosition: {x: 163, y: 45.9, z: 92.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 23, y: -17.772001, z: 0}
+  m_LocalEulerAnglesHint: {x: 40.28, y: -34.18, z: -6.668}
 --- !u!1 &914159341
 GameObject:
   m_ObjectHideFlags: 0
@@ -60948,7 +60979,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_RootOrder
-      value: 36
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
@@ -61021,7 +61052,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1746449155021346, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_Name
-      value: Rain (1)
+      value: Rain_stage1
       objectReference: {fileID: 0}
     - target: {fileID: 1746449155021346, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_IsActive
@@ -62212,7 +62243,7 @@ Transform:
   - {fileID: 414554587}
   - {fileID: 574364214}
   m_Father: {fileID: 0}
-  m_RootOrder: 35
+  m_RootOrder: 37
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1203159729
 Prefab:
@@ -86197,7 +86228,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 183.8
+      value: 175.2
       objectReference: {fileID: 0}
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_LocalPosition.y
@@ -86205,7 +86236,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 72.5
+      value: 76.8
       objectReference: {fileID: 0}
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_LocalRotation.x
@@ -86225,7 +86256,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4468278543436130, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_RootOrder
-      value: 38
+      value: 36
       objectReference: {fileID: 0}
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
@@ -86255,12 +86286,12 @@ Prefab:
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
       propertyPath: randomSeed
-      value: -1857236376
+      value: 1092339520
       objectReference: {fileID: 0}
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
       propertyPath: ShapeModule.boxX
-      value: 25
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
@@ -86298,7 +86329,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1746449155021346, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_Name
-      value: Rain (2)
+      value: Rain_stage2
       objectReference: {fileID: 0}
     - target: {fileID: 1746449155021346, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
       propertyPath: m_IsActive
@@ -87253,7 +87284,7 @@ Prefab:
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
       propertyPath: randomSeed
-      value: 1274308437
+      value: -1159196863
       objectReference: {fileID: 0}
     - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
         type: 2}
@@ -87293,6 +87324,15 @@ Prefab:
         type: 2}
       propertyPath: randomSeed
       value: 1681954598
+      objectReference: {fileID: 0}
+    - target: {fileID: 198114957526266422, guid: 84d404bb0e71bc841b70ab5100835258,
+        type: 2}
+      propertyPath: CollisionModule.collisionMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1746449155021346, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}
+      propertyPath: m_Name
+      value: Rain_stage0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 84d404bb0e71bc841b70ab5100835258, type: 2}

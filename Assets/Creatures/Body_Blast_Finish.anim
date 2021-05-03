@@ -7263,7 +7263,7 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_GenerateMotionCurves: 0
   m_Events:
-  - time: 0.6159401
+  - time: 0.45833334
     functionName: OnAttackAnimFinished
     data: OnAttackAnimFinished
     objectReferenceParameter: {fileID: 0}

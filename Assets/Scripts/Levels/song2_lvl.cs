@@ -1010,8 +1010,8 @@ public class song2_lvl : Level {
         while (t <= moveTime)
         {
             //slowly move darkboss to above the water and begin its attack
-            darkBossObj.transform.position = Vector3.Lerp(startPos, endPos, t / 10);
-            t += Time.deltaTime;
+            darkBossObj.transform.position = Vector3.Lerp(startPos, endPos, t / 8); //10 seconds to reach endPos, but only move for 2 seconds
+            t += Time.deltaTime; //move
             yield return null;
         }
         //darkBossObj.transform.position = Vector3.MoveTowards(darkBossObj.transform.position, gController.playerStage.transform.position, 2f);
@@ -1126,6 +1126,9 @@ public class song2_lvl : Level {
         //set stageNum to 4 to prevent any further Stage 3 logic from executing from other scripts
         stageNum = 4;
 
+        //Set Game State to Cutscene
+        gController.gameState = GameState.IsCutscene;
+
         //player flies towards the beach
         Transform playerPos = GameObject.FindGameObjectWithTag("Player").transform;
         speedBoostPowerUp.boostAmt = 2f;
@@ -1170,36 +1173,37 @@ public class song2_lvl : Level {
         gController.playerControl.CanMove = false;
         gController.playerControl.playerState = PlayerState.NOTMOVING;
 
-        /* [CREEP Ending]
-         * MOVE Dark Boss to the Island and slowly creep into player's view
-         */ 
-        float tempSpeed = 3;
+        //pause Dark Boss Logic
+        darkBoss.status = DarknessBoss.BossStatus.end;       
+
         //Teleport Fake version of Boss close to player's position
         yield return new WaitForSeconds(1);
         Instantiate(darkBossFake, darkBossEndPos.position, darkBossEndPos.rotation);
         //darkBossObj.transform.position = new Vector3(darkBossEndPos.transform.position.x, darkBossEndPos.transform.position.y, darkBossEndPos.transform.position.z-10);
- 
+
         //rotate boss to face downwards and in player's view
         //Quaternion darkBossEndRot = Quaternion.Euler(23.365f, darkBossObj.transform.rotation.eulerAngles.y, darkBossObj.transform.rotation.eulerAngles.z);
         //darkBossObj.transform.rotation = darkBossEndRot;
         //darkBossObj.transform.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX;
 
-        //slowly move boss towards player's position within their view
+        /* [CREEP Ending]
+         * MOVE Dark Boss to the Island and slowly creep into player's view
+        */
         yield return new WaitForSeconds(1);
         float t = 0;
         float moveTime = 3;
+        float moveSpeed = 3;
         while (t < moveTime)
         {
-            darkBossFake.transform.position = Vector3.MoveTowards(darkBossFake.transform.position, pContainerBody.transform.position, Time.deltaTime * tempSpeed);
+            darkBossFake.transform.position = Vector3.MoveTowards(darkBossFake.transform.position, pContainerBody.transform.position, Time.deltaTime * moveSpeed);
             //set boss to look in player's direction on the island
             darkBossFake.transform.LookAt(gController.playerControl.GetComponent<NFPSController>().transform);
-            darkBossFake.transform.rotation = Quaternion.Euler(40f, darkBossFake.transform.rotation.eulerAngles.y, darkBossFake.transform.rotation.eulerAngles.z); ;
+            darkBossFake.transform.rotation = Quaternion.Euler(40f, darkBossFake.transform.rotation.eulerAngles.y, darkBossFake.transform.rotation.eulerAngles.z);
+            t += Time.deltaTime;
             yield return null;
         }
 
-        yield return new WaitForSeconds(3);
-        
-        Destroy(impactFX);
+        yield return new WaitForSeconds(1);
         
         /*
          *IMPROVE EYE CLOSE - Passout animation.  make the eye-close slower and more dramatic! 
@@ -1216,6 +1220,11 @@ public class song2_lvl : Level {
                 blackOverlay.color = new Color(blackOverlay.color.r, blackOverlay.color.g, blackOverlay.color.b, 1f);
                 yield return new WaitForSeconds(0.1f);
         }
+
+        /* 
+         ******TURN SHIT OFF********
+         */
+
         //FADE OUT Music
         gController.soundManager.StopBGAudio();
         Debug.Log("song finished");

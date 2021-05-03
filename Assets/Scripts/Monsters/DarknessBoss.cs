@@ -182,8 +182,8 @@ public class DarknessBoss : MonoBehaviour {
                 animationControl.SetBool("isDead", true);
                 animationControl.SetBool("GotHit", false);
                 animationControl.SetBool("isRest", false);
-                if (animationControl.GetCurrentAnimatorStateInfo(0).IsName("BossDie2"))
-                    Application.LoadLevel("6. HappyEndScene");
+                /*if (animationControl.GetCurrentAnimatorStateInfo(0).IsName("BossDie2"))
+                    Application.LoadLevel("6. HappyEndScene");*/
                 //Destroy(gameObject);
                 break;
         }
