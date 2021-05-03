@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.EventSystems;
 
-public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused }
+public enum GameState { IsPlaying, IsPaused, IsOver, InMenu, IsWorldPaused, IsCutscene }
 public enum GameLevelSelectionState {LevelSelected, Continue, NewGame}
 
 public class GameController : MonoBehaviour {

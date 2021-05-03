@@ -46,8 +46,10 @@ public class InGameMenu : MonoBehaviour {
     void OnLevelFinished(string levelNum)
     {
         // "Level Select" Start Only: Only set the menu active after the level is finished and the player started the game via "LevelSelect"
-        if(GameController.instance.gameLevelSelectionState == GameLevelSelectionState.LevelSelected)
+        if (GameController.instance.gameLevelSelectionState == GameLevelSelectionState.LevelSelected)
             gameMenuPanel.SetActive(true);
+        else if (GameController.instance.gameLevelSelectionState == GameLevelSelectionState.NewGame)
+            LoadNextLevel();
     }
 
     public void LoadOnClick(int level)
