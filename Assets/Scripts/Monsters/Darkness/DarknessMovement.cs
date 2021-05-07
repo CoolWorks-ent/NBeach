@@ -85,7 +85,6 @@ namespace DarknessMinion
 			if (moving)
 			{
 				//TODO: Fix this, check if attackZoneNavTarget is valid
-				//attackZoneNavTarget = darkAttackZone.UpdatePointInZone(attackZoneNavTarget.navPosition);
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
 				else return (attackZoneNavTarget.navPosition - transform.position).normalized;
@@ -207,7 +206,7 @@ namespace DarknessMinion
 		}*/
 
 	#if UNITY_EDITOR
-		void OnDrawGizmos()
+		void OnDrawGizmosSelected()
 		{
 			Color col = Color.red;
 			//Gizmos.DrawCube(attackZoneNavTarget, Vector3.one*0.5f);

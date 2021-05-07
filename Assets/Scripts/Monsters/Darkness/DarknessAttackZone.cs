@@ -1,9 +1,10 @@
 ﻿using System.Collections;
-using UnityEditor;
 using UnityEngine;
+
 
 namespace DarknessMinion
 {
+	[ExecuteInEditMode]
 	public class DarknessAttackZone : MonoBehaviour
 	{
 		private Vector3 attackZoneOrigin;
@@ -57,11 +58,12 @@ namespace DarknessMinion
 		}
 
 
+
 		#if UNITY_EDITOR
-		void OnDrawGizmos()
+		void OnDrawGizmosSelected()
 		{
-			Handles.color = Color.green;
-			Handles.DrawWireDisc(attackZoneOrigin, Vector3.up, attackZoneRadius);
+			UnityEditor.Handles.color = Color.green;
+			UnityEditor.Handles.DrawWireDisc(attackZoneOrigin, Vector3.up, attackZoneRadius);
 		}
 		#endif
 	}
