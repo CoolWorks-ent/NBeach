@@ -55,6 +55,9 @@ namespace DarknessMinion
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
 		}
 
+		void OnEnable() { DarkEventManager.UpdateDarknessStates += UpdateStates; }
+		void OnDisable() { DarkEventManager.UpdateDarknessStates -= UpdateStates; }
+
 		void Start()
 		{
 			movement = GetComponent<DarknessMovement>();
@@ -68,7 +71,6 @@ namespace DarknessMinion
 			previousState  = currentState;
 			darkHitBox.enabled = false;
 			DarkEventManager.OnDarknessAdded(this);
-			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);
 		}
 
@@ -205,11 +207,6 @@ namespace DarknessMinion
 		public void KillDarkness()
 		{
 			ChangeState(deathState);
-		}
-
-		private void OnDestroy()
-		{
-			DarkEventManager.UpdateDarknessStates -= UpdateStates;
 		}
 
 

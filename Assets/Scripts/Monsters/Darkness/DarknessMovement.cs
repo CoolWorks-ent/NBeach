@@ -50,10 +50,9 @@ namespace DarknessMinion
 			//pointToHighlyAvoid = new Vector3();
 		}
 
-		void Start()
-		{
-			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-		}
+		void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
+		void OnDisable() { DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation; }
+
 
 		public void DistanceEvaluation()
 		{
@@ -232,10 +231,7 @@ namespace DarknessMinion
 			return darkAttackZone.InTheZone(ConvertToVec2(transform.position));
         }
 
-		void OnDestroy()
-		{
-			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
-		}
+
 
 		private class DirectionNode
 		{

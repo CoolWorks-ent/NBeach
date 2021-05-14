@@ -41,8 +41,7 @@ namespace DarknessMinion
 			else Instance = this;
 			ActiveDarkness = new Dictionary<int, Darkness>();
 			attackApprovalPriority = new List<int>();
-			DarkEventManager.AddDarkness += AddtoDarknessList;
-			DarkEventManager.RemoveDarkness += RemoveFromDarknessList;
+			
 			paused = false;
 			calculationTime = 0.5f;
 			//attackOffset = 2.75f;
@@ -50,10 +49,17 @@ namespace DarknessMinion
 			StartCoroutine(ManagedDarknessUpdate());
 		}
 
-		void Start()
-        {
-			
-        }
+		void OnEnable()
+		{
+			DarkEventManager.AddDarkness += AddtoDarknessList;
+			DarkEventManager.RemoveDarkness += RemoveFromDarknessList;
+		}
+
+		void OnDisable()
+		{
+			DarkEventManager.AddDarkness -= AddtoDarknessList;
+			DarkEventManager.RemoveDarkness -= RemoveFromDarknessList;
+		}
 
 		public Vector3 DirectionToPlayer(Vector3 start)
 		{
