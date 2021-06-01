@@ -25,10 +25,10 @@ namespace DarknessMinion
 		private int bestDirectionIndex;
 
 		[SerializeField,Range(0, 10)]
-		private int lookAheadDistance;
+		private int pathSetDistance;
 
 		[SerializeField, Range(0, 10)]
-		private float movementPrecisionDistance;
+		private float movementCheckDistance;
 
 		//private Vector3 pointToHighlyAvoid;
 
@@ -194,9 +194,9 @@ namespace DarknessMinion
 
 		private float CalculationDistance(float distance)
 		{
-			if (distance <= movementPrecisionDistance)
-				return lookAheadDistance / 2;
-			else return lookAheadDistance;
+			if (distance <= movementCheckDistance)
+				return pathSetDistance / 2;
+			else return pathSetDistance;
 		}
 
 		/*private float LocalAvoidanceDotValue(Vector3 direction)
