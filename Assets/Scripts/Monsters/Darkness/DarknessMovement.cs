@@ -106,11 +106,6 @@ namespace DarknessMinion
 			pather.canSearch = true;
 		}
 
-		/*public void UpdateHighAvoidancePoint(Vector3 point)
-		{
-			pointToHighlyAvoid = point;
-		}*/
-
 		/*Add functions for applying steering behaviors
 		* Choose several points in a circle that would be the starting candidates for movement
 		* Vectors closer towards the direction of the player get some positive weight
@@ -171,17 +166,6 @@ namespace DarknessMinion
 			RaycastHit rayHit;
 			float dotValue;
 
-			/*if (pointToHighlyAvoid != Vector3.zero)
-			{
-				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
-				if (avoidancePointDistance <= lookAheadDistance) //CalculationDistance(avoidancePointDistance))
-				{
-					float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
-					if (localAvoidanceDotValue >= 0.7f)
-						dNode.avoidWeight += -0.8f;
-				}
-			}*/
-
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
@@ -221,7 +205,7 @@ namespace DarknessMinion
 				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					col = Color.magenta;
 				else col = Color.white;
-				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
+				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
 			}
 		}
 	#endif
@@ -236,7 +220,7 @@ namespace DarknessMinion
 		private class DirectionNode
 		{
 			public float angle { get; private set; }
-			public float avoidWeight, seekWeight, baseWeight;
+			public float avoidWeight, seekWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
 			public Vector3 directionAtAngle { get; private set; }

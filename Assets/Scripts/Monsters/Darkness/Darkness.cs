@@ -25,8 +25,6 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public TextMesh textMesh;
-		public bool updateStates;//, attacked;
-
 		public LayerMask playerMask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
@@ -50,7 +48,6 @@ namespace DarknessMinion
 		void Awake()
 		{
 			creationID = 0;
-			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
 		}
@@ -133,7 +130,7 @@ namespace DarknessMinion
 
 		public bool IsAnimationPlaying(DarkAnimationStates anim)
 		{
-			Debug.LogWarning("Animator is playing: " + animeController.GetCurrentAnimatorClipInfo(0)[0].clip.name);
+			//Debug.LogWarning("Animator is playing: " + animeController.GetCurrentAnimatorClipInfo(0)[0].clip.name);
 			return animeController.GetCurrentAnimatorStateInfo(0).IsName(anim.ToString());
 		}
 

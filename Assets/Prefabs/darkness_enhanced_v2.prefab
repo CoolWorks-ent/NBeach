@@ -944,7 +944,6 @@ MonoBehaviour:
   movement: {fileID: 0}
   darkHitBox: {fileID: 0}
   textMesh: {fileID: 102784145251410432}
-  updateStates: 0
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
@@ -964,7 +963,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   darkAttackZone: {fileID: 0}
-  pathSetDistance: 4
+  pathSetDistance: 5
   movementCheckDistance: 6.4
   avoidLayerMask:
     serializedVersion: 2
