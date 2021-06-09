@@ -42,9 +42,13 @@ namespace DarknessMinion
 
 			directionNodes = new DirectionNode[16];
 
+			float angle = 0;
 			for(int i = 1; i < directionNodes.Length+1; i++)
 			{
-				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
+				angle = Mathf.Deg2Rad * ((360 / directionNodes.Length) * i);
+				DirectionNode n = new DirectionNode(angle);
+				directionNodes[i-1] = n;
+				n.CreateDebugText(n.directionAtAngle, this.transform, Quaternion.Euler(0, angle, 0));
 			}
 			bestDirectionIndex = 0;
 			//pointToHighlyAvoid = new Vector3();
@@ -183,10 +187,6 @@ namespace DarknessMinion
 			else return pathSetDistance;
 		}
 
-		/*private float LocalAvoidanceDotValue(Vector3 direction)
-		{
-			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
-		}*/
 
 	#if UNITY_EDITOR
 		void OnDrawGizmosSelected()
@@ -206,6 +206,7 @@ namespace DarknessMinion
 					col = Color.magenta;
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
+				//dir.SetDebugText(string.Format("Combined Value: {0}", dir.combinedWeight), dir.directionAtAngle * (dir.combinedWeight * 2.9f));
 			}
 		}
 	#endif
@@ -215,8 +216,6 @@ namespace DarknessMinion
 			return darkAttackZone.InTheZone(ConvertToVec2(transform.position));
         }
 
-
-
 		private class DirectionNode
 		{
 			public float angle { get; private set; }
@@ -224,6 +223,8 @@ namespace DarknessMinion
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
 			public Vector3 directionAtAngle { get; private set; }
+
+			public TextMesh debugText {get; private set;}
 
 			public DirectionNode(float dAngle)
 			{
@@ -236,6 +237,20 @@ namespace DarknessMinion
 			public void SetDirection(Vector3 v)
 			{ 
 				directionAtAngle = v; 
+			}
+
+			public void CreateDebugText(Vector3 location, Transform parent, Quaternion rotation)
+			{
+				debugText = new TextMesh();
+				debugText.transform.parent = parent;
+				debugText.transform.rotation = rotation;
+				//Instantiate(debugText, location, rotation, parent);
+			}
+
+			public void SetDebugText(string text, Vector3 location)
+			{
+				debugText.text = text;
+				debugText.gameObject.transform.position = location;
 			}
 		}
 	}
