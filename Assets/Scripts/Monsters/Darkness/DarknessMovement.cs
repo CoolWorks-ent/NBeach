@@ -43,12 +43,12 @@ namespace DarknessMinion
 			directionNodes = new DirectionNode[16];
 
 			float angle = 0;
-			for(int i = 1; i < directionNodes.Length+1; i++)
+			for(int i = 0; i < directionNodes.Length; i++)
 			{
 				angle = Mathf.Deg2Rad * ((360 / directionNodes.Length) * i);
 				DirectionNode n = new DirectionNode(angle);
-				directionNodes[i-1] = n;
-				n.CreateDebugText(n.directionAtAngle, this.transform, Quaternion.Euler(0, angle, 0));
+				directionNodes[i] = n;
+				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y/4, n.directionAtAngle.z), this.transform, Quaternion.Euler(0, angle, 0));
 			}
 			bestDirectionIndex = 0;
 			//pointToHighlyAvoid = new Vector3();
@@ -206,7 +206,7 @@ namespace DarknessMinion
 					col = Color.magenta;
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
-				//dir.SetDebugText(string.Format("Combined Value: {0}", dir.combinedWeight), dir.directionAtAngle * (dir.combinedWeight * 2.9f));
+				dir.SetDebugText(string.Format("Combined Value: {0}", dir.combinedWeight));
 			}
 		}
 	#endif
@@ -241,16 +241,20 @@ namespace DarknessMinion
 
 			public void CreateDebugText(Vector3 location, Transform parent, Quaternion rotation)
 			{
-				debugText = new TextMesh();
-				debugText.transform.parent = parent;
-				debugText.transform.rotation = rotation;
+				GameObject gObject = new GameObject("DebugText");
+				gObject.AddComponent<TextMesh>();
+				debugText = gObject.GetComponent<TextMesh>();
+				gObject.transform.parent = parent;
+				gObject.transform.localPosition = location;
+				//gObject.transform.position = location;
+				//gObject.transform.rotation = rotation;
+
 				//Instantiate(debugText, location, rotation, parent);
 			}
 
-			public void SetDebugText(string text, Vector3 location)
+			public void SetDebugText(string text)
 			{
 				debugText.text = text;
-				debugText.gameObject.transform.position = location;
 			}
 		}
 	}
