@@ -48,7 +48,7 @@ namespace DarknessMinion
 				angle = Mathf.Deg2Rad * ((360 / directionNodes.Length) * i);
 				DirectionNode n = new DirectionNode(angle);
 				directionNodes[i] = n;
-				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y/4, n.directionAtAngle.z), this.transform, Quaternion.Euler(0, angle, 0));
+				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform, Quaternion.Euler(0, angle, 0));
 			}
 			bestDirectionIndex = 0;
 			//pointToHighlyAvoid = new Vector3();
@@ -206,7 +206,8 @@ namespace DarknessMinion
 					col = Color.magenta;
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
-				dir.SetDebugText(string.Format("Combined Value: {0}", dir.combinedWeight));
+				//dir.SetDebugLocation(this.transform.position);
+				dir.SetDebugText(string.Format("CV: {0}", dir.combinedWeight));
 			}
 		}
 	#endif
@@ -245,10 +246,10 @@ namespace DarknessMinion
 				gObject.AddComponent<TextMesh>();
 				debugText = gObject.GetComponent<TextMesh>();
 				gObject.transform.parent = parent;
-				gObject.transform.localPosition = location;
+				debugText.gameObject.transform.position = directionAtAngle + parent.position;
+				debugText.gameObject.transform.Rotate(Vector3.up, 180 / (angle * Mathf.Rad2Deg));
 				//gObject.transform.position = location;
 				//gObject.transform.rotation = rotation;
-
 				//Instantiate(debugText, location, rotation, parent);
 			}
 
