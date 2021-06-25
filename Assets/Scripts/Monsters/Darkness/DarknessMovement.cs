@@ -42,13 +42,14 @@ namespace DarknessMinion
 
 			directionNodes = new DirectionNode[16];
 
-			float angle = 0;
+			float angle, dAngle = 0;
 			for(int i = 0; i < directionNodes.Length; i++)
 			{
-				angle = Mathf.Deg2Rad * ((360 / directionNodes.Length) * i);
-				DirectionNode n = new DirectionNode(angle);
+				dAngle = ((360.0f / directionNodes.Length) * (float)i);
+				angle = Mathf.Deg2Rad * dAngle;
+				DirectionNode n = new DirectionNode(angle, dAngle);
 				directionNodes[i] = n;
-				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform, Quaternion.Euler(0, angle, 0));
+				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
 			}
 			bestDirectionIndex = 0;
 			//pointToHighlyAvoid = new Vector3();
@@ -220,6 +221,7 @@ namespace DarknessMinion
 		private class DirectionNode
 		{
 			public float angle { get; private set; }
+			public float degAngle { get; private set; }
 			public float avoidWeight, seekWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
@@ -227,9 +229,10 @@ namespace DarknessMinion
 
 			public TextMesh debugText {get; private set;}
 
-			public DirectionNode(float dAngle)
+			public DirectionNode(float rAngle, float dAngle)
 			{
-				angle = dAngle;
+				angle = rAngle;
+				degAngle = dAngle;
 				avoidWeight = 0;
 				seekWeight = 0;
 				directionAtAngle = Vector3.zero;
@@ -240,17 +243,14 @@ namespace DarknessMinion
 				directionAtAngle = v; 
 			}
 
-			public void CreateDebugText(Vector3 location, Transform parent, Quaternion rotation)
+			public void CreateDebugText(Vector3 location, Transform parent)
 			{
 				GameObject gObject = new GameObject("DebugText");
 				gObject.AddComponent<TextMesh>();
 				debugText = gObject.GetComponent<TextMesh>();
 				gObject.transform.parent = parent;
 				debugText.gameObject.transform.position = directionAtAngle + parent.position;
-				debugText.gameObject.transform.Rotate(Vector3.up, 180 / (angle * Mathf.Rad2Deg));
-				//gObject.transform.position = location;
-				//gObject.transform.rotation = rotation;
-				//Instantiate(debugText, location, rotation, parent);
+				debugText.gameObject.transform.RotateAround(parent.position, Vector3.up, degAngle);
 			}
 
 			public void SetDebugText(string text)
