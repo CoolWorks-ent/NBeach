@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pathfinding;
+using System.Collections.Generic;
 
 namespace DarknessMinion
 {
@@ -49,10 +50,9 @@ namespace DarknessMinion
 				angle = Mathf.Deg2Rad * dAngle;
 				DirectionNode n = new DirectionNode(angle, dAngle);
 				directionNodes[i] = n;
-				n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
+				//n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
 			}
 			bestDirectionIndex = 0;
-			//pointToHighlyAvoid = new Vector3();
 		}
 
 		void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
@@ -169,15 +169,19 @@ namespace DarknessMinion
 		{
 			dNode.avoidWeight = 0;
 			RaycastHit rayHit;
-			float dotValue;
+			float dotValue, distanceNorm;
 
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
+				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position) / 10.5f;
 				if (dotValue >= 0.6f)
 					dNode.avoidWeight += -1;
 				else if (dotValue <= 0.6f && dotValue > 0)
 					dNode.avoidWeight += -0.5f;
+
+				if (distanceNorm > 0.2f)
+					dNode.avoidWeight -= distanceNorm;
 			}
 		}
 
@@ -208,15 +212,15 @@ namespace DarknessMinion
 				else col = Color.white;
 				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
 				//dir.SetDebugLocation(this.transform.position);
-				dir.SetDebugText(string.Format("CV: {0}", dir.combinedWeight));
+				//dir.SetDebugText(string.Format("CV: {0}", dir.combinedWeight));
 			}
 		}
 	#endif
 
 		private bool WithinAttackZone()
-        {
+		{
 			return darkAttackZone.InTheZone(ConvertToVec2(transform.position));
-        }
+		}
 
 		private class DirectionNode
 		{
@@ -243,7 +247,7 @@ namespace DarknessMinion
 				directionAtAngle = v; 
 			}
 
-			public void CreateDebugText(Vector3 location, Transform parent)
+			/*public void CreateDebugText(Vector3 location, Transform parent)
 			{
 				GameObject gObject = new GameObject("DebugText");
 				gObject.AddComponent<TextMesh>();
@@ -251,7 +255,7 @@ namespace DarknessMinion
 				gObject.transform.parent = parent;
 				debugText.gameObject.transform.position = directionAtAngle + parent.position;
 				debugText.gameObject.transform.RotateAround(parent.position, Vector3.up, degAngle);
-			}
+			}*/
 
 			public void SetDebugText(string text)
 			{
