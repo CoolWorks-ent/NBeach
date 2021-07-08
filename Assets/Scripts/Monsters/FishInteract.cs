@@ -8,6 +8,7 @@ public class FishInteract : MonoBehaviour {
 
     Vector3 fishLocalPos;
     bool move_wPlayer;
+    bool touched;
     GameObject player;
     PlayerController pController;
     Vector3 playerDiff;
@@ -61,10 +62,11 @@ public class FishInteract : MonoBehaviour {
     public void OnTouch()
     {
         //if fish not already moving with player, start moving with player
-        if (move_wPlayer == false)
+        if (move_wPlayer == false && touched == false)
         {
             StartCoroutine(fishCaptureAnim());
             m_InteractiveItem.enabled = false;
+            touched = true;
         }
     }
 
@@ -93,10 +95,11 @@ public class FishInteract : MonoBehaviour {
         if (other.tag == "PlayerCube") //check if fish is also "onScreen"
         {
             //if fish not already moving with player, start moving with player
-            if (move_wPlayer == false)
+            if (move_wPlayer == false && touched == false)
             {
                 StartCoroutine(fishCaptureAnim());
                 m_InteractiveItem.enabled = false;
+                touched = true;
             }
             
         }
