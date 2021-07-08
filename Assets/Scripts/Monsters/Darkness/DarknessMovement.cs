@@ -13,6 +13,7 @@ namespace DarknessMinion
 		[HideInInspector]
 		public float playerDist { get; private set; }
 
+
 		[HideInInspector]
 		public Transform player;
 
@@ -26,10 +27,13 @@ namespace DarknessMinion
 		private int bestDirectionIndex;
 
 		[SerializeField,Range(0, 10)]
-		private int pathSetDistance;
+		private float pathSetDistance;
+
+		//TODO Create another variable for editing the distance at which the path ahead is checked. Or maybe look into the values currently available and see if tweaks can make the behavior better
+		//At some point I need to make the path shorter if the set path goes past the player 
 
 		[SerializeField, Range(0, 10)]
-		private float movementCheckDistance;
+		private float higherPrecisionAvoidanceThreshold;
 
 		//private Vector3 pointToHighlyAvoid;
 
@@ -86,9 +90,8 @@ namespace DarknessMinion
 
 		public Vector3 PlayerDirection(bool moving)
 		{
-			if (moving)
+			if (moving && darkAttackZone != null)
 			{
-				//TODO: Fix this, check if attackZoneNavTarget is valid
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
 				else return (attackZoneNavTarget.navPosition - transform.position).normalized;
@@ -187,7 +190,7 @@ namespace DarknessMinion
 
 		private float CalculationDistance(float distance)
 		{
-			if (distance <= movementCheckDistance)
+			if (distance < higherPrecisionAvoidanceThreshold)
 				return pathSetDistance / 2;
 			else return pathSetDistance;
 		}
@@ -216,11 +219,6 @@ namespace DarknessMinion
 			}
 		}
 	#endif
-
-		private bool WithinAttackZone()
-		{
-			return darkAttackZone.InTheZone(ConvertToVec2(transform.position));
-		}
 
 		private class DirectionNode
 		{
