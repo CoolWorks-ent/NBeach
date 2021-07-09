@@ -200,7 +200,7 @@ namespace DarknessMinion
 		void OnDrawGizmosSelected()
 		{
 			Color col = Color.red;
-			//Gizmos.DrawCube(attackZoneNavTarget, Vector3.one*0.5f);
+			Vector3 lineStart, lineEnd;
 
 			foreach (DirectionNode dir in directionNodes)
 			{
@@ -213,9 +213,9 @@ namespace DarknessMinion
 				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					col = Color.magenta;
 				else col = Color.white;
-				Debug.DrawLine(this.transform.position + dir.directionAtAngle * (dir.combinedWeight * 2.9f), dir.directionAtAngle + this.transform.position, col);
-				//dir.SetDebugLocation(this.transform.position);
-				//dir.SetDebugText(string.Format("CV: {0}", dir.combinedWeight));
+				lineStart = this.transform.position + dir.directionAtAngle;
+				lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
+				Debug.DrawLine(lineStart, lineEnd, col);
 			}
 		}
 	#endif
@@ -244,16 +244,6 @@ namespace DarknessMinion
 			{ 
 				directionAtAngle = v; 
 			}
-
-			/*public void CreateDebugText(Vector3 location, Transform parent)
-			{
-				GameObject gObject = new GameObject("DebugText");
-				gObject.AddComponent<TextMesh>();
-				debugText = gObject.GetComponent<TextMesh>();
-				gObject.transform.parent = parent;
-				debugText.gameObject.transform.position = directionAtAngle + parent.position;
-				debugText.gameObject.transform.RotateAround(parent.position, Vector3.up, degAngle);
-			}*/
 
 			public void SetDebugText(string text)
 			{

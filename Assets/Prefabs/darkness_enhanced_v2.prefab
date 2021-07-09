@@ -963,7 +963,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   darkAttackZone: {fileID: 0}
-  pathCheckSetDistance: 2
+  pathSetDistance: 5
   higherPrecisionAvoidanceThreshold: 5
   avoidLayerMask:
     serializedVersion: 2
