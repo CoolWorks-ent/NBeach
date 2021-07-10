@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pathfinding;
+using System.Collections.Generic;
 
 namespace DarknessMinion
 {
@@ -7,15 +8,18 @@ namespace DarknessMinion
 	{
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 		public bool closeToPlayer { get; private set; }
+		public bool inAttackZone { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
-		public float navTargetDist { get; private set; }
+
 
 		[HideInInspector]
-		public NavigationTarget navTarget;
-		[HideInInspector]
-		public Transform player, playerRoot;
+		public Transform player;
+
+		public DarknessAttackZone darkAttackZone;
+
+		private NavigationTarget attackZoneNavTarget;
 
 		private AIPath pather;
 
@@ -23,15 +27,19 @@ namespace DarknessMinion
 		private int bestDirectionIndex;
 
 		[SerializeField,Range(0, 10)]
-		private int lookAheadDistance;
+		private float pathSetDistance;
+
+		//TODO Create another variable for editing the distance at which the path ahead is checked. Or maybe look into the values currently available and see if tweaks can make the behavior better
+		//At some point I need to make the path shorter if the set path goes past the player 
 
 		[SerializeField, Range(0, 10)]
-		private float movementPrecisionDistance;
+		private float higherPrecisionAvoidanceThreshold;
 
-		private Vector3 pointToHighlyAvoid;
+		//private Vector3 pointToHighlyAvoid;
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
+
 
 		void Awake()
 		{
@@ -39,29 +47,25 @@ namespace DarknessMinion
 
 			directionNodes = new DirectionNode[16];
 
-			for(int i = 1; i < directionNodes.Length+1; i++)
+			float angle, dAngle = 0;
+			for(int i = 0; i < directionNodes.Length; i++)
 			{
-				directionNodes[i-1] = new DirectionNode(Mathf.Deg2Rad * ((360 / directionNodes.Length) * i));
+				dAngle = ((360.0f / directionNodes.Length) * (float)i);
+				angle = Mathf.Deg2Rad * dAngle;
+				DirectionNode n = new DirectionNode(angle, dAngle);
+				directionNodes[i] = n;
+				//n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
 			}
 			bestDirectionIndex = 0;
-			pointToHighlyAvoid = new Vector3();
 		}
 
-		void Start()
-		{
-			DarkEventManager.UpdateDarknessDistance += DistanceEvaluation;
-			if (player)
-				playerRoot = player.root; //TODO do something with this
-		}
+		void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
+		void OnDisable() { DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation; }
+
 
 		public void DistanceEvaluation()
 		{
 			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
-			if (navTarget != null)
-			{
-				navTargetDist = Vector3.Distance(transform.position, navTarget.navPosition);
-			}
-			else navTargetDist = -1;
 		}
 
 		private Vector2 ConvertToVec2(Vector3 vector)
@@ -78,15 +82,21 @@ namespace DarknessMinion
 
 		public bool IsFacingPlayer(float minimumValue)
 		{
-			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
+			float closeness = Vector3.Dot(PlayerDirection(false), transform.forward);
 			if (closeness >= minimumValue)
 				return true;
 			else return false;
 		}
 
-		public Vector3 PlayerDirection()
+		public Vector3 PlayerDirection(bool moving)
 		{
-			return (player.position - transform.position).normalized;
+			if (moving && darkAttackZone != null)
+			{
+				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
+					return (player.position - transform.position).normalized;
+				else return (attackZoneNavTarget.navPosition - transform.position).normalized;
+			}
+			else return (player.position - transform.position).normalized; 
 		}
 
 		public void StopMovement()
@@ -97,13 +107,11 @@ namespace DarknessMinion
 
 		public void StartMovement()
 		{
+			darkAttackZone = DarknessAttackZone.Instance;
+
+			attackZoneNavTarget = darkAttackZone.RequestPointInsideZone(transform.position.y);
 			pather.canMove = true;
 			pather.canSearch = true;
-		}
-
-		public void UpdateHighAvoidancePoint(Vector3 point)
-		{
-			pointToHighlyAvoid = point;
 		}
 
 		/*Add functions for applying steering behaviors
@@ -151,7 +159,7 @@ namespace DarknessMinion
 
 		private void SeekLayer(DirectionNode dNode)
 		{
-			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection());
+			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection(true));
 
 			if (dotValue > 0)
 				dNode.seekWeight = dotValue;
@@ -164,46 +172,37 @@ namespace DarknessMinion
 		{
 			dNode.avoidWeight = 0;
 			RaycastHit rayHit;
-			float dotValue;
-
-			if (pointToHighlyAvoid != Vector3.zero)
-			{
-				float avoidancePointDistance = Vector3.Distance(transform.position, pointToHighlyAvoid);
-				if (avoidancePointDistance <= lookAheadDistance) //CalculationDistance(avoidancePointDistance))
-				{
-					float localAvoidanceDotValue = LocalAvoidanceDotValue(dNode.directionAtAngle);
-					if (localAvoidanceDotValue >= 0.7f)
-						dNode.avoidWeight += -0.8f;
-				}
-			}
+			float dotValue, distanceNorm;
 
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
+				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position) / 10.5f;
 				if (dotValue >= 0.6f)
 					dNode.avoidWeight += -1;
 				else if (dotValue <= 0.6f && dotValue > 0)
 					dNode.avoidWeight += -0.5f;
+
+				if (distanceNorm > 0.2f)
+					dNode.avoidWeight -= distanceNorm;
 			}
 		}
 
 		private float CalculationDistance(float distance)
 		{
-			if (distance <= movementPrecisionDistance)
-				return lookAheadDistance / 2;
-			else return lookAheadDistance;
+			if (distance < higherPrecisionAvoidanceThreshold)
+				return pathSetDistance / 2;
+			else return pathSetDistance;
 		}
 
-		private float LocalAvoidanceDotValue(Vector3 direction)
-		{
-			return Vector3.Dot(direction, pointToHighlyAvoid.normalized);
-		}
 
-		void OnDrawGizmos()
+	#if UNITY_EDITOR
+		void OnDrawGizmosSelected()
 		{
 			Color col = Color.red;
+			Vector3 lineStart, lineEnd;
 
-			foreach(DirectionNode dir in directionNodes)
+			foreach (DirectionNode dir in directionNodes)
 			{
 				if (dir.combinedWeight > 0.9f)
 					col = Color.green;
@@ -214,28 +213,28 @@ namespace DarknessMinion
 				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					col = Color.magenta;
 				else col = Color.white;
-				Debug.DrawLine(this.transform.position + dir.directionAtAngle * 2.9f, dir.directionAtAngle + this.transform.position, col);
+				lineStart = this.transform.position + dir.directionAtAngle;
+				lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
+				Debug.DrawLine(lineStart, lineEnd, col);
 			}
-
-			//Gizmos.DrawSphere(directionNodes[bestDirectionIndex].directionAtAngle * 5 + this.transform.position, 2);
 		}
-
-		void OnDestroy()
-		{
-			DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
-		}
+	#endif
 
 		private class DirectionNode
 		{
 			public float angle { get; private set; }
-			public float avoidWeight, seekWeight, baseWeight;
+			public float degAngle { get; private set; }
+			public float avoidWeight, seekWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
 			public Vector3 directionAtAngle { get; private set; }
 
-			public DirectionNode(float dAngle)
+			public TextMesh debugText {get; private set;}
+
+			public DirectionNode(float rAngle, float dAngle)
 			{
-				angle = dAngle;
+				angle = rAngle;
+				degAngle = dAngle;
 				avoidWeight = 0;
 				seekWeight = 0;
 				directionAtAngle = Vector3.zero;
@@ -244,6 +243,11 @@ namespace DarknessMinion
 			public void SetDirection(Vector3 v)
 			{ 
 				directionAtAngle = v; 
+			}
+
+			public void SetDebugText(string text)
+			{
+				debugText.text = text;
 			}
 		}
 	}

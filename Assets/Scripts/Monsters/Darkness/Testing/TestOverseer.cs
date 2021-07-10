@@ -12,7 +12,6 @@ namespace DarknessMinion
 		public bool showDebugInfo;
 
 		[Header("Debug Info to Show")]
-		public bool targetInfo;
 		public bool agroRating;
 		public bool stateInfo;
 		public bool locationInfo;
@@ -49,7 +48,7 @@ namespace DarknessMinion
 		{
 			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
 			{
-				dark.UpdateDebugMessage(targetInfo, agroRating, stateInfo, locationInfo, cooldownInfo);
+				dark.UpdateDebugMessage(agroRating, stateInfo, locationInfo, cooldownInfo);
 			}
 		}
 

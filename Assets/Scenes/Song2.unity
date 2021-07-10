@@ -85501,6 +85501,16 @@ Prefab:
       propertyPath: playerLocation
       value: 
       objectReference: {fileID: 957796667}
+    - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZoneRadius
+      value: 4.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZoneOffset
+      value: 3.42
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0

@@ -944,11 +944,10 @@ MonoBehaviour:
   movement: {fileID: 0}
   darkHitBox: {fileID: 0}
   textMesh: {fileID: 102784145251410432}
-  updateStates: 0
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
-  attackRange: 2.44
+  attackRange: 2.6
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114621632964799650
@@ -962,14 +961,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e4cdb5e9ea006043abeeae236ba6fd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steeringMap: []
-  navTarget:
-    position: {x: 0, y: 0, z: 0}
-    positionOffset: {x: 0, y: 0, z: 0}
   player: {fileID: 0}
-  playerRoot: {fileID: 0}
-  lookAheadDistance: 7
-  movementPrecisionDistance: 6
+  darkAttackZone: {fileID: 0}
+  pathSetDistance: 5
+  higherPrecisionAvoidanceThreshold: 5
   avoidLayerMask:
     serializedVersion: 2
     m_Bits: 139264
@@ -990,7 +985,7 @@ MonoBehaviour:
   repathRate: 1
   canSearch: 1
   canMove: 1
-  maxSpeed: 1.5
+  maxSpeed: 1.85
   gravity: {x: NaN, y: NaN, z: NaN}
   groundMask:
     serializedVersion: 2

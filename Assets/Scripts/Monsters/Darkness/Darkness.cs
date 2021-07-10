@@ -25,8 +25,6 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public TextMesh textMesh;
-		public bool updateStates;//, attacked;
-
 		public LayerMask playerMask;
 		[HideInInspector]
 		public RaycastHit rayHitInfo;
@@ -50,10 +48,12 @@ namespace DarknessMinion
 		void Awake()
 		{
 			creationID = 0;
-			updateStates = true;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
 			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
 		}
+
+		void OnEnable() { DarkEventManager.UpdateDarknessStates += UpdateStates; }
+		void OnDisable() { DarkEventManager.UpdateDarknessStates -= UpdateStates; }
 
 		void Start()
 		{
@@ -68,7 +68,6 @@ namespace DarknessMinion
 			previousState  = currentState;
 			darkHitBox.enabled = false;
 			DarkEventManager.OnDarknessAdded(this);
-			DarkEventManager.UpdateDarknessStates += UpdateStates;
 			currentState.InitializeState(this);
 		}
 
@@ -131,7 +130,7 @@ namespace DarknessMinion
 
 		public bool IsAnimationPlaying(DarkAnimationStates anim)
 		{
-			Debug.LogWarning("Animator is playing: " + animeController.GetCurrentAnimatorClipInfo(0)[0].clip.name);
+			//Debug.LogWarning("Animator is playing: " + animeController.GetCurrentAnimatorClipInfo(0)[0].clip.name);
 			return animeController.GetCurrentAnimatorStateInfo(0).IsName(anim.ToString());
 		}
 
@@ -207,23 +206,16 @@ namespace DarknessMinion
 			ChangeState(deathState);
 		}
 
-		private void OnDestroy()
-		{
-			DarkEventManager.UpdateDarknessStates -= UpdateStates;
-		}
 
-
-		public void UpdateDebugMessage(bool showTargetData, bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
+		public void UpdateDebugMessage(bool showAggresionRating, bool showStateInfo, bool showLocationInfo, bool showCooldownInfo)
 		{
 			debugMessage = "";
-			if(showTargetData && movement.navTarget != null)
-				debugMessage += String.Format("<b>NavTarget:</b> Tag = {0} Position = {1} \n" +"<b>NavTarget Distance:</b> {2} \n", movement.navTarget.navTargetTag, movement.navTarget.navPosition);
 			if(showAggresionRating)
 				debugMessage += String.Format("\n <b>Aggression Rating:</b> {0}", agRatingCurrent.ToString());
 			if(showStateInfo)
 				debugMessage += String.Format("\n <b>Current State:</b> {0} \n" + "Previous State: {1} \n", currentState.ToString(), previousState.ToString());
 			if(showLocationInfo)	
-				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>NavTarget Distance:</b> {1} \n" + "<b>Darkness Position:</b> {2}", movement.playerDist, movement.navTargetDist, this.transform.position);
+				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>Darkness Position:</b> {1}", movement.playerDist, this.transform.position);
 			if(showCooldownInfo)
 				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
 			textMesh.text = debugMessage;

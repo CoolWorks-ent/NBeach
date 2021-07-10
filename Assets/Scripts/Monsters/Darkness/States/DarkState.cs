@@ -14,7 +14,6 @@ namespace DarknessMinion
 
 		public void SortTransitionsByPriority()
 		{
-			//DarkEventManager.RemoveDarkness += RemoveDarkness;
 			if(transitions != null || transitions.Count() > 0)
 				Array.Sort(transitions, ((t, p) => {return t.priorityLevel.CompareTo(p.priorityLevel);}));
 		}
@@ -33,7 +32,7 @@ namespace DarknessMinion
 		}
 
 		public abstract void InitializeState(Darkness darkController);
-		public abstract void UpdateState(Darkness darkController);
+		public virtual void UpdateState(Darkness darkController){ }
 		public virtual void ExitState(Darkness darkController)
 		{
 			darkController.ClearCooldowns();
