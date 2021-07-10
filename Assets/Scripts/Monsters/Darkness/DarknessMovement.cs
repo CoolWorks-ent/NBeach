@@ -7,8 +7,6 @@ namespace DarknessMinion
 	public class DarknessMovement : MonoBehaviour
 	{
 		public bool reachedEndofPath { get { return pather.reachedDestination; } }
-		public bool closeToPlayer { get; private set; }
-		public bool inAttackZone { get; private set; }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
@@ -174,7 +172,7 @@ namespace DarknessMinion
 			RaycastHit rayHit;
 			float dotValue, distanceNorm;
 
-			if (Physics.SphereCast(transform.position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
+			if (Physics.SphereCast(transform.position + dNode.directionAtAngle, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
 				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position) / 10.5f;

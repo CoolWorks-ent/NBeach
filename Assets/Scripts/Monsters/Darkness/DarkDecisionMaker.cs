@@ -21,7 +21,6 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.AttackOnCooldown, AttackOnCooldownCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
-            Decisions.Add(DecisionName.CloseToPlayer, CloseToPlayer);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -37,11 +36,6 @@ namespace DarknessMinion
                 Debug.LogError("Key not found in DarkDecisionMaker: " + dName.ToString() + "Resulting in this error " + k);
                 return false;
             }
-        }
-
-        private bool CloseToPlayer(Darkness controller)
-        {
-            return controller.movement.closeToPlayer;
         }
 
         private bool IdleOnCooldownCheck(Darkness controller)

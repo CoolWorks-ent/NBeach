@@ -85504,12 +85504,17 @@ Prefab:
     - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: attackZoneRadius
-      value: 4.1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: attackZoneOffset
-      value: 3.42
+      value: 3.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: debugRoof
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}

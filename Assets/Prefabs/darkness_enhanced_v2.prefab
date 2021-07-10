@@ -947,7 +947,7 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
-  attackRange: 2.6
+  attackRange: 2.93
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114621632964799650
@@ -964,7 +964,7 @@ MonoBehaviour:
   player: {fileID: 0}
   darkAttackZone: {fileID: 0}
   pathSetDistance: 5
-  higherPrecisionAvoidanceThreshold: 5
+  higherPrecisionAvoidanceThreshold: 2.5
   avoidLayerMask:
     serializedVersion: 2
     m_Bits: 139264
