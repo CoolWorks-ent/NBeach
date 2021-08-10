@@ -157,7 +157,9 @@ namespace DarknessMinion
 
 		private void SeekLayer(DirectionNode dNode)
 		{
-			float dotValue = Vector3.Dot(dNode.directionAtAngle, PlayerDirection(true));
+			Vector3 direction = PlayerDirection(true);
+			float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
+			dNode.SetDirLength(direction.magnitude);
 
 			if (dotValue > 0)
 				dNode.seekWeight = dotValue;
@@ -225,6 +227,8 @@ namespace DarknessMinion
 			public float avoidWeight, seekWeight;
 			public float combinedWeight { get { return avoidWeight + seekWeight; } }
 
+			public float dirLength { get; private set; }
+
 			public Vector3 directionAtAngle { get; private set; }
 
 			public TextMesh debugText {get; private set;}
@@ -236,11 +240,17 @@ namespace DarknessMinion
 				avoidWeight = 0;
 				seekWeight = 0;
 				directionAtAngle = Vector3.zero;
+				dirLength = 0;
 			}
 
 			public void SetDirection(Vector3 v)
 			{ 
 				directionAtAngle = v; 
+			}
+
+			public void SetDirLength(float v)
+			{
+				dirLength = v;
 			}
 
 			public void SetDebugText(string text)

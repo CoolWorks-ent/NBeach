@@ -85516,9 +85516,44 @@ Prefab:
       propertyPath: debugRoof
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114012107853173088, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1558075753 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1087406834434032, guid: 74415f1810594ff4da1d95f640b30f8d,
+    type: 2}
+  m_PrefabInternal: {fileID: 1558075752}
+--- !u!114 &1558075754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1558075753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33ef492365ff0aa408129e9a48c7310c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 2059134424}
+  darknessAttackZones:
+  - attackZoneOrigin: {x: 195.11, y: 45.679996, z: 99.47}
+    attackZoneRadius: 1.83
+    attackZoneOffsetForward: 1.1
+    attackZoneOffsetRight: -3.7
+  - attackZoneOrigin: {x: 189.21, y: 45.679996, z: 95.57}
+    attackZoneRadius: 2.46
+    attackZoneOffsetForward: 5
+    attackZoneOffsetRight: 2.2
+  - attackZoneOrigin: {x: 192.41, y: 45.679996, z: 97.37}
+    attackZoneRadius: 2.14
+    attackZoneOffsetForward: 3.2
+    attackZoneOffsetRight: -1
+  - attackZoneOrigin: {x: 188.91, y: 45.679996, z: 98.97}
+    attackZoneRadius: 1.83
+    attackZoneOffsetForward: 1.6
+    attackZoneOffsetRight: 2.5
 --- !u!1001 &1570221242
 Prefab:
   m_ObjectHideFlags: 0

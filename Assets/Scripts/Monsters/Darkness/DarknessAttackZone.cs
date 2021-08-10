@@ -4,18 +4,16 @@ using UnityEngine;
 
 namespace DarknessMinion
 {
-	[ExecuteInEditMode]
-	public class DarknessAttackZone : MonoBehaviour
+	[System.Serializable]
+	public class DarknessAttackZone
 	{
-		private Vector3 attackZoneOrigin;
+		public Vector3 attackZoneOrigin;
 
 		[SerializeField, Range(0, 5)]
-		private float attackZoneRadius;
-		[SerializeField, Range(0, 4)]
-		private float attackZoneOffset;
-
-		[SerializeField]
-		private Transform playerRotationFacing, playerLocation;
+		public float attackZoneRadius;
+		[SerializeField, Range(-5, 5)]
+		public float attackZoneOffsetForward, attackZoneOffsetRight;
+		private Transform playerLocation;
 
 		public static DarknessAttackZone Instance { get; private set; }
 
@@ -24,24 +22,15 @@ namespace DarknessMinion
 		//The center of the zone is x units in front of the player container's forward vector.
 		//This should rotate the attack zone based on what should be their ideal position
 
-		void Awake()
-        {
-			if (Instance != null && !Instance.gameObject.CompareTag("AI Manager"))
-			{
-				Debug.LogError("Instance of DarkAttackZone already exist in this scene");
-				//Destroy(instance.gameObject.GetComponent<AI_Manager>());
-			}
-			Instance = this;
-        }
-
-		void Start()
+		public void SetParameters(Vector3 origin, Transform player)
 		{
-			attackZoneOrigin = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
+			playerLocation = player;
+			attackZoneOrigin = playerLocation.position + playerLocation.forward * attackZoneOffsetForward + playerLocation.right * attackZoneOffsetRight;
 		}
 
-		void LateUpdate()
+		public void ZoneUpdate()
 		{
-			attackZoneOrigin = playerLocation.position + playerRotationFacing.forward * attackZoneOffset;
+			attackZoneOrigin = playerLocation.position + playerLocation.forward * attackZoneOffsetForward + playerLocation.right * attackZoneOffsetRight;
 			DarkEventManager.OnUpdateZoneLocation(attackZoneOrigin);
 		}
 
@@ -59,12 +48,6 @@ namespace DarknessMinion
 
 
 
-		#if UNITY_EDITOR
-		void OnDrawGizmosSelected()
-		{
-			UnityEditor.Handles.color = Color.green;
-			UnityEditor.Handles.DrawWireDisc(attackZoneOrigin, Vector3.up, attackZoneRadius);
-		}
-		#endif
+		
 	}
 }
