@@ -14,7 +14,7 @@ namespace DarknessMinion
 		public override void InitializeState(Darkness darkController)
 		{
 
-			darkController.movement.StopMovement();
+			darkController.StopMovement();
 	
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
 			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
@@ -28,7 +28,7 @@ namespace DarknessMinion
 
 		public override void MovementUpdate(Darkness darkController)
 		{
-			darkController.movement.RotateTowardsPlayer();
+			darkController.RotateTowardsPlayer();
 		}
 
 		public override void ExitState(Darkness darkController)

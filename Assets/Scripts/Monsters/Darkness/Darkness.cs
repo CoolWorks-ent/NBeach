@@ -18,7 +18,7 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		public DarknessMovement movement;
+		public Transform player;
 
 		[HideInInspector]
 		public Collider darkHitBox;
@@ -33,6 +33,8 @@ namespace DarknessMinion
 
 		[SerializeField, Range(0, 5)]
 		private float attackRange;
+
+		private DarknessMovement movement;
 
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
@@ -69,6 +71,7 @@ namespace DarknessMinion
 			darkHitBox.enabled = false;
 			DarkEventManager.OnDarknessAdded(this);
 			currentState.InitializeState(this);
+			movement.player = player;
 		}
 
 		void FixedUpdate()
@@ -169,6 +172,45 @@ namespace DarknessMinion
 			attackRange = atkValue;
 		}
 
+		public float PlayerDistance()
+		{
+			if(movement)
+				return movement.playerDist;
+			return -1;
+		}
+
+
+		public void StopMovement()
+		{
+			if(movement)
+				movement.StopMovement();
+		}
+
+		public void RotateTowardsPlayer()
+		{
+			if(movement)
+				movement.RotateTowardsPlayer();
+		}
+
+		public bool IsFacingPlayer(float v)
+		{
+			if(movement)
+				return movement.IsFacingPlayer(v);
+			return false;
+		}	
+
+		public void UpdatePathDestination()
+		{
+			if(movement)
+				movement.UpdatePathDestination();
+		}
+
+		public void StartMovement()
+		{
+			if(movement)
+				movement.StartMovement();
+		}
+
 		private void UpdateCooldownTimers()
 		{
 			List<CooldownInfo.CooldownStatus> deletedEntries = new List<CooldownInfo.CooldownStatus>();
@@ -226,34 +268,11 @@ namespace DarknessMinion
 			textMesh.gameObject.SetActive(active);
 		}
 
+	#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
 			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, Color.red, 0.01f);
-			/*if(navTarget != null)
-            {
-				switch (navTarget.navTargetTag)
-				{
-					case NavigationTarget.NavTargetTag.Attack:
-						Gizmos.color = Color.red; //new Color(1f, 0.43f, 0.24f);
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
-
-						Gizmos.color = Color.white;
-						Gizmos.DrawSphere(navTarget.srcPosition, 2);
-						break;
-					case NavigationTarget.NavTargetTag.AttackStandby:
-						Gizmos.color = Color.yellow;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1.5f);
-						break;
-					case NavigationTarget.NavTargetTag.Neutral:
-						Gizmos.color = Color.white;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
-						break;
-					case NavigationTarget.NavTargetTag.Patrol:
-						Gizmos.color = Color.cyan;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
-						break;
-				}
-			}*/
         }
+	#endif
 	}
 }

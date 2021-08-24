@@ -1,6 +1,5 @@
 using UnityEngine;
 using Pathfinding;
-using System.Collections.Generic;
 
 namespace DarknessMinion
 {
@@ -15,7 +14,7 @@ namespace DarknessMinion
 		[HideInInspector]
 		public Transform player;
 
-		public DarknessAttackZone darkAttackZone;
+		public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
 
 		private NavigationTarget attackZoneNavTarget;
 
@@ -105,7 +104,6 @@ namespace DarknessMinion
 
 		public void StartMovement()
 		{
-			darkAttackZone = DarknessAttackZone.Instance;
 
 			attackZoneNavTarget = darkAttackZone.RequestPointInsideZone(transform.position.y);
 			pather.canMove = true;

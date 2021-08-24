@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DarknessMinion
 {
 	[System.Serializable]
-	public class DarknessAttackZone
+	public class AttackZone
 	{
 		public Vector3 attackZoneOrigin;
 
@@ -14,8 +14,6 @@ namespace DarknessMinion
 		[SerializeField, Range(-5, 5)]
 		public float attackZoneOffsetForward, attackZoneOffsetRight;
 		private Transform playerLocation;
-
-		public static DarknessAttackZone Instance { get; private set; }
 
 
 		//Have a zone offset towards the front of the player.
@@ -45,9 +43,5 @@ namespace DarknessMinion
         {
 			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);
 		}
-
-
-
-		
 	}
 }

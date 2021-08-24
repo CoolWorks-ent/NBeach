@@ -1,42 +1,37 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace  DarknessMinion
 {
 	[ExecuteInEditMode]
-	public class DarknessAttackZoneManager : MonoBehaviour 
+	public class AttackZoneManager : MonoBehaviour 
 	{
-		[SerializeField]
-		private Transform player;
+		//Collection of AttackZones. Updates zone locations. Provides a valid zone target
 
 		[SerializeField]
-		private DarknessAttackZone[] darknessAttackZones;
-
+		private AttackZone[] darknessAttackZones;
+		
+		[SerializeField]
+		private Transform playerTransform;
+		
 		void Awake()
 		{
 			if(darknessAttackZones.Length <= 0)
-				darknessAttackZones = new DarknessAttackZone[4];
-			
-			foreach(DarknessAttackZone dTZ in darknessAttackZones)
+				darknessAttackZones = new AttackZone[4];
+			foreach(AttackZone dTZ in darknessAttackZones)
 			{
-				dTZ.SetParameters(Vector3.zero, player);
+				if(!playerTransform)
+				{
+					dTZ.SetParameters(Vector3.zero, DarknessManager.Instance.playerTransform);
+				}
+				else dTZ.SetParameters(Vector3.zero, playerTransform);
 			}
-			
-		}
-		// Use this for initialization
-		void Start () {
-			
-		}
-		
-		// Update is called once per frame
-		void Update () {
-			
 		}
 
 		public void LateUpdate()
 		{
-			foreach(DarknessAttackZone dTZ in darknessAttackZones)
+			foreach(AttackZone dTZ in darknessAttackZones)
 			{
 				dTZ.ZoneUpdate();
 			}
@@ -50,7 +45,8 @@ namespace  DarknessMinion
 			if(darknessAttackZones.Length > 0)
 			{
 				UnityEditor.Handles.color = Color.green;
-				foreach(DarknessAttackZone dTZ in darknessAttackZones)
+
+				foreach(AttackZone dTZ in darknessAttackZones)
 				{
 					dTZ.ZoneUpdate();
 					UnityEditor.Handles.DrawWireDisc(dTZ.attackZoneOrigin, Vector3.up, dTZ.attackZoneRadius);

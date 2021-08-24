@@ -7,6 +7,9 @@ namespace DarknessMinion
 {
 	public class DarknessManager : MonoBehaviour
 	{
+		/* 
+		*	Contains references to all Darkness. Approves them for attacking based on distance. Provides attack target when attacking
+		*/
 		public Transform playerTransform { get { return player; } }
 		public Vector3 playerVector { get { return player.position; } }
 		public Dictionary<int, Darkness> ActiveDarkness;
@@ -112,7 +115,7 @@ namespace DarknessMinion
 		{
 			attackApprovalPriority.Sort(delegate (int a, int b)
 			{
-				return ActiveDarkness[a].movement.playerDist.CompareTo(ActiveDarkness[b].movement.playerDist);
+				return ActiveDarkness[a].PlayerDistance().CompareTo(ActiveDarkness[b].PlayerDistance());
 			});
 		}
 		#endregion
@@ -128,7 +131,7 @@ namespace DarknessMinion
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);
-			updatedDarkness.movement.player = player;
+			updatedDarkness.player = player;
 			Vector3 pDir = player.position - updatedDarkness.transform.position;
 			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
 		}

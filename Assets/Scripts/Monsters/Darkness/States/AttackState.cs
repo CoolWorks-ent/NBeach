@@ -9,7 +9,7 @@ namespace DarknessMinion
 
         public override void InitializeState(Darkness darkController)
         {   
-            darkController.movement.StopMovement();
+            darkController.StopMovement();
             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
         }
 
@@ -22,7 +22,7 @@ namespace DarknessMinion
         {
             if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) 
             {
-                if(darkController.movement.IsFacingPlayer(0.8f))
+                if(darkController.IsFacingPlayer(0.8f))
                 {
                     if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
@@ -31,7 +31,7 @@ namespace DarknessMinion
                         darkController.darkHitBox.enabled = true;
                     }
                 }
-                else darkController.movement.RotateTowardsPlayer();
+                else darkController.RotateTowardsPlayer();
             }
         }
 
@@ -43,7 +43,7 @@ namespace DarknessMinion
         protected override void CooldownCallback(Darkness darkController)
         {
             darkController.darkHitBox.enabled = false;
-            darkController.movement.StopMovement();
+            darkController.StopMovement();
         }
     }
 }
