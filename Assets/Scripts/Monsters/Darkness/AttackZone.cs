@@ -1,6 +1,5 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace DarknessMinion
 {
@@ -15,10 +14,16 @@ namespace DarknessMinion
 		public float attackZoneOffsetForward, attackZoneOffsetRight;
 		private Transform playerLocation;
 
+		public HashSet<int> OccupiedIDs;
 
 		//Have a zone offset towards the front of the player.
 		//The center of the zone is x units in front of the player container's forward vector.
 		//This should rotate the attack zone based on what should be their ideal position
+
+		public AttackZone()
+		{
+			OccupiedIDs = new HashSet<int>();
+		}
 
 		public void SetParameters(Vector3 origin, Transform player)
 		{

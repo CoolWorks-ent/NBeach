@@ -23,6 +23,8 @@ namespace DarknessMinion
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;
 
+		public AttackZoneManager atkZoneManager;
+
 		private float calculationTime;
 		private bool paused;
 
@@ -48,6 +50,7 @@ namespace DarknessMinion
 			paused = false;
 			calculationTime = 0.5f;
 			//attackOffset = 2.75f;
+			atkZoneManager = GetComponent<AttackZoneManager>();
 
 			StartCoroutine(ManagedDarknessUpdate());
 		}

@@ -85533,27 +85533,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558075753}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33ef492365ff0aa408129e9a48c7310c, type: 3}
+  m_Script: {fileID: 11500000, guid: bf7ea57210055814292f7964e591f771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 2059134424}
   darknessAttackZones:
-  - attackZoneOrigin: {x: 195.11, y: 45.679996, z: 99.47}
-    attackZoneRadius: 1.83
-    attackZoneOffsetForward: 1.1
-    attackZoneOffsetRight: -3.7
-  - attackZoneOrigin: {x: 189.21, y: 45.679996, z: 95.57}
-    attackZoneRadius: 2.46
-    attackZoneOffsetForward: 5
-    attackZoneOffsetRight: 2.2
-  - attackZoneOrigin: {x: 192.41, y: 45.679996, z: 97.37}
-    attackZoneRadius: 2.14
-    attackZoneOffsetForward: 3.2
-    attackZoneOffsetRight: -1
-  - attackZoneOrigin: {x: 188.91, y: 45.679996, z: 98.97}
-    attackZoneRadius: 1.83
-    attackZoneOffsetForward: 1.6
-    attackZoneOffsetRight: 2.5
+  - attackZoneOrigin: {x: 190.91, y: 45.679996, z: 97.67}
+    attackZoneRadius: 4.36
+    attackZoneOffsetForward: 2.9
+    attackZoneOffsetRight: 0.5
+  - attackZoneOrigin: {x: 188.51001, y: 45.679996, z: 98.17}
+    attackZoneRadius: 5
+    attackZoneOffsetForward: 2.4
+    attackZoneOffsetRight: 2.9
+  - attackZoneOrigin: {x: 193.51001, y: 45.679996, z: 96.87}
+    attackZoneRadius: 5
+    attackZoneOffsetForward: 3.7
+    attackZoneOffsetRight: -2.1
+  - attackZoneOrigin: {x: 191.41, y: 45.679996, z: 99.97}
+    attackZoneRadius: 2.78
+    attackZoneOffsetForward: 0.6
+    attackZoneOffsetRight: 0
+  playerTransform: {fileID: 2059134424}
 --- !u!1001 &1570221242
 Prefab:
   m_ObjectHideFlags: 0

@@ -105,7 +105,7 @@ namespace DarknessMinion
 		public void StartMovement()
 		{
 
-			attackZoneNavTarget = darkAttackZone.RequestPointInsideZone(transform.position.y);
+			//attackZoneNavTarget = 
 			pather.canMove = true;
 			pather.canSearch = true;
 		}
