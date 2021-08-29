@@ -60,6 +60,7 @@ namespace DarknessMinion
 		void Start()
 		{
 			movement = GetComponent<DarknessMovement>();
+			movement.darkness = this;
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			animTriggerAttack =	Animator.StringToHash("Attack");

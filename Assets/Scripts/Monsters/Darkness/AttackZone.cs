@@ -37,13 +37,6 @@ namespace DarknessMinion
 			DarkEventManager.OnUpdateZoneLocation(attackZoneOrigin);
 		}
 
-		public bool InTheZone(Vector2 location)
-        {
-			if (Vector2.Distance(new Vector2(attackZoneOrigin.x, attackZoneOrigin.z), location) < attackZoneRadius)
-				return true;
-			return false;
-        }
-
 		public NavigationTarget RequestPointInsideZone(float height)
         {
 			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);

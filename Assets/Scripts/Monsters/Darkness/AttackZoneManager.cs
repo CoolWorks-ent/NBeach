@@ -18,6 +18,7 @@ namespace  DarknessMinion
 		[SerializeField]
 		private LayerMask avoidanceMask;
 		
+		
 		void Awake()
 		{
 			if(attackZones.Length <= 0)
@@ -47,12 +48,10 @@ namespace  DarknessMinion
 			//get a zone that is least occupied
 			for(int i = attackZones.Length-1; i > 0; i--)
 			{
-				if(!attackZones[i].OccupiedIDs.Contains(iD))
-					continue;
-				else return attackZones[i].attackZoneOrigin;
+				if(attackZones[i].OccupiedIDs.Contains(iD))
+					return attackZones[i].attackZoneOrigin;
 			}
 
-			
 			while(true)
 			{
 				int t = Random.Range(0, attackZones.Length);
@@ -62,6 +61,14 @@ namespace  DarknessMinion
 				return attackZones[t].attackZoneOrigin;
 			}
 		}
+		
+		public bool InTheZone(Vector2 location, int iD)
+		{
+			Vector2 v = new Vector2(attackZones[iD].attackZoneOrigin.x, attackZones[iD].attackZoneOrigin.y);
+			if (Vector2.Distance(v, location) < attackZones[iD].attackZoneRadius)
+				return true;
+			return false;
+		}
 
 		public bool ZoneBlocked(int id)
 		{
@@ -69,9 +76,9 @@ namespace  DarknessMinion
 			if(Physics.SphereCast(attackZones[id].attackZoneOrigin, attackZones[id].attackZoneRadius * 0.8f, Vector3.zero, out hit, avoidanceMask, 0, QueryTriggerInteraction.Collide))
 				return true;
 			return false;
-		} 
+		}
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void OnDrawGizmosSelected()
 		{	
 			if(attackZones.Length > 0)

@@ -9,20 +9,22 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
-
+		[HideInInspector]
+		public Darkness darkness;
 
 		[HideInInspector]
 		public Transform player;
 
-		public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
-
-		private NavigationTarget attackZoneNavTarget;
-
-		private AIPath pather;
-
-		private DirectionNode[] directionNodes;
 		private int bestDirectionIndex;
 
+		private Vector3 destinationPoint;
+		//public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
+
+		//private NavigationTarget attackZoneNavTarget;
+
+		private AIPath pather;
+		private DirectionNode[] directionNodes;
+		
 		[SerializeField,Range(0, 10)]
 		private float pathSetDistance;
 
@@ -31,8 +33,6 @@ namespace DarknessMinion
 
 		[SerializeField, Range(0, 10)]
 		private float higherPrecisionAvoidanceThreshold;
-
-		//private Vector3 pointToHighlyAvoid;
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
@@ -43,6 +43,7 @@ namespace DarknessMinion
 			pather = GetComponent<AIPath>();
 
 			directionNodes = new DirectionNode[16];
+			destinationPoint = Vector3.zero;
 
 			float angle, dAngle = 0;
 			for(int i = 0; i < directionNodes.Length; i++)
@@ -80,14 +81,12 @@ namespace DarknessMinion
 		public bool IsFacingPlayer(float minimumValue)
 		{
 			float closeness = Vector3.Dot(PlayerDirection(false), transform.forward);
-			if (closeness >= minimumValue)
-				return true;
-			else return false;
+			return closeness >= minimumValue;
 		}
 
 		public Vector3 PlayerDirection(bool moving)
 		{
-			if (moving && darkAttackZone != null)
+			if (!moving && destinationPoint != Vector3.zero)
 			{
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
