@@ -105,11 +105,11 @@ public class PlayerController : MonoBehaviour {
         player.transform.rotation = mainCamera.transform.rotation;
 
         //Raycast from player to check for PlayerContainer Collision
-        Vector3 fwd = mainCamera.transform.TransformDirection(Vector3.forward) * 2;
+        Vector3 fwd = mainCamera.transform.TransformDirection(Vector3.forward) * 5;
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         //layer mask to only collide with PlayerOnly layer
-        int layerMask = 1 << 8;
+        int layerMask = 1 << 15;
 
         Debug.DrawRay(mainCamera.transform.position, fwd, Color.red);
         if (Physics.Raycast(mainCamera.transform.position, fwd, out hit, fwd.magnitude, layerMask))
@@ -124,6 +124,7 @@ public class PlayerController : MonoBehaviour {
                     CanMove = false;
                     insideWall = true;
                     //project vector of motion onto the plane's normal (via raycast) 
+                    //undesiredmvmtvector prevents movement along the fprward axis, to only allow the player to move up/down/left/right
                     undesiredMvmtVector = hit.normal * Vector3.Dot(mainCamera.transform.forward, hit.normal);
                     movementVector = mainCamera.transform.forward - undesiredMvmtVector;
                 }
@@ -258,9 +259,12 @@ public class PlayerController : MonoBehaviour {
                                                                              //get player's current rotation based on their starting rotation
             float curAngle = Quaternion.Angle(p_startRot, headRotation);
             float curVal = p_startRot.eulerAngles.y - headRotation.eulerAngles.y;
+            Debug.Log("y rotation: " + headRotation.eulerAngles.y);
+            Debug.Log("x rotation: " + headRotation.eulerAngles.x);
+            Debug.Log("z rotation: " + headRotation.eulerAngles.z);
 
             //if player's rotation is not behind them, allow movement in the direction they are facing.  DO NOT ALLOW BACKWARDS MOVEMENT
-            if(!(headRotation.eulerAngles.y > maxRotAngle && headRotation.eulerAngles.y < 270))
+            if (!(headRotation.eulerAngles.y > maxRotAngle && headRotation.eulerAngles.y < 270))
             {
                 //whatever player's velocity is, exert friction force onto the velocity while in water
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x * fakeFriction, rigidbody.velocity.y * fakeFriction, rigidbody.velocity.z * fakeFriction);

@@ -481,6 +481,13 @@ public class GameController : MonoBehaviour {
     }
 
     //function that contains what each event in song 1 should do
+    /**
+     * Song1 Opening
+     * "Song 1 SpeedOn" - used during the rush to the surface
+     * "Song1_pt2" - Starts the next half of the level, beginning with the wave crashing into the player
+     * Scene End
+     * 
+     */ 
     void Scene1Events(string evt)
     { 
             switch (evt)
@@ -595,8 +602,9 @@ public class GameController : MonoBehaviour {
         playerControl.CanMove = false;
         pathControl.pPathState = CamPathState.Paused;
 
-        //pause for x seconds and let player move around
-        yield return new WaitForSeconds(3);
+        //pause for x seconds and let player look around
+        //yield return new WaitForSeconds(.5f);
+
         //wave shows and hits player
         Debug.Log("Wave rushing to player");
         Color waveColor = wave.GetComponent<Renderer>().material.color;
@@ -605,21 +613,21 @@ public class GameController : MonoBehaviour {
         float fadeTime = 1f;
         //play waveincoming sound
         soundManager.PlayFoleySound(0,.8f);
-        while (time < fadeTime)
+        /*while (time < fadeTime)
         {
             wave.GetComponent<Renderer>().material.color = Color.Lerp(baseColor, new Color(waveColor.r, waveColor.g, waveColor.b, 1), time / fadeTime);
             time += Time.deltaTime;
             yield return null;
-        }
+        }*/
         Vector3 w_basePosition = wave.transform.position;
         time = 0f;
-        float waveCrashTime = 3f;
+        float waveCrashTime = 3.5f;
 
         //show left arrow to warn player to look to the left at the wave
-        uiManager.showArrow(0, wave);
+        //uiManager.showArrow(0, wave);
         //set the impact position to be slightly further from the camera
-        Vector3 crashPos = player.transform.position;
-        yield return new WaitUntil(() => wave.GetComponent<Renderer>().isVisible == true);
+        Vector3 crashPos = new Vector3(player.transform.position.x, w_basePosition.y, player.transform.position.z);
+        //yield return new WaitUntil(() => wave.GetComponent<Renderer>().isVisible == true);
         while (time < waveCrashTime)
         {
             wave.transform.position = Vector3.Lerp(w_basePosition, crashPos, time / waveCrashTime);
