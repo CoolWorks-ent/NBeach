@@ -23,8 +23,6 @@ namespace DarknessMinion
 		[SerializeField]
 		private int darknessIDCounter, darknessConcurrentAttackLimit;
 
-		public AttackZoneManager atkZoneManager;
-
 		private float calculationTime;
 		private bool paused;
 
@@ -49,8 +47,6 @@ namespace DarknessMinion
 			
 			paused = false;
 			calculationTime = 0.5f;
-			//attackOffset = 2.75f;
-			atkZoneManager = GetComponent<AttackZoneManager>();
 
 			StartCoroutine(ManagedDarknessUpdate());
 		}
@@ -85,6 +81,7 @@ namespace DarknessMinion
 					SortTheGoons();
 
 					UpdateDarknessAggresion();
+					
 					yield return new WaitForSeconds(calculationTime);
 					DarkEventManager.OnUpdateDarknessStates();
 				}
@@ -102,6 +99,7 @@ namespace DarknessMinion
 				if (i < darknessConcurrentAttackLimit)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Attacking);
+					//TODO Set attackZone on DarknessMovement, check if zone if already assigned and not blocked
 					//if (i + 1 <= attackApprovalPriority.Count - 1)
 					//	ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
 				}

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace  DarknessMinion
+namespace DarknessMinion
 {
 	[ExecuteInEditMode]
 	public class AttackZoneManager : MonoBehaviour 
@@ -18,9 +18,11 @@ namespace  DarknessMinion
 		[SerializeField]
 		private LayerMask avoidanceMask;
 		
+		public static AttackZoneManager Instance { get; private set; }
 		
 		void Awake()
 		{
+			Instance = this;
 			if(attackZones.Length <= 0)
 				attackZones = new AttackZone[4];
 			foreach(AttackZone dTZ in attackZones)
@@ -43,32 +45,37 @@ namespace  DarknessMinion
 			//check if the zone is mostly blocked. if so assign the next best zone
 		}
 
-		public Vector3 GetZoneTarget(int iD)
+		public AttackZone RequestZoneTarget(int iD)
 		{
-			//get a zone that is least occupied
 			for(int i = attackZones.Length-1; i > 0; i--)
 			{
 				if(attackZones[i].OccupiedIDs.Contains(iD))
-					return attackZones[i].attackZoneOrigin;
+				{
+					if(!ZoneBlocked(i))
+						return attackZones[i];
+					else attackZones[i].OccupiedIDs.Remove(iD);
+				}
 			}
 
-			while(true)
+			while(true) 
 			{
 				int t = Random.Range(0, attackZones.Length);
 				if(ZoneBlocked(t))
 					continue;
 				attackZones[t].OccupiedIDs.Add(iD);
-				return attackZones[t].attackZoneOrigin;
+				return attackZones[t];
+			}
+		}
+
+		public void DeAllocateZone(int iD)
+		{
+			for(int i = attackZones.Length-1; i > 0; i--)
+			{
+				if(attackZones[i].OccupiedIDs.Contains(iD))
+					attackZones[i].OccupiedIDs.Remove(iD);
 			}
 		}
 		
-		public bool InTheZone(Vector2 location, int iD)
-		{
-			Vector2 v = new Vector2(attackZones[iD].attackZoneOrigin.x, attackZones[iD].attackZoneOrigin.y);
-			if (Vector2.Distance(v, location) < attackZones[iD].attackZoneRadius)
-				return true;
-			return false;
-		}
 
 		public bool ZoneBlocked(int id)
 		{

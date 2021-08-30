@@ -10,8 +10,9 @@ namespace DarknessMinion
 
 		[SerializeField, Range(0, 5)]
 		public float attackZoneRadius;
+		
 		[SerializeField, Range(-5, 5)]
-		public float attackZoneOffsetForward, attackZoneOffsetRight;
+		private float attackZoneOffsetForward, attackZoneOffsetRight;
 		private Transform playerLocation;
 
 		public HashSet<int> OccupiedIDs;
@@ -40,6 +41,14 @@ namespace DarknessMinion
 		public NavigationTarget RequestPointInsideZone(float height)
         {
 			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);
+		}
+
+		public bool InTheZone(Vector2 location)
+		{
+			Vector2 v = new Vector2(attackZoneOrigin.x, attackZoneOrigin.y);
+			if (Vector2.Distance(v, location) < attackZoneRadius)
+				return true;
+			return false;
 		}
 	}
 }

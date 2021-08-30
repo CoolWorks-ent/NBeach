@@ -17,8 +17,7 @@ namespace DarknessMinion
 
 		private int bestDirectionIndex;
 
-		private Vector3 destinationPoint;
-		//public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
+		public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
 
 		//private NavigationTarget attackZoneNavTarget;
 
@@ -36,14 +35,13 @@ namespace DarknessMinion
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
-
+		private bool moving;
 
 		void Awake()
 		{
 			pather = GetComponent<AIPath>();
 
 			directionNodes = new DirectionNode[16];
-			destinationPoint = Vector3.zero;
 
 			float angle, dAngle = 0;
 			for(int i = 0; i < directionNodes.Length; i++)
@@ -80,33 +78,33 @@ namespace DarknessMinion
 
 		public bool IsFacingPlayer(float minimumValue)
 		{
-			float closeness = Vector3.Dot(PlayerDirection(false), transform.forward);
+			float closeness = Vector3.Dot(PlayerDirection(), transform.forward);
 			return closeness >= minimumValue;
 		}
 
-		public Vector3 PlayerDirection(bool moving)
+		public Vector3 PlayerDirection()
 		{
-			if (!moving && destinationPoint != Vector3.zero)
+			if (moving) 
 			{
 				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
 					return (player.position - transform.position).normalized;
-				else return (attackZoneNavTarget.navPosition - transform.position).normalized;
+				else return (darkAttackZone.attackZoneOrigin - transform.position).normalized;
 			}
-			else return (player.position - transform.position).normalized; 
+			else return (player.position - transform.position).normalized;
 		}
 
 		public void StopMovement()
 		{
 			pather.canSearch = false;
 			pather.canMove = false;
+			moving = false;
 		}
 
 		public void StartMovement()
 		{
-
-			//attackZoneNavTarget = 
 			pather.canMove = true;
 			pather.canSearch = true;
+			moving = true;
 		}
 
 		/*Add functions for applying steering behaviors
@@ -117,8 +115,9 @@ namespace DarknessMinion
 		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
 		*/
 
-		public void UpdatePathDestination()
+		public void UpdatePathDestination(AttackZone atkZone) //TODO Pass in an attackZone
 		{
+			darkAttackZone = atkZone;
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
 			{
@@ -154,7 +153,7 @@ namespace DarknessMinion
 
 		private void SeekLayer(DirectionNode dNode)
 		{
-			Vector3 direction = PlayerDirection(true);
+			Vector3 direction = PlayerDirection();
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
 			dNode.SetDirLength(direction.magnitude);
 
@@ -198,21 +197,25 @@ namespace DarknessMinion
 		{
 			Color col = Color.red;
 			Vector3 lineStart, lineEnd;
-
-			foreach (DirectionNode dir in directionNodes)
+			if(moving)
 			{
-				if (dir.combinedWeight > 0.9f)
-					col = Color.green;
-				else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
-					col = Color.cyan;
-				else if (dir.combinedWeight < 0.7f && dir.combinedWeight > 0.5f)
-					col = Color.yellow;
-				else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
-					col = Color.magenta;
-				else col = Color.white;
-				lineStart = this.transform.position + dir.directionAtAngle;
-				lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
-				Debug.DrawLine(lineStart, lineEnd, col);
+				Debug.DrawLine(this.transform.position, darkAttackZone.attackZoneOrigin, Color.white);
+				Debug.DrawLine(this.transform.position, pather.destination, Color.red);
+				foreach (DirectionNode dir in directionNodes)
+				{
+					if (dir.combinedWeight > 0.9f)
+						col = Color.green;
+					else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
+						col = Color.cyan;
+					else if (dir.combinedWeight < 0.7f && dir.combinedWeight > 0.5f)
+						col = Color.yellow;
+					else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
+						col = Color.magenta;
+					else col = Color.white;
+					lineStart = this.transform.position + dir.directionAtAngle;
+					lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
+					Debug.DrawLine(lineStart, lineEnd, col);
+				}
 			}
 		}
 	#endif

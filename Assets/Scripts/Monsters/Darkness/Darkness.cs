@@ -34,7 +34,7 @@ namespace DarknessMinion
 		[SerializeField, Range(0, 5)]
 		private float attackRange;
 
-		private DarknessMovement movement;
+		public DarknessMovement movement;
 
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
@@ -178,38 +178,6 @@ namespace DarknessMinion
 			if(movement)
 				return movement.playerDist;
 			return -1;
-		}
-
-
-		public void StopMovement()
-		{
-			if(movement)
-				movement.StopMovement();
-		}
-
-		public void RotateTowardsPlayer()
-		{
-			if(movement)
-				movement.RotateTowardsPlayer();
-		}
-
-		public bool IsFacingPlayer(float v)
-		{
-			if(movement)
-				return movement.IsFacingPlayer(v);
-			return false;
-		}	
-
-		public void UpdatePathDestination()
-		{
-			if(movement)
-				movement.UpdatePathDestination();
-		}
-
-		public void StartMovement()
-		{
-			if(movement)
-				movement.StartMovement();
 		}
 
 		private void UpdateCooldownTimers()

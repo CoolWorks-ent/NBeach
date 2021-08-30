@@ -12,8 +12,8 @@ namespace DarknessMinion
 		public override void InitializeState(Darkness darkController)
 		{
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.StartMovement();
-			darkController.UpdatePathDestination();
+			darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); //pass attackZone
+			darkController.movement.StartMovement(); 
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
@@ -24,13 +24,15 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			darkController.UpdatePathDestination();
+			//TODO check if attackZone valid, if not request new zone
+			darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); 
 			darkController.AddCooldown(new CooldownInfo(pathUpdateRate, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
 		public override void ExitState(Darkness darkController)
 		{
-			darkController.StopMovement();
+			darkController.movement.StopMovement();
+			AttackZoneManager.Instance.DeAllocateZone(darkController.creationID);
 			base.ExitState(darkController);
 		}
 	}
