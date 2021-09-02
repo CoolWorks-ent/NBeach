@@ -37,9 +37,11 @@ namespace DarknessMinion
 
 		public void LateUpdate()
 		{
-			foreach(AttackZone dTZ in attackZones)
+			for(int i = 0; i < attackZones.Length; i++)
 			{
-				dTZ.ZoneUpdate();
+				attackZones[i].ZoneUpdate();
+				if(ZoneBlocked(i))
+					ClearZone(i);
 			}
 
 			//check if the zone is mostly blocked. if so assign the next best zone
@@ -53,15 +55,13 @@ namespace DarknessMinion
 				{
 					if(!ZoneBlocked(i))
 						return attackZones[i];
-					else attackZones[i].OccupiedIDs.Remove(iD);
+					else ClearZone(i);
 				}
 			}
 
 			while(true) 
 			{
 				int t = Random.Range(0, attackZones.Length);
-				if(ZoneBlocked(t))
-					continue;
 				attackZones[t].OccupiedIDs.Add(iD);
 				return attackZones[t];
 			}
@@ -83,6 +83,11 @@ namespace DarknessMinion
 			if(Physics.SphereCast(attackZones[id].attackZoneOrigin, attackZones[id].attackZoneRadius * 0.8f, Vector3.zero, out hit, avoidanceMask, 0, QueryTriggerInteraction.Collide))
 				return true;
 			return false;
+		}
+
+		public void ClearZone(int index)
+		{
+			attackZones[index].OccupiedIDs.Clear();
 		}
 
 #if UNITY_EDITOR

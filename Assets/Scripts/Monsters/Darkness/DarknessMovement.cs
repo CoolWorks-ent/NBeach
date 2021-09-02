@@ -19,16 +19,11 @@ namespace DarknessMinion
 
 		public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
 
-		//private NavigationTarget attackZoneNavTarget;
-
 		private AIPath pather;
 		private DirectionNode[] directionNodes;
 		
 		[SerializeField,Range(0, 10)]
 		private float pathSetDistance;
-
-		//TODO Create another variable for editing the distance at which the path ahead is checked. Or maybe look into the values currently available and see if tweaks can make the behavior better
-		//At some point I need to make the path shorter if the set path goes past the player 
 
 		[SerializeField, Range(0, 10)]
 		private float higherPrecisionAvoidanceThreshold;
