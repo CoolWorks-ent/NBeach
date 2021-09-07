@@ -21,8 +21,9 @@ GameObject:
   - component: {fileID: 4400177786202110}
   - component: {fileID: 114595640382436030}
   - component: {fileID: 114964895663174236}
+  - component: {fileID: 114429885863368034}
+  - component: {fileID: 114896603844078356}
   - component: {fileID: 114270159059498466}
-  - component: {fileID: 114012107853173088}
   m_Layer: 0
   m_Name: AI Manager
   m_TagString: AI Manager
@@ -43,21 +44,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114012107853173088
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1087406834434032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 257328a5f2356294ba8ec6310ce5595e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackZoneRadius: 1.84
-  attackZoneOffset: 1.61
-  playerRotationFacing: {fileID: 0}
-  playerLocation: {fileID: 0}
 --- !u!114 &114270159059498466
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -72,11 +58,38 @@ MonoBehaviour:
   darknessPrefab: {fileID: 114511842479999518, guid: dc628364e3d2c884783040d81df6ae2f,
     type: 2}
   showDebugInfo: 1
-  targetInfo: 0
   agroRating: 0
   stateInfo: 0
   locationInfo: 0
   cooldownInfo: 0
+--- !u!114 &114429885863368034
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1087406834434032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7ea57210055814292f7964e591f771, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackZones:
+  - attackZoneOrigin: {x: 191.41, y: 45.679996, z: 98.95}
+    attackZoneRadius: 2.59
+    attackZoneOffsetForward: 1.62
+    attackZoneOffsetRight: 0
+  - attackZoneOrigin: {x: 193.31, y: 45.679996, z: 99.67}
+    attackZoneRadius: 2.87
+    attackZoneOffsetForward: 0.9
+    attackZoneOffsetRight: -1.9
+  - attackZoneOrigin: {x: 189.91, y: 45.679996, z: 99.57}
+    attackZoneRadius: 3.04
+    attackZoneOffsetForward: 1
+    attackZoneOffsetRight: 1.5
+  playerTransform: {fileID: 0}
+  avoidanceMask:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!114 &114595640382436030
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -163,6 +176,34 @@ MonoBehaviour:
     pivotPointRoot: {fileID: 0}
     spreadOutCount: 1
   showGraphs: 1
+--- !u!114 &114896603844078356
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1087406834434032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7ea57210055814292f7964e591f771, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackZones:
+  - attackZoneOrigin: {x: 191.41, y: 45.679996, z: 98.95}
+    attackZoneRadius: 2.59
+    attackZoneOffsetForward: 1.62
+    attackZoneOffsetRight: 0
+  - attackZoneOrigin: {x: 193.31, y: 45.679996, z: 99.67}
+    attackZoneRadius: 2.87
+    attackZoneOffsetForward: 0.9
+    attackZoneOffsetRight: -1.9
+  - attackZoneOrigin: {x: 189.91, y: 45.679996, z: 99.57}
+    attackZoneRadius: 3.04
+    attackZoneOffsetForward: 1
+    attackZoneOffsetRight: 1.5
+  playerTransform: {fileID: 0}
+  avoidanceMask:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!114 &114964895663174236
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -174,8 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3fa065d3ac01d4fb37dd0c11a3771f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackApprovalPriority: 
-  darknessIDCounter: 0
-  darknessConcurrentAttackLimit: 0
+  attackApprovalPriority: 0100000002000000
+  darknessIDCounter: 2
+  darknessConcurrentAttackLimit: 2
   player: {fileID: 0}
   maxEnemyCount: 6

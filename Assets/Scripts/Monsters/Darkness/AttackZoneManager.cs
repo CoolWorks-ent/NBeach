@@ -23,6 +23,7 @@ namespace DarknessMinion
 		void Awake()
 		{
 			Instance = this;
+
 			if(attackZones.Length <= 0)
 				attackZones = new AttackZone[4];
 			foreach(AttackZone dTZ in attackZones)
@@ -90,7 +91,7 @@ namespace DarknessMinion
 			attackZones[index].OccupiedIDs.Clear();
 		}
 
-#if UNITY_EDITOR
+	#if UNITY_EDITOR
 		void OnDrawGizmosSelected()
 		{	
 			if(attackZones.Length > 0)
