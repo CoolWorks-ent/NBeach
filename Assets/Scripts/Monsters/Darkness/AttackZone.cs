@@ -17,6 +17,9 @@ namespace DarknessMinion
 
 		public HashSet<int> OccupiedIDs;
 
+		//TODO bool occupied, take in RemovedDarkness, with that data I can against ID to unassign
+		//TODO test to make sure when the player is far away from the zone the darkness 
+
 		//Have a zone offset towards the front of the player.
 		//The center of the zone is x units in front of the player container's forward vector.
 		//This should rotate the attack zone based on what should be their ideal position

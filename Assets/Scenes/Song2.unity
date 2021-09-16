@@ -62919,6 +62919,81 @@ Prefab:
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 2059134424}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[2].attackZoneOffsetRight
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[2].attackZoneOrigin.x
+      value: 189.91
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[2].attackZoneOffsetForward
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[2].attackZoneOrigin.z
+      value: 98.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[0].attackZoneOffsetRight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[0].attackZoneOrigin.x
+      value: 191.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[1].attackZoneOffsetRight
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[1].attackZoneOrigin.x
+      value: 192.91
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[1].attackZoneOffsetForward
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[1].attackZoneOrigin.z
+      value: 98.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[2].attackZoneRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[1].attackZoneRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[0].attackZoneOffsetForward
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZones.Array.data[0].attackZoneOrigin.z
+      value: 98.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: avoidanceMask.m_Bits
+      value: 8192
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114429885863368034, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
