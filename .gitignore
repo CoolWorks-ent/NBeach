@@ -52,3 +52,6 @@ Assets/Textures/clownFishObj/images.meta
 /.vscode
 bfg-1.13.0.jar
 .idea
+Assets/Plugins/Editor/JetBrains
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor.meta
