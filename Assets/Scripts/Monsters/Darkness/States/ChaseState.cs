@@ -41,7 +41,6 @@ namespace DarknessMinion
 
 		private float UpdateRate(float playerDist)
 		{
-
 			if(playerDist < closenessRange)
 				return pathUpdateRateClose;
 			return pathUpdateRateFar;

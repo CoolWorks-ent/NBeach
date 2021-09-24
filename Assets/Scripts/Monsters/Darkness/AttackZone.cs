@@ -10,12 +10,17 @@ namespace DarknessMinion
 
 		[SerializeField, Range(0, 5)]
 		public float attackZoneRadius;
+
+		[HideInInspector]
+		public int occupierID;
+		[HideInInspector]
+		public bool occupied;
 		
 		[SerializeField, Range(-5, 5)]
 		private float attackZoneOffsetForward, attackZoneOffsetRight;
 		private Transform playerLocation;
 
-		public HashSet<int> OccupiedIDs;
+
 
 		//TODO bool occupied, take in RemovedDarkness, with that data I can against ID to unassign
 		//TODO test to make sure when the player is far away from the zone the darkness 
@@ -26,7 +31,7 @@ namespace DarknessMinion
 
 		public AttackZone()
 		{
-			OccupiedIDs = new HashSet<int>();
+			occupierID = -1;
 		}
 
 		public void SetParameters(Vector3 origin, Transform player)
@@ -44,6 +49,18 @@ namespace DarknessMinion
 		public NavigationTarget RequestPointInsideZone(float height)
         {
 			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);
+		}
+
+		public void OccupyZone(int iD)
+		{
+			occupied = true;
+			occupierID = iD;
+		}
+
+		public void DeAllocateZone()
+		{
+			occupierID = 2000;
+			occupied = false;
 		}
 
 		public bool InTheZone(Vector2 location)

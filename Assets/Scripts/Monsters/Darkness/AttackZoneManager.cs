@@ -41,8 +41,6 @@ namespace DarknessMinion
 			for(int i = 0; i < attackZones.Length; i++)
 			{
 				attackZones[i].ZoneUpdate();
-				if(ZoneBlocked(i))
-					ClearZone(i);
 			}
 
 			//check if the zone is mostly blocked. if so assign the next best zone
@@ -50,30 +48,44 @@ namespace DarknessMinion
 
 		public AttackZone RequestZoneTarget(int iD)
 		{
-			for(int i = attackZones.Length-1; i > 0; i--)
+			//assign a random unoccupied zone 
+			List<AttackZone> zones = UnOccupiedZones();
+
+			if(zones.Count != 0)
 			{
-				if(attackZones[i].OccupiedIDs.Contains(iD))
+				if(zones.Count != 1)
 				{
-					if(!ZoneBlocked(i))
-						return attackZones[i];
-					else ClearZone(i);
+					int t = Random.Range(0, zones.Count);
+					zones[t].OccupyZone(iD);
+					return zones[t];
 				}
+				
+				zones[0].OccupyZone(iD);
+				return zones[0];
 			}
 
-			while(true) 
+			return null;
+		}
+
+		public List<AttackZone> UnOccupiedZones()
+		{
+			List<AttackZone> zones = new List<AttackZone>();
+
+			for(int i = 0; i < attackZones.Length; i++)
 			{
-				int t = Random.Range(0, attackZones.Length);
-				attackZones[t].OccupiedIDs.Add(iD);
-				return attackZones[t];
+				if(attackZones[i].occupied)
+					zones.Add(attackZones[i]);
 			}
+
+			return zones;
 		}
 
 		public void DeAllocateZone(int iD)
 		{
 			for(int i = attackZones.Length-1; i > 0; i--)
 			{
-				if(attackZones[i].OccupiedIDs.Contains(iD))
-					attackZones[i].OccupiedIDs.Remove(iD);
+				if(attackZones[i].occupierID == iD)
+					attackZones[i].DeAllocateZone();
 			}
 		}
 		
@@ -84,11 +96,6 @@ namespace DarknessMinion
 			if(Physics.SphereCast(attackZones[id].attackZoneOrigin, attackZones[id].attackZoneRadius * 0.8f, Vector3.zero, out hit, avoidanceMask, 0, QueryTriggerInteraction.Collide))
 				return true;
 			return false;
-		}
-
-		public void ClearZone(int index)
-		{
-			attackZones[index].OccupiedIDs.Clear();
 		}
 
 	#if UNITY_EDITOR
