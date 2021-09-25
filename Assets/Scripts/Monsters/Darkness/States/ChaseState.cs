@@ -28,7 +28,7 @@ namespace DarknessMinion
 		protected override void CooldownCallback(Darkness darkController)
 		{
 			//TODO check if attackZone valid, if not request new zone
-			darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); 
+			//darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); 
 			darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 

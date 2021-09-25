@@ -9,9 +9,8 @@ namespace DarknessMinion
         public GameObject deathFX;
 
         public override void InitializeState(Darkness darkController)
-        {   
+        {
             darkController.StartCoroutine(DeathRoutine(darkController));
-            //controller.aIMovement.EndMovement();
         }
 
         public override void ExitState(Darkness darkController)

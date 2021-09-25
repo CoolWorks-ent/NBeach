@@ -37,13 +37,12 @@ namespace DarknessMinion
 
         public override void ExitState(Darkness darkController)
         {
-
+            
         }
 
         protected override void CooldownCallback(Darkness darkController)
         {
             darkController.darkHitBox.enabled = false;
-            darkController.movement.StopMovement();
         }
     }
 }

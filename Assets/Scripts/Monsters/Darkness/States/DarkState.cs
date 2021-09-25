@@ -7,15 +7,13 @@ namespace DarknessMinion
 {
 	public abstract class DarkState : ScriptableObject
 	{
-		//protected readonly Darkness darkController;
 		public DarkTransition[] transitions;
 		public List<DarkState> referencedBy;
-		//protected Lookup<DarkTransition.TransitionPriority, DarkTransition> priorityTransitions;
 
 		public void SortTransitionsByPriority()
 		{
 			if(transitions != null || transitions.Count() > 0)
-				Array.Sort(transitions, ((t, p) => {return t.priorityLevel.CompareTo(p.priorityLevel);}));
+				Array.Sort(transitions, (t, p) => t.priorityLevel.CompareTo(p.priorityLevel));
 		}
 
 		public void UpdateReferences()
@@ -50,11 +48,5 @@ namespace DarknessMinion
 				}
 			}
 		}
-
-		/*protected void RemoveDarkness()
-		{
-			this.ExitState(); //fire this if not in the Death state already
-			darkController.updateStates = false;
-		}*/
 	}
 }

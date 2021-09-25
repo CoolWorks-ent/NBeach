@@ -91,7 +91,7 @@ namespace DarknessMinion
 		{
 			previousState = currentState;
 			currentState = nextState;
-			previousState.ExitState(this);
+			previousState.ExitState(this);  
 			currentState.InitializeState(this);
 		}
 
@@ -108,7 +108,7 @@ namespace DarknessMinion
 		public void ChangeAnimation(DarkAnimationStates anim)
 		{
 			//animeController.SetInteger(stateAnimID, playID);
-			switch(anim)
+			switch (anim)
 			{
 				case DarkAnimationStates.Attack:
 					animeController.SetTrigger(animTriggerAttack);
@@ -123,7 +123,6 @@ namespace DarknessMinion
 					animeController.SetTrigger(animTriggerDeath);
 					return;
 			}
-			//animeController.Play(anim.ToString());
 		}
 
 		public float CurrentAnimationLength()
@@ -240,7 +239,7 @@ namespace DarknessMinion
 	#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, Color.red, 0.01f);
+			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, new Color(1f, 0.92f, 0.08f), 0.01f);
         }
 	#endif
 	}
