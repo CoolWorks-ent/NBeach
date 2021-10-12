@@ -10,14 +10,19 @@ namespace DarknessMinion
 	{
 		//Collection of AttackZones. Updates zone locations. Provides a valid zone target
 
+		//[SerializeField]
+		//private AttackZone[] attackZones;
+
 		[SerializeField]
-		private AttackZone[] attackZones;
-		
+		private AttackZone attackZone;
+
 		[SerializeField]
 		private Transform playerTransform;
 
 		[SerializeField]
 		private LayerMask avoidanceMask;
+		
+		public AttackZone playerAttackZone { get { return attackZone; } }
 		
 		public static AttackZoneManager Instance { get; private set; }
 		
@@ -25,27 +30,30 @@ namespace DarknessMinion
 		{
 			Instance = this;
 
-			if(attackZones.Length <= 0)
+			/*if(attackZones.Length <= 0)
 				attackZones = new AttackZone[4];
 			foreach(AttackZone dTZ in attackZones)
 			{
 				if(!playerTransform)
 				{
-					dTZ.SetPlayerLocationOrigin(Vector3.zero, DarknessManager.Instance.playerTransform);
+					dTZ.SetPlayerLocationOrigin(playerTransform);
 				}
-				else dTZ.SetPlayerLocationOrigin(Vector3.zero, playerTransform);
-			}
+				else dTZ.SetPlayerLocationOrigin(playerTransform);
+			}*/
+			
+			attackZone.SetPlayerLocationOrigin(playerTransform);
 		}
 
 		public void LateUpdate()
 		{
-			for(int i = 0; i < attackZones.Length; i++)
+			/*for(int i = 0; i < attackZones.Length; i++)
 			{
 				attackZones[i].ZoneUpdate();
-			}
+			}*/
+			
 		}
 		
-		public AttackZone RequestZoneTarget(int iD)
+		/*public AttackZone RequestZoneTarget(int iD)
 		{
 			//assign a random unoccupied zone 
 			List<AttackZone> zones = UnOccupiedZones();
@@ -92,17 +100,21 @@ namespace DarknessMinion
 			if(Physics.SphereCast(attackZones[id].attackZoneOrigin, attackZones[id].attackZoneRadius * 0.8f, Vector3.zero, out hit, avoidanceMask, 0, QueryTriggerInteraction.Collide))
 				return true;
 			return false;
-		}
+		}*/
 
 	#if UNITY_EDITOR
 		void OnDrawGizmosSelected()
 		{	
-			if(attackZones.Length > 0)
+			attackZone.SetPlayerLocationOrigin(playerTransform);
+			UnityEditor.Handles.DrawWireDisc(attackZone.attackZoneOrigin, Vector3.up, attackZone.attackZoneRadius);
+			UnityEditor.Handles.color = Color.yellow;
+			UnityEditor.Handles.DrawWireDisc(attackZone.AttackPoint(), Vector3.up, 0.5f);
+			/*if(attackZones.Length > 0)
 			{
 				foreach(AttackZone dTZ in attackZones)
 				{
 					if(dTZ == null)
-						dTZ.SetPlayerLocationOrigin(Vector3.zero, DarknessManager.Instance.playerTransform);
+						dTZ.SetPlayerLocationOrigin(playerTransform);
 					dTZ.ZoneUpdate();
 					//TODO change color for occupied zones
 					if(dTZ.occupied)
@@ -110,7 +122,7 @@ namespace DarknessMinion
 					else UnityEditor.Handles.color = Color.green;
 					UnityEditor.Handles.DrawWireDisc(dTZ.attackZoneOrigin, Vector3.up, dTZ.attackZoneRadius);
 				}
-			}
+			}*/
 		}
 		#endif
 	}

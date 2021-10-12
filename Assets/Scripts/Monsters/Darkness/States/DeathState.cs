@@ -24,9 +24,9 @@ namespace DarknessMinion
             darkController.ChangeAnimation(Darkness.DarkAnimationStates.Death);
 
             GameObject newFX = Instantiate(deathFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
-            newFX.transform.SetParent(DarknessManager.Instance.transform);
+            //newFX.transform.SetParent(DarknessManager.Instance.transform);
             
-            //change darkness back to idle to state to prevent moving & set to Kinematic to prevent any Physics effects
+            //set to Kinematic to prevent any Physics effects
             darkController.gameObject.GetComponentInChildren<Rigidbody>().isKinematic = true;
 
             float fxTime = 1;

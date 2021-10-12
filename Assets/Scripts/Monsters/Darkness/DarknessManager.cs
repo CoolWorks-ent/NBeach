@@ -16,8 +16,6 @@ namespace DarknessMinion
 
 		public List<int> attackApprovalPriority;
 
-		public float groundLevel { get { return player.position.y; } }
-
 		public static DarknessManager Instance { get; private set; }
 
 		[SerializeField]
@@ -125,7 +123,7 @@ namespace DarknessMinion
 		///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
 		private void AddtoDarknessList(Darkness updatedDarkness)
 		{
-			updatedDarkness.transform.SetParent(Instance.transform);
+			updatedDarkness.transform.SetParent(this.transform);
 			darknessIDCounter++;
 			
 			updatedDarkness.Spawn(darknessIDCounter);

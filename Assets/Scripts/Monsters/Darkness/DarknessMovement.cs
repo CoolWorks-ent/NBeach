@@ -3,9 +3,10 @@ using Pathfinding;
 
 namespace DarknessMinion
 {
+	[RequireComponent(typeof(Rigidbody))]
+	[RequireComponent(typeof(Darkness))]
 	public class DarknessMovement : MonoBehaviour
 	{
-		public bool reachedEndofPath { get { return pather.reachedDestination; } }
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
@@ -16,8 +17,6 @@ namespace DarknessMinion
 		public Transform player;
 
 		private int bestDirectionIndex;
-
-		public AttackZone darkAttackZone; //TODO Replace this with just a reference to a Vector3
 
 		private AIPath pather;
 		private DirectionNode[] directionNodes;
@@ -32,11 +31,23 @@ namespace DarknessMinion
 		private LayerMask avoidLayerMask;
 		private bool moving;
 
+		[SerializeField, Range(5, 20)] 
+		private float maxAccel;
+		[SerializeField, Range(0.1f, 5)]
+		private float maxSpeed;
+		[SerializeField, Range(1, 360)]
+		private float rotationSpeed;
+        
+		private Rigidbody rgdBod;
+		private Vector3 velocity;
+
 		void Awake()
 		{
 			pather = GetComponent<AIPath>();
+			rgdBod = GetComponent<Rigidbody>();
 
 			directionNodes = new DirectionNode[16];
+			velocity = rgdBod.velocity;
 
 			float angle, dAngle = 0;
 			for(int i = 0; i < directionNodes.Length; i++)
@@ -59,15 +70,20 @@ namespace DarknessMinion
 			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
 		}
 
-		private Vector2 ConvertToVec2(Vector3 vector)
+		public Vector2 ConvertToVec2(Vector3 vector)
 		{
 			return new Vector2(vector.x, vector.z);
 		}
 
 		public void RotateTowardsPlayer()
 		{
-			Vector3 pDir = DarknessManager.Instance.DirectionToPlayer(transform.position);
-			Vector3 dir = Vector3.RotateTowards(transform.forward, pDir, 2.0f * Time.deltaTime, 0.1f);
+			Vector3 dir = Vector3.RotateTowards(transform.forward, PlayerDirection(), 2.0f * Time.deltaTime, 0.1f);
+			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+		}
+		
+		private void RotateTowardsDirection(Vector3 mDir) 
+		{
+			Vector3 dir = Vector3.RotateTowards(transform.forward, mDir, 2.0f * Time.deltaTime * rotationSpeed, 0.1f);
 			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 		}
 
@@ -79,13 +95,7 @@ namespace DarknessMinion
 
 		public Vector3 PlayerDirection()
 		{
-			if (moving) 
-			{
-				if (darkAttackZone.InTheZone(ConvertToVec2(transform.position)))
-					return (player.position - transform.position).normalized;
-				else return (darkAttackZone.attackZoneOrigin - transform.position).normalized;
-			}
-			else return (player.position - transform.position).normalized;
+			return (player.position - transform.position).normalized;
 		}
 
 		public void StopMovement()
@@ -102,21 +112,30 @@ namespace DarknessMinion
 			moving = true;
 		}
 
-		/*Add functions for applying steering behaviors
-		* Choose several points in a circle that would be the starting candidates for movement
-		* Vectors closer towards the direction of the player get some positive weight
-		* Vectors close to the directions of other Darkness get some negative weight
-		* Somehow we'll have a direction that is weighted most favorable and we move in that direction
-		* This will not run very often. Still need to figure out how I want that to happen. Maybe decided in state cooldowns
-		*/
-
-		public void UpdatePathDestination(AttackZone atkZone) //TODO Pass in an attackZone
+		public void MoveBody(Vector2 moveDirection)
 		{
-			darkAttackZone = atkZone;
+			if (moveDirection != Vector2.zero)
+			{
+				float maxSpeedChange = maxAccel * Time.deltaTime;
+				Vector2 desiredVelocity;
+				desiredVelocity = moveDirection * maxSpeed;
+
+				velocity = rgdBod.velocity;
+
+				velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+				velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.y, maxSpeedChange);
+
+				rgdBod.velocity = new Vector3(velocity.x, rgdBod.velocity.y, velocity.z);
+				RotateTowardsDirection(velocity);
+			}
+		}
+
+		public Vector2 UpdatePathDestination(Vector3 destination) //TODO Pass in an attackZone
+		{
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
 			{
-				SeekLayer(dNode);
+				SeekLayer(dNode, destination);
 				AvoidLayer(dNode);
 			}
 
@@ -131,8 +150,9 @@ namespace DarknessMinion
 						bestDirectionIndex = i;
 				}
 			}
+			return ConvertToVec2(directionNodes[bestDirectionIndex].directionAtAngle) * CalculationDistance(playerDist);
 
-			pather.destination = directionNodes[bestDirectionIndex].directionAtAngle * CalculationDistance(playerDist) + this.transform.position;
+			//pather.destination = 
 		}
 
 
@@ -146,9 +166,8 @@ namespace DarknessMinion
 			}
 		}
 
-		private void SeekLayer(DirectionNode dNode)
+		private void SeekLayer(DirectionNode dNode, Vector3 direction)
 		{
-			Vector3 direction = PlayerDirection();
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
 			dNode.SetDirLength(direction.magnitude);
 
@@ -194,7 +213,7 @@ namespace DarknessMinion
 			Vector3 lineStart, lineEnd;
 			if(moving)
 			{
-				Debug.DrawLine(this.transform.position, darkAttackZone.attackZoneOrigin, Color.white);
+				//Debug.DrawLine(this.transform.position, darkAttackZone.attackZoneOrigin, Color.white);
 				Debug.DrawLine(this.transform.position, pather.destination, Color.red);
 				foreach (DirectionNode dir in directionNodes)
 				{

@@ -62994,8 +62994,49 @@ Prefab:
       propertyPath: avoidanceMask.m_Bits
       value: 8192
       objectReference: {fileID: 0}
+    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneRadius
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneOffsetForward
+      value: 9.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneOffsetRight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneOrigin.x
+      value: 191.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneOrigin.y
+      value: 45.679996
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackZoneOrigin.z
+      value: 91.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
+        type: 2}
+      propertyPath: attackZone.attackPointOffsetForward
+      value: 1.2
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114429885863368034, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
+    - {fileID: 114270159059498466, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &1370181008

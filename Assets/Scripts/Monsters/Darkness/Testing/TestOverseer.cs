@@ -29,7 +29,7 @@ namespace DarknessMinion
 			if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
 			{
 				//Vector3 sLoc = Random.insideUnitCircle * 5;
-				Darkness enemy = Instantiate(darknessPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.groundLevel + 0.5f, Random.Range(0, 10)), darknessPrefab.transform.rotation);
+				Darkness enemy = Instantiate(darknessPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.playerTransform.position.y + 0.5f, Random.Range(0, 10)), darknessPrefab.transform.rotation);
 			}
 		}
 

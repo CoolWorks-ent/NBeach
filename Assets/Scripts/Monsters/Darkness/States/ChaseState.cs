@@ -14,10 +14,9 @@ namespace DarknessMinion
 		public override void InitializeState(Darkness darkController)
 		{
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); //pass attackZone
-			darkController.movement.StartMovement(); 
-			
-			darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
+			darkController.movement.StartMovement();
+
+			//darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
 		public override void UpdateState(Darkness darkController)
@@ -25,17 +24,26 @@ namespace DarknessMinion
 			CheckTransitions(darkController);
 		}
 
+		public override void MovementUpdate(Darkness darkController)
+		{
+			Vector3 direction;
+			DarknessMovement darkMove = darkController.movement;
+			AttackZone atkZone = AttackZoneManager.Instance.playerAttackZone;
+			if (atkZone.InTheZone(darkMove.ConvertToVec2(darkMove.transform.position)))
+				direction = (atkZone.AttackPoint() - darkMove.transform.position).normalized;
+			else direction = (atkZone.attackZoneOrigin - darkController.transform.position).normalized;
+			darkMove.MoveBody(darkMove.UpdatePathDestination(direction));
+		}
+
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			//TODO check if attackZone valid, if not request new zone
 			//darkController.movement.UpdatePathDestination(AttackZoneManager.Instance.RequestZoneTarget(darkController.creationID)); 
-			darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
+			//darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
 		public override void ExitState(Darkness darkController)
 		{
 			darkController.movement.StopMovement();
-			AttackZoneManager.Instance.DeAllocateZone(darkController.creationID);
 			base.ExitState(darkController);
 		}
 
