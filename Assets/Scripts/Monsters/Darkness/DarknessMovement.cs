@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pathfinding;
+using VRStandardAssets.Maze;
 
 namespace DarknessMinion
 {
@@ -10,15 +11,11 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public float playerDist { get; private set; }
-		[HideInInspector]
-		public Darkness darkness;
 
 		[HideInInspector]
 		public Transform player;
 
 		private int bestDirectionIndex;
-
-		private AIPath pather;
 		private DirectionNode[] directionNodes;
 		
 		[SerializeField,Range(0, 10)]
@@ -26,6 +23,9 @@ namespace DarknessMinion
 
 		[SerializeField, Range(0, 10)]
 		private float higherPrecisionAvoidanceThreshold;
+
+		[SerializeField, Range(0, 0.5f)]
+		private float seekThreshold;
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
@@ -41,13 +41,15 @@ namespace DarknessMinion
 		private Rigidbody rgdBod;
 		private Vector3 velocity;
 
+		private Vector2 moveDirection;
+
 		void Awake()
 		{
-			pather = GetComponent<AIPath>();
 			rgdBod = GetComponent<Rigidbody>();
 
 			directionNodes = new DirectionNode[16];
 			velocity = rgdBod.velocity;
+			moveDirection = Vector2.zero;
 
 			float angle, dAngle = 0;
 			for(int i = 0; i < directionNodes.Length; i++)
@@ -100,25 +102,21 @@ namespace DarknessMinion
 
 		public void StopMovement()
 		{
-			pather.canSearch = false;
-			pather.canMove = false;
 			moving = false;
+			moveDirection = Vector2.zero;
 		}
 
 		public void StartMovement()
 		{
-			pather.canMove = true;
-			pather.canSearch = true;
 			moving = true;
 		}
 
-		public void MoveBody(Vector2 moveDirection)
+		public void MoveBody()
 		{
 			if (moveDirection != Vector2.zero)
 			{
 				float maxSpeedChange = maxAccel * Time.deltaTime;
-				Vector2 desiredVelocity;
-				desiredVelocity = moveDirection * maxSpeed;
+				Vector2 desiredVelocity = moveDirection * maxSpeed;
 
 				velocity = rgdBod.velocity;
 
@@ -130,7 +128,7 @@ namespace DarknessMinion
 			}
 		}
 
-		public Vector2 UpdatePathDestination(Vector3 destination) //TODO Pass in an attackZone
+		public void UpdatePathDestination(Vector3 destination) //TODO Pass in an attackZone
 		{
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
@@ -139,20 +137,24 @@ namespace DarknessMinion
 				AvoidLayer(dNode);
 			}
 
-			//Once the layers are calulated with weights narrow down the path that leads closer to the player
+			//Once the layers are calculated with weights narrow down the path that leads closer to the player
 			//Once the direction is chosen set the navtarget to a point along the direction vector
 			bestDirectionIndex = 0;
 			for (int i = 0; i < directionNodes.Length; i++)
 			{
 				if(i+1 <= directionNodes.Length-1)
 				{
-					if(directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
-						bestDirectionIndex = i;
+					if (directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
+					{
+						float directionDifference = Mathf.Abs(directionNodes[bestDirectionIndex].combinedWeight -
+						                                      directionNodes[i].combinedWeight);
+						if(directionDifference > seekThreshold)
+							bestDirectionIndex = i;
+					}
 				}
 			}
-			return ConvertToVec2(directionNodes[bestDirectionIndex].directionAtAngle) * CalculationDistance(playerDist);
 
-			//pather.destination = 
+			moveDirection = ConvertToVec2(directionNodes[bestDirectionIndex].directionAtAngle); // * CalculationDistance(playerDist);
 		}
 
 
@@ -171,11 +173,26 @@ namespace DarknessMinion
 			float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
 			dNode.SetDirLength(direction.magnitude);
 
-			if (dotValue > 0)
-				dNode.seekWeight = dotValue;
-			else if (dotValue == 0)
-				dNode.seekWeight = 0.1f;
-			else dNode.seekWeight = 0.05f;
+			if (playerDist > higherPrecisionAvoidanceThreshold * 1.5f)
+			{
+				if (dotValue > 0)
+					dNode.seekWeight = dotValue;
+				else if (dotValue == 0)
+					dNode.seekWeight = 0.1f;
+				else dNode.seekWeight = 0.05f;
+			}
+			else
+			{
+				if (dotValue >= 0.8f && dotValue <= 0.9f)
+					dNode.seekWeight = dotValue + 0.2f;
+				else if (dotValue < 0.8f && dotValue > 0.7f)
+					dNode.seekWeight = dotValue + 0.1f;
+				else if (dotValue > 0.9f)
+					dNode.seekWeight = dotValue - 0.1f;
+				else if (dotValue < 0.7f && dotValue > 0)
+					dNode.seekWeight = dotValue;
+				else dNode.seekWeight = 0.1f;
+			}
 		}
 
 		private void AvoidLayer(DirectionNode dNode)
@@ -187,14 +204,14 @@ namespace DarknessMinion
 			if (Physics.SphereCast(transform.position + dNode.directionAtAngle, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
 			{
 				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
-				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position) / 10.5f;
+				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position);
 				if (dotValue >= 0.6f)
 					dNode.avoidWeight += -1;
 				else if (dotValue <= 0.6f && dotValue > 0)
 					dNode.avoidWeight += -0.5f;
 
-				if (distanceNorm > 0.2f)
-					dNode.avoidWeight -= distanceNorm;
+				if (distanceNorm < higherPrecisionAvoidanceThreshold)
+					dNode.avoidWeight -= -1;
 			}
 		}
 
@@ -214,10 +231,12 @@ namespace DarknessMinion
 			if(moving)
 			{
 				//Debug.DrawLine(this.transform.position, darkAttackZone.attackZoneOrigin, Color.white);
-				Debug.DrawLine(this.transform.position, pather.destination, Color.red);
+				//Debug.DrawLine(this.transform.position, pather.destination, Color.red);
 				foreach (DirectionNode dir in directionNodes)
 				{
-					if (dir.combinedWeight > 0.9f)
+					if(dir == directionNodes[bestDirectionIndex])
+						col = new Color(1f, 0.56f, 0.03f);
+					else if (dir.combinedWeight > 0.9f)
 						col = Color.green;
 					else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
 						col = Color.cyan;
@@ -230,6 +249,7 @@ namespace DarknessMinion
 					lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
 					Debug.DrawLine(lineStart, lineEnd, col);
 				}
+				
 			}
 		}
 	#endif

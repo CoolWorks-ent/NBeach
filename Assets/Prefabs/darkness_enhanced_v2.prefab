@@ -947,7 +947,7 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
-  attackRange: 2.93
+  attackRange: 3
   movement: {fileID: 0}
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
@@ -962,23 +962,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e4cdb5e9ea006043abeeae236ba6fd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  darkness: {fileID: 0}
   player: {fileID: 0}
-  darkAttackZone:
-    attackZoneOrigin: {x: 0, y: 0, z: 0}
-    attackZoneRadius: 0
-    occupierID: 0
-    occupied: 0
-    attackZoneOffsetForward: 0
-    attackZoneOffsetRight: 0
   pathSetDistance: 5
-  higherPrecisionAvoidanceThreshold: 2.5
+  higherPrecisionAvoidanceThreshold: 3.2
+  seekThreshold: 0.2
   avoidLayerMask:
     serializedVersion: 2
     m_Bits: 139264
-  maxAccel: 14.4
-  maxSpeed: 0.99
-  rotationSpeed: 85
+  maxAccel: 12.4
+  maxSpeed: 2.06
+  rotationSpeed: 55
 --- !u!114 &114774764668895200
 MonoBehaviour:
   m_ObjectHideFlags: 1
