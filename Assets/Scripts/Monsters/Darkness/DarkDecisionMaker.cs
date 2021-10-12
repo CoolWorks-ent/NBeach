@@ -7,7 +7,7 @@ namespace DarknessMinion
 {
     public class DarkDecisionMaker
     {
-        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, IdleComplete, CloseToPlayer }
+        public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, IdleComplete, CloseToPlayer, NotInZone, InsideZone }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
         public DarkDecisionMaker()
@@ -21,6 +21,8 @@ namespace DarknessMinion
             Decisions.Add(DecisionName.AttackOnCooldown, AttackOnCooldownCheck);
             Decisions.Add(DecisionName.IdleComplete, IdleOnCooldownCheck);
             Decisions.Add(DecisionName.IsIdling, IdlingCheck);
+            Decisions.Add(DecisionName.NotInZone, NotInTheZone);
+            Decisions.Add(DecisionName.InsideZone, AlreadyInZone);
         }
 
         public bool MakeDecision(DecisionName dName, Darkness controller)
@@ -93,6 +95,21 @@ namespace DarknessMinion
             if (controller.PlayerDistance() > controller.attackSwitchRange)
                 return true;
             else return false;
+        }
+
+        private bool NotInTheZone(Darkness controller)
+        {
+            if(AttackZoneManager.Instance.playerAttackZone.InTheZone(
+                controller.movement.ConvertToVec2(controller.transform.position)))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool AlreadyInZone(Darkness controller)
+        {
+            return !NotInTheZone(controller);
         }
     }
 }

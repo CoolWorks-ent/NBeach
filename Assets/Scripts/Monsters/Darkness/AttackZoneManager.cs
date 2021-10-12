@@ -106,7 +106,7 @@ namespace DarknessMinion
 		void OnDrawGizmosSelected()
 		{	
 			attackZone.SetPlayerLocationOrigin(playerTransform);
-			UnityEditor.Handles.DrawWireDisc(attackZone.attackZoneOrigin, Vector3.up, attackZone.attackZoneRadius);
+			UnityEditor.Handles.DrawWireDisc(attackZone.attackZoneOrigin, Vector3.up, attackZone.zoneRadius);
 			UnityEditor.Handles.color = Color.yellow;
 			UnityEditor.Handles.DrawWireDisc(attackZone.AttackPoint(), Vector3.up, 0.5f);
 			/*if(attackZones.Length > 0)

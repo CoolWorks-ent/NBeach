@@ -9,7 +9,7 @@ namespace DarknessMinion
 		public Vector3 attackZoneOrigin;
 
 		[SerializeField, Range(0, 25)]
-		public float attackZoneRadius;
+		public float zoneRadius;
 
 		[HideInInspector]
 		public int occupierID;
@@ -17,7 +17,7 @@ namespace DarknessMinion
 		public bool occupied;
 		
 		[SerializeField, Range(-25, 25)]
-		private float attackZoneOffsetForward, attackZoneOffsetRight;
+		private float zoneOffsetForward, zoneOffsetRight;
 		[SerializeField, Range(-5, 10)]
 		private float attackPointOffsetForward;
 		private Transform playerLocation;
@@ -28,12 +28,12 @@ namespace DarknessMinion
 		public void SetPlayerLocationOrigin(Transform player)
 		{
 			playerLocation = player;
-			attackZoneOrigin = playerLocation.position + playerLocation.forward * attackZoneOffsetForward + playerLocation.right * attackZoneOffsetRight;
+			attackZoneOrigin = playerLocation.position + playerLocation.forward * zoneOffsetForward + playerLocation.right * zoneOffsetRight;
 		}
 
 		public void ZoneUpdate()
 		{
-			attackZoneOrigin = playerLocation.position + playerLocation.forward * attackZoneOffsetForward + playerLocation.right * attackZoneOffsetRight;
+			attackZoneOrigin = playerLocation.position + playerLocation.forward * zoneOffsetForward + playerLocation.right * zoneOffsetRight;
 			DarkEventManager.OnUpdateZoneLocation(attackZoneOrigin);
 		}
 
@@ -44,7 +44,7 @@ namespace DarknessMinion
 
 		public NavigationTarget RequestPointInsideZone(float height)
         {
-			return new NavigationTarget((Random.insideUnitSphere * attackZoneRadius), attackZoneOrigin, height);
+			return new NavigationTarget((Random.insideUnitSphere * zoneRadius), attackZoneOrigin, height);
 		}
 
 		public void OccupyZone(int iD)
@@ -62,7 +62,7 @@ namespace DarknessMinion
 		public bool InTheZone(Vector2 location)
 		{
 			Vector2 v = new Vector2(attackZoneOrigin.x, attackZoneOrigin.z);
-			if (Vector2.Distance(v, location) < attackZoneRadius)
+			if (Vector2.Distance(v, location) < zoneRadius)
 				return true;
 			return false;
 		}
