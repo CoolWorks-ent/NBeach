@@ -1,4 +1,5 @@
 using UnityEngine;
+using DarknessMinion.Movement;
 
 namespace DarknessMinion
 {

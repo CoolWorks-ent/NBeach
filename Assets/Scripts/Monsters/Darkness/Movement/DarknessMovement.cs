@@ -1,8 +1,7 @@
 using UnityEngine;
 using Pathfinding;
-using VRStandardAssets.Maze;
 
-namespace DarknessMinion
+namespace DarknessMinion.Movement
 {
 	[RequireComponent(typeof(Rigidbody))]
 	[RequireComponent(typeof(Darkness))]
@@ -14,6 +13,8 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public Transform player;
+
+		private Steering steering;
 
 		private int bestDirectionIndex;
 		private DirectionNode[] directionNodes;
@@ -40,7 +41,6 @@ namespace DarknessMinion
         
 		private Rigidbody rgdBod;
 		private Vector3 velocity;
-
 		private Vector2 moveDirection;
 
 		void Awake()
@@ -61,6 +61,7 @@ namespace DarknessMinion
 				//n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
 			}
 			bestDirectionIndex = 0;
+			steering = new Steering();
 		}
 
 		void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
@@ -133,8 +134,8 @@ namespace DarknessMinion
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
 			{
-				SeekLayer(dNode, destination);
-				AvoidLayer(dNode);
+				steering.Seek(dNode, destination, higherPrecisionAvoidanceThreshold, playerDist);
+				steering.Avoid(dNode, transform.position, higherPrecisionAvoidanceThreshold, CalculationDistance(playerDist), avoidLayerMask);
 			}
 
 			//Once the layers are calculated with weights narrow down the path that leads closer to the player
@@ -165,53 +166,6 @@ namespace DarknessMinion
 			for (int i = 0; i < directionNodes.Length; i++)
 			{
 				directionNodes[i].SetDirection(new Vector3(Mathf.Cos(directionNodes[i].angle), 0.1f, Mathf.Sin(directionNodes[i].angle)));
-			}
-		}
-
-		private void SeekLayer(DirectionNode dNode, Vector3 direction)
-		{
-			float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
-			dNode.SetDirLength(direction.magnitude);
-
-			if (playerDist > higherPrecisionAvoidanceThreshold * 1.5f)
-			{
-				if (dotValue > 0)
-					dNode.seekWeight = dotValue;
-				else if (dotValue == 0)
-					dNode.seekWeight = 0.1f;
-				else dNode.seekWeight = 0.05f;
-			}
-			else
-			{
-				if (dotValue >= 0.8f && dotValue <= 0.9f)
-					dNode.seekWeight = dotValue + 0.2f;
-				else if (dotValue < 0.8f && dotValue > 0.7f)
-					dNode.seekWeight = dotValue + 0.1f;
-				else if (dotValue > 0.9f)
-					dNode.seekWeight = dotValue - 0.1f;
-				else if (dotValue < 0.7f && dotValue > 0)
-					dNode.seekWeight = dotValue;
-				else dNode.seekWeight = 0.1f;
-			}
-		}
-
-		private void AvoidLayer(DirectionNode dNode)
-		{
-			dNode.avoidWeight = 0;
-			RaycastHit rayHit;
-			float dotValue, distanceNorm;
-
-			if (Physics.SphereCast(transform.position + dNode.directionAtAngle, 2, dNode.directionAtAngle * CalculationDistance(playerDist) * 1.5f, out rayHit, CalculationDistance(playerDist) + 2, avoidLayerMask, QueryTriggerInteraction.Collide))
-			{
-				dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
-				distanceNorm = Vector3.Distance(transform.position, rayHit.transform.position);
-				if (dotValue >= 0.6f)
-					dNode.avoidWeight += -1;
-				else if (dotValue <= 0.6f && dotValue > 0)
-					dNode.avoidWeight += -0.5f;
-
-				if (distanceNorm < higherPrecisionAvoidanceThreshold)
-					dNode.avoidWeight -= -1;
 			}
 		}
 
@@ -253,44 +207,5 @@ namespace DarknessMinion
 			}
 		}
 	#endif
-
-		private class DirectionNode
-		{
-			public float angle { get; private set; }
-			public float degAngle { get; private set; }
-			public float avoidWeight, seekWeight;
-			public float combinedWeight { get { return avoidWeight + seekWeight; } }
-
-			public float dirLength { get; private set; }
-
-			public Vector3 directionAtAngle { get; private set; }
-
-			public TextMesh debugText {get; private set;}
-
-			public DirectionNode(float rAngle, float dAngle)
-			{
-				angle = rAngle;
-				degAngle = dAngle;
-				avoidWeight = 0;
-				seekWeight = 0;
-				directionAtAngle = Vector3.zero;
-				dirLength = 0;
-			}
-
-			public void SetDirection(Vector3 v)
-			{ 
-				directionAtAngle = v; 
-			}
-
-			public void SetDirLength(float v)
-			{
-				dirLength = v;
-			}
-
-			public void SetDebugText(string text)
-			{
-				debugText.text = text;
-			}
-		}
 	}
 }

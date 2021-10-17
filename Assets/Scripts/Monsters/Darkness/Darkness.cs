@@ -9,7 +9,7 @@ using System;
 
 namespace DarknessMinion
 {
-	[RequireComponent(typeof(DarknessMovement))]
+	[RequireComponent(typeof(Movement.DarknessMovement))]
 	public class Darkness : MonoBehaviour
 	{
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
@@ -34,7 +34,7 @@ namespace DarknessMinion
 		[SerializeField, Range(0, 5)]
 		private float attackRange;
 
-		public DarknessMovement movement;
+		public Movement.DarknessMovement movement;
 
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
@@ -59,7 +59,7 @@ namespace DarknessMinion
 
 		void Start()
 		{
-			movement = GetComponent<DarknessMovement>();
+			movement = GetComponent<Movement.DarknessMovement>();
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			animTriggerAttack =	Animator.StringToHash("Attack");
