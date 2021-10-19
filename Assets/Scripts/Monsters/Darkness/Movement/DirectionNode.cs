@@ -11,9 +11,7 @@ namespace DarknessMinion.Movement
 
         public float dirLength { get; private set; }
 
-        public Vector3 directionAtAngle { get; private set; }
-
-        public TextMesh debugText {get; private set;}
+        public Vector2 directionAtAngle { get; private set; }
 
         public DirectionNode(float rAngle, float dAngle)
         {
@@ -21,11 +19,11 @@ namespace DarknessMinion.Movement
             degAngle = dAngle;
             avoidWeight = 0;
             seekWeight = 0;
-            directionAtAngle = Vector3.zero;
+            directionAtAngle = Vector2.zero;
             dirLength = 0;
         }
 
-        public void SetDirection(Vector3 v)
+        public void SetDirection(Vector2 v)
         { 
             directionAtAngle = v; 
         }
@@ -33,11 +31,6 @@ namespace DarknessMinion.Movement
         public void SetDirLength(float v)
         {
             dirLength = v;
-        }
-
-        public void SetDebugText(string text)
-        {
-            debugText.text = text;
         }
     }
 }

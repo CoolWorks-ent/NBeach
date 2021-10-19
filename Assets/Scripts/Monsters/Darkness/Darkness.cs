@@ -42,7 +42,7 @@ namespace DarknessMinion
 
 		private Animator animeController;
 
-		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
+		private CooldownInfo actionOnCooldown;
 		private string debugMessage {get; set;}
 
 		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
@@ -51,7 +51,7 @@ namespace DarknessMinion
 		{
 			creationID = 0;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
+			actionOnCooldown = null;
 		}
 
 		void OnEnable() { DarkEventManager.UpdateDarknessStates += UpdateStates; }
@@ -82,8 +82,8 @@ namespace DarknessMinion
 
 		void Update()
 		{
-			if (stateActionsOnCooldown.Count > 0)
-				UpdateCooldownTimers();
+			if (actionOnCooldown != null)
+				UpdateCooldownTimer();
 		}
 
 		public void ChangeState(DarkState nextState)
@@ -146,24 +146,20 @@ namespace DarknessMinion
 
 		public bool CheckActionsOnCooldown(CooldownInfo.CooldownStatus actType)
 		{
-			if (stateActionsOnCooldown.Count > 0)
-				return stateActionsOnCooldown.ContainsKey(actType);
+			if (actionOnCooldown != null && actionOnCooldown.acType == actType)
+				return true;
 			return false;
 		}
 		#endregion
 
-		public void AddCooldown(CooldownInfo actionCooldownInfo)
+		public void AssignCooldown(CooldownInfo actionCooldownInfo)
 		{
-			if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
-			{
-				//Debug.LogWarning("Adding cooldown for " + actionCooldownInfo.acType);
-				stateActionsOnCooldown.Add(actionCooldownInfo.acType, actionCooldownInfo);
-			}
+			actionOnCooldown = actionCooldownInfo;
 		}
 
-		public void ClearCooldowns()
+		public void ClearCooldown()
 		{
-			stateActionsOnCooldown.Clear();
+			actionOnCooldown = null;
 		}
 
 		public void SetAttackDistance(float atkValue)
@@ -178,24 +174,10 @@ namespace DarknessMinion
 			return -1;
 		}
 
-		private void UpdateCooldownTimers()
+		private void UpdateCooldownTimer()
 		{
-			List<CooldownInfo.CooldownStatus> deletedEntries = new List<CooldownInfo.CooldownStatus>();
-			foreach (KeyValuePair<CooldownInfo.CooldownStatus, CooldownInfo> info in stateActionsOnCooldown)
-			{
-				if(!info.Value.TimeRemaining(Time.deltaTime))
-					deletedEntries.Add(info.Key);
-			}
-
-			foreach (CooldownInfo.CooldownStatus cdStatus in deletedEntries)
-			{
-				CooldownInfo deletedInfo; // = stateActionsOnCooldown[cdStatus];
-				if(stateActionsOnCooldown.TryGetValue(cdStatus, out deletedInfo))
-                {
-					stateActionsOnCooldown.Remove(cdStatus);
-					deletedInfo.Callback.Invoke(this);
-				}
-			}
+			if(!actionOnCooldown.TimeRemaining(Time.deltaTime))
+				actionOnCooldown.Callback.Invoke(this);
 		}
 
 		private void OnTriggerEnter(Collider col)
@@ -226,7 +208,7 @@ namespace DarknessMinion
 			if(showLocationInfo)	
 				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>Darkness Position:</b> {1}", movement.playerDist, this.transform.position);
 			if(showCooldownInfo)
-				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
+				debugMessage += String.Format("\n<b>Active Cooldown: {0}</b>", actionOnCooldown.acType);
 			textMesh.text = debugMessage;
 		}
 

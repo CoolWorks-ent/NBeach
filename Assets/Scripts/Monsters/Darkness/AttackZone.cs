@@ -22,13 +22,9 @@ namespace DarknessMinion
 		private float attackPointOffsetForward;
 		private Transform playerLocation;
 
-		//TODO bool occupied, take in RemovedDarkness, with that data I can against ID to unassign
-		//TODO test to make sure when the player is far away from the zone the darkness 
-
 		public void SetPlayerLocationOrigin(Transform player)
 		{
 			playerLocation = player;
-			attackZoneOrigin = playerLocation.position + playerLocation.forward * zoneOffsetForward + playerLocation.right * zoneOffsetRight;
 		}
 
 		public void ZoneUpdate()
@@ -40,11 +36,6 @@ namespace DarknessMinion
 		public Vector3 AttackPoint()
 		{
 			return playerLocation.position + playerLocation.forward * attackPointOffsetForward;
-		}
-
-		public NavigationTarget RequestPointInsideZone(float height)
-        {
-			return new NavigationTarget((Random.insideUnitSphere * zoneRadius), attackZoneOrigin, height);
 		}
 
 		public void OccupyZone(int iD)
@@ -61,7 +52,7 @@ namespace DarknessMinion
 
 		public bool InTheZone(Vector2 location)
 		{
-			Vector2 v = new Vector2(attackZoneOrigin.x, attackZoneOrigin.z);
+			Vector2 v = attackZoneOrigin.ToVector2();
 			if (Vector2.Distance(v, location) < zoneRadius)
 				return true;
 			return false;

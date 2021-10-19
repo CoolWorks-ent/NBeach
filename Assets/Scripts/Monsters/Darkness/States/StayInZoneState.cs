@@ -12,9 +12,8 @@ namespace DarknessMinion
 
         protected override void CooldownCallback(Darkness darkController)
         {
-            Vector3 direction = (AttackZoneManager.Instance.playerAttackZone.attackZoneOrigin - darkController.transform.position).normalized;
-            darkController.movement.UpdatePathDestination(direction);
-            darkController.AddCooldown(new CooldownInfo(pathUpdateRateFar, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
+            darkController.movement.DetermineBestDirection(AttackZoneManager.Instance.playerAttackZone.attackZoneOrigin);
+            darkController.AssignCooldown(new CooldownInfo(pathUpdateRateFar, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
         }
     }
 }

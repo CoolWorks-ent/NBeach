@@ -33,14 +33,14 @@ namespace DarknessMinion
 
 		protected override void CooldownCallback(Darkness darkController)
 		{
-			Vector3 direction;
+			Vector2 destination;
 			DarknessMovement darkMove = darkController.movement;
 			AttackZone atkZone = AttackZoneManager.Instance.playerAttackZone;
 			if (atkZone.InTheZone(darkMove.ConvertToVec2(darkMove.transform.position)))
-				direction = (atkZone.AttackPoint() - darkMove.transform.position).normalized;
-			else direction = (atkZone.attackZoneOrigin - darkController.transform.position).normalized;
-			darkController.movement.UpdatePathDestination(direction);
-			darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
+				destination = atkZone.AttackPoint().ToVector2();
+			else destination = atkZone.attackZoneOrigin.ToVector2();
+			darkController.movement.DetermineBestDirection(destination);
+			darkController.AssignCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
 		public override void ExitState(Darkness darkController)

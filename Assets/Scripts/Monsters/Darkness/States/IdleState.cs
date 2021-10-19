@@ -17,7 +17,7 @@ namespace DarknessMinion
 			darkController.movement.StopMovement();
 	
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
-			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
+			darkController.AssignCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
 		}
 
 		public override void UpdateState(Darkness darkController)
@@ -40,7 +40,7 @@ namespace DarknessMinion
 		protected override void CooldownCallback(Darkness darkController)
 		{
 			CheckTransitions(darkController);
-			darkController.AddCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
+			darkController.AssignCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
 		}
 	}
 }

@@ -41,7 +41,7 @@ namespace DarknessMinion.Movement
         
 		private Rigidbody rgdBod;
 		private Vector3 velocity;
-		private Vector2 moveDirection;
+		public Vector2 moveDirection { get; private set; }
 
 		void Awake()
 		{
@@ -129,17 +129,16 @@ namespace DarknessMinion.Movement
 			}
 		}
 
-		public void UpdatePathDestination(Vector3 destination) //TODO Pass in an attackZone
+		public void DetermineBestDirection(Vector2 destination) //TODO pass in a target based on the 
 		{
+			Vector2 position = transform.position.ToVector2();
 			GenerateVectorPaths();
 			foreach (DirectionNode dNode in directionNodes)
 			{
-				steering.Seek(dNode, destination, higherPrecisionAvoidanceThreshold, playerDist);
-				steering.Avoid(dNode, transform.position, higherPrecisionAvoidanceThreshold, CalculationDistance(playerDist), avoidLayerMask);
+				steering.Seek(dNode, position, destination, higherPrecisionAvoidanceThreshold, playerDist);
+				steering.Avoid(dNode, position, higherPrecisionAvoidanceThreshold, CalculationDistance(playerDist), avoidLayerMask);
 			}
 
-			//Once the layers are calculated with weights narrow down the path that leads closer to the player
-			//Once the direction is chosen set the navtarget to a point along the direction vector
 			bestDirectionIndex = 0;
 			for (int i = 0; i < directionNodes.Length; i++)
 			{
@@ -155,7 +154,7 @@ namespace DarknessMinion.Movement
 				}
 			}
 
-			moveDirection = ConvertToVec2(directionNodes[bestDirectionIndex].directionAtAngle); // * CalculationDistance(playerDist);
+			moveDirection = directionNodes[bestDirectionIndex].directionAtAngle;
 		}
 
 
@@ -165,7 +164,7 @@ namespace DarknessMinion.Movement
 			//I want points at certain angles all around the Darkness and I want to save those to an array
 			for (int i = 0; i < directionNodes.Length; i++)
 			{
-				directionNodes[i].SetDirection(new Vector3(Mathf.Cos(directionNodes[i].angle), 0.1f, Mathf.Sin(directionNodes[i].angle)));
+				directionNodes[i].SetDirection(new Vector2(Mathf.Cos(directionNodes[i].angle), Mathf.Sin(directionNodes[i].angle)));
 			}
 		}
 
@@ -199,8 +198,8 @@ namespace DarknessMinion.Movement
 					else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 						col = Color.magenta;
 					else col = Color.white;
-					lineStart = this.transform.position + dir.directionAtAngle;
-					lineEnd = dir.directionAtAngle * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
+					lineStart = this.transform.position + dir.directionAtAngle.ToVector3();
+					lineEnd = dir.directionAtAngle.ToVector3(1) * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
 					Debug.DrawLine(lineStart, lineEnd, col);
 				}
 				

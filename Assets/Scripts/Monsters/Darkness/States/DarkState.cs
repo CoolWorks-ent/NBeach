@@ -7,7 +7,7 @@ namespace DarknessMinion
 {
 	public abstract class DarkState : ScriptableObject
 	{
-		public DarkTransition[] transitions;
+		public Transition[] transitions;
 		public List<DarkState> referencedBy;
 
 		public void SortTransitionsByPriority()
@@ -19,7 +19,7 @@ namespace DarknessMinion
 		public void UpdateReferences()
 		{
 			referencedBy = new List<DarkState>();
-			foreach (DarkTransition t in transitions)
+			foreach (Transition t in transitions)
 			{
 				if(t.trueState != null)
 				{
@@ -33,13 +33,13 @@ namespace DarknessMinion
 		public virtual void UpdateState(Darkness darkController){ }
 		public virtual void ExitState(Darkness darkController)
 		{
-			darkController.ClearCooldowns();
+			darkController.ClearCooldown();
 		}
 		public virtual void MovementUpdate(Darkness darkController){}
 		protected virtual void CooldownCallback(Darkness darkController) { }
 		protected void CheckTransitions(Darkness darkController)
 		{
-			foreach (DarkTransition darkTran in transitions)
+			foreach (Transition darkTran in transitions)
 			{
 				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, darkController);
 				if (decisionResult)

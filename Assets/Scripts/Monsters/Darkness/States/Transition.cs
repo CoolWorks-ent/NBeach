@@ -1,11 +1,11 @@
 ﻿namespace DarknessMinion
 { 
     [System.Serializable]
-    public class DarkTransition
+    public class Transition
     {
         public enum TransitionPriority {High, Medium, Low}
-        public DarkDecisionMaker decision = new DarkDecisionMaker();
-        public DarkDecisionMaker.DecisionName decisionChoice;
+        public DecisionMaker decision = new DecisionMaker();
+        public DecisionMaker.DecisionName decisionChoice;
         public TransitionPriority priorityLevel;
         public DarkState trueState;
         

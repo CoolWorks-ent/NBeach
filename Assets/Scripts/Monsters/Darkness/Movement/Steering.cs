@@ -4,9 +4,10 @@ namespace DarknessMinion.Movement
 {
     public class Steering
     {
-        public void Seek(DirectionNode dNode, Vector3 direction, float distanceThreshold, float playerDist)
+        public void Seek(DirectionNode dNode, Vector2 startPos, Vector2 destination, float distanceThreshold, float playerDist)
         {
-        	float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
+	        Vector2 direction = (destination - startPos).normalized;
+        	float dotValue = Vector2.Dot(dNode.directionAtAngle, direction);
         	dNode.SetDirLength(direction.magnitude);
 
         	if (playerDist > distanceThreshold)
@@ -31,22 +32,23 @@ namespace DarknessMinion.Movement
         	}
         }
 
-        public void Avoid(DirectionNode dNode, Vector3 position, float distanceThreshold, float raycastDistance, LayerMask avoidLayerMask)
+        public void Avoid(DirectionNode dNode, Vector2 startPos, float distanceThreshold, float raycastDistance, LayerMask avoidLayerMask)
         {
         	dNode.avoidWeight = 0;
         	RaycastHit rayHit;
         	float dotValue, distanceNorm;
 
-        	if (Physics.SphereCast(position + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle, out rayHit, raycastDistance, avoidLayerMask, QueryTriggerInteraction.Collide))
-        	{
-        		dotValue = Vector3.Dot(dNode.directionAtAngle, rayHit.transform.position.normalized);
-        		distanceNorm = Vector3.Distance(position, rayHit.transform.position);
+        	if (Physics.SphereCast(startPos + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle, out rayHit, raycastDistance, avoidLayerMask, QueryTriggerInteraction.Collide))
+            {
+	            Vector2 dir = (rayHit.transform.position.ToVector2() - startPos).normalized;
+        		dotValue = Vector2.Dot(dNode.directionAtAngle, dir);
+        		distanceNorm = Vector2.Distance(startPos, rayHit.transform.position);
         		if (dotValue >= 0.6f)
         			dNode.avoidWeight += -1;
         		else if (dotValue <= 0.6f && dotValue > 0)
         			dNode.avoidWeight += -0.5f;
 
-        		if (distanceNorm < distanceThreshold) //highPrecsion
+        		if (distanceNorm < distanceThreshold) 
         			dNode.avoidWeight += -1;
         	}
         }

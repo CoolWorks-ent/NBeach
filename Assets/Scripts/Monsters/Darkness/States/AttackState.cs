@@ -27,7 +27,7 @@ namespace DarknessMinion
                     if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
                         darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
-                        darkController.AddCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
+                        darkController.AssignCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
                         darkController.darkHitBox.enabled = true;
                     }
                 }

@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace DarknessMinion
 {
-    public class DarkDecisionMaker
+    public class DecisionMaker
     {
         public enum DecisionName { IsAggressive, IsIdling, PausedForNextCommand, IsWandering, InAttackRange, PlayerOutOfRange, AttackOnCooldown, IdleComplete, CloseToPlayer, NotInZone, InsideZone }
         Dictionary<DecisionName, Func<Darkness, bool>> Decisions;
 
-        public DarkDecisionMaker()
+        public DecisionMaker()
         {
             Decisions = new Dictionary<DecisionName, Func<Darkness, bool>>();
             Decisions.Add(DecisionName.IsAggressive, AggresiveCheck);
