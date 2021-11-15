@@ -16,7 +16,6 @@ namespace DarknessMinion
 		public override void InitializeState(Darkness darkController)
 		{
 			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
-			darkController.movement.StartMovement();
 			CooldownCallback(darkController);
 			//darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
@@ -36,7 +35,7 @@ namespace DarknessMinion
 			Vector2 destination;
 			DarknessMovement darkMove = darkController.movement;
 			AttackZone atkZone = AttackZoneManager.Instance.playerAttackZone;
-			if (atkZone.InTheZone(darkMove.ConvertToVec2(darkMove.transform.position)))
+			if (atkZone.InTheZone(darkMove.transform.position.ToVector2()))
 				destination = atkZone.AttackPoint().ToVector2();
 			else destination = atkZone.attackZoneOrigin.ToVector2();
 			darkController.movement.DetermineBestDirection(destination);

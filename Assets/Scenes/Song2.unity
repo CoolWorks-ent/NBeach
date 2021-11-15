@@ -62173,7 +62173,7 @@ Prefab:
         type: 2}
       propertyPath: playerTransform
       value: 
-      objectReference: {fileID: 2059134424}
+      objectReference: {fileID: 1275722337}
     - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
         type: 2}
       propertyPath: player

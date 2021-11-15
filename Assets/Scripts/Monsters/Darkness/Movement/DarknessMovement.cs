@@ -3,11 +3,9 @@ using Pathfinding;
 
 namespace DarknessMinion.Movement
 {
-	[RequireComponent(typeof(Rigidbody))]
-	[RequireComponent(typeof(Darkness))]
-	public class DarknessMovement : MonoBehaviour
+	[System.Serializable]
+	public class DarknessMovement 
 	{
-
 		[HideInInspector]
 		public float playerDist { get; private set; }
 
@@ -30,7 +28,6 @@ namespace DarknessMinion.Movement
 
 		[SerializeField]
 		private LayerMask avoidLayerMask;
-		private bool moving;
 
 		[SerializeField, Range(5, 20)] 
 		private float maxAccel;
@@ -38,8 +35,7 @@ namespace DarknessMinion.Movement
 		private float maxSpeed;
 		[SerializeField, Range(1, 360)]
 		private float rotationSpeed;
-        
-		private Rigidbody rgdBod;
+		
 		private Vector3 velocity;
 		public Vector2 moveDirection { get; private set; }
 
@@ -58,7 +54,6 @@ namespace DarknessMinion.Movement
 				angle = Mathf.Deg2Rad * dAngle;
 				DirectionNode n = new DirectionNode(angle, dAngle);
 				directionNodes[i] = n;
-				//n.CreateDebugText(new Vector3(n.directionAtAngle.x, transform.position.y, n.directionAtAngle.z), this.transform);
 			}
 			bestDirectionIndex = 0;
 			steering = new Steering();
@@ -70,12 +65,7 @@ namespace DarknessMinion.Movement
 
 		public void DistanceEvaluation()
 		{
-			playerDist = Vector2.Distance(ConvertToVec2(transform.position), ConvertToVec2(DarknessManager.Instance.playerVector));
-		}
-
-		public Vector2 ConvertToVec2(Vector3 vector)
-		{
-			return new Vector2(vector.x, vector.z);
+			playerDist = Vector2.Distance(transform.position.ToVector2(), DarknessManager.Instance.playerVector.ToVector2());
 		}
 
 		public void RotateTowardsPlayer()
@@ -86,7 +76,7 @@ namespace DarknessMinion.Movement
 		
 		private void RotateTowardsDirection(Vector3 mDir) 
 		{
-			Vector3 dir = Vector3.RotateTowards(transform.forward, mDir, 2.0f * Time.deltaTime * rotationSpeed, 0.1f);
+			Vector3 dir = Vector3.RotateTowards(transform.forward, mDir,  Time.deltaTime * rotationSpeed, 0.1f);
 			transform.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 		}
 
@@ -103,15 +93,9 @@ namespace DarknessMinion.Movement
 
 		public void StopMovement()
 		{
-			moving = false;
 			moveDirection = Vector2.zero;
 		}
-
-		public void StartMovement()
-		{
-			moving = true;
-		}
-
+		
 		public void MoveBody()
 		{
 			if (moveDirection != Vector2.zero)
@@ -132,7 +116,7 @@ namespace DarknessMinion.Movement
 		public void DetermineBestDirection(Vector2 destination) //TODO pass in a target based on the 
 		{
 			Vector2 position = transform.position.ToVector2();
-			GenerateVectorPaths();
+			GenerateDirectionVectors();
 			foreach (DirectionNode dNode in directionNodes)
 			{
 				steering.Seek(dNode, position, destination, higherPrecisionAvoidanceThreshold, playerDist);
@@ -158,7 +142,7 @@ namespace DarknessMinion.Movement
 		}
 
 
-		private void GenerateVectorPaths()
+		private void GenerateDirectionVectors()
 		{
 			//Generate vectors in several directions in a circle around the Darkness
 			//I want points at certain angles all around the Darkness and I want to save those to an array
@@ -172,22 +156,21 @@ namespace DarknessMinion.Movement
 		{
 			if (distance < higherPrecisionAvoidanceThreshold)
 				return pathSetDistance / 2;
-			else return pathSetDistance;
+			return pathSetDistance;
 		}
 
 
 	#if UNITY_EDITOR
 		void OnDrawGizmosSelected()
 		{
-			Color col = Color.red;
-			Vector3 lineStart, lineEnd;
-			if(moving)
+			if (Application.isPlaying)
 			{
-				//Debug.DrawLine(this.transform.position, darkAttackZone.attackZoneOrigin, Color.white);
-				//Debug.DrawLine(this.transform.position, pather.destination, Color.red);
+				Color col = Color.red;
+				Vector3 lineStart, lineEnd;
+
 				foreach (DirectionNode dir in directionNodes)
 				{
-					if(dir == directionNodes[bestDirectionIndex])
+					if (dir == directionNodes[bestDirectionIndex])
 						col = new Color(1f, 0.56f, 0.03f);
 					else if (dir.combinedWeight > 0.9f)
 						col = Color.green;
@@ -199,10 +182,11 @@ namespace DarknessMinion.Movement
 						col = Color.magenta;
 					else col = Color.white;
 					lineStart = this.transform.position + dir.directionAtAngle.ToVector3();
-					lineEnd = dir.directionAtAngle.ToVector3(1) * (dir.combinedWeight * CalculationDistance(playerDist)) + this.transform.position ;
+					lineEnd =
+						dir.directionAtAngle.ToVector3(1) * (dir.combinedWeight * CalculationDistance(playerDist)) +
+						this.transform.position;
 					Debug.DrawLine(lineStart, lineEnd, col);
 				}
-				
 			}
 		}
 	#endif

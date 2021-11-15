@@ -1,20 +1,109 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEditor;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 namespace DarknessMinion.Movement
 {
-    public class Steering
+    [RequireComponent(typeof(MovementController))]
+    public class AIMovement : MonoBehaviour, IInputInterpreter
     {
-	    private Transform transform;
-	    private MovementController movementController;
-		    
-	    public Steering(Transform t, MovementController m)
-	    {
-		    transform = t;
-		    movementController = m;
-	    }
-	    
-	    public Vector2 Seek(Vector2 target)
+	    public Vector2 currentMovementDirection { get; private set; } 
+        
+        [SerializeField, Range(0.1f, 1)]
+        private float changeDirectionThreshold;
+        [SerializeField] 
+        private LayerMask obstacleLayerMask;
+        
+        private int bestDirectionIndex;
+        private DirectionNode[] directionNodes;
+        private HashSet<Avoidable> avoidableObstacles;
+        private MovementController movementController;
+        private InputInfo inputInfo;
+        private Collider colliderBounds;
+
+        private void Awake()
+        {
+            currentMovementDirection = Vector2.zero;
+            inputInfo = new InputInfo();
+            CreateDirectionNodes(4);
+            avoidableObstacles = new HashSet<Avoidable>(new AvoidableComparer());
+            movementController = GetComponent<MovementController>();
+            colliderBounds = GetComponent<Collider>(); 
+        }
+
+        public void CreateDirectionNodes(int angleAmounts)
+        {
+            directionNodes = new DirectionNode[angleAmounts];
+            float angle, dAngle = 0;
+            for(int i = 0; i < directionNodes.Length; i++)
+            {
+                dAngle = ((360.0f / directionNodes.Length) * (float)i);
+                angle = Mathf.Deg2Rad * dAngle;
+                DirectionNode n = new DirectionNode(angle);
+                directionNodes[i] = n;
+            }
+            bestDirectionIndex = 0;
+        }
+
+        public void ResetMovement()
+        {
+            currentMovementDirection = Vector2.zero;
+            inputInfo = new InputInfo();
+        }
+
+        public void SetMovementDirection(Vector2 dir)
+        {
+            currentMovementDirection = dir;
+        }
+        
+        public InputInfo GetInputInfo()
+        {
+	        if (currentMovementDirection == Vector2.zero)
+		        return new InputInfo();
+	        inputInfo.inputDirection = currentMovementDirection;
+            return inputInfo;
+        }
+
+        public Vector2 GetMovementDirection()
+        {
+            return currentMovementDirection;
+        }
+
+        public void SetInputInfo(Vector2 direction, float speedModifier = 0)
+        {
+	        inputInfo.inputDirection = direction;
+	        inputInfo.maxSpeedModifier = speedModifier;
+        }
+
+        public Vector2 GetLocalNavDirection(Vector2 destination) 
+        {
+            foreach (DirectionNode dNode in directionNodes)
+            {
+                //ContextSeek(dNode, destination);
+                //ContextAvoid(dNode);
+            }
+            
+            bestDirectionIndex = 0;
+            for (int i = 0; i < directionNodes.Length; i++)
+            {
+                if(i+1 <= directionNodes.Length-1)
+                {
+                    if (directionNodes[bestDirectionIndex].combinedWeight < directionNodes[i].combinedWeight)
+                    {
+                        float directionDifference = Mathf.Abs(directionNodes[bestDirectionIndex].combinedWeight -
+                                                              directionNodes[i].combinedWeight);
+                        if(directionDifference > changeDirectionThreshold)
+                            bestDirectionIndex = i;
+                    }
+                }
+            }
+
+            return directionNodes[bestDirectionIndex].directionAtAngle; 
+        }
+
+        #region Steering functions
+        public Vector2 Seek(Vector2 target)
 	    {
 		    return (target - movementController.GetPosition()).normalized;
 	    }
@@ -24,7 +113,7 @@ namespace DarknessMinion.Movement
 		    return (movementController.GetPosition() - target).normalized;
 	    }
 	    
-	    public Vector2 Arrive(Vector2 targetPos, InputInfo inputInfo, float slowdownDistance = 2.5f)
+	    public Vector2 Arrive(Vector2 targetPos, float slowdownDistance = 2.5f)
 	    {
 		    float distanceTo = Vector2.Distance(targetPos, movementController.GetPosition());
 		    if (distanceTo < slowdownDistance) //distance at 5
@@ -38,7 +127,7 @@ namespace DarknessMinion.Movement
 		    return Seek(targetPos);
 	    }
 
-	    public Vector2 Pursuit(MovementController targetMovement, Vector2 currentMovementDirection)
+	    public Vector2 Pursuit(MovementController targetMovement)
 	    {
 		    //Get context target velocity normalized and current position
 		    //check if the direction is the same 
@@ -75,16 +164,14 @@ namespace DarknessMinion.Movement
 			return Seek(wanderTarget);
 	    }
 
-	    public Vector2 ObstacleAvoidance(Hashset<Avoidable> avoidableObstacles, Collider colliderBounds, MovementController movementController, float agentBoundsScalar, float lookAheadSpeedMod, 
-		    LayerMask obstacleLayerMask, float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
+	    public Vector2 ObstacleAvoidance(float agentBoundsScalar, float lookAheadSpeedMod, float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
 	    {
 		    Vector2 avoidanceVector = Vector2.zero;
 		    float distanceScaled = Mathf.Max(1 ,(lookAheadSpeedMod * movementController.GetVelocity().magnitude));
-
-		    RaycastHit hitInfo;
+			
 			//if I hit something with this boxcast store the obstacle, if already stored update the hitPosition
 			if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, transform.forward,
-				out hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
+				out RaycastHit hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
 			{
 				int iD = hitInfo.transform.GetInstanceID();
 				Bounds obstacleBounds = new Bounds(hitInfo.transform.position, hitInfo.collider.bounds.size * agentBoundsScalar);
@@ -153,104 +240,15 @@ namespace DarknessMinion.Movement
 			return avoidanceVector.normalized;
 	    }
 	    
-	    
-	    
-        public void Seek(DirectionNode dNode, Vector2 startPos, Vector2 destination, float distanceThreshold, float playerDist)
+
+
+    #endregion
+
+    #if UNITY_EDITOR
+        void OnDrawGizmosSelected()
         {
-	        Vector2 direction = (destination - startPos).normalized;
-        	float dotValue = Vector2.Dot(dNode.directionAtAngle, direction);
-        	dNode.SetDirLength(direction.magnitude);
 
-        	if (playerDist > distanceThreshold)
-        	{
-        		if (dotValue > 0)
-        			dNode.seekWeight = dotValue;
-        		else if (dotValue == 0)
-        			dNode.seekWeight = 0.1f;
-        		else dNode.seekWeight = 0.05f;
-        	}
-        	else
-        	{
-        		if (dotValue >= 0.8f && dotValue <= 0.9f)
-        			dNode.seekWeight = dotValue + 0.2f;
-        		else if (dotValue < 0.8f && dotValue > 0.7f)
-        			dNode.seekWeight = dotValue + 0.1f;
-        		else if (dotValue > 0.9f)
-        			dNode.seekWeight = dotValue - 0.1f;
-        		else if (dotValue < 0.7f && dotValue > 0)
-        			dNode.seekWeight = dotValue;
-        		else dNode.seekWeight = 0.1f;
-        	}
         }
-
-        public void Avoid(DirectionNode dNode, Vector2 startPos, float distanceThreshold, float raycastDistance, LayerMask avoidLayerMask)
-        {
-        	dNode.avoidWeight = 0;
-        	RaycastHit rayHit;
-        	float dotValue, distanceNorm;
-
-        	if (Physics.SphereCast(startPos + dNode.directionAtAngle * 1.5f, 2, dNode.directionAtAngle, out rayHit, raycastDistance, avoidLayerMask, QueryTriggerInteraction.Collide))
-            {
-	            Vector2 dir = (rayHit.transform.position.ToVector2() - startPos).normalized;
-        		dotValue = Vector2.Dot(dNode.directionAtAngle, dir);
-        		distanceNorm = Vector2.Distance(startPos, rayHit.transform.position);
-        		if (dotValue >= 0.6f)
-        			dNode.avoidWeight += -1;
-        		else if (dotValue <= 0.6f && dotValue > 0)
-        			dNode.avoidWeight += -0.5f;
-
-        		if (distanceNorm < distanceThreshold) 
-        			dNode.avoidWeight += -1;
-        	}
-        }
-        
-        public void ContextSeek(DirectionNode dNode, Vector3 direction, float distanceThreshold, float playerDist)
-        {
-	        float dotValue = Vector3.Dot(dNode.directionAtAngle, direction);
-	        dNode.SetDirLength(direction.magnitude);
-
-	        if (playerDist > distanceThreshold)
-	        {
-		        if (dotValue > 0)
-			        dNode.seekWeight = dotValue;
-		        else if (dotValue == 0)
-			        dNode.seekWeight = 0.1f;
-		        else dNode.seekWeight = 0.05f;
-	        }
-	        else
-	        {
-		        if (dotValue >= 0.8f && dotValue <= 0.9f)
-			        dNode.seekWeight = dotValue + 0.2f;
-		        else if (dotValue < 0.8f && dotValue > 0.7f)
-			        dNode.seekWeight = dotValue + 0.1f;
-		        else if (dotValue > 0.9f)
-			        dNode.seekWeight = dotValue - 0.1f;
-		        else if (dotValue < 0.7f && dotValue > 0)
-			        dNode.seekWeight = dotValue;
-		        else dNode.seekWeight = 0.1f;
-	        }
-        }
-
-        public void ContextAvoid(DirectionNode dNode, Vector3 position, float distanceThreshold, float raycastDistance, LayerMask avoidLayerMask)
-        {
-	        dNode.avoidWeight = 0;
-	        RaycastHit rayHit;
-	        float dotValue, distanceNorm;
-
-	        if (Physics.SphereCast(position.ToVector2() + dNode.directionAtAngle * 1.5f, 2, 
-		        dNode.directionAtAngle, out rayHit, raycastDistance, avoidLayerMask, QueryTriggerInteraction.Collide))
-	        {
-		        Vector3 hitPos = rayHit.transform.position;
-		        dotValue = Vector3.Dot(dNode.directionAtAngle, hitPos.normalized);
-		        distanceNorm = Vector3.Distance(position, hitPos);
-		        if (dotValue >= 0.6f)
-			        dNode.avoidWeight += -1;
-		        else if (dotValue <= 0.6f && dotValue > 0)
-			        dNode.avoidWeight += -0.5f;
-
-		        if (distanceNorm < distanceThreshold) 
-			        dNode.avoidWeight += -1;
-	        }
-        }
+    #endif
     }
 }

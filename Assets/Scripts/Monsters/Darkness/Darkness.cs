@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
+﻿using UnityEngine;
 using System;
 
 /*************Darkness Enemy Script**********
@@ -9,7 +7,6 @@ using System;
 
 namespace DarknessMinion
 {
-	[RequireComponent(typeof(Movement.DarknessMovement))]
 	public class Darkness : MonoBehaviour
 	{
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
@@ -36,7 +33,7 @@ namespace DarknessMinion
 
 		public Movement.DarknessMovement movement;
 
-		[SerializeField] //Tooltip("Assign in Editor")
+		[SerializeField] 
 		private DarkState deathState, currentState;
 		private DarkState previousState;
 

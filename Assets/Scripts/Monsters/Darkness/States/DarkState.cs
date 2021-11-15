@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using DarknessMinion.Movement;
 
 namespace DarknessMinion
 {
@@ -35,7 +36,7 @@ namespace DarknessMinion
 		{
 			darkController.ClearCooldown();
 		}
-		public virtual void MovementUpdate(Darkness darkController){}
+		public virtual void MovementUpdate(Darkness darkController, MovementController movementController){}
 		protected virtual void CooldownCallback(Darkness darkController) { }
 		protected void CheckTransitions(Darkness darkController)
 		{

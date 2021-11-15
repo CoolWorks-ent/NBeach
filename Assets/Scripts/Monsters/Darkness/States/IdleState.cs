@@ -1,3 +1,4 @@
+using DarknessMinion.Movement;
 using UnityEngine;
 
 namespace DarknessMinion
@@ -26,9 +27,9 @@ namespace DarknessMinion
 				CheckTransitions(darkController);
 		}
 
-		public override void MovementUpdate(Darkness darkController)
+		public override void MovementUpdate(Darkness darkController, MovementController movementController)
 		{
-			darkController.movement.RotateTowardsPlayer();
+			movementController.RotateTowardsPlayer();
 		}
 
 		public override void ExitState(Darkness darkController)
