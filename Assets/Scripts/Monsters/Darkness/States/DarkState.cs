@@ -7,21 +7,19 @@ namespace DarknessMinion
 {
 	public abstract class DarkState : ScriptableObject
 	{
-		//protected readonly Darkness darkController;
-		public DarkTransition[] transitions;
+		public Transition[] transitions;
 		public List<DarkState> referencedBy;
-		//protected Lookup<DarkTransition.TransitionPriority, DarkTransition> priorityTransitions;
 
 		public void SortTransitionsByPriority()
 		{
 			if(transitions != null || transitions.Count() > 0)
-				Array.Sort(transitions, ((t, p) => {return t.priorityLevel.CompareTo(p.priorityLevel);}));
+				Array.Sort(transitions, (t, p) => t.priorityLevel.CompareTo(p.priorityLevel));
 		}
 
 		public void UpdateReferences()
 		{
 			referencedBy = new List<DarkState>();
-			foreach (DarkTransition t in transitions)
+			foreach (Transition t in transitions)
 			{
 				if(t.trueState != null)
 				{
@@ -35,13 +33,13 @@ namespace DarknessMinion
 		public virtual void UpdateState(Darkness darkController){ }
 		public virtual void ExitState(Darkness darkController)
 		{
-			darkController.ClearCooldowns();
+			darkController.ClearCooldown();
 		}
 		public virtual void MovementUpdate(Darkness darkController){}
 		protected virtual void CooldownCallback(Darkness darkController) { }
 		protected void CheckTransitions(Darkness darkController)
 		{
-			foreach (DarkTransition darkTran in transitions)
+			foreach (Transition darkTran in transitions)
 			{
 				bool decisionResult = darkTran.decision.MakeDecision(darkTran.decisionChoice, darkController);
 				if (decisionResult)
@@ -50,11 +48,5 @@ namespace DarknessMinion
 				}
 			}
 		}
-
-		/*protected void RemoveDarkness()
-		{
-			this.ExitState(); //fire this if not in the Death state already
-			darkController.updateStates = false;
-		}*/
 	}
 }

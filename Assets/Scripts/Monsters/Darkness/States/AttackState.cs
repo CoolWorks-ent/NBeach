@@ -27,8 +27,7 @@ namespace DarknessMinion
                     if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
                         darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
-
-                        darkController.AddCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
+                        darkController.AssignCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
                         darkController.darkHitBox.enabled = true;
                     }
                 }
@@ -38,13 +37,12 @@ namespace DarknessMinion
 
         public override void ExitState(Darkness darkController)
         {
-
+            
         }
 
         protected override void CooldownCallback(Darkness darkController)
         {
             darkController.darkHitBox.enabled = false;
-            darkController.movement.StopMovement();
         }
     }
 }

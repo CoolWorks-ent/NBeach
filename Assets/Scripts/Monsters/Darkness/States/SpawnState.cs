@@ -14,7 +14,7 @@ namespace DarknessMinion
 			GameObject newFX = Instantiate(spawnFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             newFX.transform.SetParent(darkController.transform);
 			Destroy(newFX, 3);
-			darkController.AddCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownInfo.CooldownStatus.Spawn, CooldownCallback));
+			darkController.AssignCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownInfo.CooldownStatus.Spawn, CooldownCallback));
 		}
 
 		protected override void CooldownCallback(Darkness darkController)

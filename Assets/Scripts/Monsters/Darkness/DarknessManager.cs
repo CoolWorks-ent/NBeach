@@ -7,13 +7,14 @@ namespace DarknessMinion
 {
 	public class DarknessManager : MonoBehaviour
 	{
+		/* 
+		*	Contains references to all Darkness. Approves them for attacking based on distance. Provides attack target when attacking
+		*/
 		public Transform playerTransform { get { return player; } }
 		public Vector3 playerVector { get { return player.position; } }
 		public Dictionary<int, Darkness> ActiveDarkness;
 
 		public List<int> attackApprovalPriority;
-
-		public float groundLevel { get { return player.position.y; } }
 
 		public static DarknessManager Instance { get; private set; }
 
@@ -44,7 +45,6 @@ namespace DarknessMinion
 			
 			paused = false;
 			calculationTime = 0.5f;
-			//attackOffset = 2.75f;
 
 			StartCoroutine(ManagedDarknessUpdate());
 		}
@@ -79,6 +79,7 @@ namespace DarknessMinion
 					SortTheGoons();
 
 					UpdateDarknessAggresion();
+					
 					yield return new WaitForSeconds(calculationTime);
 					DarkEventManager.OnUpdateDarknessStates();
 				}
@@ -96,6 +97,7 @@ namespace DarknessMinion
 				if (i < darknessConcurrentAttackLimit)
 				{
 					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Attacking);
+					//TODO Set attackZone on DarknessMovement, check if zone if already assigned and not blocked
 					//if (i + 1 <= attackApprovalPriority.Count - 1)
 					//	ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
 				}
@@ -112,7 +114,7 @@ namespace DarknessMinion
 		{
 			attackApprovalPriority.Sort(delegate (int a, int b)
 			{
-				return ActiveDarkness[a].movement.playerDist.CompareTo(ActiveDarkness[b].movement.playerDist);
+				return ActiveDarkness[a].PlayerDistance().CompareTo(ActiveDarkness[b].PlayerDistance());
 			});
 		}
 		#endregion
@@ -121,14 +123,14 @@ namespace DarknessMinion
 		///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
 		private void AddtoDarknessList(Darkness updatedDarkness)
 		{
-			updatedDarkness.transform.SetParent(Instance.transform);
+			updatedDarkness.transform.SetParent(this.transform);
 			darknessIDCounter++;
 			
 			updatedDarkness.Spawn(darknessIDCounter);
 
 			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
 			attackApprovalPriority.Add(updatedDarkness.creationID);
-			updatedDarkness.movement.player = player;
+			updatedDarkness.player = player;
 			Vector3 pDir = player.position - updatedDarkness.transform.position;
 			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
 		}

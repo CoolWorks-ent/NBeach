@@ -941,13 +941,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agRatingCurrent: 0
   agRatingPrevious: 0
-  movement: {fileID: 0}
+  player: {fileID: 0}
   darkHitBox: {fileID: 0}
   textMesh: {fileID: 102784145251410432}
   playerMask:
     serializedVersion: 2
     m_Bits: 4096
-  attackRange: 2.6
+  attackRange: 3
+  movement: {fileID: 0}
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
 --- !u!114 &114621632964799650
@@ -962,19 +963,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  darkAttackZone: {fileID: 0}
   pathSetDistance: 5
-  higherPrecisionAvoidanceThreshold: 5
+  higherPrecisionAvoidanceThreshold: 3.2
+  seekThreshold: 0.2
   avoidLayerMask:
     serializedVersion: 2
     m_Bits: 139264
+  maxAccel: 12.4
+  maxSpeed: 2.06
+  rotationSpeed: 55
 --- !u!114 &114774764668895200
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6eb1402c17e84a9282a7f0f62eb584f, type: 3}
   m_Name: 

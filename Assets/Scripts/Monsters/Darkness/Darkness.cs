@@ -9,7 +9,7 @@ using System;
 
 namespace DarknessMinion
 {
-	[RequireComponent(typeof(DarknessMovement))]
+	[RequireComponent(typeof(Movement.DarknessMovement))]
 	public class Darkness : MonoBehaviour
 	{
 		public enum AggresionRating { Attacking = 1, Idling, Wandering }
@@ -18,7 +18,7 @@ namespace DarknessMinion
 
 		[HideInInspector]
 		public AggresionRating agRatingCurrent, agRatingPrevious;
-		public DarknessMovement movement;
+		public Transform player;
 
 		[HideInInspector]
 		public Collider darkHitBox;
@@ -34,13 +34,15 @@ namespace DarknessMinion
 		[SerializeField, Range(0, 5)]
 		private float attackRange;
 
+		public Movement.DarknessMovement movement;
+
 		[SerializeField] //Tooltip("Assign in Editor")
 		private DarkState deathState, currentState;
 		private DarkState previousState;
 
 		private Animator animeController;
 
-		private Dictionary<CooldownInfo.CooldownStatus, CooldownInfo> stateActionsOnCooldown;
+		private CooldownInfo actionOnCooldown;
 		private string debugMessage {get; set;}
 
 		private int animTriggerAttack, animTriggerIdle, animTriggerChase, animTriggerDeath;
@@ -49,7 +51,7 @@ namespace DarknessMinion
 		{
 			creationID = 0;
 			agRatingCurrent = agRatingPrevious = AggresionRating.Idling;
-			stateActionsOnCooldown = new Dictionary<CooldownInfo.CooldownStatus, CooldownInfo>();
+			actionOnCooldown = null;
 		}
 
 		void OnEnable() { DarkEventManager.UpdateDarknessStates += UpdateStates; }
@@ -57,7 +59,7 @@ namespace DarknessMinion
 
 		void Start()
 		{
-			movement = GetComponent<DarknessMovement>();
+			movement = GetComponent<Movement.DarknessMovement>();
 			textMesh = GetComponentInChildren<TextMesh>(true);
 			animeController = GetComponentInChildren<Animator>();
 			animTriggerAttack =	Animator.StringToHash("Attack");
@@ -69,6 +71,7 @@ namespace DarknessMinion
 			darkHitBox.enabled = false;
 			DarkEventManager.OnDarknessAdded(this);
 			currentState.InitializeState(this);
+			movement.player = player;
 		}
 
 		void FixedUpdate()
@@ -79,15 +82,15 @@ namespace DarknessMinion
 
 		void Update()
 		{
-			if (stateActionsOnCooldown.Count > 0)
-				UpdateCooldownTimers();
+			if (actionOnCooldown != null)
+				UpdateCooldownTimer();
 		}
 
 		public void ChangeState(DarkState nextState)
 		{
 			previousState = currentState;
 			currentState = nextState;
-			previousState.ExitState(this);
+			previousState.ExitState(this);  
 			currentState.InitializeState(this);
 		}
 
@@ -104,7 +107,7 @@ namespace DarknessMinion
 		public void ChangeAnimation(DarkAnimationStates anim)
 		{
 			//animeController.SetInteger(stateAnimID, playID);
-			switch(anim)
+			switch (anim)
 			{
 				case DarkAnimationStates.Attack:
 					animeController.SetTrigger(animTriggerAttack);
@@ -119,7 +122,6 @@ namespace DarknessMinion
 					animeController.SetTrigger(animTriggerDeath);
 					return;
 			}
-			//animeController.Play(anim.ToString());
 		}
 
 		public float CurrentAnimationLength()
@@ -144,24 +146,20 @@ namespace DarknessMinion
 
 		public bool CheckActionsOnCooldown(CooldownInfo.CooldownStatus actType)
 		{
-			if (stateActionsOnCooldown.Count > 0)
-				return stateActionsOnCooldown.ContainsKey(actType);
+			if (actionOnCooldown != null && actionOnCooldown.acType == actType)
+				return true;
 			return false;
 		}
 		#endregion
 
-		public void AddCooldown(CooldownInfo actionCooldownInfo)
+		public void AssignCooldown(CooldownInfo actionCooldownInfo)
 		{
-			if (!stateActionsOnCooldown.ContainsKey(actionCooldownInfo.acType))
-			{
-				//Debug.LogWarning("Adding cooldown for " + actionCooldownInfo.acType);
-				stateActionsOnCooldown.Add(actionCooldownInfo.acType, actionCooldownInfo);
-			}
+			actionOnCooldown = actionCooldownInfo;
 		}
 
-		public void ClearCooldowns()
+		public void ClearCooldown()
 		{
-			stateActionsOnCooldown.Clear();
+			actionOnCooldown = null;
 		}
 
 		public void SetAttackDistance(float atkValue)
@@ -169,24 +167,17 @@ namespace DarknessMinion
 			attackRange = atkValue;
 		}
 
-		private void UpdateCooldownTimers()
+		public float PlayerDistance()
 		{
-			List<CooldownInfo.CooldownStatus> deletedEntries = new List<CooldownInfo.CooldownStatus>();
-			foreach (KeyValuePair<CooldownInfo.CooldownStatus, CooldownInfo> info in stateActionsOnCooldown)
-			{
-				if(!info.Value.TimeRemaining(Time.deltaTime))
-					deletedEntries.Add(info.Key);
-			}
+			if(movement)
+				return movement.playerDist;
+			return -1;
+		}
 
-			foreach (CooldownInfo.CooldownStatus cdStatus in deletedEntries)
-			{
-				CooldownInfo deletedInfo; // = stateActionsOnCooldown[cdStatus];
-				if(stateActionsOnCooldown.TryGetValue(cdStatus, out deletedInfo))
-                {
-					stateActionsOnCooldown.Remove(cdStatus);
-					deletedInfo.Callback.Invoke(this);
-				}
-			}
+		private void UpdateCooldownTimer()
+		{
+			if(!actionOnCooldown.TimeRemaining(Time.deltaTime))
+				actionOnCooldown.Callback.Invoke(this);
 		}
 
 		private void OnTriggerEnter(Collider col)
@@ -217,7 +208,7 @@ namespace DarknessMinion
 			if(showLocationInfo)	
 				debugMessage += String.Format("\n <b>Player Distance:</b> {0} \n" + "<b>Darkness Position:</b> {1}", movement.playerDist, this.transform.position);
 			if(showCooldownInfo)
-				debugMessage += String.Format("\n<b>Active Cooldown Count: {0}</b>", stateActionsOnCooldown.Count());
+				debugMessage += String.Format("\n<b>Active Cooldown: {0}</b>", actionOnCooldown.acType);
 			textMesh.text = debugMessage;
 		}
 
@@ -226,34 +217,11 @@ namespace DarknessMinion
 			textMesh.gameObject.SetActive(active);
 		}
 
+	#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, Color.red, 0.01f);
-			/*if(navTarget != null)
-            {
-				switch (navTarget.navTargetTag)
-				{
-					case NavigationTarget.NavTargetTag.Attack:
-						Gizmos.color = Color.red; //new Color(1f, 0.43f, 0.24f);
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 2);
-
-						Gizmos.color = Color.white;
-						Gizmos.DrawSphere(navTarget.srcPosition, 2);
-						break;
-					case NavigationTarget.NavTargetTag.AttackStandby:
-						Gizmos.color = Color.yellow;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1.5f);
-						break;
-					case NavigationTarget.NavTargetTag.Neutral:
-						Gizmos.color = Color.white;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
-						break;
-					case NavigationTarget.NavTargetTag.Patrol:
-						Gizmos.color = Color.cyan;
-						Gizmos.DrawCube(navTarget.navPosition, Vector3.one * 1f);
-						break;
-				}
-			}*/
+			Debug.DrawRay(transform.position+new Vector3(0,1,0), transform.forward*2f, new Color(1f, 0.92f, 0.08f), 0.01f);
         }
+	#endif
 	}
 }
