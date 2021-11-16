@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
     [CreateAssetMenu(menuName = "Darkness/SpawnState")]
     public class SpawnState : DarkState
@@ -9,7 +9,7 @@ namespace DarknessMinion
 		[Range(0, 3)]
 		public float spawnDelay;
 
-		public override void InitializeState(Darkness darkController)
+		public override void InitializeState(DarknessController darkController)
 		{	
 			GameObject newFX = Instantiate(spawnFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             newFX.transform.SetParent(darkController.transform);
@@ -17,7 +17,7 @@ namespace DarknessMinion
 			darkController.AssignCooldown(new CooldownInfo(darkController.CurrentAnimationLength(), CooldownInfo.CooldownStatus.Spawn, CooldownCallback));
 		}
 
-		protected override void CooldownCallback(Darkness darkController)
+		protected override void CooldownCallback(DarknessController darkController)
         {
 			CheckTransitions(darkController);
         }

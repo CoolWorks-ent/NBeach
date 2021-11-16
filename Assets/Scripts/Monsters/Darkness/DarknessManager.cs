@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DarknessMinion
+namespace Darkness
 {
 	public class DarknessManager : MonoBehaviour
 	{
@@ -12,7 +12,7 @@ namespace DarknessMinion
 		*/
 		public Transform playerTransform { get { return player; } }
 		public Vector3 playerVector { get { return player.position; } }
-		public Dictionary<int, Darkness> ActiveDarkness;
+		public Dictionary<int, DarknessController> ActiveDarkness;
 
 		public List<int> attackApprovalPriority;
 
@@ -40,7 +40,7 @@ namespace DarknessMinion
 				//Destroy(instance.gameObject.GetComponent<AI_Manager>());
 			}
 			else Instance = this;
-			ActiveDarkness = new Dictionary<int, Darkness>();
+			ActiveDarkness = new Dictionary<int, DarknessController>();
 			attackApprovalPriority = new List<int>();
 			
 			paused = false;
@@ -96,14 +96,14 @@ namespace DarknessMinion
 			{
 				if (i < darknessConcurrentAttackLimit)
 				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Attacking);
+					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(DarknessController.AggresionRating.Attacking);
 					//TODO Set attackZone on DarknessMovement, check if zone if already assigned and not blocked
 					//if (i + 1 <= attackApprovalPriority.Count - 1)
 					//	ActiveDarkness[attackApprovalPriority[i + 1]].movement.UpdateHighAvoidancePoint(ActiveDarkness[attackApprovalPriority[i]].transform.position); //update the avoidance points of the next Darkness sorted in the list
 				}
 				else
 				{
-					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(Darkness.AggresionRating.Idling);
+					ActiveDarkness[attackApprovalPriority[i]].AggressionRatingUpdate(DarknessController.AggresionRating.Idling);
 					//ActiveDarkness[attackApprovalPriority[i]].movement.UpdateHighAvoidancePoint(Vector3.zero);
 				}
 			}
@@ -121,32 +121,31 @@ namespace DarknessMinion
 
 		#region DarknessCollectionUpdates
 		///<summary> Notified by the AddDarkness event. Initializes Darkness parameters and adds to ActiveDakness </summary>
-		private void AddtoDarknessList(Darkness updatedDarkness)
+		private void AddtoDarknessList(DarknessController updatedDarknessController)
 		{
-			updatedDarkness.transform.SetParent(this.transform);
+			updatedDarknessController.transform.SetParent(this.transform);
 			darknessIDCounter++;
 			
-			updatedDarkness.Spawn(darknessIDCounter);
+			updatedDarknessController.Spawn(darknessIDCounter);
 
-			ActiveDarkness.Add(updatedDarkness.creationID, updatedDarkness);
-			attackApprovalPriority.Add(updatedDarkness.creationID);
-			updatedDarkness.player = player;
-			Vector3 pDir = player.position - updatedDarkness.transform.position;
-			updatedDarkness.transform.Rotate(Vector3.RotateTowards(updatedDarkness.transform.forward, pDir, 180, 0.0f));
+			ActiveDarkness.Add(updatedDarknessController.creationID, updatedDarknessController);
+			attackApprovalPriority.Add(updatedDarknessController.creationID);
+			Vector3 pDir = player.position - updatedDarknessController.transform.position;
+			updatedDarknessController.transform.Rotate(Vector3.RotateTowards(updatedDarknessController.transform.forward, pDir, 180, 0.0f));
 		}
 
 		///<summary>Removes Darkness from attack list if present. Also removes Darkness from active list and stops any relevant running funcitons</summary>
-		public void RemoveFromDarknessList(Darkness updatedDarkness)
+		public void RemoveFromDarknessList(DarknessController updatedDarknessController)
 		{
-			attackApprovalPriority.Remove(updatedDarkness.creationID);
-			ActiveDarkness.Remove(updatedDarkness.creationID);
+			attackApprovalPriority.Remove(updatedDarknessController.creationID);
+			ActiveDarkness.Remove(updatedDarknessController.creationID);
 		}
 
 		[ContextMenu("Test KillAllDarkness")]
 		public void KillAllDarkness()
 		{
 			Debug.Log("[AI] All Darkness AI kill call");
-			foreach (KeyValuePair<int, Darkness> dark in ActiveDarkness)
+			foreach (KeyValuePair<int, DarknessController> dark in ActiveDarkness)
 			{
 				dark.Value.KillDarkness();
 				RemoveFromDarknessList(dark.Value);

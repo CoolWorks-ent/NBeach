@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using DarknessMinion;
+using Darkness.Test;
 
 [CustomEditor(typeof(TestOverseer))]
 public class DarknessTester : Editor 

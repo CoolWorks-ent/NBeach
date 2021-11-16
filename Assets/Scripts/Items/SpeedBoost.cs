@@ -128,7 +128,7 @@ public class SpeedBoost : MonoBehaviour {
     {
         float time = 0;
         float startSpeed = gameController.pathControl.pathSpeed;
-        Debug.Log("boosting");
+        //Debug.Log("boosting");
         //fade sign out every second
         while (time < initBoostTime)
         {

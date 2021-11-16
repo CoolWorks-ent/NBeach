@@ -1,46 +1,41 @@
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
 
     [CreateAssetMenu(menuName = "Darkness/AttackState")]
     public class AttackState : DarkState
     {
 
-        public override void InitializeState(Darkness darkController)
+        public override void InitializeState(DarknessController darkController)
         {   
-            darkController.movement.StopMovement();
-            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+            darkController.steering.ResetMovement();
+            darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Idle);
         }
 
-        public override void UpdateState(Darkness darkController)
+        public override void UpdateState(DarknessController darkController)
         {
             CheckTransitions(darkController);
         }
 
-        public override void MovementUpdate(Darkness darkController) 
+        public override void MovementUpdate(DarknessController darkController) 
         {
-            if(!darkController.IsAnimationPlaying(Darkness.DarkAnimationStates.Attack)) 
+            if(!darkController.IsAnimationPlaying(DarknessController.DarkAnimationStates.Attack)) 
             {
-                if(darkController.movement.IsFacingPlayer(0.8f))
+                if(darkController.steering.IsFacingTarget(0.8f)) 
                 {
                     if (!darkController.CheckActionsOnCooldown(CooldownInfo.CooldownStatus.Attacking))
                     {
-                        darkController.ChangeAnimation(Darkness.DarkAnimationStates.Attack);
+                        darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Attack);
                         darkController.AssignCooldown(new CooldownInfo(1.5f, CooldownInfo.CooldownStatus.Attacking, CooldownCallback));
                         darkController.darkHitBox.enabled = true;
                     }
                 }
-                else darkController.movement.RotateTowardsPlayer();
+                else darkController.steering.movementController.RotateTowardsDirection(darkController.steering.Target.position);
             }
         }
 
-        public override void ExitState(Darkness darkController)
-        {
-            
-        }
-
-        protected override void CooldownCallback(Darkness darkController)
+        protected override void CooldownCallback(DarknessController darkController)
         {
             darkController.darkHitBox.enabled = false;
         }

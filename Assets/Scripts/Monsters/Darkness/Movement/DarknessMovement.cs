@@ -1,18 +1,16 @@
 using UnityEngine;
 using Pathfinding;
 
-namespace DarknessMinion.Movement
+namespace Darkness.Movement
 {
 	[System.Serializable]
-	public class DarknessMovement 
+	public class DarknessMovement : MonoBehaviour
 	{
 		[HideInInspector]
 		public float playerDist { get; private set; }
 
 		[HideInInspector]
 		public Transform player;
-
-		private Steering steering;
 
 		private int bestDirectionIndex;
 		private DirectionNode[] directionNodes;
@@ -35,7 +33,8 @@ namespace DarknessMinion.Movement
 		private float maxSpeed;
 		[SerializeField, Range(1, 360)]
 		private float rotationSpeed;
-		
+
+		private Rigidbody rgdBod;
 		private Vector3 velocity;
 		public Vector2 moveDirection { get; private set; }
 
@@ -48,15 +47,14 @@ namespace DarknessMinion.Movement
 			moveDirection = Vector2.zero;
 
 			float angle, dAngle = 0;
-			for(int i = 0; i < directionNodes.Length; i++)
+			/*for(int i = 0; i < directionNodes.Length; i++)
 			{
 				dAngle = ((360.0f / directionNodes.Length) * (float)i);
 				angle = Mathf.Deg2Rad * dAngle;
 				DirectionNode n = new DirectionNode(angle, dAngle);
 				directionNodes[i] = n;
 			}
-			bestDirectionIndex = 0;
-			steering = new Steering();
+			bestDirectionIndex = 0;*/
 		}
 
 		void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
@@ -113,10 +111,10 @@ namespace DarknessMinion.Movement
 			}
 		}
 
-		public void DetermineBestDirection(Vector2 destination) //TODO pass in a target based on the 
+		/*public void DetermineBestDirection(Vector2 destination) //TODO pass in a target based on the 
 		{
 			Vector2 position = transform.position.ToVector2();
-			GenerateDirectionVectors();
+			//GenerateDirectionVectors();
 			foreach (DirectionNode dNode in directionNodes)
 			{
 				steering.Seek(dNode, position, destination, higherPrecisionAvoidanceThreshold, playerDist);
@@ -139,10 +137,10 @@ namespace DarknessMinion.Movement
 			}
 
 			moveDirection = directionNodes[bestDirectionIndex].directionAtAngle;
-		}
+		}*/
 
 
-		private void GenerateDirectionVectors()
+		/*private void GenerateDirectionVectors()
 		{
 			//Generate vectors in several directions in a circle around the Darkness
 			//I want points at certain angles all around the Darkness and I want to save those to an array
@@ -150,7 +148,7 @@ namespace DarknessMinion.Movement
 			{
 				directionNodes[i].SetDirection(new Vector2(Mathf.Cos(directionNodes[i].angle), Mathf.Sin(directionNodes[i].angle)));
 			}
-		}
+		}*/
 
 		private float CalculationDistance(float distance)
 		{

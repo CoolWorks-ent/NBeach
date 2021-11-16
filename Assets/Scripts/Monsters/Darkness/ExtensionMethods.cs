@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness
 {
     public static class ExtensionMethods
     {

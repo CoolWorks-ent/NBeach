@@ -2,26 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness
 {
     static class DarkEventManager
     {
 		public delegate void DarkEvent();
 		public delegate void DarkEvent<T>(T obj);
-		public static event DarkEvent<Darkness> AddDarkness;
-		public static event DarkEvent<Darkness> RemoveDarkness;
+		public static event DarkEvent<DarknessController> AddDarkness;
+		public static event DarkEvent<DarknessController> RemoveDarkness;
 
 		public static event DarkEvent<Vector3> UpdateZoneLocation;
 		public static event DarkEvent UpdateDarknessDistance;
 		public static event DarkEvent UpdateDarknessStates;
 
-		public static void OnDarknessAdded(Darkness d)
+		public static void OnDarknessAdded(DarknessController d)
 		{
 			if (AddDarkness != null)
 				AddDarkness(d);
 		}
 
-		public static void OnDarknessRemoved(Darkness d)
+		public static void OnDarknessRemoved(DarknessController d)
 		{
 			if (RemoveDarkness != null)
 				RemoveDarkness(d);

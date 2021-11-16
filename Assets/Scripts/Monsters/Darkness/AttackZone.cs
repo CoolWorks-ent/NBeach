@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness
 {
 	[System.Serializable]
 	public class AttackZone

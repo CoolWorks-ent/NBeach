@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness.Test
 {
 	public class TestOverseer : MonoBehaviour 
 	{
-		public Darkness darknessPrefab;
+		public DarknessController darknessControllerPrefab;
 		public static TestOverseer Instance { get; private set; }
 
 		[Header("Show Info")]
@@ -29,7 +29,7 @@ namespace DarknessMinion
 			if (DarknessManager.Instance.ActiveDarkness.Count < DarknessManager.Instance.maxEnemyCount)
 			{
 				//Vector3 sLoc = Random.insideUnitCircle * 5;
-				Darkness enemy = Instantiate(darknessPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.playerTransform.position.y + 0.5f, Random.Range(0, 10)), darknessPrefab.transform.rotation);
+				DarknessController enemy = Instantiate(darknessControllerPrefab, new Vector3(Random.Range(-15, 15), DarknessManager.Instance.playerTransform.position.y + 0.5f, Random.Range(0, 10)), darknessControllerPrefab.transform.rotation);
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace DarknessMinion
 		{
 			if(DarknessManager.Instance.ActiveDarkness.Count > 0)
 			{
-				Darkness d;
+				DarknessController d;
 				d = DarknessManager.Instance.ActiveDarkness.Values.LastOrDefault();
 				if(d != null)
 					d.KillDarkness();
@@ -46,26 +46,26 @@ namespace DarknessMinion
 
 		void LateUpdate()
 		{
-			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			/*foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
 			{
 				dark.UpdateDebugMessage(agroRating, stateInfo, locationInfo, cooldownInfo);
-			}
+			}*/
 		}
 
 		public void DisplayDebugInfo()
 		{
-			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			/*foreach(DarknessController dark in DarknessManager.Instance.ActiveDarkness.Values)
 			{
 				dark.ToggleDebugMessage(true);
-			}
+			}*/
 		}
 
 		public void DeactivateDebugInfo()
 		{
-			foreach(Darkness dark in DarknessManager.Instance.ActiveDarkness.Values)
+			/*foreach(DarknessController dark in DarknessManager.Instance.ActiveDarkness.Values)
 			{
 				dark.ToggleDebugMessage(false);
-			}
+			}*/
 		}
 
 		public void MovePlayerObject(Vector3 direction)

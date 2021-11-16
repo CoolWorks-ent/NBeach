@@ -1,10 +1,9 @@
 using UnityEngine;
-using DarknessMinion.Movement;
+using Darkness.Movement;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
-
-    [CreateAssetMenu(menuName = "Darkness/ChaseState")]
+	[CreateAssetMenu(menuName = "Darkness/ChaseState")]
 	public class ChaseState : DarkState
 	{
 		[SerializeField, Range(0.25f, 5)]
@@ -13,41 +12,37 @@ namespace DarknessMinion
 		[SerializeField, Range(2, 15)]
 		private float closenessRange;
 
-		public override void InitializeState(Darkness darkController)
+		public override void InitializeState(DarknessController darkController)
 		{
-			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Chase);
+			darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Chase);
 			CooldownCallback(darkController);
 			//darkController.AddCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
 
-		public override void UpdateState(Darkness darkController)
+		public override void UpdateState(DarknessController darkController)
 		{
 			CheckTransitions(darkController);
 		}
 
-		public override void MovementUpdate(Darkness darkController)
+		public override void MovementUpdate(DarknessController darkController)
 		{
-			darkController.movement.MoveBody();
+			//TODO call a movement function on the 
 		}
 
-		protected override void CooldownCallback(Darkness darkController)
+		protected override void CooldownCallback(DarknessController darkController)
 		{
-			Vector2 destination;
-			DarknessMovement darkMove = darkController.movement;
+			Vector2 direction;
+			AISteering steering = darkController.steering;
 			AttackZone atkZone = AttackZoneManager.Instance.playerAttackZone;
-			if (atkZone.InTheZone(darkMove.transform.position.ToVector2()))
-				destination = atkZone.AttackPoint().ToVector2();
-			else destination = atkZone.attackZoneOrigin.ToVector2();
-			darkController.movement.DetermineBestDirection(destination);
+			if (atkZone.InTheZone(darkController.transform.position.ToVector2()))
+				direction = steering.Arrive(atkZone.AttackPoint().ToVector2());
+			else direction = steering.Arrive(atkZone.attackZoneOrigin.ToVector2());
+			direction += steering.ObstacleAvoidance(1.5f, 1.25f) * 1.15f;
+			steering.SetMovementDirection(direction);
+			//darkController.steering.DetermineBestDirection(destination);
 			darkController.AssignCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
-
-		public override void ExitState(Darkness darkController)
-		{
-			darkController.movement.StopMovement();
-			base.ExitState(darkController);
-		}
-
+		
 		private float UpdateRate(float playerDist)
 		{
 			if(playerDist < closenessRange)

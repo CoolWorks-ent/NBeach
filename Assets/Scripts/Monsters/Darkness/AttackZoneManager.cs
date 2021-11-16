@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness
 {
 	[ExecuteInEditMode]
 	public class AttackZoneManager : MonoBehaviour 
@@ -20,9 +20,6 @@ namespace DarknessMinion
 		[SerializeField]
 		private Transform playerTransform;
 
-		[SerializeField]
-		private LayerMask avoidanceMask;
-		
 		public AttackZone playerAttackZone { get { return attackZone; } }
 		
 		public static AttackZoneManager Instance { get; private set; }

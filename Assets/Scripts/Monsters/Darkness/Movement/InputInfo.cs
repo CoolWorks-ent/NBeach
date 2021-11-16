@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DarknessMinion.Movement
+namespace Darkness.Movement
 {
     public struct InputInfo
     {

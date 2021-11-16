@@ -1,27 +1,22 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
     [CreateAssetMenu(menuName = "Darkness/DeathState")]
     public class DeathState : DarkState
     {
         public GameObject deathFX;
 
-        public override void InitializeState(Darkness darkController)
+        public override void InitializeState(DarknessController darkController)
         {
             darkController.StartCoroutine(DeathRoutine(darkController));
         }
 
-        public override void ExitState(Darkness darkController)
-        { 
-            base.ExitState(darkController);
-        }
-
-        public IEnumerator DeathRoutine(Darkness darkController)
+        public IEnumerator DeathRoutine(DarknessController darkController)
         {
             //controller.animeController.SetTrigger(controller.deathTrigHash);
-            darkController.ChangeAnimation(Darkness.DarkAnimationStates.Death);
+            darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Death);
 
             GameObject newFX = Instantiate(deathFX.gameObject, darkController.transform.position, Quaternion.identity) as GameObject;
             //newFX.transform.SetParent(DarknessManager.Instance.transform);

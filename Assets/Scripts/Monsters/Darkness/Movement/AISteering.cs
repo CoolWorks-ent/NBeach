@@ -1,24 +1,43 @@
 using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
-namespace DarknessMinion.Movement
+namespace Darkness.Movement
 {
     [RequireComponent(typeof(MovementController))]
-    public class AIMovement : MonoBehaviour, IInputInterpreter
+    public class AISteering : MonoBehaviour, IInputInterpreter
     {
 	    public Vector2 currentMovementDirection { get; private set; } 
+	    public MovementController movementController { get; private set; }
+	    public float targetDist { get; private set; }
+
+	    public Transform Target
+	    {
+		    get
+		    {
+			    if (!target)
+				    target = DarknessManager.Instance.playerTransform;
+			    return target;
+		    }
+	    }
+
+	    private Transform target;
         
+	    [Header("Obstacle Avoidance Related")]
+	    [Tooltip("How much difference between the next direction")]
         [SerializeField, Range(0.1f, 1)]
         private float changeDirectionThreshold;
+
+        [SerializeField, Range(1, 3.5f)]
+        private float agentBoundsScalar, lookAheadSpeedMod;
+        
         [SerializeField] 
         private LayerMask obstacleLayerMask;
         
         private int bestDirectionIndex;
         private DirectionNode[] directionNodes;
         private HashSet<Avoidable> avoidableObstacles;
-        private MovementController movementController;
+        
         private InputInfo inputInfo;
         private Collider colliderBounds;
 
@@ -29,7 +48,15 @@ namespace DarknessMinion.Movement
             CreateDirectionNodes(4);
             avoidableObstacles = new HashSet<Avoidable>(new AvoidableComparer());
             movementController = GetComponent<MovementController>();
-            colliderBounds = GetComponent<Collider>(); 
+            colliderBounds = GetComponent<Collider>();
+        }
+        
+        void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
+        void OnDisable() { DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation; }
+        
+        public void DistanceEvaluation()
+        {
+	        targetDist = Vector2.Distance(transform.position.ToVector2(), Target.position.ToVector2());
         }
 
         public void CreateDirectionNodes(int angleAmounts)
@@ -52,9 +79,25 @@ namespace DarknessMinion.Movement
             inputInfo = new InputInfo();
         }
 
-        public void SetMovementDirection(Vector2 dir)
+        public void SetMovementDirection(params Vector2[] directions)
         {
-            currentMovementDirection = dir;
+	        Vector2 finalDir = Vector2.zero;
+	        foreach (Vector2 dir in directions)
+	        {
+		        finalDir += dir;
+	        }
+            currentMovementDirection = finalDir;
+        }
+        
+        public bool IsFacingTarget(float minimumValue)
+        {
+	        float closeness = Vector3.Dot(TargetDirection(), transform.forward);
+	        return closeness >= minimumValue;
+        }
+        
+        public Vector3 TargetDirection()
+        {
+	        return (Target.position - transform.position).normalized;
         }
         
         public InputInfo GetInputInfo()
@@ -164,14 +207,16 @@ namespace DarknessMinion.Movement
 			return Seek(wanderTarget);
 	    }
 
-	    public Vector2 ObstacleAvoidance(float agentBoundsScalar, float lookAheadSpeedMod, float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
+	    public Vector2 ObstacleAvoidance(float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
 	    {
+		    
 		    Vector2 avoidanceVector = Vector2.zero;
 		    float distanceScaled = Mathf.Max(1 ,(lookAheadSpeedMod * movementController.GetVelocity().magnitude));
-			
+
+		    RaycastHit hitInfo;
 			//if I hit something with this boxcast store the obstacle, if already stored update the hitPosition
 			if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, transform.forward,
-				out RaycastHit hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
+				out hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
 			{
 				int iD = hitInfo.transform.GetInstanceID();
 				Bounds obstacleBounds = new Bounds(hitInfo.transform.position, hitInfo.collider.bounds.size * agentBoundsScalar);
@@ -193,7 +238,6 @@ namespace DarknessMinion.Movement
 				Vector3 forward = transform.forward;
 				Vector3 position = transform.position;
 				List<Avoidable> entriesToDiscard = new List<Avoidable>();
-				Debug.Log($"Obstacles to avoid {avoidableObstacles.Count}, for {this.name}");
 				foreach (Avoidable avoidable in avoidableObstacles)
 				{
 					//Check to see if the obstacle is behind us or too far away, if true -> mark for deletion, continue
@@ -245,10 +289,32 @@ namespace DarknessMinion.Movement
     #endregion
 
     #if UNITY_EDITOR
-        void OnDrawGizmosSelected()
-        {
+	    void OnDrawGizmosSelected()
+	    {
+		    if (Application.isPlaying)
+		    {
+			    Color col = Color.red;
+			    Vector3 lineStart, lineEnd;
 
-        }
+			    foreach (DirectionNode dir in directionNodes)
+			    {
+				    if (dir == directionNodes[bestDirectionIndex])
+					    col = new Color(1f, 0.56f, 0.03f);
+				    else if (dir.combinedWeight > 0.9f)
+					    col = Color.green;
+				    else if (dir.combinedWeight > 0.7f && dir.combinedWeight < 0.9f)
+					    col = Color.cyan;
+				    else if (dir.combinedWeight < 0.7f && dir.combinedWeight > 0.5f)
+					    col = Color.yellow;
+				    else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
+					    col = Color.magenta;
+				    else col = Color.white;
+				    lineStart = transform.position + dir.directionAtAngle.ToVector3();
+				    lineEnd = dir.directionAtAngle.ToVector3(1) * dir.combinedWeight + transform.position;
+				    Debug.DrawLine(lineStart, lineEnd, col);
+			    }
+		    }
+	    }
     #endif
     }
 }

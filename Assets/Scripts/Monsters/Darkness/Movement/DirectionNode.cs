@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DarknessMinion.Movement
+namespace Darkness.Movement
 {
     public class DirectionNode
     {
@@ -13,19 +13,14 @@ namespace DarknessMinion.Movement
 
         public Vector2 directionAtAngle { get; private set; }
 
-        public DirectionNode(float rAngle, float dAngle)
+        public DirectionNode(float radianAngle)
         {
-            angle = rAngle;
-            degAngle = dAngle;
+            angle = radianAngle;
+            degAngle = angle * Mathf.Rad2Deg;
             avoidWeight = 0;
             seekWeight = 0;
-            directionAtAngle = Vector2.zero;
+            directionAtAngle = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
             dirLength = 0;
-        }
-
-        public void SetDirection(Vector2 v)
-        { 
-            directionAtAngle = v; 
         }
 
         public void SetDirLength(float v)

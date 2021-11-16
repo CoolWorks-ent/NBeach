@@ -1,12 +1,14 @@
 using UnityEngine;
 
-namespace DarknessMinion.Movement
+namespace Darkness.Movement
 {
     [RequireComponent(typeof(Rigidbody))]
     public class MovementController : MonoBehaviour
     {
-        [SerializeField, Range(1, 25)]
-        private float maxAccel, maxSpeed;
+        [SerializeField, Range(10.5f, 25)]
+        private float maxAccel;
+        [SerializeField, Range(1, 5)]
+        private float maxSpeed;
         [SerializeField]
         private Transform inputSpace;
         [SerializeField, Range(1, 360)]
@@ -30,6 +32,9 @@ namespace DarknessMinion.Movement
                 if (mon is IInputInterpreter)
                     inputInterpreter = (IInputInterpreter)mon;
             }
+            if(inputInterpreter == null)
+                Debug.LogError("Attach an IInputInterpreter before continuing");
+                
         }
 
         private void FixedUpdate()

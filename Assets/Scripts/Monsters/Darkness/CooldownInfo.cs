@@ -1,15 +1,15 @@
 using System;
 
-namespace DarknessMinion
+namespace Darkness
 {
     public class CooldownInfo
     {
         public enum CooldownStatus { Attacking, Patrolling, Idling, Moving, Spawn}
         public CooldownStatus acType { get; private set; }
         private float remainingTime;
-        public Action<Darkness> Callback;
+        public Action<DarknessController> Callback;
 
-        public CooldownInfo(float cdTime, CooldownStatus acT, Action<Darkness> cback)
+        public CooldownInfo(float cdTime, CooldownStatus acT, Action<DarknessController> cback)
         {
             remainingTime = cdTime;
             acType = acT;

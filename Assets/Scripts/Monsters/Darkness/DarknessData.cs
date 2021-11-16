@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness
 {
 	public class DarknessData : ScriptableObject
 	{

@@ -219,13 +219,10 @@ GameObject:
   - component: {fileID: 65387374068129854}
   - component: {fileID: 65625734434817152}
   - component: {fileID: 54991120590850454}
-  - component: {fileID: 114511842479999518}
-  - component: {fileID: 114621632964799650}
-  - component: {fileID: 114150173797437670}
-  - component: {fileID: 114857173380954124}
   - component: {fileID: 136796206659899728}
-  - component: {fileID: 114774764668895200}
-  - component: {fileID: 114074823609324606}
+  - component: {fileID: 114511842479999518}
+  - component: {fileID: 114999679919110776}
+  - component: {fileID: 114004581545654566}
   m_Layer: 17
   m_Name: darkness_enhanced_v2
   m_TagString: Darkness
@@ -887,7 +884,7 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4294967295
---- !u!114 &114074823609324606
+--- !u!114 &114004581545654566
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -895,39 +892,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558497094199476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a537d958aa5bb4f35b0d7b40d72278f2, type: 3}
+  m_Script: {fileID: 11500000, guid: d9e44ea94c0fd9a4a95297ce714d1381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 1
-  penalty: 1000
-  randomStep: 7
---- !u!114 &114150173797437670
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 373b52eb9bf8c40f785bb6947a1aee66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  drawGizmos: 1
-  detailedGizmos: 0
-  startEndModifier:
-    addPoints: 0
-    exactStartPoint: 1
-    exactEndPoint: 4
-    useRaycasting: 0
-    mask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    useGraphRaycasting: 0
-  traversableTags: -3
-  tagPenalties: 00000000dc050000e80300000000000000000000000000000000000000000000000000000000000000000000000000000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-  graphMask:
-    value: -1
+  maxAccel: 11.5
+  maxSpeed: 2.14
+  inputSpace: {fileID: 0}
+  rotationSpeed: 55
 --- !u!114 &114511842479999518
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -941,17 +912,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agRatingCurrent: 0
   agRatingPrevious: 0
-  player: {fileID: 0}
   darkHitBox: {fileID: 0}
   textMesh: {fileID: 102784145251410432}
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 4096
   attackRange: 3
-  movement: {fileID: 0}
   deathState: {fileID: 11400000, guid: 45f9b5a3d113ca44cbea43986b64d4d2, type: 2}
   currentState: {fileID: 11400000, guid: d6d9a35e6d84fb64ba0e4538959ced70, type: 2}
---- !u!114 &114621632964799650
+--- !u!114 &114999679919110776
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -959,75 +925,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558497094199476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e4cdb5e9ea006043abeeae236ba6fd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f264ee779c35e84c9f84376298ec539, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  pathSetDistance: 5
-  higherPrecisionAvoidanceThreshold: 3.2
-  seekThreshold: 0.2
-  avoidLayerMask:
+  changeDirectionThreshold: 0.78
+  agentBoundsScalar: 1.5
+  lookAheadSpeedMod: 1.75
+  obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 139264
-  maxAccel: 12.4
-  maxSpeed: 2.06
-  rotationSpeed: 55
---- !u!114 &114774764668895200
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6eb1402c17e84a9282a7f0f62eb584f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 2
-  radius: 0.5
-  height: 0.01
-  repathRate: 1
-  canSearch: 1
-  canMove: 1
-  maxSpeed: 1.85
-  gravity: {x: NaN, y: NaN, z: NaN}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  centerOffsetCompatibility: NaN
-  orientation: 0
-  enableRotation: 1
-  targetCompatibility: {fileID: 0}
-  maxAcceleration: -2.5
-  rotationSpeed: 360
-  slowdownDistance: 0.6
-  pickNextWaypointDist: 2
-  endReachedDistance: 0.2
-  alwaysDrawGizmos: 0
-  slowWhenNotFacingTarget: 1
-  whenCloseToDestination: 0
-  constrainInsideGraph: 0
---- !u!114 &114857173380954124
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1558497094199476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb6a34d769a1e4ac7b0b30e433aa443c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  smoothType: 3
-  subdivisions: 3
-  iterations: 2
-  strength: 0.5
-  uniformLength: 1
-  maxSegmentLength: 2
-  bezierTangentLength: 0.4
-  offset: 0.12
-  factor: 0.4
 --- !u!136 &136796206659899728
 CapsuleCollider:
   m_ObjectHideFlags: 1

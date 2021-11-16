@@ -1,7 +1,6 @@
-using DarknessMinion.Movement;
 using UnityEngine;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
 	
 	[CreateAssetMenu(menuName = "Darkness/IdleState")]
@@ -12,33 +11,33 @@ namespace DarknessMinion
 
 		public bool waitFullIdleTime;
 
-		public override void InitializeState(Darkness darkController)
+		public override void InitializeState(DarknessController darkController)
 		{
 
-			darkController.movement.StopMovement();
+			darkController.steering.ResetMovement();
 	
-			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+			darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Idle);
 			darkController.AssignCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));
 		}
 
-		public override void UpdateState(Darkness darkController)
+		public override void UpdateState(DarknessController darkController)
 		{
 			if(!waitFullIdleTime)
 				CheckTransitions(darkController);
 		}
 
-		public override void MovementUpdate(Darkness darkController, MovementController movementController)
+		public override void MovementUpdate(DarknessController darkController)
 		{
-			movementController.RotateTowardsPlayer();
+			darkController.steering.movementController.RotateTowardsDirection(darkController.steering.Target.position);
 		}
 
-		public override void ExitState(Darkness darkController)
+		public override void ExitState(DarknessController darkController)
 		{
-			darkController.ChangeAnimation(Darkness.DarkAnimationStates.Idle);
+			darkController.ChangeAnimation(DarknessController.DarkAnimationStates.Idle);
 			base.ExitState(darkController);
 		}
 
-		protected override void CooldownCallback(Darkness darkController)
+		protected override void CooldownCallback(DarknessController darkController)
 		{
 			CheckTransitions(darkController);
 			darkController.AssignCooldown(new CooldownInfo(idleTime, CooldownInfo.CooldownStatus.Idling, CooldownCallback));

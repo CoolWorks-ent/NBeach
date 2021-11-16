@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using DarknessMinion;
-
+﻿using UnityEngine;
+using Darkness;
 /*
  * Class to manage enemies in the scene & the spawning of enemies
  */
@@ -10,7 +7,7 @@ using DarknessMinion;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    Darkness darknessEnemy;
+    DarknessController darknessEnemy;
     [SerializeField]
     public float spawnRate = 10; //The greater the slower, 1 every x seconds
     [SerializeField]
@@ -23,19 +20,7 @@ public class EnemySpawner : MonoBehaviour
     public bool pauseSpawning = false;
     float spawnWait = 0;
     int enemiesDestroyed = 0;
-
-    public void Start()
-    {
-        //EventManager.StartListening("DarknessDeath", DarknessDeath);
-    }
-
-    //function called if an enemy dies to decrease from the total enemy count
-    void DarknessDeath(string enemyName)
-    {
-        //remove enemy from the list
-        Darkness enemyObj = GameObject.Find(enemyName).GetComponent<Darkness>();
-        Destroy(enemyObj.gameObject);
-    }
+    
 
     public void DarknessGruntSpawnCheck(Vector3 spawnPos)
     {
@@ -49,7 +34,7 @@ public class EnemySpawner : MonoBehaviour
                     if (spawnWait >= spawnRate)
                     {
                         Vector3 randomloc = Random.insideUnitCircle * 5;
-                        Darkness enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
+                        DarknessController enemy = Instantiate(darknessEnemy, new Vector3(spawnPos.x, spawnPos.y+0.5f, spawnPos.z), darknessEnemy.transform.rotation);
                         //reset timer
                         spawnWait = 0;
                         //Debug.Log("darkness spawned");

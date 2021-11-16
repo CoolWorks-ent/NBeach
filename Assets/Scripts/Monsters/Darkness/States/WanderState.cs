@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
 
 
@@ -15,7 +15,7 @@ namespace DarknessMinion
 		[Range(0, 10)]
 		public float timeToPickNextPoint;
 
-		public override void InitializeState(Darkness darkController)
+		public override void InitializeState(DarknessController darkController)
 		{
 			base.InitializeState(darkController);
 			//AI_Manager.OnRequestNewTarget(controller.creationID);
@@ -38,7 +38,7 @@ namespace DarknessMinion
 			controller.aIMovement.speed = 10;*/
 		}
 
-		public override void UpdateState(Darkness controller)
+		public override void UpdateState(DarknessController controller)
 		{
 			//Check if the Darkness has finished moving then assign it a new location
 			// if(controller.aIMovement.aI.remainingDistance <= 3)
@@ -57,12 +57,12 @@ namespace DarknessMinion
 			CheckTransitions(controller);*/
 		}
 
-		public override void MovementUpdate(Darkness controller)
+		public override void MovementUpdate(DarknessController controller)
 		{
 
 		}
 
-		protected override void CooldownCallback(Darkness controller)
+		protected override void CooldownCallback(DarknessController controller)
 		{
 			//controller.navTarget = ChooseNewPatrolPoint(wanderRadius);
 		}
@@ -112,16 +112,5 @@ namespace DarknessMinion
 		   return controller.aIMovement.PatrolPoints[Random.Range(0,controller.aIMovement.PatrolPoints.Length)];
 		}
 		*/
-
-		public override void ExitState(Darkness darkController)
-		{
-			//controller.aIMovement.EndMovement();
-			//controller.aIMovement.wandering = false;
-			//darkController.pather.canMove = false;
-			//darkController.pather.canSearch = false;
-			//darkController.sekr.CancelCurrentPathRequest();
-			//controller.animeController.ResetTrigger(controller.chaseHash);
-			base.ExitState(darkController);
-		}
 	}
 }

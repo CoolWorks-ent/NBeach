@@ -1,4 +1,4 @@
-﻿namespace DarknessMinion
+﻿namespace Darkness.States
 { 
     [System.Serializable]
     public class Transition

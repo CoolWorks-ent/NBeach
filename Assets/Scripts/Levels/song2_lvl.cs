@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using DarknessMinion;
+using Darkness;
 
 public class song2_lvl : Level {
 
@@ -329,7 +329,7 @@ public class song2_lvl : Level {
                 ShellPickup tempShell = pickupShells[Random.Range(0, pickupShells.Length)];
                 ShellPickup reloadShell = Instantiate(tempShell, shellLocs[Random.Range(0, shellLocs.Length)].position, tempShell.transform.rotation);
                 shellArray.Add(reloadShell);
-                Debug.Log("pickup shell spawned");
+                //Debug.Log("pickup shell spawned");
                 shellSpawnTime = 0;
             }
             else
@@ -562,7 +562,7 @@ public class song2_lvl : Level {
             default:
                 break;
         }
-        Debug.Log("[EVENT] " + evt);
+        //Debug.Log("[EVENT] " + evt);
     }
 
     /*
@@ -638,7 +638,7 @@ public class song2_lvl : Level {
 
     IEnumerator Stage0Routine()
     {
-        Debug.Log("Stage 0 Start");
+        //Debug.Log("Stage 0 Start");
         //Dissolve title text after 3 seconds
         StartCoroutine(SongTitleRoutine()); 
 

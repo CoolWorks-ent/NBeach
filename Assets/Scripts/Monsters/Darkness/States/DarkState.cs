@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using DarknessMinion.Movement;
 
-namespace DarknessMinion
+namespace Darkness.States
 {
 	public abstract class DarkState : ScriptableObject
 	{
@@ -30,15 +29,16 @@ namespace DarknessMinion
 			}
 		}
 
-		public abstract void InitializeState(Darkness darkController);
-		public virtual void UpdateState(Darkness darkController){ }
-		public virtual void ExitState(Darkness darkController)
+		public abstract void InitializeState(DarknessController darkController);
+		public virtual void UpdateState(DarknessController darkController){ }
+		public virtual void ExitState(DarknessController darkController)
 		{
 			darkController.ClearCooldown();
+			darkController.steering.ResetMovement();
 		}
-		public virtual void MovementUpdate(Darkness darkController, MovementController movementController){}
-		protected virtual void CooldownCallback(Darkness darkController) { }
-		protected void CheckTransitions(Darkness darkController)
+		public virtual void MovementUpdate(DarknessController darkController){}
+		protected virtual void CooldownCallback(DarknessController darkController) { }
+		protected void CheckTransitions(DarknessController darkController)
 		{
 			foreach (Transition darkTran in transitions)
 			{

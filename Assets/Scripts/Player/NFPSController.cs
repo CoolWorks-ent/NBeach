@@ -367,7 +367,7 @@ public class NFPSController : PlayerController {
 
                     //rigidbody.velocity = Vector3.right * dodgeSpeed;
                     lastDodgeTime = Time.time;
-                    print("dodge left!");
+                    //print("dodge left!");
                     resetRot = false;
                 }
             }
@@ -385,7 +385,7 @@ public class NFPSController : PlayerController {
 
                     //rigidbody.velocity = Vector3.left * dodgeSpeed;
                     lastDodgeTime = Time.time;
-                    print("dodge right");
+                    //print("dodge right");
                     resetRot = false;
                 }
             }

@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-using DarknessMinion;
+using Darkness.States;
 
 [CustomEditor(typeof(DarkState), true)]
 public class DarkStateEditor : Editor 
