@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
 
 namespace Darkness.Movement
 {
@@ -36,19 +35,24 @@ namespace Darkness.Movement
         
         private int bestDirectionIndex;
         private DirectionNode[] directionNodes;
-        private HashSet<Avoidable> avoidableObstacles;
+        private HashSet<Avoidable> avoidableStaticObstacles, avoidableAgents;
+        
         
         private InputInfo inputInfo;
         private Collider colliderBounds;
+        private LayerMask agentLayerMask;
+
 
         private void Awake()
         {
             currentMovementDirection = Vector2.zero;
             inputInfo = new InputInfo();
-            CreateDirectionNodes(4);
-            avoidableObstacles = new HashSet<Avoidable>(new AvoidableComparer());
+            CreateDirectionNodes(6);
+            avoidableStaticObstacles = new HashSet<Avoidable>(new AvoidableComparer());
+            avoidableAgents = new HashSet<Avoidable>(new AvoidableComparer());
             movementController = GetComponent<MovementController>();
             colliderBounds = GetComponent<Collider>();
+            agentLayerMask = this.gameObject.layer;
         }
         
         void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
@@ -59,13 +63,13 @@ namespace Darkness.Movement
 	        targetDist = Vector2.Distance(transform.position.ToVector2(), Target.position.ToVector2());
         }
 
-        public void CreateDirectionNodes(int angleAmounts)
+        public void CreateDirectionNodes(int angleAmounts, float degAngle = 360.0f)
         {
             directionNodes = new DirectionNode[angleAmounts];
             float angle, dAngle = 0;
             for(int i = 0; i < directionNodes.Length; i++)
             {
-                dAngle = ((360.0f / directionNodes.Length) * (float)i);
+                dAngle = (degAngle / directionNodes.Length) * (float)i;
                 angle = Mathf.Deg2Rad * dAngle;
                 DirectionNode n = new DirectionNode(angle);
                 directionNodes[i] = n;
@@ -207,6 +211,65 @@ namespace Darkness.Movement
 			return Seek(wanderTarget);
 	    }
 
+	    public Vector2 AgentAvoidance()
+	    {
+		    
+		    return Vector2.zero;
+	    }
+
+	    private void AgentAvoidanceCheck(DirectionNode dNode)
+	    {
+		    dNode.avoidWeight = 0;
+		    RaycastHit rayHit;
+		    float dotValue = 0, distance = 0;
+
+		    if (CheckForAvoidables(agentLayerMask, dNode.directionAtAngle.ToVector3() * 1.5f, 1, out rayHit))
+		    {
+			    Vector3 hitPos = rayHit.transform.position;
+			    dotValue = Vector3.Dot(transform.forward, hitPos);
+			    distance = Vector3.Distance(transform.position, rayHit.transform.position);
+			    
+			    //calculate if the time to collision will happen. if so add to the avoidable list to check against later
+			    UpdateAvoidableToCollection(avoidableAgents, rayHit);
+			     
+			    /*if (dotValue >= 0.6f)
+				    dNode.avoidWeight += -1;
+			    else if (dotValue <= 0.6f && dotValue > 0)
+				    dNode.avoidWeight += -0.5f;
+
+			    if (distanceNorm > 0.2f)
+				    dNode.avoidWeight -= distanceNorm;*/
+		    }
+	    }
+	    
+	    private bool CheckForAvoidables(LayerMask layerMask, Vector3 direction, float distance,  out RaycastHit hit)
+	    {
+		    if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, direction,
+			    out hit, Quaternion.identity, distance, layerMask))
+		    {
+			    return true;
+		    }
+		    else hit = new RaycastHit();
+		    
+		    return false;
+	    }
+
+	    private void UpdateAvoidableToCollection(HashSet<Avoidable> avoidableCollection, RaycastHit hit)
+	    {
+		    int iD = hit.transform.GetInstanceID();
+		    Bounds obstacleBounds = new Bounds(hit.transform.position, hit.collider.bounds.size * agentBoundsScalar);
+		    Avoidable a = new Avoidable(hit.transform, obstacleBounds, hit.point.ToVector2(), iD);
+		    if (avoidableCollection.Contains(a))
+		    {
+			    foreach (Avoidable avoidable in avoidableCollection)
+			    {
+				    if (avoidable.comparer.Equals(avoidable, a))
+					    avoidable.UpdateHitPosition(hit.point.ToVector2());
+			    }
+		    }
+		    else avoidableCollection.Add(a);
+	    }
+
 	    public Vector2 ObstacleAvoidance(float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
 	    {
 		    
@@ -214,31 +277,34 @@ namespace Darkness.Movement
 		    float distanceScaled = Mathf.Max(1 ,(lookAheadSpeedMod * movementController.GetVelocity().magnitude));
 
 		    RaycastHit hitInfo;
+		    if(CheckForAvoidables(agentLayerMask, transform.forward, distanceScaled, out hitInfo))
+			    UpdateAvoidableToCollection(avoidableStaticObstacles, hitInfo);
+		    
 			//if I hit something with this boxcast store the obstacle, if already stored update the hitPosition
-			if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, transform.forward,
+			/*if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, transform.forward,
 				out hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
 			{
 				int iD = hitInfo.transform.GetInstanceID();
 				Bounds obstacleBounds = new Bounds(hitInfo.transform.position, hitInfo.collider.bounds.size * agentBoundsScalar);
 				Avoidable a = new Avoidable(hitInfo.transform, obstacleBounds, hitInfo.point.ToVector2(), iD);
-				if (avoidableObstacles.Contains(a))
+				if (avoidableStaticObstacles.Contains(a))
 				{
-					foreach (Avoidable avoidable in avoidableObstacles)
+					foreach (Avoidable avoidable in avoidableStaticObstacles)
 					{
 						if (avoidable.comparer.Equals(avoidable, a))
 							avoidable.UpdateHitPosition(hitInfo.point.ToVector2());
 					}
 				}
-				else avoidableObstacles.Add(a);
-			}
-			
+				else avoidableStaticObstacles.Add(a);
+			}*/
+
 			//for each obstacle in the list create a force away from those obstacles if they are within distance of forward direction 
-			if (avoidableObstacles.Count > 0)
+			if (avoidableStaticObstacles.Count > 0)
 			{
 				Vector3 forward = transform.forward;
 				Vector3 position = transform.position;
 				List<Avoidable> entriesToDiscard = new List<Avoidable>();
-				foreach (Avoidable avoidable in avoidableObstacles)
+				foreach (Avoidable avoidable in avoidableStaticObstacles)
 				{
 					//Check to see if the obstacle is behind us or too far away, if true -> mark for deletion, continue
 					Vector3 obstaclePos = avoidable.transform.position;
@@ -277,7 +343,7 @@ namespace Darkness.Movement
 				{
 					for (int i = 0; i <= entriesToDiscard.Count-1; i++)
 					{
-						avoidableObstacles.Remove(entriesToDiscard[i]);
+						avoidableStaticObstacles.Remove(entriesToDiscard[i]);
 					}
 				}
 			}
@@ -293,12 +359,12 @@ namespace Darkness.Movement
 	    {
 		    if (Application.isPlaying)
 		    {
-			    Color col = Color.red;
+			    Color col = new Color(1f, 0.56f, 0.03f);;
 			    Vector3 lineStart, lineEnd;
 
 			    foreach (DirectionNode dir in directionNodes)
 			    {
-				    if (dir == directionNodes[bestDirectionIndex])
+				    /*if (dir == directionNodes[bestDirectionIndex])
 					    col = new Color(1f, 0.56f, 0.03f);
 				    else if (dir.combinedWeight > 0.9f)
 					    col = Color.green;
@@ -308,9 +374,10 @@ namespace Darkness.Movement
 					    col = Color.yellow;
 				    else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					    col = Color.magenta;
-				    else col = Color.white;
-				    lineStart = transform.position + dir.directionAtAngle.ToVector3();
-				    lineEnd = dir.directionAtAngle.ToVector3(1) * dir.combinedWeight + transform.position;
+				    else col = Color.white;*/
+				    dir.UpdateDirection(transform.forward.ToVector2());
+				    lineStart = transform.position + (dir.directionAtAngle * 2).ToVector3(1);
+				    lineEnd = transform.position + (dir.directionAtAngle * 5).ToVector3(1);
 				    Debug.DrawLine(lineStart, lineEnd, col);
 			    }
 		    }

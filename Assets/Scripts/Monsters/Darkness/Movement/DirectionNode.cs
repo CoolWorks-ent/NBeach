@@ -19,13 +19,18 @@ namespace Darkness.Movement
             degAngle = angle * Mathf.Rad2Deg;
             avoidWeight = 0;
             seekWeight = 0;
-            directionAtAngle = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            directionAtAngle = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)).normalized;
             dirLength = 0;
         }
 
         public void SetDirLength(float v)
         {
             dirLength = v;
+        }
+
+        public void UpdateDirection(Vector2 transformForward)
+        {
+            directionAtAngle = (directionAtAngle + transformForward).normalized;
         }
     }
 }

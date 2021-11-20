@@ -42,6 +42,11 @@ namespace Darkness.States
 			//darkController.steering.DetermineBestDirection(destination);
 			darkController.AssignCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
+
+		protected void CheckCooldown()
+		{
+			
+		}
 		
 		private float UpdateRate(float playerDist)
 		{
