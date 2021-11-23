@@ -35,7 +35,8 @@ namespace Darkness.Movement
         
         private int bestDirectionIndex;
         private DirectionNode[] directionNodes;
-        private HashSet<Avoidable> avoidableStaticObstacles, avoidableAgents;
+        private HashSet<Avoidable> avoidableStaticObstacles;
+        private Avoidable closestAvoidableAgent;
         
         
         private InputInfo inputInfo;
@@ -49,10 +50,10 @@ namespace Darkness.Movement
             inputInfo = new InputInfo();
             CreateDirectionNodes(6);
             avoidableStaticObstacles = new HashSet<Avoidable>(new AvoidableComparer());
-            avoidableAgents = new HashSet<Avoidable>(new AvoidableComparer());
             movementController = GetComponent<MovementController>();
             colliderBounds = GetComponent<Collider>();
-            agentLayerMask = this.gameObject.layer;
+            agentLayerMask =  LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer));
+            //Debug.Log(LayerMask.LayerToName(gameObject.layer));
         }
         
         void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
@@ -95,15 +96,10 @@ namespace Darkness.Movement
         
         public bool IsFacingTarget(float minimumValue)
         {
-	        float closeness = Vector3.Dot(TargetDirection(), transform.forward);
+	        float closeness = Vector3.Dot((Target.position - transform.position).normalized, transform.forward);
 	        return closeness >= minimumValue;
         }
-        
-        public Vector3 TargetDirection()
-        {
-	        return (Target.position - transform.position).normalized;
-        }
-        
+
         public InputInfo GetInputInfo()
         {
 	        if (currentMovementDirection == Vector2.zero)
@@ -210,42 +206,69 @@ namespace Darkness.Movement
 
 			return Seek(wanderTarget);
 	    }
-
-	    public Vector2 AgentAvoidance()
-	    {
-		    
-		    return Vector2.zero;
-	    }
-
-	    private void AgentAvoidanceCheck(DirectionNode dNode)
-	    {
-		    dNode.avoidWeight = 0;
-		    RaycastHit rayHit;
-		    float dotValue = 0, distance = 0;
-
-		    if (CheckForAvoidables(agentLayerMask, dNode.directionAtAngle.ToVector3() * 1.5f, 1, out rayHit))
-		    {
-			    Vector3 hitPos = rayHit.transform.position;
-			    dotValue = Vector3.Dot(transform.forward, hitPos);
-			    distance = Vector3.Distance(transform.position, rayHit.transform.position);
-			    
-			    //calculate if the time to collision will happen. if so add to the avoidable list to check against later
-			    UpdateAvoidableToCollection(avoidableAgents, rayHit);
-			     
-			    /*if (dotValue >= 0.6f)
-				    dNode.avoidWeight += -1;
-			    else if (dotValue <= 0.6f && dotValue > 0)
-				    dNode.avoidWeight += -0.5f;
-
-			    if (distanceNorm > 0.2f)
-				    dNode.avoidWeight -= distanceNorm;*/
-		    }
-	    }
 	    
-	    private bool CheckForAvoidables(LayerMask layerMask, Vector3 direction, float distance,  out RaycastHit hit)
+	    public void FindNearbyAvoidables()
+	    {
+		    //check for static obstacles to avoid
+		    float distanceScaled = Mathf.Max(1 ,(lookAheadSpeedMod * movementController.GetVelocity().magnitude));
+		    RaycastHit hitInfo;
+		    if(AvoidableCast(obstacleLayerMask, transform.forward, distanceScaled, out hitInfo))
+			    AddToAvoidableCollection(avoidableStaticObstacles, hitInfo);
+		    
+		    //check for other agents to avoid
+		    RaycastHit rayHit;
+
+		    if (AvoidableCast(agentLayerMask, transform.forward, 1, out rayHit))
+		    {
+			    int iD = rayHit.transform.GetInstanceID();
+			    Bounds obstacleBounds = new Bounds(rayHit.transform.position, rayHit.collider.bounds.size * agentBoundsScalar);
+			    closestAvoidableAgent = new Avoidable(rayHit.transform, obstacleBounds, rayHit.point.ToVector2(), iD);
+		    }
+			     //AddToAvoidableCollection(closestAvoidableAgent, rayHit);
+	    }
+
+	    public Vector2 AvoidAgent()
+	    {
+		    Vector2 agentAvoidanceForce = Vector2.zero;
+		    //List<Avoidable> entriesToDiscard = new List<Avoidable>();
+		    
+		    if (closestAvoidableAgent != null)
+		    {
+			    MovementController movement = closestAvoidableAgent.transform.GetComponent<MovementController>();
+
+			    if (movement != null)
+			    {
+				    Vector2 relativePos, relativeVelocity;
+				    float relativeSpeed, timeToCollision;
+
+				    relativePos = movement.GetPosition() - movementController.GetPosition();
+				    if (relativePos.magnitude < 1)
+				    {
+					    agentAvoidanceForce = Flee(movement.GetPosition());
+				    }
+				    else
+				    {
+					    relativeVelocity = movement.GetVelocity() - movementController.GetVelocity();
+					    relativeSpeed = relativeVelocity.magnitude;
+					    timeToCollision = Vector2.Dot(relativePos, relativeVelocity) / (relativeSpeed * relativeSpeed);
+
+					    if (timeToCollision > 0)
+						    agentAvoidanceForce = Evade(movement);
+				    }
+				    //lse entriesToDiscard.Add(closestAvoidableAgent);
+			    }
+			    //else entriesToDiscard.Add(avoidable);
+		    }
+		    
+		    //RemoveFromAvoidableCollection(entriesToDiscard);
+		    
+		    return agentAvoidanceForce;
+	    }
+
+	    private bool AvoidableCast(LayerMask layerMask, Vector3 direction, float distance, out RaycastHit hit)
 	    {
 		    if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, direction,
-			    out hit, Quaternion.identity, distance, layerMask))
+			    out hit, Quaternion.identity, distance, layerMask, QueryTriggerInteraction.Collide))
 		    {
 			    return true;
 		    }
@@ -254,7 +277,7 @@ namespace Darkness.Movement
 		    return false;
 	    }
 
-	    private void UpdateAvoidableToCollection(HashSet<Avoidable> avoidableCollection, RaycastHit hit)
+	    private void AddToAvoidableCollection(HashSet<Avoidable> avoidableCollection, RaycastHit hit)
 	    {
 		    int iD = hit.transform.GetInstanceID();
 		    Bounds obstacleBounds = new Bounds(hit.transform.position, hit.collider.bounds.size * agentBoundsScalar);
@@ -270,35 +293,22 @@ namespace Darkness.Movement
 		    else avoidableCollection.Add(a);
 	    }
 
-	    public Vector2 ObstacleAvoidance(float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
+	    private void RemoveFromAvoidableCollection(List<Avoidable> entriesToDiscard)
 	    {
-		    
+		    if (entriesToDiscard.Count > 0)
+		    {
+			    for (int i = 0; i <= entriesToDiscard.Count-1; i++)
+			    {
+				    avoidableStaticObstacles.Remove(entriesToDiscard[i]);
+			    }
+		    }
+	    }
+
+	    public Vector2 AvoidObstacles(float discardDistance = 2.5f, float avoidanceForce = 1.25f, float brakeWeight = 0.2f)
+	    {
 		    Vector2 avoidanceVector = Vector2.zero;
-		    float distanceScaled = Mathf.Max(1 ,(lookAheadSpeedMod * movementController.GetVelocity().magnitude));
-
-		    RaycastHit hitInfo;
-		    if(CheckForAvoidables(agentLayerMask, transform.forward, distanceScaled, out hitInfo))
-			    UpdateAvoidableToCollection(avoidableStaticObstacles, hitInfo);
 		    
-			//if I hit something with this boxcast store the obstacle, if already stored update the hitPosition
-			/*if (Physics.BoxCast(transform.position, colliderBounds.bounds.size * agentBoundsScalar, transform.forward,
-				out hitInfo, Quaternion.identity, distanceScaled, obstacleLayerMask))
-			{
-				int iD = hitInfo.transform.GetInstanceID();
-				Bounds obstacleBounds = new Bounds(hitInfo.transform.position, hitInfo.collider.bounds.size * agentBoundsScalar);
-				Avoidable a = new Avoidable(hitInfo.transform, obstacleBounds, hitInfo.point.ToVector2(), iD);
-				if (avoidableStaticObstacles.Contains(a))
-				{
-					foreach (Avoidable avoidable in avoidableStaticObstacles)
-					{
-						if (avoidable.comparer.Equals(avoidable, a))
-							avoidable.UpdateHitPosition(hitInfo.point.ToVector2());
-					}
-				}
-				else avoidableStaticObstacles.Add(a);
-			}*/
-
-			//for each obstacle in the list create a force away from those obstacles if they are within distance of forward direction 
+		    //for each obstacle in the list create a force away from those obstacles if they are within distance of forward direction 
 			if (avoidableStaticObstacles.Count > 0)
 			{
 				Vector3 forward = transform.forward;
@@ -314,7 +324,7 @@ namespace Darkness.Movement
 					
 					float distanceToObject = Vector2.Distance(hitPointXZ,  closestPoint); 
 					float obstacleAgentDot = Vector3.Dot(obstacleDirection, transform.forward);
-					if (obstacleAgentDot <= 0.15f || (distanceToObject > discardDistance * distanceScaled)) //TODO check to see if we are likely to collide still?
+					if (obstacleAgentDot <= 0.15f || (distanceToObject > discardDistance)) //TODO check to see if we are likely to collide still?
 					{
 						entriesToDiscard.Add(avoidable);
 						continue;
@@ -339,20 +349,13 @@ namespace Darkness.Movement
 					avoidanceVector += new Vector2(lateralForce, brakingForce);
 				}
 
-				if (entriesToDiscard.Count > 0)
-				{
-					for (int i = 0; i <= entriesToDiscard.Count-1; i++)
-					{
-						avoidableStaticObstacles.Remove(entriesToDiscard[i]);
-					}
-				}
+				RemoveFromAvoidableCollection(entriesToDiscard);
 			}
 			return avoidanceVector.normalized;
 	    }
-	    
 
 
-    #endregion
+	    #endregion
 
     #if UNITY_EDITOR
 	    void OnDrawGizmosSelected()
@@ -375,9 +378,9 @@ namespace Darkness.Movement
 				    else if (dir.combinedWeight < 0.5f && dir.combinedWeight > 0)
 					    col = Color.magenta;
 				    else col = Color.white;*/
-				    dir.UpdateDirection(transform.forward.ToVector2());
-				    lineStart = transform.position + (dir.directionAtAngle * 2).ToVector3(1);
-				    lineEnd = transform.position + (dir.directionAtAngle * 5).ToVector3(1);
+				    
+				    lineStart = transform.position + (dir.directionAtAngle).ToVector3(1);
+				    lineEnd = transform.position + (dir.directionAtAngle * 2).ToVector3(1);
 				    Debug.DrawLine(lineStart, lineEnd, col);
 			    }
 		    }

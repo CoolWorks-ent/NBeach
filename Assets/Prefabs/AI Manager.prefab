@@ -127,7 +127,7 @@ MonoBehaviour:
     seed: 0
     pivotPointRoot: {fileID: 0}
     spreadOutCount: 1
-  showGraphs: 1
+  showGraphs: 0
 --- !u!114 &114896603844078356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -140,17 +140,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackZone:
-    attackZoneOrigin: {x: 191.41, y: 45.679996, z: 88.57}
-    zoneRadius: 12
+    attackZoneOrigin: {x: 191.41, y: 46.329998, z: 93.17}
+    zoneRadius: 8.7
     occupierID: 0
     occupied: 0
-    zoneOffsetForward: 12
+    zoneOffsetForward: 7.3
     zoneOffsetRight: 0
-    attackPointOffsetForward: 1.2
+    attackPointOffsetForward: 0
   playerTransform: {fileID: 0}
-  avoidanceMask:
-    serializedVersion: 2
-    m_Bits: 8192
 --- !u!114 &114964895663174236
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -162,8 +159,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3fa065d3ac01d4fb37dd0c11a3771f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackApprovalPriority: 0200000001000000
-  darknessIDCounter: 2
-  darknessConcurrentAttackLimit: 2
+  attackApprovalPriority: 
+  darknessIDCounter: 0
+  darknessConcurrentAttackLimit: 0
   player: {fileID: 0}
-  maxEnemyCount: 6
+  maxEnemyCount: 0

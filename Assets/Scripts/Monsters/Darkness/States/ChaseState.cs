@@ -27,6 +27,7 @@ namespace Darkness.States
 		public override void MovementUpdate(DarknessController darkController)
 		{
 			//TODO call a movement function on the 
+			darkController.steering.FindNearbyAvoidables();
 		}
 
 		protected override void CooldownCallback(DarknessController darkController)
@@ -35,9 +36,10 @@ namespace Darkness.States
 			AISteering steering = darkController.steering;
 			AttackZone atkZone = AttackZoneManager.Instance.playerAttackZone;
 			if (atkZone.InTheZone(darkController.transform.position.ToVector2()))
-				direction = steering.Arrive(atkZone.AttackPoint().ToVector2());
-			else direction = steering.Arrive(atkZone.attackZoneOrigin.ToVector2());
-			direction += steering.ObstacleAvoidance(1.5f, 1.25f) * 1.15f;
+				direction = steering.Seek(atkZone.AttackPoint().ToVector2());
+			else direction = steering.Seek(atkZone.attackZoneOrigin.ToVector2());
+			direction += steering.AvoidObstacles(1.5f, 1.25f) * 1.15f;
+			direction += steering.AvoidAgent();
 			steering.SetMovementDirection(direction);
 			//darkController.steering.DetermineBestDirection(destination);
 			darkController.AssignCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));

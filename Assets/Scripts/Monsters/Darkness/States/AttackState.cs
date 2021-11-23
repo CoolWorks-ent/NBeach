@@ -31,7 +31,7 @@ namespace Darkness.States
                         darkController.darkHitBox.enabled = true;
                     }
                 }
-                else darkController.steering.movementController.RotateTowardsDirection(darkController.steering.Target.position);
+                else darkController.steering.movementController.RotateTowardsDirection(darkController.steering.Target.position); //TODO make sure this works still
             }
         }
 

@@ -17,7 +17,8 @@ namespace Darkness.States
             Vector2 pos = AttackZoneManager.Instance.playerAttackZone.attackZoneOrigin.ToVector2();
 
             direction += darkController.steering.Seek(pos);
-            direction += darkController.steering.ObstacleAvoidance(1.5f, 1.25f) * 1.2f;
+            direction += darkController.steering.AvoidObstacles(1.5f, 1.25f) * 1.2f;
+            direction += darkController.steering.AvoidAgent();
             darkController.steering.SetMovementDirection(direction);
             darkController.AssignCooldown(new CooldownInfo(pathUpdateRateFar, CooldownInfo.CooldownStatus.Moving, CooldownCallback));
         }

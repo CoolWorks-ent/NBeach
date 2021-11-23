@@ -62108,11 +62108,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackApprovalPriority.Array.size
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4400177786202110, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
       propertyPath: m_LocalPosition.x
       value: 178.78412
@@ -62155,71 +62150,6 @@ Prefab:
       propertyPath: player
       value: 
       objectReference: {fileID: 2059134424}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: debugRoof
-      value: 20000
-      objectReference: {fileID: 0}
-    - target: {fileID: 114595640382436030, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: showGraphs
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.attackZoneOrigin.x
-      value: 191.41
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.attackZoneOrigin.y
-      value: 45.679996
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.attackZoneOrigin.z
-      value: 93.27
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.zoneRadius
-      value: 8.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.zoneOffsetForward
-      value: 7.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: attackZone.attackPointOffsetForward
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114896603844078356, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: avoidanceMask.m_Bits
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: darknessIDCounter
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: darknessConcurrentAttackLimit
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114964895663174236, guid: 74415f1810594ff4da1d95f640b30f8d,
-        type: 2}
-      propertyPath: maxEnemyCount
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74415f1810594ff4da1d95f640b30f8d, type: 2}
   m_IsPrefabParent: 0
