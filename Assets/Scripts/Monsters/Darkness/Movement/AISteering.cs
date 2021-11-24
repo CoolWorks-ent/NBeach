@@ -1,15 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Pathfinding;
 
 namespace Darkness.Movement
 {
+	[RequireComponent(typeof(Seeker))]
     [RequireComponent(typeof(MovementController))]
     public class AISteering : MonoBehaviour, IInputInterpreter
     {
 	    public Vector2 currentMovementDirection { get; private set; } 
 	    public MovementController movementController { get; private set; }
 	    public float targetDist { get; private set; }
-
+	    public bool endOfPath { get; private set; }
 	    public Transform Target
 	    {
 		    get
@@ -37,11 +39,15 @@ namespace Darkness.Movement
         private DirectionNode[] directionNodes;
         private HashSet<Avoidable> avoidableStaticObstacles;
         private Avoidable closestAvoidableAgent;
-        
-        
         private InputInfo inputInfo;
         private Collider colliderBounds;
         private LayerMask agentLayerMask;
+        private Seeker seeker;
+        private int pathIndex;
+        private Path calculatedPath;
+        
+        public enum PathfindingStatus { Requested, Available, Successful }
+        public PathfindingStatus pathfindingStatus;
 
 
         private void Awake()
@@ -53,11 +59,17 @@ namespace Darkness.Movement
             movementController = GetComponent<MovementController>();
             colliderBounds = GetComponent<Collider>();
             agentLayerMask =  LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer));
-            //Debug.Log(LayerMask.LayerToName(gameObject.layer));
+            seeker = GetComponent<Seeker>();
+            seeker.pathCallback += PathComplete;
         }
         
         void OnEnable() { DarkEventManager.UpdateDarknessDistance += DistanceEvaluation; }
-        void OnDisable() { DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation; }
+
+        void OnDisable()
+        {
+	        DarkEventManager.UpdateDarknessDistance -= DistanceEvaluation;
+	        seeker.pathCallback -= PathComplete;
+        }
         
         public void DistanceEvaluation()
         {
@@ -70,7 +82,7 @@ namespace Darkness.Movement
             float angle, dAngle = 0;
             for(int i = 0; i < directionNodes.Length; i++)
             {
-                dAngle = (degAngle / directionNodes.Length) * (float)i;
+                dAngle = (degAngle / directionNodes.Length) * i;
                 angle = Mathf.Deg2Rad * dAngle;
                 DirectionNode n = new DirectionNode(angle);
                 directionNodes[i] = n;
@@ -143,6 +155,40 @@ namespace Darkness.Movement
             }
 
             return directionNodes[bestDirectionIndex].directionAtAngle; 
+        }
+
+        public bool RequestNewPath(Vector3 endPoint)
+        {
+	        if (pathfindingStatus == PathfindingStatus.Available)
+	        {
+		        pathfindingStatus = PathfindingStatus.Requested;
+		        seeker.StartPath(transform.position,endPoint);
+		        return true;
+	        }
+
+	        return false;
+        }
+        
+        public Vector2 GetNextPoint(int pathLookAhead)
+        {
+	        if (pathIndex + pathLookAhead <= calculatedPath.vectorPath.Count - 1)
+	        {
+		        pathIndex += pathLookAhead;
+		        return calculatedPath.vectorPath[pathIndex + pathLookAhead].ToVector2();
+	        }
+	        pathIndex = 0;
+	        pathfindingStatus = PathfindingStatus.Available;
+	        return Vector2.zero;
+        }
+
+        private void PathComplete(Path p)
+        {
+	        if (!p.error)
+	        {
+		        calculatedPath = p;
+		        pathfindingStatus = PathfindingStatus.Successful;
+	        }
+	        else pathfindingStatus = PathfindingStatus.Available;
         }
 
         #region Steering functions
@@ -224,7 +270,6 @@ namespace Darkness.Movement
 			    Bounds obstacleBounds = new Bounds(rayHit.transform.position, rayHit.collider.bounds.size * agentBoundsScalar);
 			    closestAvoidableAgent = new Avoidable(rayHit.transform, obstacleBounds, rayHit.point.ToVector2(), iD);
 		    }
-			     //AddToAvoidableCollection(closestAvoidableAgent, rayHit);
 	    }
 
 	    public Vector2 AvoidAgent()

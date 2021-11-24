@@ -6,7 +6,6 @@ namespace Darkness.Movement
 	[System.Serializable]
 	public class DarknessMovement : MonoBehaviour
 	{
-		[HideInInspector]
 		public float playerDist { get; private set; }
 
 		[HideInInspector]

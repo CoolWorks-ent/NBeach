@@ -40,7 +40,13 @@ namespace Darkness.States
 			else direction = steering.Seek(atkZone.attackZoneOrigin.ToVector2());
 			direction += steering.AvoidObstacles(1.5f, 1.25f) * 1.15f;
 			direction += steering.AvoidAgent();
-			steering.SetMovementDirection(direction);
+			
+			if (steering.pathfindingStatus == AISteering.PathfindingStatus.Available)
+				steering.RequestNewPath(direction.ToVector3() * 10);
+			if(steering.pathfindingStatus == AISteering.PathfindingStatus.Successful)
+				steering.SetMovementDirection();
+			
+			
 			//darkController.steering.DetermineBestDirection(destination);
 			darkController.AssignCooldown(new CooldownInfo(UpdateRate(darkController.PlayerDistance()), CooldownInfo.CooldownStatus.Moving, CooldownCallback));
 		}
